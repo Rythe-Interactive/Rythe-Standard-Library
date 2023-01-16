@@ -18,7 +18,7 @@
 #pragma once
 #include "DelegateBase.h"
 
-namespace SA {
+namespace rythe {
 
 	template <typename T> class delegate;
 	template <typename T> class multicast_delegate;

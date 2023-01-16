@@ -17,7 +17,7 @@
 
 #pragma once
 
-namespace SA {
+namespace rythe {
 	
 	template<typename T>
 	class delegate_base;
