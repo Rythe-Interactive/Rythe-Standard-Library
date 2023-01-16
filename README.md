@@ -1,4 +1,8 @@
-# impossibly-fast-delegates
+# Rythe Standard Library
+Library will all STL-like containers and algorithms
+
+## Credits
+### impossibly-fast-delegates
 Copyright (C) 2017 by Sergey A Kryukov: derived work
 http://www.SAKryukov.org
 http://www.codeproject.com/Members/SAKryukov
