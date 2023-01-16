@@ -25,26 +25,24 @@ namespace rythe {
 
     template<typename RET, typename ...PARAMS>
     class delegate<RET(PARAMS...)> final : private delegate_base<RET(PARAMS...)> {
+        friend class multicast_delegate<RET(PARAMS...)>;
+        invocation_element m_invocation;
+        
     public:
         delegate() = default;
+        delegate(const delegate& other) : m_invocation(other.m_invocation) {}
 
-        bool isNull() const { return invocation.stub == nullptr; }
-        bool operator ==(void* ptr) const {
-            return (ptr == nullptr) && this->isNull();
-        } //operator ==
-        bool operator !=(void* ptr) const {
-            return (ptr != nullptr) || (!this->isNull());
-        } //operator !=
-
-        delegate(const delegate& another) { another.invocation.Clone(invocation); }
+        bool empty() const { return m_invocation.stub == nullptr; }
+        bool operator ==(std::nullptr_t) const { return empty(); }
+        bool operator !=(std::nullptr_t) const { return !empty(); }
 
         template <typename LAMBDA>
         delegate(const LAMBDA& lambda) {
             assign((void*)(&lambda), lambda_stub<LAMBDA>);
-        } //delegate
+        }
 
         delegate& operator =(const delegate& another) {
-            another.invocation.Clone(invocation);
+            another.m_invocation.Clone(m_invocation);
             return *this;
         } //operator =
 
@@ -54,8 +52,8 @@ namespace rythe {
             return *this;
         } //operator =
 
-        bool operator == (const delegate& another) const { return invocation == another.invocation; }
-        bool operator != (const delegate& another) const { return invocation != another.invocation; }
+        bool operator == (const delegate& another) const { return m_invocation == another.m_invocation; }
+        bool operator != (const delegate& another) const { return m_invocation != another.m_invocation; }
 
         bool operator ==(const multicast_delegate<RET(PARAMS...)>& another) const { return another == (*this); }
         bool operator !=(const multicast_delegate<RET(PARAMS...)>& another) const { return another != (*this); }
@@ -81,20 +79,16 @@ namespace rythe {
         } //create
 
         RET operator()(PARAMS... arg) const {
-            return (*invocation.stub)(invocation.object, arg...);
+            return (*m_invocation.stub)(m_invocation.object, arg...);
         } //operator()
 
     private:
+        using invocation_element = delegate_base<RET(PARAMS...)>::invocation_element;
+        delegate(void* a_object, typename delegate_base<RET(PARAMS...)>::stub_type a_stub) : m_invocation(a_object, a_stub) {}
 
-        delegate(void* anObject, typename delegate_base<RET(PARAMS...)>::stub_type aStub) {
-            invocation.object = anObject;
-            invocation.stub = aStub;
-        } //delegate
-
-        void assign(void* anObject, typename delegate_base<RET(PARAMS...)>::stub_type aStub) {
-            this->invocation.object = anObject;
-            this->invocation.stub = aStub;
-        } //assign
+        void assign(void* a_object, typename delegate_base<RET(PARAMS...)>::stub_type a_stub) {
+            m_invocation = invocation_element(a_object, a_stub);
+        }
 
         template <class T, RET(T::*TMethod)(PARAMS...)>
         static RET method_stub(void* this_ptr, PARAMS... params) {
@@ -118,10 +112,6 @@ namespace rythe {
             LAMBDA* p = static_cast<LAMBDA*>(this_ptr);
             return (p->operator())(arg...);
         } //lambda_stub
-
-        friend class multicast_delegate<RET(PARAMS...)>;
-        typename delegate_base<RET(PARAMS...)>::invocation_element invocation;
-
     };
 
 }
