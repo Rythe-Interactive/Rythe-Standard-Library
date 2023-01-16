@@ -16,7 +16,7 @@
 */
 
 #pragma once
-#include "Delegate.h"
+#include "delegate.hpp"
 #include <list>
 #include <functional>
 
@@ -69,7 +69,7 @@ namespace rythe {
 
 		multicast_delegate& operator +=(const multicast_delegate& another) {
 			for (auto& item : another.m_invocationList) // clone, not copy; flattens hierarchy:
-				this->m_invocationList.push_back(new typename delegate_base<ReturnType(ParamTypes...)>::InvocationElement(item->object, item->stub));
+				this->m_invocationList.push_back(new typename delegate_base<ReturnType(ParamTypes...)>::invocation_element(item->object, item->stub));
 			return *this;
 		}
 
@@ -81,7 +81,7 @@ namespace rythe {
 
 		multicast_delegate& operator +=(const delegate<ReturnType(ParamTypes...)>& another) {
 			if (another.isNull()) return *this;
-			this->m_invocationList.push_back(new typename delegate_base<ReturnType(ParamTypes...)>::InvocationElement(another.invocation.object, another.invocation.stub));
+			this->m_invocationList.push_back(new typename delegate_base<ReturnType(ParamTypes...)>::invocation_element(another.invocation.object, another.invocation.stub));
 			return *this;
 		}
 
@@ -112,7 +112,7 @@ namespace rythe {
 
 	private:
 
-		std::list<typename delegate_base<ReturnType(ParamTypes...)>::InvocationElement *> m_invocationList;
+		std::list<typename delegate_base<ReturnType(ParamTypes...)>::invocation_element *> m_invocationList;
 
 	};
 

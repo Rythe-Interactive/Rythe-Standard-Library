@@ -16,7 +16,7 @@
 */
 
 #pragma once
-#include "DelegateBase.h"
+#include "delegate_base.hpp"
 
 namespace rythe {
 
@@ -26,7 +26,6 @@ namespace rythe {
 	template<typename RET, typename ...PARAMS>
 	class delegate<RET(PARAMS...)> final : private delegate_base<RET(PARAMS...)> {
 	public:
-
 		delegate() = default;
 
 		bool isNull() const { return invocation.stub == nullptr; }
@@ -121,8 +120,8 @@ namespace rythe {
 		} //lambda_stub
 
 		friend class multicast_delegate<RET(PARAMS...)>;
-		typename delegate_base<RET(PARAMS...)>::InvocationElement invocation;
+		typename delegate_base<RET(PARAMS...)>::invocation_element invocation;
 
-	}; //class delegate
+	};
 
-} /* namespace SA */
+}
