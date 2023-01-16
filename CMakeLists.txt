@@ -20,14 +20,10 @@ endif()
 
 project(rythe-standard-library LANGUAGES ${RYTHE_LANGUAGE})
 
-if(NOT COMMAND rythe_find_sources)
-	macro(rythe_find_sources sources directory)
-		file(GLOB_RECURSE sources ${RYTHE_FILE_TYPES})
-		list(FILTER sources INCLUDE REGEX ${directory})
-	endmacro()
-endif()
-
-rythe_find_sources(sources "${PROJECT_SOURCE_DIR}/src")
+set(directory "${PROJECT_SOURCE_DIR}/src")
+file(GLOB_RECURSE sources *)
+list(FILTER sources INCLUDE REGEX ${directory})
+list(FILTER sources INCLUDE REGEX "(src\\/.*\\.hpp)|(src\\/.*\\.cpp)|(src\\/.*\\.h)|(src\\/.*\\.c)|(src\\/.*\\.inl)|(src\\/[^\\.]*)")
 add_library(rythe-standard-library STATIC ${sources})
 
 foreach(src ${sources})
