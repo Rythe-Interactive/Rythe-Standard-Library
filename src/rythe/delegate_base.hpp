@@ -30,7 +30,7 @@ namespace rythe {
         struct invocation_element {
             invocation_element() = default;
             invocation_element(void* object, stub_type stub) : m_object(object), m_stub(stub) {}
-            invocation_element(const invocation_element& other) m_object(other.m_object), m_stub(other.m_stub) {}
+            invocation_element(const invocation_element& other) : m_object(other.m_object), m_stub(other.m_stub) {}
 
             bool operator ==(const invocation_element& other) const {
                 return other.m_stub == m_stub && other.m_object == m_object;

@@ -16,15 +16,23 @@
 */
 
 #pragma once
+#include <cstddef>
+#include <concepts>
+#include <functional>
+
 #include "delegate_base.hpp"
 
 namespace rythe {
 
-    template <typename T> class delegate;
-    template <typename T> class multicast_delegate;
+    template<typename T> class delegate;
+    template<typename T> class multicast_delegate;
 
     template<typename RET, typename ...PARAMS>
     class delegate<RET(PARAMS...)> final : private delegate_base<RET(PARAMS...)> {
+    public:
+        using invocation_element = typename delegate_base<RET(PARAMS...)>::invocation_element;
+
+    private:
         friend class multicast_delegate<RET(PARAMS...)>;
         invocation_element m_invocation;
         
@@ -32,31 +40,29 @@ namespace rythe {
         delegate() = default;
         delegate(const delegate& other) : m_invocation(other.m_invocation) {}
 
+        template<typename LAMBDA>
+        delegate(const LAMBDA& lambda) : m_invocation(&lambda, lambda_stub<LAMBDA>) {}
+
         bool empty() const { return m_invocation.stub == nullptr; }
         bool operator ==(std::nullptr_t) const { return empty(); }
         bool operator !=(std::nullptr_t) const { return !empty(); }
-
-        template <typename LAMBDA>
-        delegate(const LAMBDA& lambda) {
-            assign((void*)(&lambda), lambda_stub<LAMBDA>);
-        }
-
-        delegate& operator =(const delegate& another) {
-            another.m_invocation.Clone(m_invocation);
-            return *this;
-        } //operator =
-
-        template <typename LAMBDA> // template instantiation is not needed, will be deduced (inferred):
-        delegate& operator =(const LAMBDA& instance) {
-            assign((void*)(&instance), lambda_stub<LAMBDA>);
-            return *this;
-        } //operator =
 
         bool operator == (const delegate& another) const { return m_invocation == another.m_invocation; }
         bool operator != (const delegate& another) const { return m_invocation != another.m_invocation; }
 
         bool operator ==(const multicast_delegate<RET(PARAMS...)>& another) const { return another == (*this); }
         bool operator !=(const multicast_delegate<RET(PARAMS...)>& another) const { return another != (*this); }
+
+        delegate& operator =(const delegate& another) {
+            m_invocation = another.m_invocation;
+            return *this;
+        }
+
+        template <typename LAMBDA>
+        delegate& operator =(const LAMBDA& instance) {
+            m_invocation = invocation_element((void*)(&instance), lambda_stub<LAMBDA>);
+            return *this;
+        }
 
         template <class T, RET(T::*TMethod)(PARAMS...)>
         static delegate create(T* instance) {
@@ -83,12 +89,7 @@ namespace rythe {
         } //operator()
 
     private:
-        using invocation_element = delegate_base<RET(PARAMS...)>::invocation_element;
         delegate(void* a_object, typename delegate_base<RET(PARAMS...)>::stub_type a_stub) : m_invocation(a_object, a_stub) {}
-
-        void assign(void* a_object, typename delegate_base<RET(PARAMS...)>::stub_type a_stub) {
-            m_invocation = invocation_element(a_object, a_stub);
-        }
 
         template <class T, RET(T::*TMethod)(PARAMS...)>
         static RET method_stub(void* this_ptr, PARAMS... params) {
