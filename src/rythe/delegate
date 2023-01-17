@@ -1,5 +1,5 @@
 #pragma once
 
-#include "delegate_base.hpp"
-#include "delegate.hpp"
-#include "multicast_delegate.hpp"
+#include "impl/delegate_base.hpp"
+#include "impl/delegate.hpp"
+#include "impl/multicast_delegate.hpp"

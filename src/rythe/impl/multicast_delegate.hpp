@@ -1,6 +1,6 @@
 /*
 
-    Copyright (C) 2017 by Sergey A Kryukov: derived work
+    Based on work by Sergey A Kryukov: derived work
     http://www.SAKryukov.org
     http://www.codeproject.com/Members/SAKryukov
 
@@ -16,18 +16,19 @@
 */
 
 #pragma once
-#include "delegate.hpp"
 #include <list>
 #include <functional>
 
-namespace rythe {
+#include "delegate.hpp"
 
-    template<typename RET, typename ...PARAMS>
-    class multicast_delegate<RET(PARAMS...)> final : private delegate_base<RET(PARAMS...)> {
+namespace rsl {
+
+    template<typename ReturnType, typename ...ParamTypes>
+    class multicast_delegate<ReturnType(ParamTypes...)> final : private delegate_base<ReturnType(ParamTypes...)> {
     public:
-
-        using ReturnType = RET;
-        using ParamTypes = PARAMS;
+        using return_type = ReturnType;
+        using Paramparam_typesTypes = type_sequence<ParamTypes...>;
+        using invocation_element = typename delegate_base<ReturnType(ParamTypes...)>::invocation_element;
 
         multicast_delegate() = default;
         ~multicast_delegate() {
