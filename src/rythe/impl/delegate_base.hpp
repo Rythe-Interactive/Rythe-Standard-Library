@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "../concepts"
 #include "../hash"
 #include "../utilities"
@@ -30,13 +32,15 @@ namespace rsl {
     class delegate_base<ReturnType(ParamTypes...)>	{
     protected:
         using stub_type = ReturnType(*)(void*, ParamTypes...);
+        using deleter_type = void(*)(void*);
+        constexpr static deleter_type defaultDeleter = []([[maybe_unused]] void*) {};
 
         struct invocation_element {
             using return_type = ReturnType;
             using param_types = type_sequence<ParamTypes...>;
             constexpr invocation_element() = default;
-            constexpr invocation_element(void* object, stub_type stub, id_type id) : m_object(object), m_stub(stub), m_id(id) {}
-            constexpr invocation_element(const invocation_element& other) : m_object(other.m_object), m_stub(other.m_stub), m_id(other.m_id) {}
+            constexpr invocation_element(void* object, stub_type stub, id_type id, deleter_type deleter = nullptr) : m_object(object, deleter ? deleter : defaultDeleter), m_ownsData(deleter != nullptr), m_stub(stub), m_id(id) {}
+            constexpr invocation_element(const invocation_element& other) : m_object(other.m_object), m_ownsData(other.m_ownsData), m_stub(other.m_stub), m_id(other.m_id) {}
 
             constexpr bool operator ==(const invocation_element& other) const {
                 return other.m_stub == m_stub && other.m_object == m_object;
@@ -46,10 +50,40 @@ namespace rsl {
                 return other.m_stub != m_stub || other.m_object != m_object;
             }
 
-            void* m_object = nullptr;
+            std::shared_ptr<void> m_object = nullptr;
+            bool m_ownsData = false;
             stub_type m_stub = nullptr;
             id_type m_id = invalid_id;
         };
+
+        template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
+        inline static invocation_element createElement(T& instance) {
+            return invocation_element(&instance, method_stub<T, TMethod>, method_id<T, TMethod>(instance));
+        }
+
+        template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
+        inline static invocation_element createElement(const T& instance) {
+            return invocation_element(const_cast<void*>(&instance), const_method_stub<T, TMethod>, method_id<T, TMethod>(instance));
+        }
+
+        template <ReturnType(*TMethod)(ParamTypes...)>
+        inline static invocation_element createElement() {
+            return invocation_element(nullptr, function_stub<TMethod>, function_id<TMethod>());
+        }
+
+        template <functor Functor>
+        requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+        inline static invocation_element createElement(const Functor& instance) {
+            if constexpr (std::is_empty_v<Functor>) {
+                return invocation_element((void*)(&instance), functor_stub<Functor>, functor_id<Functor>(instance));
+            }
+            else {
+                return invocation_element(new Functor(instance), functor_stub<Functor>, functor_id<Functor>(instance), [](void* vptr) {
+                    Functor* ptr = static_cast<Functor*>(vptr);
+                    delete ptr;
+                });
+            }
+        }
 
         template<typename T, ReturnType(T::* method)(ParamTypes...)>
         static ReturnType method_stub(void* obj, ParamTypes... args) {
