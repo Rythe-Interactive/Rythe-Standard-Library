@@ -45,5 +45,5 @@ namespace rsl {
     constexpr bool is_function_ptr_v = (std::is_empty_v<Func> || std::is_pointer_v<Func>) && is_invocable_v<Func, maxParams>;
 
     template<typename Func, size_type maxParams = 32>
-    constexpr bool is_functor_v = (!std::is_empty_v<Func> && !std::is_pointer_v<Func>) && is_invocable_v<Func, maxParams>;
+    constexpr bool is_functor_v = requires { &Func::operator(); } && is_invocable_v<Func, maxParams>;
 }

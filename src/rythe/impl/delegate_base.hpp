@@ -56,35 +56,6 @@ namespace rsl {
             id_type m_id = invalid_id;
         };
 
-        template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
-        inline static invocation_element createElement(T& instance) {
-            return invocation_element(&instance, method_stub<T, TMethod>, method_id<T, TMethod>(instance));
-        }
-
-        template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
-        inline static invocation_element createElement(const T& instance) {
-            return invocation_element(const_cast<void*>(&instance), const_method_stub<T, TMethod>, method_id<T, TMethod>(instance));
-        }
-
-        template <ReturnType(*TMethod)(ParamTypes...)>
-        inline static invocation_element createElement() {
-            return invocation_element(nullptr, function_stub<TMethod>, function_id<TMethod>());
-        }
-
-        template <functor Functor>
-        requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
-        inline static invocation_element createElement(const Functor& instance) {
-            if constexpr (std::is_empty_v<Functor>) {
-                return invocation_element((void*)(&instance), functor_stub<Functor>, functor_id<Functor>(instance));
-            }
-            else {
-                return invocation_element(new Functor(instance), functor_stub<Functor>, functor_id<Functor>(instance), [](void* vptr) {
-                    Functor* ptr = static_cast<Functor*>(vptr);
-                    delete ptr;
-                });
-            }
-        }
-
         template<typename T, ReturnType(T::* method)(ParamTypes...)>
         static ReturnType method_stub(void* obj, ParamTypes... args) {
             T* p = static_cast<T*>(obj);
@@ -98,7 +69,12 @@ namespace rsl {
         }
 
         template<typename T, ReturnType(T::* method)(ParamTypes...)>
-        static id_type method_id(const T& obj) {
+        inline static id_type method_id(const T& obj) {
+            return hash_combine(force_cast<size_type>(&obj), force_cast<size_type>(method));
+        }
+
+        template<typename T, ReturnType(T::* method)(ParamTypes...) const>
+        inline static id_type method_id(const T& obj) {
             return hash_combine(force_cast<size_type>(&obj), force_cast<size_type>(method));
         }
 
@@ -112,15 +88,61 @@ namespace rsl {
             return force_cast<size_type>(func);
         }
 
+        template<invocable Func>
+            requires std::invocable<Func, ParamTypes...> && std::same_as<std::invoke_result_t<Func, ParamTypes...>, ReturnType> && (!functor<Func>)
+        static ReturnType function_ptr_stub(void* obj, ParamTypes... args) {
+            return (reinterpret_cast<Func>(obj))(std::forward<ParamTypes>(args)...);
+        }
+
+        template<invocable Func>
+            requires std::invocable<Func, ParamTypes...> && std::same_as<std::invoke_result_t<Func, ParamTypes...>, ReturnType> && (!functor<Func>)
+        inline static id_type function_ptr_id(Func obj) {
+            return force_cast<size_type>(obj);
+        }
+
         template<functor Functor>
+            requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
         static ReturnType functor_stub(void* obj, ParamTypes... args) {
             Functor* p = static_cast<Functor*>(obj);
             return (p->operator())(std::forward<ParamTypes>(args)...);
         }
 
         template<functor Functor>
-        static id_type functor_id(Functor&& obj, ParamTypes... args) {
-            return method_id<Functor, &Functor::operator()>(std::forward<Functor>(obj));
+            requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+        inline static id_type functor_id(const Functor& obj) {
+            return hash_combine(force_cast<size_type>(&obj), force_cast<size_type>(&Functor::operator()));
+        }
+
+        template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
+        inline static invocation_element createElement(T& instance) {
+            return invocation_element(&instance, method_stub<T, TMethod>, method_id<T, TMethod>(instance));
+        }
+
+        template<typename T, ReturnType(T::* TMethod)(ParamTypes...) const>
+        inline static invocation_element createElement(const T& instance) {
+            return invocation_element(const_cast<void*>(static_cast<const void*>(&instance)), const_method_stub<T, TMethod>, method_id<T, TMethod>(instance));
+        }
+
+        template <ReturnType(*TMethod)(ParamTypes...)>
+        inline static invocation_element createElement() {
+            return invocation_element(nullptr, function_stub<TMethod>, function_id<TMethod>());
+        }
+
+        template <invocable Functor>
+            requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+        inline static invocation_element createElement(const Functor& instance) {
+            if constexpr (!is_functor_v<Functor>) {
+                return invocation_element((void*)(instance), function_ptr_stub<Functor>, function_ptr_id<Functor>(instance));
+            }
+            else if constexpr (std::is_empty_v<Functor>) {
+                return invocation_element((void*)(&instance), functor_stub<Functor>, functor_id<Functor>(instance));
+            }
+            else {
+                return invocation_element(new Functor(instance), functor_stub<Functor>, functor_id<Functor>(instance), [](void* vptr) {
+                    Functor* ptr = static_cast<Functor*>(vptr);
+                    delete ptr;
+                });
+            }
         }
     };
 

@@ -42,14 +42,24 @@ namespace rsl {
         friend class multicast_delegate<ReturnType(ParamTypes...)>;
         invocation_element m_invocation;
 
-        delegate(void* a_object, stub_type a_stub, id_type a_id) : m_invocation(a_object, a_stub, a_id) {}
+        constexpr delegate(invocation_element&& e) : m_invocation(e) {}
 
     public:
         delegate() = default;
         delegate(const delegate& other) : m_invocation(other.m_invocation) {}
 
-        template<function_ptr Func>
-        constexpr delegate(Func&& instance) : m_invocation(nullptr, base::template function_stub<instance>, base::template function_id<instance>()) {}
+        template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
+        static constexpr delegate create(T& instance) { return delegate(base::template createElement<T, TMethod>(instance)); }
+
+        template<typename T, ReturnType(T::* TMethod)(ParamTypes...) const>
+        static constexpr delegate create(const T& instance) { return delegate(base::template createElement<T, TMethod>(instance)); }
+
+        template <ReturnType(*TMethod)(ParamTypes...)>
+        static constexpr delegate create() { return delegate(base::template createElement<TMethod>()); }
+
+        template <functor Functor>
+            requires std::invocable<Functor, ParamTypes...>&& std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+        static constexpr delegate create(const Functor& instance) { return delegate(base::template createElement<Functor>(instance)); }
 
         inline bool empty() const { return m_invocation.stub == nullptr; }
         inline void clear() { m_invocation = invocation_element(); }
@@ -68,30 +78,11 @@ namespace rsl {
             return *this;
         }
 
-        template<function_ptr Func>
-        constexpr delegate& operator =(Func&& instance) {
-            m_invocation = invocation_element(nullptr, base::template function_stub<instance>, 0);
+        template <invocable Functor>
+        requires std::invocable<Functor, ParamTypes...>&& std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+        constexpr delegate& operator =(const Functor& instance) {
+            m_invocation = base::template createElement<Functor>(instance);
             return *this;
-        }
-
-        template<typename T, ReturnType(T::*TMethod)(ParamTypes...)>
-        inline static delegate create(T& instance) {
-            return delegate(&instance, base::template method_stub<T, TMethod>, base::template method_id<T, TMethod>(instance));
-        }
-
-        template<typename T, ReturnType(T::*TMethod)(ParamTypes...) const>
-        inline static delegate create(const T& instance) {
-            return delegate(const_cast<void*>(&instance), base::template const_method_stub<T, TMethod>, base::template method_id<T, TMethod>(instance));
-        }
-
-        template <ReturnType(*TMethod)(ParamTypes...)>
-        inline static delegate create() {
-            return delegate(nullptr, base::template function_stub<TMethod>, base::template function_id<TMethod>());
-        }
-
-        template <functor Functor>
-        inline static delegate create(const Functor& instance) {
-            return delegate((void*)(&instance), base::template functor_stub<Functor>, base::template functor_id<Functor>(instance));
         }
 
         inline ReturnType operator()(ParamTypes... args) const {
@@ -99,8 +90,7 @@ namespace rsl {
         }
 
         inline ReturnType invoke(ParamTypes... args) const {
-            return (*m_invocation.m_stub)(m_invocation.m_object, args...);
+            return (*m_invocation.m_stub)(m_invocation.m_object.get(), args...);
         }
     };
-
 }
