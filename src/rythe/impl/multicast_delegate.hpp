@@ -1,17 +1,17 @@
 /*
 
-    Based on work by Sergey A Kryukov: derived work
-    http://www.SAKryukov.org
-    http://www.codeproject.com/Members/SAKryukov
+	Based on work by Sergey A Kryukov: derived work
+	http://www.SAKryukov.org
+	http://www.codeproject.com/Members/SAKryukov
 
-    Based on original work by Sergey Ryazanov:
-    "The Impossibly Fast C++ Delegates", 18 Jul 2005
-    https://www.codeproject.com/articles/11015/the-impossibly-fast-c-delegates
+	Based on original work by Sergey Ryazanov:
+	"The Impossibly Fast C++ Delegates", 18 Jul 2005
+	https://www.codeproject.com/articles/11015/the-impossibly-fast-c-delegates
 
-    MIT license:
-    http://en.wikipedia.org/wiki/MIT_License
+	MIT license:
+	http://en.wikipedia.org/wiki/MIT_License
 
-    Original publication: https://www.codeproject.com/Articles/1170503/The-Impossibly-Fast-Cplusplus-Delegates-Fixed
+	Original publication: https://www.codeproject.com/Articles/1170503/The-Impossibly-Fast-Cplusplus-Delegates-Fixed
 
 */
 
@@ -23,99 +23,135 @@
 
 namespace rsl {
 
-    template<typename ReturnType, typename ...ParamTypes>
-    class multicast_delegate<ReturnType(ParamTypes...)> final : private delegate_base<ReturnType(ParamTypes...)> {
-    public:
-        using return_type = ReturnType;
-        using Paramparam_typesTypes = type_sequence<ParamTypes...>;
-        using invocation_element = typename delegate_base<ReturnType(ParamTypes...)>::invocation_element;
+	template<typename ReturnType, typename ...ParamTypes>
+	class multicast_delegate<ReturnType(ParamTypes...)> final : private delegate_base<ReturnType(ParamTypes...)> {
+		using base = delegate_base<ReturnType(ParamTypes...)>;
+	public:
+		using return_type = ReturnType;
+		using param_types = type_sequence<ParamTypes...>;
+		using invocation_element = typename base::invocation_element;
 
-        multicast_delegate() = default;
-        ~multicast_delegate() {
-            for (auto& element : m_invocationList) delete element;
-            m_invocationList.clear();
-        }
+	private:
+		std::vector<invocation_element> m_invocationList;
+		using stub_type = typename base::stub_type;
 
-        bool empty() const { return m_invocationList.empty(); }
-        bool operator ==(std::nullptr_t) const { return empty(); }
-        bool operator !=(std::nullptr_t) const { return !empty(); }
-        operator bool() const { return !empty(); }
+		constexpr multicast_delegate(multicast_delegate&& e) : m_invocationList(e) {}
 
-        size_t size() const { return m_invocationList.size(); }
+	public:
+		constexpr multicast_delegate() = default;
+		constexpr multicast_delegate(const multicast_delegate& other) : m_invocationList(other.m_invocationList) {}
 
-        multicast_delegate& operator =(const multicast_delegate&) = delete;
-        multicast_delegate(const multicast_delegate&) = delete;
+		constexpr bool empty() const { return m_invocationList.size() < 1; }
+		constexpr void clear() { m_invocationList.clear(); }
 
-        bool operator ==(const multicast_delegate& another) const {
-            if (m_invocationList.size() != another.m_invocationList.size())
-                return false;
+		constexpr bool operator ==(std::nullptr_t) const { return empty(); }
+		constexpr bool operator !=(std::nullptr_t) const { return !empty(); }
 
-            auto anotherIt = another.m_invocationList.begin();
-            for (auto it = m_invocationList.begin(); it != m_invocationList.end(); ++it)
-                if (**it != **anotherIt)
-                    return false;
+		constexpr bool operator ==(const multicast_delegate<ReturnType(ParamTypes...)>& another) const { return another == (*this); }
+		constexpr bool operator !=(const multicast_delegate<ReturnType(ParamTypes...)>& another) const { return another != (*this); }
 
-            return true;
-        }
+		constexpr multicast_delegate& push_back(const delegate<ReturnType(ParamTypes...)>& del)
+		{
+			m_invocationList.push_back(del.m_invocation);
+			return *this;
+		}
 
-        bool operator !=(const multicast_delegate& another) const { return !(*this == another); }
+		template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
+		constexpr multicast_delegate& push_back(T& instance)
+		{
+		    m_invocationList.push_back(base::template createElement<T, TMethod>(instance));
+		    return *this;
+		}
 
-        bool operator ==(const delegate<ReturnType(ParamTypes...)>& another) const {
-            if (isNull() && another.isNull()) return true;
-            if (another.isNull() || (size() != 1)) return false;
-            return (another.invocation == **m_invocationList.begin());
-        }
+		template<typename T, ReturnType(T::* TMethod)(ParamTypes...) const>
+		constexpr multicast_delegate& push_back(const T& instance)
+		{
+		    m_invocationList.push_back(base::template createElement<T, TMethod>(instance));
+		    return *this;
+		}
 
-        bool operator !=(const delegate<ReturnType(ParamTypes...)>& another) const { return !(*this == another); }
+		template <ReturnType(*TMethod)(ParamTypes...)>
+		constexpr multicast_delegate& push_back()
+		{
+			m_invocationList.push_back(base::template createElement<TMethod>());
+		    return *this;
+		}
 
-        multicast_delegate& operator +=(const multicast_delegate& another) {
-            for (auto& item : another.m_invocationList) // clone, not copy; flattens hierarchy:
-                this->m_invocationList.push_back(new typename delegate_base<ReturnType(ParamTypes...)>::invocation_element(item->object, item->stub));
-            return *this;
-        }
+		constexpr multicast_delegate& operator +=(delegate<ReturnType(ParamTypes...)>&& another) {
+			m_invocationList.push_back(another.m_invocation);
+			return *this;
+		}
 
-        template <typename LAMBDA> // template instantiation is not neededm, will be deduced/inferred:
-        multicast_delegate& operator +=(const LAMBDA & lambda) {
-            delegate<ReturnType(ParamTypes...)> d = delegate<ReturnType(ParamTypes...)>::template create<LAMBDA>(lambda);
-            return *this += d;
-        }
+		constexpr multicast_delegate& operator +=(const delegate<ReturnType(ParamTypes...)>& another) {
+			m_invocationList.push_back(another.m_invocation);
+			return *this;
+		}
 
-        multicast_delegate& operator +=(const delegate<ReturnType(ParamTypes...)>& another) {
-            if (another.isNull()) return *this;
-            this->m_invocationList.push_back(new typename delegate_base<ReturnType(ParamTypes...)>::invocation_element(another.invocation.object, another.invocation.stub));
-            return *this;
-        }
+		constexpr multicast_delegate& remove(const delegate<ReturnType(ParamTypes...)>& del)
+		{
+			for (auto& item : m_invocationList)
+			{
+				if (item.m_id == del.m_invocation.m_id)
+				{
+					m_invocationList.erase(item);
+					break;
+				}
+			}
+			return *this;
+		}
 
-        // will work even if ReturnType is void, return values are ignored:
-        // (for handling return values, see operator(..., handler))
-        void operator()(ParamTypes... arg) const {
-            for (auto& item : m_invocationList)
-                (*(item->stub))(item->object, arg...);
-        }
 
-        template<typename HANDLER>
-        void operator()(ParamTypes... arg, HANDLER handler) const {
-            size_t index = 0;
-            for (auto& item : m_invocationList) {
-                ReturnType value = (*(item->stub))(item->object, arg...);
-                handler(index, &value);
-                ++index;
-            }
-        }
+		constexpr void operator -=(delegate<ReturnType(ParamTypes...)>&& another) {
+			for (auto& item : m_invocationList)
+			{
+				if (item.m_id == another.m_invocation.m_id)
+				{
+					m_invocationList.erase(item);
+					break;
+				}
+			}
+		}
 
-        void operator()(ParamTypes... arg, delegate<void(size_t, ReturnType*)> handler) const {
-            operator()<decltype(handler)>(arg..., handler);
-        }
+		constexpr void operator -=(const delegate<ReturnType(ParamTypes...)>& another) {
+			for (auto& item : m_invocationList)
+			{
+				if (item.m_id == another.m_invocation.m_id)
+				{
+					m_invocationList.erase(item);
+					break;
+				}
+			}
+		}
 
-        void operator()(ParamTypes... arg, std::function<void(size_t, ReturnType*)> handler) const {
-            operator()<decltype(handler)>(arg..., handler);
-        }
+		constexpr multicast_delegate& operator =(multicast_delegate<ReturnType(ParamTypes...)>&& another) {
+			m_invocationList = another.m_invocationList;
+			return *this;
+		}
 
-    private:
+		constexpr multicast_delegate& operator =(const multicast_delegate<ReturnType(ParamTypes...)>& another) {
+			m_invocationList = another.m_invocationList;
+			return *this;
+		}
 
-        std::list<typename delegate_base<ReturnType(ParamTypes...)>::invocation_element *> m_invocationList;
+		template <invocable Functor>
+			requires std::invocable<Functor, ParamTypes...>&& std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+		constexpr multicast_delegate& operator =(const Functor& instance) {
+			m_invocationList.push_back(base::template createElement<Functor>(instance));
+			return *this;
+		}
 
-    };
+		constexpr void operator()(ParamTypes... args) const {
+			invoke(args...);
+		}
+
+		constexpr void invoke(ParamTypes... args) const
+		{
+			for (auto& m_item : m_invocationList)
+			{
+				(*m_item.m_stub)(m_item.m_object.get(), args...);
+			}
+		}
+	};
 
 }
 

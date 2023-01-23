@@ -48,6 +48,10 @@ namespace rsl {
         constexpr delegate() = default;
         constexpr delegate(const delegate& other) : m_invocation(other.m_invocation) {}
 
+        template <functor Functor>
+            requires std::invocable<Functor, ParamTypes...>&& std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+        constexpr delegate(const Functor& instance) : m_invocation(base::template createElement<Functor>(instance)) {}
+
         template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
         static constexpr delegate create(T& instance) { return delegate(base::template createElement<T, TMethod>(instance)); }
 
