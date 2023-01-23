@@ -9,7 +9,7 @@
 #include <iostream>
 
 namespace rsl {
-    void func() {
+    static void func() {
         std::cout << "function\n";
     }
 
@@ -38,7 +38,7 @@ namespace rsl {
         }
     };
 
-    std::vector<int> createVec() {
+    static std::vector<int> createVec() {
         std::vector<int> vec;
         for (int i = 20; i > 0; i--) {
             vec.push_back(i);
@@ -46,7 +46,7 @@ namespace rsl {
         return vec;
     }
 
-    void test() {
+    static void test() {
         delegate<void()> del;
 
         {
@@ -81,7 +81,7 @@ namespace rsl {
         {
             Object obj{ createVec() };
             {
-                del = delegate<void()>::create<Object, &Object::memberFunc>(obj);
+                del.assign<Object, &Object::memberFunc>(obj);
             }
 
             del();
@@ -91,7 +91,7 @@ namespace rsl {
         {
             const Object obj{ createVec() };
             {
-                del = delegate<void()>::create<Object, &Object::memberFunc>(obj);
+                del.assign<Object, &Object::memberFunc>(obj);
             }
 
             del();

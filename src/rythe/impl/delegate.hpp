@@ -45,8 +45,8 @@ namespace rsl {
         constexpr delegate(invocation_element&& e) : m_invocation(e) {}
 
     public:
-        delegate() = default;
-        delegate(const delegate& other) : m_invocation(other.m_invocation) {}
+        constexpr delegate() = default;
+        constexpr delegate(const delegate& other) : m_invocation(other.m_invocation) {}
 
         template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
         static constexpr delegate create(T& instance) { return delegate(base::template createElement<T, TMethod>(instance)); }
@@ -61,19 +61,37 @@ namespace rsl {
             requires std::invocable<Functor, ParamTypes...>&& std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
         static constexpr delegate create(const Functor& instance) { return delegate(base::template createElement<Functor>(instance)); }
 
-        inline bool empty() const { return m_invocation.stub == nullptr; }
-        inline void clear() { m_invocation = invocation_element(); }
+        constexpr bool empty() const { return m_invocation.stub == nullptr; }
+        constexpr void clear() { m_invocation = invocation_element(); }
 
-        inline bool operator ==(std::nullptr_t) const { return empty(); }
-        inline bool operator !=(std::nullptr_t) const { return !empty(); }
+        constexpr bool operator ==(std::nullptr_t) const { return empty(); }
+        constexpr bool operator !=(std::nullptr_t) const { return !empty(); }
 
-        inline bool operator == (const delegate& another) const { return m_invocation == another.m_invocation; }
-        inline bool operator != (const delegate& another) const { return m_invocation != another.m_invocation; }
+        constexpr bool operator == (const delegate& another) const { return m_invocation == another.m_invocation; }
+        constexpr bool operator != (const delegate& another) const { return m_invocation != another.m_invocation; }
 
-        inline bool operator ==(const multicast_delegate<ReturnType(ParamTypes...)>& another) const { return another == (*this); }
-        inline bool operator !=(const multicast_delegate<ReturnType(ParamTypes...)>& another) const { return another != (*this); }
+        constexpr bool operator ==(const multicast_delegate<ReturnType(ParamTypes...)>& another) const { return another == (*this); }
+        constexpr bool operator !=(const multicast_delegate<ReturnType(ParamTypes...)>& another) const { return another != (*this); }
 
-        inline delegate& operator =(const delegate& another) {
+        template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
+        constexpr delegate& assign(T& instance) {
+            m_invocation = base::template createElement<T, TMethod>(instance);
+            return *this;
+        }
+
+        template<typename T, ReturnType(T::* TMethod)(ParamTypes...) const>
+        constexpr delegate& assign(const T& instance) {
+            m_invocation = base::template createElement<T, TMethod>(instance);
+            return *this;
+        }
+
+        template <ReturnType(*TMethod)(ParamTypes...)>
+        constexpr delegate& assign() {
+            m_invocation = base::template createElement<TMethod>();
+            return *this;
+        }
+
+        constexpr delegate& operator =(const delegate& another) {
             m_invocation = another.m_invocation;
             return *this;
         }
@@ -85,11 +103,11 @@ namespace rsl {
             return *this;
         }
 
-        inline ReturnType operator()(ParamTypes... args) const {
+        constexpr ReturnType operator()(ParamTypes... args) const {
             return invoke(args...);
         }
 
-        inline ReturnType invoke(ParamTypes... args) const {
+        constexpr ReturnType invoke(ParamTypes... args) const {
             return (*m_invocation.m_stub)(m_invocation.m_object.get(), args...);
         }
     };
