@@ -30,4 +30,11 @@ namespace rsl{
         constexpr ::std::hash<T> hasher{};
         return hasher(val);
     }
+
+    template<typename T>
+    constexpr static size_type typeHash()
+    {
+        T t;
+        return typeid(t).hash_code();
+    }
 }
