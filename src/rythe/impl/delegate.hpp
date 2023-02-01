@@ -17,6 +17,7 @@
 
 #pragma once
 #include <cstddef>
+#include <vector>
 #include <functional>
 
 #include "../concepts"
@@ -25,8 +26,8 @@
 
 namespace rsl {
 
-    template<typename T> class delegate;
-    template<typename T> class multicast_delegate;
+    template<typename FuncSig> class delegate;
+    template<typename FuncSig, template<typename, typename> typename ContainerType = std::vector, template<typename> typename Allocator = std::allocator> class multicast_delegate;
 
     template<typename ReturnType, typename... ParamTypes>
     class delegate<ReturnType(ParamTypes...)> final : private delegate_base<ReturnType(ParamTypes...)> {
@@ -46,7 +47,6 @@ namespace rsl {
 
     public:
         constexpr delegate() = default;
-        constexpr delegate(const delegate& other) : m_invocation(other.m_invocation) {}
 
         template <functor Functor>
             requires std::invocable<Functor, ParamTypes...>&& std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
@@ -71,11 +71,11 @@ namespace rsl {
         constexpr bool operator ==(std::nullptr_t) const { return empty(); }
         constexpr bool operator !=(std::nullptr_t) const { return !empty(); }
 
-        constexpr bool operator == (const delegate& another) const { return m_invocation == another.m_invocation; }
-        constexpr bool operator != (const delegate& another) const { return m_invocation != another.m_invocation; }
+        constexpr bool operator == (const delegate&) const = default;
+        constexpr bool operator != (const delegate&) const = default;
 
-        constexpr bool operator ==(const multicast_delegate<ReturnType(ParamTypes...)>& another) const { return another == (*this); }
-        constexpr bool operator !=(const multicast_delegate<ReturnType(ParamTypes...)>& another) const { return another != (*this); }
+        constexpr bool operator ==(const multicast_delegate<ReturnType(ParamTypes...)>& other) const { return other == (*this); }
+        constexpr bool operator !=(const multicast_delegate<ReturnType(ParamTypes...)>& other) const { return other != (*this); }
 
         template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
         constexpr delegate& assign(T& instance) {
@@ -95,10 +95,7 @@ namespace rsl {
             return *this;
         }
 
-        constexpr delegate& operator =(const delegate& another) {
-            m_invocation = another.m_invocation;
-            return *this;
-        }
+        constexpr delegate& operator =(const delegate&) = default;
 
         template <invocable Functor>
         requires std::invocable<Functor, ParamTypes...>&& std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
