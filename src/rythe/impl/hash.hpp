@@ -34,7 +34,6 @@ namespace rsl{
     template<typename T>
     constexpr static size_type typeHash()
     {
-        T t;
-        return typeid(t).hash_code();
+        return typeid(T).hash_code();
     }
 }
