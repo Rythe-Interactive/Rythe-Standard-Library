@@ -73,4 +73,9 @@ namespace rsl
     using precise_milli_seconds = precise_time;
     using precise_micro_seconds = precise_time;
     using precise_nano_seconds = precise_time;
+
+    enum npos_type : size_type {};
+
+    constexpr npos_type npos = static_cast<npos_type>(-1);
+    static_assert(npos == std::string::npos);
 }

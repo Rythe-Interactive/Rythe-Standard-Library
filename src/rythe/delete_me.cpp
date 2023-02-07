@@ -46,7 +46,20 @@ namespace rsl {
         return vec;
     }
 
-    static void test() {
+    void sizeTest(size_type s) {
+        std::cout << std::to_string(s) << "\n";
+    }
+
+    void sizeTest(npos_type np) {
+        std::cout << std::to_string(np) << "\n";
+    }
+
+
+    int main() {
+
+        sizeTest(4);
+        sizeTest(npos);
+
         delegate<void()> del;
 
         {
@@ -96,6 +109,8 @@ namespace rsl {
 
             del();
         }
+
+        return 0;
     }
 
 }
