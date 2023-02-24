@@ -1,17 +1,24 @@
 #pragma once
 #include <chrono>
-#include <core/time/time_span.hpp>
-#include <core/types/primitives.hpp>
+
+#include "time_span.hpp"
+#include "primitives.hpp"
 
 namespace rsl
 {
-    template<typename precision = fast_time, typename chrono_clock = std::chrono::high_resolution_clock>
+    template<typename Clock>
+    concept chrono_clock = requires {
+        { Clock::now() } -> specialization_of<std::chrono::time_point>;
+        requires specialization_of<typename Clock::duration, std::chrono::duration>;
+    };
+
+    template<time_duration_rep precision = fast_time, chrono_clock clock_t = std::chrono::high_resolution_clock>
     struct stopwatch
     {
     public:
         using time_type = precision;
         using span_type = time_span<time_type>;
-        using clock_type = chrono_clock;
+        using clock_type = clock_t;
 
     private:
         std::chrono::time_point<clock_type> m_start = clock_type::now();

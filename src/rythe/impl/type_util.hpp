@@ -1,5 +1,6 @@
 #pragma once
 #include <utility>
+#include <ratio>
 
 #include "../primitives"
 
@@ -21,7 +22,7 @@ namespace rsl {
         constexpr static size_type size = sizeof...(Types);
     };
 
-    namespace detail {
+    namespace internal {
         struct any_type {
             template<class T>
             constexpr operator T(); // implicit conversion to any type.
@@ -35,7 +36,7 @@ namespace rsl {
 
     template<typename Func, size_type maxParams = 32>
     struct is_invocable {
-        static constexpr bool value = detail::test_invocable_impl<Func>(std::make_index_sequence<maxParams>{});
+        static constexpr bool value = internal::test_invocable_impl<Func>(std::make_index_sequence<maxParams>{});
     };
 
     template<typename Func, size_type maxParams = 32>
@@ -46,4 +47,21 @@ namespace rsl {
 
     template<typename Func, size_type maxParams = 32>
     constexpr bool is_functor_v = requires { &Func::operator(); } && is_invocable_v<Func, maxParams>;
+
+    template<typename Type, template<typename...> typename Template>
+    constexpr bool is_specialization_v = false; // true if and only if Type is a specialization of Template
+    template<template<typename...> typename Template, typename... Types>
+    constexpr bool is_specialization_v<Template<Types...>, Template> = true;
+
+    template<typename Type, template<typename...> typename Template>
+    struct is_specialization : std::bool_constant<is_specialization_v<Type, Template>> {};
+
+    template<typename Type>
+    constexpr bool is_ratio_v = false; // test for ratio type
+
+    template<int_max numerator, int_max denominator>
+    constexpr bool is_ratio_v<std::ratio<numerator, denominator>> = true;
+
+    template<typename Type>
+    struct is_ratio : std::bool_constant<is_ratio_v<Type>> {};
 }
