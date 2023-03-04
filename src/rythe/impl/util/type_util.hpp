@@ -24,12 +24,12 @@ namespace rsl {
 
     namespace internal {
         struct any_type {
-            template<class T>
+            template<typename T>
             constexpr operator T(); // implicit conversion to any type.
         };
 
         template<typename Func, size_type... paramCounts>
-        constexpr bool test_invocable_impl([[maybe_unused]]std::integer_sequence<size_type, paramCounts...> int_seq) {
+        constexpr bool test_invocable_impl([[maybe_unused]] std::integer_sequence<size_type, paramCounts...> int_seq) {
             return ((make_sequence_t<std::is_invocable, any_type, paramCounts, Func>::value) || ...);
         }
     }

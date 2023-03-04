@@ -21,7 +21,7 @@ namespace rsl
 
         constexpr time_span(time_type other) noexcept : duration(other) {}
 
-        template<time_duration_rep other_time, typename ratio>
+        template<time_duration_rep other_time, ratio_type ratio>
         constexpr explicit time_span(const std::chrono::duration<other_time, ratio>& other) noexcept
             : duration(std::chrono::duration_cast<duration_type>(other)) {}
 
