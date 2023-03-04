@@ -1,8 +1,8 @@
 #pragma once
 #include <chrono>
 
-#include "primitives.hpp"
-#include "concepts.hpp"
+#include "../util/primitives.hpp"
+#include "../util/concepts.hpp"
 
 namespace rsl
 {

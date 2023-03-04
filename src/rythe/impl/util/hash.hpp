@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../primitives"
+#include "primitives.hpp"
 
 namespace rsl{
     constexpr static size_type hash_combine(size_type seed, size_type hash)

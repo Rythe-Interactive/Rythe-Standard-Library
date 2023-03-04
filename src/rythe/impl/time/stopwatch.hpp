@@ -1,8 +1,11 @@
 #pragma once
 #include <chrono>
 
+#include "../defines.hpp"
+#include "../util/primitives.hpp"
+
 #include "time_span.hpp"
-#include "primitives.hpp"
+
 
 namespace rsl
 {
@@ -24,36 +27,19 @@ namespace rsl
         std::chrono::time_point<clock_type> m_start = clock_type::now();
     public:
 
-        void start() noexcept {
-            m_start = clock_type::now();
-        }
+        always_inline void start() noexcept { m_start = clock_type::now(); }
 
-        void fast_forward(span_type time)
-        {
-            m_start -= std::chrono::duration_cast<typename clock_type::duration>(time.duration);
-        }
+        always_inline void fast_forward(span_type time) { m_start -= std::chrono::duration_cast<typename clock_type::duration>(time.duration); }
 
-        void rewind(span_type time)
-        {
-            m_start += std::chrono::duration_cast<typename clock_type::duration>(time.duration);
-        }
+        always_inline void rewind(span_type time) { m_start += std::chrono::duration_cast<typename clock_type::duration>(time.duration); }
 
-        span_type start_point() const noexcept
-        {
-            return span_type(m_start.time_since_epoch());
-        }
+        always_inline span_type start_point() const noexcept { return span_type(m_start.time_since_epoch()); }
 
-        span_type elapsed_time() const noexcept
-        {
-            return span_type(clock_type::now() - m_start);
-        }
+        always_inline span_type elapsed_time() const noexcept { return span_type(clock_type::now() - m_start); }
 
-        span_type end() noexcept
-        {
-            return span_type(clock_type::now() - m_start);
-        }
+        always_inline span_type end() const noexcept { return span_type(clock_type::now() - m_start); }
 
-        span_type restart() noexcept
+        always_inline span_type restart() noexcept
         {
             auto startTime = clock_type::now();
             span_type time(startTime - m_start);

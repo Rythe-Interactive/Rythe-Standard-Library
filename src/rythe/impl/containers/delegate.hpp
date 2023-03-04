@@ -3,8 +3,6 @@
 #include <vector>
 #include <functional>
 
-#include "../concepts"
-
 #include "delegate_base.hpp"
 
 namespace rsl {
@@ -36,17 +34,17 @@ namespace rsl {
         constexpr delegate(const Functor& instance) : m_invocation(base::template createElement<Functor>(instance)) {}
 
         template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
-        static constexpr delegate create(T& instance) { return delegate(base::template createElement<T, TMethod>(instance)); }
+        constexpr static delegate create(T& instance) { return delegate(base::template createElement<T, TMethod>(instance)); }
 
         template<typename T, ReturnType(T::* TMethod)(ParamTypes...) const>
-        static constexpr delegate create(const T& instance) { return delegate(base::template createElement<T, TMethod>(instance)); }
+        constexpr static delegate create(const T& instance) { return delegate(base::template createElement<T, TMethod>(instance)); }
 
         template <ReturnType(*TMethod)(ParamTypes...)>
-        static constexpr delegate create() { return delegate(base::template createElement<TMethod>()); }
+        constexpr static delegate create() { return delegate(base::template createElement<TMethod>()); }
 
         template <functor Functor>
             requires std::invocable<Functor, ParamTypes...>&& std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
-        static constexpr delegate create(const Functor& instance) { return delegate(base::template createElement<Functor>(instance)); }
+        constexpr static delegate create(const Functor& instance) { return delegate(base::template createElement<Functor>(instance)); }
 
         constexpr bool empty() const { return m_invocation.stub == nullptr; }
         constexpr void clear() { m_invocation = invocation_element(); }
