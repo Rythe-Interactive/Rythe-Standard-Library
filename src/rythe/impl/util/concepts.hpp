@@ -3,8 +3,8 @@
 
 #include "type_util.hpp"
 
-namespace rsl {
-
+namespace rsl
+{
     template<typename Func>
     concept invocable = is_invocable_v<Func>;
 

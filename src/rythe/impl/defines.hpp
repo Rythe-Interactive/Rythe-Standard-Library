@@ -27,10 +27,12 @@
 #   define RYTHE_CONFIGURATION RYTHE_RELEASE_VALUE
 #endif
 
-#if defined(RYTHE_VALIDATE)
-#   define RYTHE_VALIDATION_LEVEL 1
-#else
-#   define RYTHE_VALIDATION_LEVEL 0
+#if !defined(RYTHE_VALIDATION_LEVEL)
+#   if defined(RYTHE_VALIDATE)
+#       define RYTHE_VALIDATION_LEVEL 1
+#   else
+#       define RYTHE_VALIDATION_LEVEL 0
+#   endif
 #endif
 
 #pragma region /////////////////////////////////// Operating system /////////////////////////////////////

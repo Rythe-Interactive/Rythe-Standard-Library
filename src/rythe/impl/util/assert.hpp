@@ -7,16 +7,18 @@
 
 #if defined(RYTHE_VALIDATE)
 
-namespace rsl {
-    always_inline static bool __assert_impl(const char* expr_str, const char* file, int line, const char* msg) {
-        std::cerr << "Assertion failed:\t" << (msg ? msg : "") << std::endl
+namespace rsl
+{
+    always_inline static bool __assert_impl(const char* expr_str, const char* file, int line, std::string_view msg)
+    {
+        std::cerr << "Assertion failed:\t" << msg << std::endl
             << "Expected:\t" << expr_str << std::endl
             << "Source:\t\t" << file << ", line " << line << std::endl;
         std::abort();
     }
 }
 
-#define rsl_assert(expr) { [[maybe_unused]] bool ANONYMOUS_NAME(assert_) = (!!(expr)) || rsl::__assert_impl(#expr, __FILE__, __LINE__, nullptr); }
+#define rsl_assert(expr) { [[maybe_unused]] bool ANONYMOUS_NAME(assert_) = (!!(expr)) || rsl::__assert_impl(#expr, __FILE__, __LINE__, ""); }
 #define rsl_assert_msg(expr, msg) { [[maybe_unused]] bool ANONYMOUS_NAME(assert_) = (!!(expr)) || rsl::__assert_impl(#expr, __FILE__, __LINE__, msg); }
 
 #else

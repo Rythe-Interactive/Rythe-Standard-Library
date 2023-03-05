@@ -7,7 +7,8 @@
 
 namespace rsl {
     template<size_type maxSize, typename CharType = char>
-    struct buffered_string {
+    struct buffered_string
+    {
         using value_type = CharType;
         using reference = value_type&;
         using const_reference = const value_type&;
@@ -15,20 +16,14 @@ namespace rsl {
         using const_iterator = const value_type*;
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+        using view_type = std::basic_string_view<value_type>;
 
     private:
         value_type m_buffer[maxSize + 1];
         size_type m_size;
 
     public:
-        template<size_type N>
-        constexpr buffered_string(const value_type(&str)[N]) noexcept : m_size(N < maxSize ? N : maxSize)
-        {
-            for (size_type i = 0; i < m_size; i++)
-                m_buffer[i] = str[i];
-
-            m_buffer[m_size] = '\0';
-        }
+        constexpr buffered_string() noexcept = default;
 
         constexpr buffered_string(const buffered_string& src) noexcept : m_size(src.m_size)
         {
@@ -38,11 +33,47 @@ namespace rsl {
             m_buffer[m_size] = '\0';
         }
 
+        template<size_type N>
+        constexpr buffered_string(const value_type(&str)[N]) noexcept : m_size(N < maxSize ? N : maxSize)
+        {
+            for (size_type i = 0; i < m_size; i++)
+                m_buffer[i] = str[i];
+
+            m_buffer[m_size] = '\0';
+        }
+
+        constexpr buffered_string(view_type src) noexcept : m_size(src.size())
+        {
+            for (size_type i = 0; i < m_size; i++)
+                m_buffer[i] = src[i];
+
+            m_buffer[m_size] = '\0';
+        }
+
         constexpr buffered_string& operator=(const buffered_string& src) noexcept
         {
             m_size = src.m_size;
             for (size_type i = 0; i < m_size; i++)
                 m_buffer[i] = src.m_buffer[i];
+
+            m_buffer[m_size] = '\0';
+        }
+
+        template<size_type N>
+        constexpr buffered_string& operator=(const value_type(&str)[N]) noexcept
+        {
+            m_size = N;
+            for (size_type i = 0; i < m_size; i++)
+                m_buffer[i] = str[i];
+
+            m_buffer[m_size] = '\0';
+        }
+
+        constexpr buffered_string& operator=(view_type src) noexcept
+        {
+            m_size = src.size();
+            for (size_type i = 0; i < m_size; i++)
+                m_buffer[i] = src[i];
 
             m_buffer[m_size] = '\0';
         }
@@ -66,8 +97,9 @@ namespace rsl {
         constexpr size_type size() const noexcept { return m_size; }
         constexpr size_type max_size() const noexcept { return maxSize; }
 
+        constexpr view_type view() const noexcept { return view_type(m_buffer, m_size); }
         constexpr operator const value_type* () const noexcept { return m_buffer; }
-        constexpr operator std::string_view() const noexcept { return std::string_view(m_buffer, m_size); }
+        constexpr operator view_type() const noexcept { return view_type(m_buffer, m_size); }
 
         constexpr iterator begin() noexcept { return m_buffer; }
         constexpr const_iterator begin() const noexcept { return m_buffer; }
