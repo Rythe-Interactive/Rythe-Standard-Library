@@ -16,7 +16,6 @@ namespace fmt
     template <>
     struct formatter<std::thread::id>
     {
-
         constexpr const char* parse(format_parse_context& ctx)
         {
             auto it = ctx.begin(), end = ctx.end();
@@ -35,7 +34,6 @@ namespace fmt
             oss << p;
             return format_to(ctx.out(), "{}", oss.str());
         }
-
     };
 
     /*
@@ -268,8 +266,7 @@ namespace rsl::log
         void format([[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest) override
         {
             //get seconds since engine start
-            const auto now = std::chrono::high_resolution_clock::now();
-            const auto time_since_genesis = now - genesis;
+            const auto time_since_genesis = std::chrono::high_resolution_clock::now() - genesis;
             const auto seconds = std::chrono::duration_cast<std::chrono::duration<float, std::ratio<1, 1>>>(time_since_genesis).count();
 
             //convert to "--s.ms---"
@@ -289,20 +286,17 @@ namespace rsl::log
 
     class logger_name_formatter : public spdlog::custom_flag_formatter
     {
-        std::string m_name;
     public:
-        logger_name_formatter(std::string_view name) : m_name(name) {}
-
-        void format([[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest) override
+        void format(const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest) override
         {
             //append to data
-            dest.append(m_name.data(), m_name.data() + m_name.size());
+            dest.append(msg.logger_name.begin(), msg.logger_name.end());
         }
 
         //generates a new formatter flag
         [[nodiscard]] std::unique_ptr<custom_flag_formatter> clone() const override
         {
-            return spdlog::details::make_unique<logger_name_formatter>(m_name);
+            return spdlog::details::make_unique<logger_name_formatter>();
         }
     };
 
@@ -370,12 +364,12 @@ namespace rsl::log
 
     enum struct severity
     {
-        trace,   // lowest severity
+        trace,  // lowest severity
         debug,
         info,
         warn,
         error,
-        fatal // highest severity
+        fatal   // highest severity
     };
 
     constexpr severity severity_trace = severity::trace;
