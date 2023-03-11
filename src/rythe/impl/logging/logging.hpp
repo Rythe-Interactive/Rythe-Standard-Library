@@ -3,11 +3,7 @@
 #include <sstream>
 #include <thread>
 
-#define SPDLOG_HEADER_ONLY
-#include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
-#include "spdlog/sinks/rotating_file_sink.h"
-#include "spdlog/pattern_formatter.h"
+#include "spdlog_include.hpp"
 
 #include "../util/primitives.hpp"
 
@@ -259,83 +255,6 @@ namespace rsl::log
     };
 
     const static inline std::chrono::time_point<std::chrono::high_resolution_clock> genesis = std::chrono::high_resolution_clock::now();
-
-    class genesis_formatter_flag : public spdlog::custom_flag_formatter
-    {
-    public:
-        void format([[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest) override
-        {
-            //get seconds since engine start
-            const auto time_since_genesis = std::chrono::high_resolution_clock::now() - genesis;
-            const auto seconds = std::chrono::duration_cast<std::chrono::duration<float, std::ratio<1, 1>>>(time_since_genesis).count();
-
-            //convert to "--s.ms---"
-            const auto str = std::to_string(seconds);
-
-            //append to data
-            dest.append(str.data(), str.data() + str.size());
-
-        }
-
-        //generates a new formatter flag
-        [[nodiscard]] std::unique_ptr<custom_flag_formatter> clone() const override
-        {
-            return spdlog::details::make_unique<genesis_formatter_flag>();
-        }
-    };
-
-    class logger_name_formatter : public spdlog::custom_flag_formatter
-    {
-    public:
-        void format(const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest) override
-        {
-            //append to data
-            dest.append(msg.logger_name.begin(), msg.logger_name.end());
-        }
-
-        //generates a new formatter flag
-        [[nodiscard]] std::unique_ptr<custom_flag_formatter> clone() const override
-        {
-            return spdlog::details::make_unique<logger_name_formatter>();
-        }
-    };
-
-    class thread_name_formatter_flag : public spdlog::custom_flag_formatter
-    {
-        void format([[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest) override
-        {
-            //std::string thread_ident;
-            thread_local static std::string* thread_ident;
-
-            if (!thread_ident)
-            {
-                auto& inst = impl::get();
-                //async::readonly_guard guard(inst.threadNamesLock);
-
-                if (inst.threadNames.count(std::this_thread::get_id()))
-                {
-                    thread_ident = &inst.threadNames.at(std::this_thread::get_id());
-                }
-                else
-                {
-                    std::ostringstream oss;
-                    oss << std::this_thread::get_id();
-                    {
-                        //async::readwrite_guard wguard(inst.threadNamesLock);
-                        thread_ident = &inst.threadNames[std::this_thread::get_id()];
-                    }
-                    *thread_ident = oss.str();
-                }
-            }
-
-            dest.append(thread_ident->data(), thread_ident->data() + thread_ident->size());
-        }
-
-        std::unique_ptr<custom_flag_formatter> clone() const override
-        {
-            return spdlog::details::make_unique<thread_name_formatter_flag>();
-        }
-    };
 
     inline static void initLogger(logger_ptr& logger, std::string_view loggerName = "")
     {
