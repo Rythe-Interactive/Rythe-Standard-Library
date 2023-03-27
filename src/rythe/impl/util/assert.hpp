@@ -7,19 +7,14 @@
 
 #if defined(RYTHE_VALIDATE)
 
-namespace rsl
-{
-    always_inline static bool __assert_impl(const char* expr_str, const char* file, int line, std::string_view msg)
-    {
-        std::cerr << "Assertion failed:\t" << msg << std::endl
-            << "Expected:\t" << expr_str << std::endl
-            << "Source:\t\t" << file << ", line " << line << std::endl;
-        std::abort();
-    }
-}
+#define __rsl_assert_impl(expr, file, line, msg)                                                                                \
+{                                                                                                                               \
+    std::cerr << "Assertion failed:\t" << msg << "\nExpected:\t\t" expr "\nSource:\t\t\t" file ", line " STRINGIFY(line) "\n";  \
+    std::abort();                                                                                                               \
+}                                                                                                                               \
 
-#define rsl_assert(expr) { [[maybe_unused]] bool ANONYMOUS_NAME(assert_) = (!!(expr)) || rsl::__assert_impl(#expr, __FILE__, __LINE__, ""); }
-#define rsl_assert_msg(expr, msg) { [[maybe_unused]] bool ANONYMOUS_NAME(assert_) = (!!(expr)) || rsl::__assert_impl(#expr, __FILE__, __LINE__, msg); }
+#define rsl_assert(expr) { if (!!!(expr)) __rsl_assert_impl(#expr, __FILE__, __LINE__, "") }
+#define rsl_assert_msg(expr, msg) { if (!!!(expr)) __rsl_assert_impl(#expr, __FILE__, __LINE__, msg) }
 
 #else
 

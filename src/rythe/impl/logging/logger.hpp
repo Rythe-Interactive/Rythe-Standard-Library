@@ -35,31 +35,31 @@ namespace rsl {
         {
             void format([[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest) override
             {
-                //std::string thread_ident;
-                thread_local static std::string* thread_ident;
+                ////std::string thread_ident;
+                //thread_local static std::string* thread_ident;
 
-                if (!thread_ident)
-                {
-                    auto& inst = impl::get();
-                    //async::readonly_guard guard(inst.threadNamesLock);
+                //if (!thread_ident)
+                //{
+                //    auto& inst = impl::get();
+                //    //async::readonly_guard guard(inst.threadNamesLock);
 
-                    if (inst.threadNames.count(std::this_thread::get_id()))
-                    {
-                        thread_ident = &inst.threadNames.at(std::this_thread::get_id());
-                    }
-                    else
-                    {
-                        std::ostringstream oss;
-                        oss << std::this_thread::get_id();
-                        {
-                            //async::readwrite_guard wguard(inst.threadNamesLock);
-                            thread_ident = &inst.threadNames[std::this_thread::get_id()];
-                        }
-                        *thread_ident = oss.str();
-                    }
-                }
+                //    if (inst.threadNames.count(std::this_thread::get_id()))
+                //    {
+                //        thread_ident = &inst.threadNames.at(std::this_thread::get_id());
+                //    }
+                //    else
+                //    {
+                //        std::ostringstream oss;
+                //        oss << std::this_thread::get_id();
+                //        {
+                //            //async::readwrite_guard wguard(inst.threadNamesLock);
+                //            thread_ident = &inst.threadNames[std::this_thread::get_id()];
+                //        }
+                //        *thread_ident = oss.str();
+                //    }
+                //}
 
-                dest.append(thread_ident->data(), thread_ident->data() + thread_ident->size());
+                //dest.append(thread_ident->data(), thread_ident->data() + thread_ident->size());
             }
 
             std::unique_ptr<custom_flag_formatter> clone() const override

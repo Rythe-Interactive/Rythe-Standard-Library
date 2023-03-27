@@ -6,7 +6,7 @@ namespace rsl {
 
     const static inline std::chrono::time_point<std::chrono::high_resolution_clock> genesis = std::chrono::high_resolution_clock::now();
 
-    void logger::genesis_formatter_flag::format([[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest) override
+    void logger::genesis_formatter_flag::format([[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest)
     {
         //get seconds since engine start
         const auto time_since_genesis = std::chrono::high_resolution_clock::now() - genesis;

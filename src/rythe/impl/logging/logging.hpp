@@ -258,22 +258,22 @@ namespace rsl::log
 
     inline static void initLogger(logger_ptr& logger, std::string_view loggerName = "")
     {
-        auto f = std::make_unique<spdlog::pattern_formatter>();
+        //auto f = std::make_unique<spdlog::pattern_formatter>();
 
-        f->add_flag<thread_name_formatter_flag>('f');
-        f->add_flag<genesis_formatter_flag>('*');
+        //f->add_flag<thread_name_formatter_flag>('f');
+        //f->add_flag<genesis_formatter_flag>('*');
 
-        if (!loggerName.empty())
-        {
-            f->add_flag<logger_name_formatter>('n', loggerName);
-            f->set_pattern("T+ %* [%n] [%^%=7l%$] [%=13!f] : %v");
-        }
-        else
-        {
-            f->set_pattern("T+ %* [%^%=7l%$] [%=13!f] : %v");
-        }
+        //if (!loggerName.empty())
+        //{
+        //    f->add_flag<logger_name_formatter>('n', loggerName);
+        //    f->set_pattern("T+ %* [%n] [%^%=7l%$] [%=13!f] : %v");
+        //}
+        //else
+        //{
+        //    f->set_pattern("T+ %* [%^%=7l%$] [%=13!f] : %v");
+        //}
 
-        logger->set_formatter(std::move(f));
+        //logger->set_formatter(std::move(f));
     }
 
     inline void setDefaultLogger(const logger_ptr& newLogger)

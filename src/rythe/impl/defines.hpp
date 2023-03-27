@@ -6,6 +6,8 @@
 
 #define ANONYMOUS_NAME(x) CONCAT(x, __LINE__)
 
+#define STRINGIFY(x) #x
+
 #define RYTHE_DEBUG_VALUE 1
 #define RYTHE_RELEASE_VALUE 2
 
