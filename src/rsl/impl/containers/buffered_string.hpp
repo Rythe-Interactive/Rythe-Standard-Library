@@ -60,6 +60,8 @@ namespace rsl {
                 m_buffer[i] = src.m_buffer[i];
 
             m_buffer[m_size] = '\0';
+
+            return *this;
         }
 
         template<size_type N>
@@ -71,6 +73,8 @@ namespace rsl {
                 m_buffer[i] = str[i];
 
             m_buffer[m_size] = '\0';
+
+            return *this;
         }
 
         constexpr buffered_string& operator=(view_type src) noexcept
@@ -81,6 +85,8 @@ namespace rsl {
                 m_buffer[i] = src[i];
 
             m_buffer[m_size] = '\0';
+
+            return *this;
         }
 
         constexpr reference at(size_type i)

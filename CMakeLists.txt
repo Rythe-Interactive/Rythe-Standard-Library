@@ -20,16 +20,16 @@ endif()
 
 project(rythe-standard-library LANGUAGES ${RYTHE_LANGUAGE})
 
-set(directory "${PROJECT_SOURCE_DIR}/src/rythe")
+set(directory "${PROJECT_SOURCE_DIR}/src/rsl")
 file(GLOB_RECURSE sources *)
 list(FILTER sources INCLUDE REGEX ${directory})
-list(FILTER sources INCLUDE REGEX "(src\\/rythe\\/.*\\.hpp)|(src\\/rythe\\/.*\\.cpp)|(src\\/rythe\\/.*\\.h)|(src\\/rythe\\/.*\\.c)|(src\\/rythe\\/.*\\.inl)|(src\\/rythe\\/[^\\.]*)")
+list(FILTER sources INCLUDE REGEX "(src\\/rsl\\/.*\\.hpp)|(src\\/rsl\\/.*\\.cpp)|(src\\/rsl\\/.*\\.h)|(src\\/rsl\\/.*\\.c)|(src\\/rsl\\/.*\\.inl)|(src\\/rsl\\/[^\\.]*)")
 add_library(rythe-standard-library STATIC ${sources})
 
 foreach(src ${sources})
 	get_filename_component(SRC_EXT ${src} EXT)
 	get_filename_component(dir ${src} DIRECTORY)
-	file(RELATIVE_PATH rel_path ${PROJECT_SOURCE_DIR}/src/rythe ${dir})
+	file(RELATIVE_PATH rel_path ${PROJECT_SOURCE_DIR}/src/rsl ${dir})
 	source_group("${rel_path}" FILES "${src}")
 endforeach()
 
