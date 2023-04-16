@@ -151,4 +151,21 @@
 #   define always_inline inline
 #endif
 
+
+#define COPY_FUNCS(type)\
+type(const type&) = default;\
+type& operator=(const type&) = default;
+
+#define COPY_FUNCS_DECO(pre, type, post)\
+pre type(const type&) post = default;\
+pre type& operator=(const type&) post = default;
+
+#define MOVE_FUNCS(type)\
+type(type&&) = default;\
+type& operator=(type&&) = default;
+
+#define MOVE_FUNCS_DECO(pre, type, post)\
+pre type(type&&) post = default;\
+pre type& operator=(type&&) post = default;
+
 #pragma endregion

@@ -10,7 +10,7 @@ namespace rsl {
     {
         //get seconds since engine start
         const auto time_since_genesis = std::chrono::high_resolution_clock::now() - genesis;
-        const auto seconds = std::chrono::duration_cast<std::chrono::duration<float, std::ratio<1, 1>>>(time_since_genesis).count();
+        const auto seconds = std::chrono::duration_cast<std::chrono::duration<float32, std::ratio<1, 1>>>(time_since_genesis).count();
 
         //convert to "--s.ms---"
         const auto str = std::to_string(seconds);

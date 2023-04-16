@@ -28,8 +28,8 @@ namespace rsl
     using float64 = double;
     using float_max = long double;
 
-    using time32 = float;
-    using time64 = double;
+    using time32 = float32;
+    using time64 = float64;
     using time_large = int_max;
 
     using cstring = const char*;
