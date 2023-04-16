@@ -4,40 +4,26 @@
 #include "../defines.hpp"
 #include "../util/primitives.hpp"
 
-#include "time_span.hpp"
+#include "time_point.hpp"
 
 
 namespace rsl
 {
-    template<typename Clock>
-    concept chrono_clock = requires {
-        { Clock::now() } -> specialization_of<std::chrono::time_point>;
-        requires specialization_of<typename Clock::duration, std::chrono::duration>;
-    };
-
     template<time_duration_rep precision = fast_time, chrono_clock clock_t = std::chrono::high_resolution_clock>
     struct stopwatch
     {
     public:
         using time_type = precision;
         using span_type = time_span<time_type>;
+        using time_point_type = time_point<precision, clock_t>;
         using clock_type = clock_t;
 
     private:
-        std::chrono::time_point<clock_type> m_start = clock_type::now();
+        std::chrono::time_point<clock_type> m_start{ clock_type::now() };
+
     public:
-
-        always_inline void start() noexcept { m_start = clock_type::now(); }
-
-        always_inline void fast_forward(span_type time) { m_start -= std::chrono::duration_cast<typename clock_type::duration>(time.duration); }
-
-        always_inline void rewind(span_type time) { m_start += std::chrono::duration_cast<typename clock_type::duration>(time.duration); }
-
-        always_inline span_type start_point() const noexcept { return span_type(m_start.time_since_epoch()); }
-
-        always_inline span_type elapsed_time() const noexcept { return span_type(clock_type::now() - m_start); }
-
-        always_inline span_type end() const noexcept { return span_type(clock_type::now() - m_start); }
+        always_inline void      start()   noexcept       { m_start = clock_type::now(); }
+        always_inline span_type end()     const noexcept { return span_type(clock_type::now() - m_start); }
 
         always_inline span_type restart() noexcept
         {
@@ -46,6 +32,13 @@ namespace rsl
             m_start = startTime;
             return time;
         }
+
+        always_inline time_point_type start_point()  const noexcept { return time_point_type{ m_start.time_since_epoch() }; }
+        always_inline time_point_type current_point()  const noexcept { return time_point_type{ clock_type::now() }; }
+        always_inline span_type elapsed_time() const noexcept { return span_type{ clock_type::now() - m_start }; }
+
+        always_inline void fast_forward(span_type time) noexcept(std::is_arithmetic_v<time_type>) { m_start -= std::chrono::duration_cast<typename clock_type::duration>(time.duration); }
+        always_inline void rewind(span_type time)       noexcept(std::is_arithmetic_v<time_type>) { m_start += std::chrono::duration_cast<typename clock_type::duration>(time.duration); }
     };
 
     using timer = stopwatch<>;

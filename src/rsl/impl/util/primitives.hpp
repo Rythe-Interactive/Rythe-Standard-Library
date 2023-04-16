@@ -30,6 +30,7 @@ namespace rsl
 
     using time32 = float;
     using time64 = double;
+    using time_large = int_max;
 
     using cstring = const char*;
 
@@ -52,11 +53,13 @@ namespace rsl
 
 #define invalid_id 0
 
-    using hours = time32;
-    using minutes = time32;
+    using days = int32;
+    using hours = int32;
+    using minutes = int32;
     using seconds = time32;
     using milli_seconds = time32;
-    using micro_seconds = time32;
+    using micro_seconds = time64;
+    using nano_seconds = time_large;
 
     using fast_time = time32;
     using fast_hours = fast_time;
