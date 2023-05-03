@@ -60,3 +60,5 @@ target_compile_options(rythe-standard-library PUBLIC ${RYTHE_COMPILER_FLAGS})
 if(DEFINED RYTHE_LINKER_FLAGS)
 	target_link_options(rythe-standard-library PUBLIC ${RYTHE_LINKER_FLAGS})
 endif()
+
+add_subdirectory(tests)
