@@ -4,7 +4,8 @@
 add_subdirectory(test_all)
 
 if(NOT TARGET Catch2)
-    set(RYTHE_CATCH_DIR ${CMAKE_CURRENT_SOURCE_DIR}/catch2 PARENT_SCOPE)
+    set(RYTHE_CATCH_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/catch2)
+    set(RYTHE_CATCH_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/catch2 PARENT_SCOPE)
     if (${RYTHE_FETCH_SUBMODULES})
         message(STATUS "Downloading ${RYTHE_CATCH_DIR}")
         
