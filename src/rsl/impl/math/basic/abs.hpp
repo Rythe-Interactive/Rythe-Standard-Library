@@ -12,7 +12,7 @@ namespace rsl::math
     namespace detail
     {
         template<typename T>
-        [[nodiscard]] inline always_inline static auto _abs_impl_(T val)
+        [[nodiscard]] inline r_always_inline static auto _abs_impl_(T val)
         {
             using value_type = ::std::remove_cvref_t<T>;
             if constexpr (::std::is_floating_point_v<value_type>)
@@ -74,7 +74,7 @@ namespace rsl::math
     }
 
     template<typename T>
-    [[nodiscard]] inline always_inline static auto abs(T val)
+    [[nodiscard]] inline r_always_inline static auto abs(T val)
     {
         using value_type = ::std::remove_cvref_t<T>;
         if constexpr (is_vector_v<value_type>)

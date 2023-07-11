@@ -10,11 +10,11 @@ namespace rsl::math
 {
     // mul
     template<typename TypeA, typename TypeB>
-    [[nodiscard]] always_inline constexpr auto mul(TypeA&& a, TypeB&& b) noexcept;
+    [[nodiscard]] r_always_inline constexpr auto mul(TypeA&& a, TypeB&& b) noexcept;
 
     // operator *
     template<typename TypeA, typename TypeB, std::enable_if_t<is_linear_algebraic_construct_v<TypeA> || is_linear_algebraic_construct_v<TypeB>, bool> = true>
-    [[nodiscard]] always_inline constexpr auto operator*(TypeA&& a, TypeB&& b) noexcept;
+    [[nodiscard]] r_always_inline constexpr auto operator*(TypeA&& a, TypeB&& b) noexcept;
 
     // mul_assign
     template<typename TypeA, typename TypeB>

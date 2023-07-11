@@ -116,6 +116,7 @@ namespace rsl
 
     template<rsl::time_duration_rep precisionLHS, rsl::time_duration_rep precisionRHS>
     using common_time_span = time_span<std::common_type_t<precisionLHS, precisionRHS>>;
+    using span = time_span<>;
 }
 
 template<rsl::time_duration_rep precisionLHS, rsl::time_duration_rep precisionRHS>

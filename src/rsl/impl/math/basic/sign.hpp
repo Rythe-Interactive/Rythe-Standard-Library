@@ -9,7 +9,7 @@
 namespace rsl::math
 {
     template<typename Scalar>
-    [[nodiscard]] always_inline constexpr Scalar sign(Scalar val) noexcept
+    [[nodiscard]] r_always_inline constexpr Scalar sign(Scalar val) noexcept
     {
         if constexpr (::std::is_signed_v<Scalar>)
             return static_cast<Scalar>(1);
@@ -18,7 +18,7 @@ namespace rsl::math
     }
 
     template<typename Scalar>
-    [[nodiscard]] always_inline constexpr Scalar signum(Scalar val) noexcept
+    [[nodiscard]] r_always_inline constexpr Scalar signum(Scalar val) noexcept
     {
         if constexpr (::std::is_signed_v<Scalar>)
             return static_cast<Scalar>(0) < val;
@@ -37,7 +37,7 @@ namespace rsl::math
             static constexpr size_type size = Size;
             using vec_type = vector<Scalar, size>;
 
-            [[nodiscard]] always_inline constexpr static vec_type compute(const vec_type& val) noexcept
+            [[nodiscard]] r_always_inline constexpr static vec_type compute(const vec_type& val) noexcept
             {
                 vec_type result;
                 for (size_type i = 0; i < size; i++)
@@ -45,7 +45,7 @@ namespace rsl::math
                 return result;
             }
 
-            [[nodiscard]] always_inline constexpr static vec_type compute_sign(const vec_type& val) noexcept
+            [[nodiscard]] r_always_inline constexpr static vec_type compute_sign(const vec_type& val) noexcept
             {
                 vec_type result;
                 for (size_type i = 0; i < size; i++)
@@ -60,12 +60,12 @@ namespace rsl::math
             static constexpr size_type size = 1;
             using vec_type = vector<Scalar, size>;
 
-            [[nodiscard]] always_inline constexpr static Scalar compute(const vec_type& val) noexcept
+            [[nodiscard]] r_always_inline constexpr static Scalar compute(const vec_type& val) noexcept
             {
                 return signum(val[0]);
             }
 
-            [[nodiscard]] always_inline constexpr static Scalar compute_sign(const vec_type& val) noexcept
+            [[nodiscard]] r_always_inline constexpr static Scalar compute_sign(const vec_type& val) noexcept
             {
                 return sign(val[0]);
             }
@@ -73,13 +73,13 @@ namespace rsl::math
     }
 
     template<typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>&& vec_type::size != 1, bool> = true>
-    [[nodiscard]] always_inline constexpr auto sign(const vec_type& val) noexcept
+    [[nodiscard]] r_always_inline constexpr auto sign(const vec_type& val) noexcept
     {
         return detail::compute_signum<make_vector_t<vec_type>>::compute_sign(val);
     }
 
     template<typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>&& vec_type::size != 1, bool> = true>
-    [[nodiscard]] always_inline constexpr auto signum(const vec_type& val) noexcept
+    [[nodiscard]] r_always_inline constexpr auto signum(const vec_type& val) noexcept
     {
         return detail::compute_signum<make_vector_t<vec_type>>::compute(val);
     }

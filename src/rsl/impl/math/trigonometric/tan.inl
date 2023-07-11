@@ -9,7 +9,7 @@ namespace rsl::math
 {
     // tan
     template<typename T>
-    [[nodiscard]] always_inline auto tan(T&& value) noexcept
+    [[nodiscard]] r_always_inline auto tan(T&& value) noexcept
     {
         using Type = ::std::remove_cvref_t<T>;
 
@@ -33,7 +33,7 @@ namespace rsl::math
 
     // atan
     template<typename T>
-    [[nodiscard]] always_inline auto atan(T&& value) noexcept
+    [[nodiscard]] r_always_inline auto atan(T&& value) noexcept
     {
         using Type = ::std::remove_cvref_t<T>;
 

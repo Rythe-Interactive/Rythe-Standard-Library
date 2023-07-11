@@ -11,12 +11,12 @@ namespace rsl::math::detail
     {
         using vec_type = vector<Scalar, Size>;
 
-        [[nodiscard]] always_inline static Scalar compute(const vec_type& v) noexcept
+        [[nodiscard]] r_always_inline static Scalar compute(const vec_type& v) noexcept
         {
             return ::std::sqrt(dot(v, v));
         }
 
-        [[nodiscard]] always_inline constexpr static Scalar compute2(const vec_type& v) noexcept
+        [[nodiscard]] r_always_inline constexpr static Scalar compute2(const vec_type& v) noexcept
         {
             return dot(v, v);
         }
@@ -27,12 +27,12 @@ namespace rsl::math::detail
     {
         using vec_type = vector<Scalar, 1u>;
 
-        [[nodiscard]] always_inline static Scalar compute(Scalar v) noexcept
+        [[nodiscard]] r_always_inline static Scalar compute(Scalar v) noexcept
         {
             return v;
         }
 
-        [[nodiscard]] always_inline constexpr static Scalar compute2(Scalar v) noexcept
+        [[nodiscard]] r_always_inline constexpr static Scalar compute2(Scalar v) noexcept
         {
             return v * v;
         }
@@ -44,12 +44,12 @@ namespace rsl::math::detail
         using swizzle_type = swizzle<Scalar, Size, args...>;
         using vec_type = typename swizzle_type::conv_type;
 
-        [[nodiscard]] always_inline static auto compute(const vec_type& v) noexcept
+        [[nodiscard]] r_always_inline static auto compute(const vec_type& v) noexcept
         {
             return compute_length<vec_type>::compute(v);
         }
 
-        [[nodiscard]] always_inline static auto compute2(const vec_type& v) noexcept
+        [[nodiscard]] r_always_inline static auto compute2(const vec_type& v) noexcept
         {
             return compute_length<vec_type>::compute(v);
         }

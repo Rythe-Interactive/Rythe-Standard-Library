@@ -16,7 +16,7 @@ namespace rsl::math
         using float4::vector;
 
         constexpr color(const float4& other) : float4(other) {}
-        constexpr color(float32 _r, float32 _g, float32 _b) : float4(_r, _g, _b, 1.f) {}
+        constexpr color(rsl::float32 _r, rsl::float32 _g, rsl::float32 _b) : float4(_r, _g, _b, 1.f) {}
 
         using float4::operator=;
         using float4::operator[];
@@ -33,7 +33,7 @@ namespace rsl::math
         using double4::vector;
 
         constexpr dcolor(const double4& other) : double4(other) {}
-        constexpr dcolor(float64 _r, float64 _g, float64 _b) : double4(_r, _g, _b, 1.0) {}
+        constexpr dcolor(rsl::float64 _r, rsl::float64 _g, rsl::float64 _b) : double4(_r, _g, _b, 1.0) {}
 
         using double4::operator=;
         using double4::operator[];

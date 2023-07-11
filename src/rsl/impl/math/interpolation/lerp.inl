@@ -4,7 +4,7 @@
 namespace rsl::math::detail
 {
     template<typename V, typename T>
-    [[nodiscard]] always_inline constexpr auto _lerp_impl_(V&& a, V&& b, T&& t) noexcept
+    [[nodiscard]] r_always_inline constexpr auto _lerp_impl_(V&& a, V&& b, T&& t) noexcept
     {
         return a + (b - a) * t;
     }
@@ -18,7 +18,7 @@ namespace rsl::math
 {
     // lerp
     template<typename TypeA, typename TypeB, typename InterpType>
-    [[nodiscard]] always_inline constexpr auto lerp(TypeA&& a, TypeB&& b, InterpType&& t) noexcept
+    [[nodiscard]] r_always_inline constexpr auto lerp(TypeA&& a, TypeB&& b, InterpType&& t) noexcept
     {
         using A = ::std::remove_cvref_t<TypeA>;
         using B = ::std::remove_cvref_t<TypeB>;

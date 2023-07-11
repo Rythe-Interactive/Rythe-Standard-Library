@@ -5,7 +5,7 @@ namespace rsl::math
 {
     thread_local uint64 rythe_default_engine::m_seed = static_cast<uint64>(::std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
-    [[nodiscard]] always_inline static constexpr uint64 xor_shift64(uint64 seed) noexcept
+    [[nodiscard]] r_always_inline static constexpr uint64 xor_shift64(uint64 seed) noexcept
     {
         seed ^= seed << 13;
         seed ^= seed >> 7;
@@ -13,7 +13,7 @@ namespace rsl::math
         return seed;
     }
 
-    [[nodiscard]] always_inline static constexpr uint64 seed64(size_type seed) noexcept
+    [[nodiscard]] r_always_inline static constexpr uint64 seed64(size_type seed) noexcept
     {
         if constexpr (sizeof(size_type) != sizeof(uint64))
         {

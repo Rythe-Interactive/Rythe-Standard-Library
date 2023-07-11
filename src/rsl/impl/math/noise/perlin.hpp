@@ -9,11 +9,11 @@ namespace rsl::math
 {
     // perlin
     template<typename VectorType>
-    [[nodiscard]] always_inline constexpr auto perlin(VectorType&& value, int_least<sizeof(vector_scalar_t<VectorType>)> seed = 0) noexcept;
+    [[nodiscard]] r_always_inline constexpr auto perlin(VectorType&& value, int_least<sizeof(vector_scalar_t<VectorType>)> seed = 0) noexcept;
 
     // perlin
     template<typename VectorType>
-    [[nodiscard]] always_inline constexpr auto perlin(VectorType&& value, decay_vector_t<VectorType>& derivative, int_least<sizeof(vector_scalar_t<VectorType>)> seed = 0) noexcept;
+    [[nodiscard]] r_always_inline constexpr auto perlin(VectorType&& value, decay_vector_t<VectorType>& derivative, int_least<sizeof(vector_scalar_t<VectorType>)> seed = 0) noexcept;
 }
 
 #include "perlin.inl"

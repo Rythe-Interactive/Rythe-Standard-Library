@@ -4,7 +4,8 @@
 
 #include "../util/primitives.hpp"
 
-namespace rsl {
+namespace rsl
+{
     struct logger {
         class genesis_formatter_flag : public spdlog::custom_flag_formatter
         {
@@ -70,3 +71,4 @@ namespace rsl {
 
     };
 }
+

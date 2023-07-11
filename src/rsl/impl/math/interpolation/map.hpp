@@ -10,10 +10,10 @@ namespace rsl::math
 {
     // map
     template<typename T, typename InMin, typename InMax, typename OutMin, typename OutMax>
-    [[nodiscard]] always_inline constexpr auto map(T&& value, InMin&& inMin, InMax&& inMax, OutMin&& outMin, OutMax&& outMax) noexcept;
+    [[nodiscard]] r_always_inline constexpr auto map(T&& value, InMin&& inMin, InMax&& inMax, OutMin&& outMin, OutMax&& outMax) noexcept;
 
     template<typename T, typename InMin, typename InMax>
-    [[nodiscard]] always_inline constexpr auto map01(T&& value, InMin&& inMin, InMax&& inMax) noexcept;
+    [[nodiscard]] r_always_inline constexpr auto map01(T&& value, InMin&& inMin, InMax&& inMax) noexcept;
 }
 
 #include "map.inl"

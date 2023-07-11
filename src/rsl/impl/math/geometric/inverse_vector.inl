@@ -11,7 +11,7 @@ namespace rsl::math::detail
     {
         using vec_type = vector<Scalar, Size>;
 
-        [[nodiscard]] always_inline static vec_type compute(const vec_type& v) noexcept
+        [[nodiscard]] r_always_inline static vec_type compute(const vec_type& v) noexcept
         {
             return vec_type::one / v;
         }
@@ -22,7 +22,7 @@ namespace rsl::math::detail
     {
         using vec_type = vector<Scalar, 1u>;
 
-        [[nodiscard]] always_inline static Scalar compute(Scalar v) noexcept
+        [[nodiscard]] r_always_inline static Scalar compute(Scalar v) noexcept
         {
             return static_cast<Scalar>(1) / v;
         }
@@ -34,7 +34,7 @@ namespace rsl::math::detail
         using swizzle_type = swizzle<Scalar, Size, args...>;
         using vec_type = typename swizzle_type::conv_type;
 
-        [[nodiscard]] always_inline static auto compute(const vec_type& v) noexcept
+        [[nodiscard]] r_always_inline static auto compute(const vec_type& v) noexcept
         {
             return compute_inverse<vec_type>::compute(v);
         }

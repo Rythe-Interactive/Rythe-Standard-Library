@@ -236,7 +236,6 @@ namespace fmt
     };*/
 }
 
-
 namespace rsl::log
 {
     using logger_ptr = std::shared_ptr<spdlog::logger>;
@@ -476,3 +475,5 @@ namespace rsl::log
     }
 }
 #undef logger
+
+namespace log = rsl::log;

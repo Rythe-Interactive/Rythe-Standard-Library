@@ -5,6 +5,7 @@
 
 #include "../defines.hpp"
 #include "primitives.hpp"
+#include "hash.hpp"
 
 namespace rsl {
     template<template<typename...>typename T, typename U, size_type I, typename... Args>
@@ -94,6 +95,100 @@ namespace rsl {
 
     template<typename Type>
     struct is_ratio : std::bool_constant<is_ratio_v<Type>> {};
+
+
+    template<typename derived_type, typename base_type>
+    using inherits_from = typename std::enable_if<std::is_base_of<base_type, derived_type>::value, int>::type;
+
+    template<typename derived_type, typename base_type>
+    using doesnt_inherit_from = typename std::enable_if<!std::is_base_of<base_type, derived_type>::value, int>::type;
+
+    template<typename T>
+    using remove_cvr = std::remove_cv<std::remove_reference_t<T>>;
+
+    template<typename T>
+    using remove_cvr_t = typename remove_cvr<T>::type;
+
+    template <class T>
+    struct is_vector
+        : public std::false_type
+    {
+    };
+
+    template <class T>
+    struct is_vector<std::vector<T>>
+        : public std::true_type
+    {
+    };
+
+    template<template<typename>typename Compare, typename T, T A, T B>
+    struct do_compare
+    {
+        static constexpr inline Compare<T> comp{};
+        static constexpr inline bool value = comp(A, B);
+    };
+
+    template<template<typename>typename Compare, typename T, T A, T B>
+    inline constexpr bool do_compare_v = do_compare<Compare, T, A, B>::value;
+
+    template<rsl::size_type I, typename Type, typename... Types>
+    struct element_at
+#if !defined(DOXY_EXCLUDE)
+        : element_at<I - 1, Types...>
+    {
+    };
+
+    template<typename Type, typename... Types>
+    struct element_at<0, Type, Types...>
+#endif
+    {
+        using type = Type;
+    };
+
+    template<rsl::size_type I, typename Type, typename... Types>
+    using element_at_t = typename element_at<I, Type, Types...>::type;
+
+    template<typename T, typename... Args>
+    struct is_brace_constructible
+    {
+    private:
+        template<typename _T, typename... _Args>
+        static constexpr auto check(void*)
+            -> decltype(void(_T{ std::declval<_Args>()... }), std::true_type());
+
+        template <typename...>
+        static constexpr auto check(...)
+            ->std::false_type;
+
+        using type = decltype(check<T, Args...>(nullptr));
+    public:
+        static constexpr bool value = type::value;
+    };
+
+    template<class T, typename... Args>
+    inline constexpr bool is_brace_constructible_v = is_brace_constructible<T, Args...>::value;
+
+
+    template<rsl::size_type I, typename Check, typename...>
+    struct element_at_is_same_as;
+
+    template<rsl::size_type I, typename Check, typename Type, typename... Types>
+    struct element_at_is_same_as<I, Check, Type, Types...> : element_at_is_same_as<I-1, Check, Type, Types...> {};
+
+    template<typename Check, typename Type, typename... Types>
+    struct element_at_is_same_as<0, Check, Type, Types...>
+    {
+        static constexpr bool value = ::std::is_same_v<Check, Type>;
+    };
+
+    template<rsl::size_type I, typename Check>
+    struct element_at_is_same_as<I, Check>
+    {
+        static constexpr bool value = false;
+    };
+
+    template<rsl::size_type I, typename Check, typename... Types>
+    inline constexpr bool element_at_is_same_as_v = element_at_is_same_as<I, Check, Types...>::value;
 
 #if defined(RYTHE_MSVC)
 
