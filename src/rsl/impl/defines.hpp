@@ -1,10 +1,14 @@
 #pragma once
 
+#define EXPAND(x) x
+
 #define _CONCAT_IMPL_(A, B) A ## B
 
 #define CONCAT(A, B) _CONCAT_IMPL_(A, B)
 
 #define ANONYMOUS_NAME(x) CONCAT(x, __LINE__)
+
+#define ANON_VAR(Type, Category) inline static Type EXPAND(ANONYMOUS_NAME(Category))
 
 #define STRINGIFY(x) #x
 
@@ -430,4 +434,23 @@ type& operator=(type&&) noexcept = default;
     template<typename C, typename F>                                                                                    \
     constexpr bool CONCAT(has_static_, CONCAT(x, _v)) = CONCAT(has_static_, x)<C, F>::value;
 #endif
+
+    HAS_FUNC(setup);
+    HAS_FUNC(shutdown);
+    HAS_FUNC(update);
+
+    HAS_FUNC(begin);
+    HAS_FUNC(end);
+    HAS_FUNC(at);
+
+    HAS_FUNC(size);
+    HAS_FUNC(resize);
+
+    HAS_FUNC(push_back);
+    HAS_FUNC(emplace);
+    HAS_FUNC(insert);
+
+    // COMBINE_SFINAE(is_container, has_begin_v<T L_COMMA typename T::iterator(void)>&& has_end_v<T L_COMMA typename T::iterator(void)>, T);
+    // COMBINE_SFINAE(is_resizable_container, has_begin_v<T L_COMMA typename T::iterator(void)>&& has_end_v<T L_COMMA typename T::iterator(void)>&& has_resize_v<T L_COMMA void(size_type)>, T);
+    // COMBINE_SFINAE(is_any_castable, std::is_constructible<T L_COMMA const T&>::value, T);
 
