@@ -9,7 +9,7 @@
 namespace rsl::math
 {
     // mul
-    template<typename TypeA, typename TypeB>
+    template<typename TypeA, typename TypeB >
     [[nodiscard]] r_always_inline constexpr auto mul(TypeA&& a, TypeB&& b) noexcept
     {
         using A = ::std::remove_cvref_t<TypeA>;
@@ -29,6 +29,11 @@ namespace rsl::math
             using scalar = elevated_t<typename A::scalar, typename B::scalar>;
             return detail::compute_multiplication<matrix<scalar, A::row_count, A::col_count>>::compute(std::forward<TypeA>(a), std::forward<TypeB>(b));
         }
+        //else if constexpr (is_matrix_v<A> && is_scalar_v<B>)
+        //{
+        //    using scalar = elevated_t<typename A::scalar, typename B>;
+        //    return detail::compute_multiplication<matrix<scalar, A::row_count, A::col_count>>::compute(std::forward<TypeA>(a), std::forward<TypeB>(b));
+        //}
         else if constexpr (is_vector_v<A> && is_matrix_v<B>)
         {
             return detail::compute_multiplication<make_matrix_t<B>>::compute(std::forward<TypeA>(a), std::forward<TypeB>(b));

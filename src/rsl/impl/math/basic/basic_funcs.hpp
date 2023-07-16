@@ -4,3 +4,13 @@
 #include "fmod.hpp"
 #include "modf.hpp"
 #include "round.hpp"
+
+
+namespace rsl::math
+{
+    template<typename type, typename valueType = rsl::remove_cvr_t<typename type::Scalar>>
+    [[nodiscard]] valueType* value_ptr(type t)
+    {
+        return t.data;
+    }
+}

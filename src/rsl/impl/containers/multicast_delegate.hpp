@@ -104,6 +104,8 @@ namespace rsl {
 
         constexpr multicast_delegate& push_back(const delegate_type& del) { return push_back(del.m_invocation); }
 
+        constexpr multicast_delegate& push_back(delegate_type&& del) { return push_back(del.m_invocation); }
+
         template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
         constexpr multicast_delegate& push_back(T& instance) { return push_back(base::template createElement<T, TMethod>(instance)); }
 
@@ -118,6 +120,8 @@ namespace rsl {
         constexpr multicast_delegate& push_back(const Functor& instance) { return push_back(base::template createElement<Functor>(instance)); }
 
         constexpr multicast_delegate& operator +=(const delegate_type& another) { return push_back(another.m_invocation); }
+
+        constexpr multicast_delegate& operator +=(delegate_type&& another) { return push_back(another.m_invocation); }
 
         template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
         constexpr multicast_delegate& operator +=(T& instance) { return push_back(base::template createElement<T, TMethod>(instance)); }

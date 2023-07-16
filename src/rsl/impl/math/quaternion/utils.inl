@@ -71,4 +71,10 @@ namespace rsl::math
             qPerms[(idx + 2) % 4],
             qPerms[invIdx]);
     }
+
+    template<typename Scalar>
+    [[nodiscard]] r_always_inline quaternion<Scalar> quaternion<Scalar>::conjugate(const quaternion<Scalar>& _quat) noexcept
+    {
+        return quaternion<Scalar>(_quat.w,-_quat.i,-_quat.j,-_quat.k);
+    }
 }
