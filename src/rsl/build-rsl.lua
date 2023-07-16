@@ -21,7 +21,6 @@ DEALINGS IN THE SOFTWARE.
 
 ]]--
 
-group "rsl"
 project "rsl"
     kind "StaticLib"
     language "C++"
@@ -29,4 +28,3 @@ project "rsl"
     includedirs {"impl/"}
 
     files { "**.h", "**.hpp" ,"**.inl","**.c", "**.cpp" }
-group ""

@@ -40,13 +40,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug64|x64'">
-    <OutDir>bin\Debug64\</OutDir>
+    <OutDir>..\..\build\Debug64\</OutDir>
     <IntDir>obj\Debug64\</IntDir>
     <TargetName>rsl</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release64|x64'">
-    <OutDir>bin\Release64\</OutDir>
+    <OutDir>..\..\build\Release64\</OutDir>
     <IntDir>obj\Release64\</IntDir>
     <TargetName>rsl</TargetName>
     <TargetExt>.lib</TargetExt>
@@ -56,7 +56,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\AL;..\..\..\cereal;..\..\..\CL;..\..\..\inih;..\..\..\lgnspre;..\..\..\physx;..\..\..\pxshared;..\..;..\..\..\tinygltf;..\..\..\Voro++;impl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>impl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -67,7 +67,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\..\..\lib;..\..\..\..\build\Debug64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\lib;..\..\build\Debug64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release64|x64'">
@@ -75,7 +75,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\AL;..\..\..\cereal;..\..\..\CL;..\..\..\inih;..\..\..\lgnspre;..\..\..\physx;..\..\..\pxshared;..\..;..\..\..\tinygltf;..\..\..\Voro++;impl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>impl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -90,7 +90,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\..\..\lib;..\..\..\..\build\Release64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\lib;..\..\build\Release64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
