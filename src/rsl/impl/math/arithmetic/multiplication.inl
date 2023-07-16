@@ -29,6 +29,10 @@ namespace rsl::math
             using scalar = elevated_t<typename A::scalar, typename B::scalar>;
             return detail::compute_multiplication<matrix<scalar, A::row_count, A::col_count>>::compute(std::forward<TypeA>(a), std::forward<TypeB>(b));
         }
+        else if constexpr (is_matrix_v<A> && is_vector_v<B>)
+        {
+            return detail::compute_multiplication<make_matrix_t<A>>::compute(std::forward<TypeB>(b), std::forward<TypeA>(a));
+        }
         else if constexpr (is_vector_v<A> && is_matrix_v<B>)
         {
             return detail::compute_multiplication<make_matrix_t<B>>::compute(std::forward<TypeA>(a), std::forward<TypeB>(b));

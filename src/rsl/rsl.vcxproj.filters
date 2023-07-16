@@ -874,4 +874,8 @@
       <Filter>impl\util</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="impl\math\arithmetic\division_quaternion.inl" />
+    <None Include="impl\math\arithmetic\division.inl" />
+  </ItemGroup>
 </Project>

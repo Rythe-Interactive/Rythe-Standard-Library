@@ -359,6 +359,10 @@
     <ClCompile Include="impl\util\error_handling.cpp" />
     <ClCompile Include="impl\util\hash.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="impl\math\arithmetic\division.inl" />
+    <None Include="impl\math\arithmetic\division_quaternion.inl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
