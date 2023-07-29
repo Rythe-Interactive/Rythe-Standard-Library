@@ -45,6 +45,20 @@ namespace rsl::math
         using row_type = vector<void, 0>;
     };
 
+    namespace detail
+    {
+        template<typename T>
+        struct _is_scalar_impl : ::std::is_arithmetic<T>{};
+    }
+
+    
+    template<typename T>
+    struct is_scalar : detail::_is_scalar_impl<::std::remove_cvref_t<T>> {};
+
+    template<typename T>
+    constexpr static bool is_scalar_v = is_scalar<T>::value;
+
+
     template<typename Scalar, size_type RowCount, size_type ColCount, size_type ColIdx>
     struct column;
 

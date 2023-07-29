@@ -2,10 +2,9 @@
 
 namespace rsl
 {
-
-    std::unordered_map<id_type, id_type> detail::local_to_global;
-    std::unordered_map<id_type, id_type> detail::global_to_local;
-    std::unordered_map<id_type, type_reference> detail::hash_to_reference;
+    //std::unordered_map<id_type, id_type> detail::local_to_global;
+    //std::unordered_map<id_type, id_type> detail::global_to_local;
+    //std::unordered_map<id_type, type_reference> detail::hash_to_reference;
 
     id_type local_cast(id_type global)
     {
@@ -75,12 +74,12 @@ namespace rsl
         return value->global();
     }
 
-    string_view type_reference::local_name() const
+    std::string_view type_reference::local_name() const
     {
         return value->local_name();
     }
 
-    string_view type_reference::global_name() const
+    std::string_view type_reference::global_name() const
     {
         return value->global_name();
     }

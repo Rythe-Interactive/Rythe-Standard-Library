@@ -9,6 +9,12 @@
 
 namespace fmt
 {
+    struct gog
+    {
+        std::thread t;
+
+    };
+
     template <>
     struct formatter<std::thread::id>
     {
@@ -242,7 +248,7 @@ namespace rsl::log
 
     struct impl
     {
-        cstring logFile = "logs/rythe.log";
+        rsl::cstring logFile = "logs/rythe.log";
         logger_ptr logger;
         logger_ptr fileLogger;
         logger_ptr consoleLogger = spdlog::stdout_color_mt("console-logger");
@@ -321,14 +327,15 @@ namespace rsl::log
     template <class... Args, class FormatString>
     void println(severity s, const FormatString& format, Args&&... a)
     {
-        impl::get().logger->log(args2spdlog(s), format, std::forward<Args>(a)...);
+        //impl::get().logger->log(args2spdlog(s), format, std::forward<Args>(a)...);
     }
 
     /** @brief same as println but uses the undecorated logger */
     template <class... Args, class FormatString>
     void undecoratedln(severity s, const FormatString& format, Args&&... a)
     {
-        impl::get().undecoratedLogger->log(args2spdlog(s), format, std::forward<Args>(a)...);
+        //I need to get back to this
+        //impl::get().undecoratedLogger->log(args2spdlog(s), format, std::forward<Args>(a)...);
     }
 
     /** @brief prints a log line, using the specified `severity`

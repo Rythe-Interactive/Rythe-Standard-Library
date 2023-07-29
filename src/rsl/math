@@ -19,3 +19,6 @@
 #include "impl/math/trigonometry.hpp"
 #include "impl/math/color.hpp"
 #include "impl/math/geometry.hpp"
+
+
+namespace math = rsl::math;

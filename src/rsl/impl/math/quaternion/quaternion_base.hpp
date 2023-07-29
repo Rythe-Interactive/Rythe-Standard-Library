@@ -81,6 +81,7 @@ namespace rsl::math
         [[nodiscard]] vec_type up() noexcept;
         [[nodiscard]] static quaternion angle_axis(scalar angle, const vec_type& vec) noexcept;
         [[nodiscard]] static quaternion look_at(const vec_type& _pos, const vec_type& _center, const vec_type& _up = vec_type::up) noexcept;
+        [[nodiscard]] static quaternion conjugate(const quaternion& _quat) noexcept;
 
     };
 

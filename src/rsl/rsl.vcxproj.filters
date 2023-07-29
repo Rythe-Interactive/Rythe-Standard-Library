@@ -1,0 +1,881 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="impl">
+      <UniqueIdentifier>{D781987C-C3B8-990D-6CA5-7F1058BB150F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\containers">
+      <UniqueIdentifier>{1C34B509-88BF-22CE-91D0-A5C2FDDA7ECE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\filesystem">
+      <UniqueIdentifier>{CB67DE2A-37F3-4BEF-4004-CFE3AC0EA8EF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\logging">
+      <UniqueIdentifier>{8DE12202-7944-B2A6-22CA-EA5C0E0C7E29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\logging\spdlog">
+      <UniqueIdentifier>{25D1933A-9132-7148-1AA0-B7FA8600A807}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\logging\spdlog\cfg">
+      <UniqueIdentifier>{2454CD14-908B-15AC-9995-79CF054C3CA5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\logging\spdlog\details">
+      <UniqueIdentifier>{9A16AAF1-0624-D8D7-8F0A-D4C2FB16A48E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\logging\spdlog\fmt">
+      <UniqueIdentifier>{DB61CD14-4799-15AC-50A3-79CFBC593CA5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\logging\spdlog\fmt\bundled">
+      <UniqueIdentifier>{C82BDF4F-340F-EE8F-3D12-1CCCA974B4E0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\logging\spdlog\sinks">
+      <UniqueIdentifier>{5C46967E-C808-CA08-11B9-58957DBAA2E6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math">
+      <UniqueIdentifier>{303126FE-9C9B-DA74-E5D9-8B1A5183B8C9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\arithmetic">
+      <UniqueIdentifier>{C9CF4183-B55E-CB4C-5E7D-DF474AEBDBF2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\basic">
+      <UniqueIdentifier>{0154F94B-6DDF-6610-76F0-E904E2FAC210}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\exponential">
+      <UniqueIdentifier>{86F72267-F263-DE61-BB57-76BF278300CA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\geometric">
+      <UniqueIdentifier>{5E64DC5D-CAC5-B96B-5333-001EBF93F02A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\interpolation">
+      <UniqueIdentifier>{8725532F-F35C-9BC6-FC66-FFE9681DC2BF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\logic">
+      <UniqueIdentifier>{4DC3B54C-B94E-2311-C25F-A6052E6A7F11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\matrix">
+      <UniqueIdentifier>{F446CDE4-E03F-EC36-0972-D1BBF5C9CB42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\matrix\column">
+      <UniqueIdentifier>{3123171C-9D5A-5FB3-A664-C3D6121B86AC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\noise">
+      <UniqueIdentifier>{1DFED94C-8989-4711-929A-CA05FEA4A311}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\quaternion">
+      <UniqueIdentifier>{E54FB1B8-D1DE-3A82-7AFD-4E7D666B4B28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\random">
+      <UniqueIdentifier>{008D73F0-EC85-9242-15B8-77C70110724E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\trigonometric">
+      <UniqueIdentifier>{650FF475-D146-3C0D-DA50-A03046076306}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\util">
+      <UniqueIdentifier>{9D123986-89E0-2C8C-7274-9DB25EE108F1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\vector">
+      <UniqueIdentifier>{72CD0AFA-5EC6-294C-87F8-0ED173500958}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\math\vector\swizzle">
+      <UniqueIdentifier>{B96AB8FB-A58F-077C-CEDA-EC0BBA5E069A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\time">
+      <UniqueIdentifier>{F5282AFE-6193-DE74-AAD1-8F1A167BBCC9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl\util">
+      <UniqueIdentifier>{A4E32AFE-104E-DF74-598C-901AC535BDC9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="impl\containers\buffered_string.hpp">
+      <Filter>impl\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\containers\delegate.hpp">
+      <Filter>impl\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\containers\delegate_base.hpp">
+      <Filter>impl\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\containers\iterator_tricks.hpp">
+      <Filter>impl\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\containers\multicast_delegate.hpp">
+      <Filter>impl\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\defines.hpp">
+      <Filter>impl</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\filesystem\domain_resolver.hpp">
+      <Filter>impl\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\filesystem\filesystem_registry.hpp">
+      <Filter>impl\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\filesystem\resource.hpp">
+      <Filter>impl\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\filesystem\view.hpp">
+      <Filter>impl\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\logger.hpp">
+      <Filter>impl\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\logging.hpp">
+      <Filter>impl\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\async.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\async_logger-inl.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\async_logger.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\cfg\argv.h">
+      <Filter>impl\logging\spdlog\cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\cfg\env.h">
+      <Filter>impl\logging\spdlog\cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\cfg\helpers-inl.h">
+      <Filter>impl\logging\spdlog\cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\cfg\helpers.h">
+      <Filter>impl\logging\spdlog\cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\common-inl.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\common.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\backtracer-inl.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\backtracer.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\circular_q.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\console_globals.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\file_helper-inl.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\file_helper.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\fmt_helper.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\log_msg-inl.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\log_msg.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\log_msg_buffer-inl.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\log_msg_buffer.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\mpmc_blocking_q.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\null_mutex.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\os-inl.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\os.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\periodic_worker-inl.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\periodic_worker.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\registry-inl.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\registry.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\synchronous_factory.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\tcp_client-windows.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\tcp_client.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\thread_pool-inl.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\thread_pool.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\udp_client-windows.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\udp_client.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\details\windows_include.h">
+      <Filter>impl\logging\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bin_to_hex.h">
+      <Filter>impl\logging\spdlog\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\args.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\chrono.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\color.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\compile.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\core.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\format-inl.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\format.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\locale.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\os.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\ostream.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\printf.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\ranges.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\bundled\xchar.h">
+      <Filter>impl\logging\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\chrono.h">
+      <Filter>impl\logging\spdlog\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\compile.h">
+      <Filter>impl\logging\spdlog\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\fmt.h">
+      <Filter>impl\logging\spdlog\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\ostr.h">
+      <Filter>impl\logging\spdlog\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\ranges.h">
+      <Filter>impl\logging\spdlog\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fmt\xchar.h">
+      <Filter>impl\logging\spdlog\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\formatter.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\fwd.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\logger-inl.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\logger.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\pattern_formatter-inl.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\pattern_formatter.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\android_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\ansicolor_sink-inl.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\ansicolor_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\base_sink-inl.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\base_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\basic_file_sink-inl.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\basic_file_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\daily_file_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\dist_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\dup_filter_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\hourly_file_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\mongo_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\msvc_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\null_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\ostream_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\qt_sinks.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\ringbuffer_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\rotating_file_sink-inl.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\rotating_file_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\sink-inl.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\stdout_color_sinks-inl.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\stdout_color_sinks.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\stdout_sinks-inl.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\stdout_sinks.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\syslog_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\systemd_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\tcp_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\udp_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\win_eventlog_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\wincolor_sink-inl.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\sinks\wincolor_sink.h">
+      <Filter>impl\logging\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\spdlog-inl.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\spdlog.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\stopwatch.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\tweakme.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog\version.h">
+      <Filter>impl\logging\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\logging\spdlog_include.hpp">
+      <Filter>impl\logging</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\addition.hpp">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\arithmetic.hpp">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\division.hpp">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\multiplication.hpp">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\multiplication.inl">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\multiplication_matrix.inl">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\multiplication_quaternion.inl">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\multiplication_vector.inl">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\negate.hpp">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\subtraction.hpp">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\basic\abs.hpp">
+      <Filter>impl\math\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\basic\basic_funcs.hpp">
+      <Filter>impl\math\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\basic\constraint.hpp">
+      <Filter>impl\math\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\basic\constraint.inl">
+      <Filter>impl\math\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\basic\constraint_vector.inl">
+      <Filter>impl\math\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\basic\fmod.hpp">
+      <Filter>impl\math\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\basic\modf.hpp">
+      <Filter>impl\math\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\basic\round.hpp">
+      <Filter>impl\math\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\basic\round.inl">
+      <Filter>impl\math\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\basic\sign.hpp">
+      <Filter>impl\math\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\color.hpp">
+      <Filter>impl\math</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\constants.hpp">
+      <Filter>impl\math</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\exponential\exponential.hpp">
+      <Filter>impl\math\exponential</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\exponential\inverse_sqrt.hpp">
+      <Filter>impl\math\exponential</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\exponential\pow.hpp">
+      <Filter>impl\math\exponential</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\exponential\sqrt.hpp">
+      <Filter>impl\math\exponential</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\cross.hpp">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\distance.hpp">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\dot.hpp">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\geometric.hpp">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\inverse.hpp">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\inverse.inl">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\inverse_matrix.inl">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\inverse_quat.inl">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\inverse_vector.inl">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\length.hpp">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\length.inl">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\length_quat.inl">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\length_vector.inl">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\normalize.hpp">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\normalize.inl">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\normalize_dot.hpp">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\normalize_quaternion.inl">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometric\normalize_vector.inl">
+      <Filter>impl\math\geometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\geometry.hpp">
+      <Filter>impl\math</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\interpolation.hpp">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\lerp.hpp">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\lerp.inl">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\lerp_vector.inl">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\map.hpp">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\map.inl">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\map_vector.inl">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\quintic.hpp">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\quintic.inl">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\quintic_vector.inl">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\smoothstep.hpp">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\smoothstep.inl">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\interpolation\smoothstep_vector.inl">
+      <Filter>impl\math\interpolation</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\logic\all.hpp">
+      <Filter>impl\math\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\logic\any.hpp">
+      <Filter>impl\math\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\logic\equality.hpp">
+      <Filter>impl\math\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\logic\greater.hpp">
+      <Filter>impl\math\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\logic\logic.hpp">
+      <Filter>impl\math\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\logic\not.hpp">
+      <Filter>impl\math\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\adjoint.hpp">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\adjoint.inl">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\column\column_base.hpp">
+      <Filter>impl\math\matrix\column</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\decompose.hpp">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\decompose.inl">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\determinant.hpp">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\determinant.inl">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\matrix.hpp">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\matrix2.hpp">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\matrix3.hpp">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\matrix4.hpp">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\matrix_base.hpp">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\matrix_base.inl">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\noise\common.hpp">
+      <Filter>impl\math\noise</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\noise\noise.hpp">
+      <Filter>impl\math\noise</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\noise\perlin.hpp">
+      <Filter>impl\math\noise</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\noise\perlin.inl">
+      <Filter>impl\math\noise</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\noise\value.hpp">
+      <Filter>impl\math\noise</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\noise\value.inl">
+      <Filter>impl\math\noise</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\quaternion\matrix_quat_conv.inl">
+      <Filter>impl\math\quaternion</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\quaternion\quaternion.hpp">
+      <Filter>impl\math\quaternion</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\quaternion\quaternion_base.hpp">
+      <Filter>impl\math\quaternion</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\quaternion\utils.inl">
+      <Filter>impl\math\quaternion</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\random\circular_rand.hpp">
+      <Filter>impl\math\random</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\random\circular_rand.inl">
+      <Filter>impl\math\random</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\random\linear_rand.hpp">
+      <Filter>impl\math\random</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\random\linear_rand.inl">
+      <Filter>impl\math\random</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\random\random.hpp">
+      <Filter>impl\math\random</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\random\random_number_engine.hpp">
+      <Filter>impl\math\random</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\random\randomnumbergenerator.hpp">
+      <Filter>impl\math\random</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\random\randomnumbergenerator.inl">
+      <Filter>impl\math\random</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\random\spherical_rand.hpp">
+      <Filter>impl\math\random</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\random\spherical_rand.inl">
+      <Filter>impl\math\random</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\trigonometric\cos.hpp">
+      <Filter>impl\math\trigonometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\trigonometric\cos.inl">
+      <Filter>impl\math\trigonometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\trigonometric\cos_vector.inl">
+      <Filter>impl\math\trigonometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\trigonometric\sin.hpp">
+      <Filter>impl\math\trigonometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\trigonometric\sin.inl">
+      <Filter>impl\math\trigonometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\trigonometric\sin_vector.inl">
+      <Filter>impl\math\trigonometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\trigonometric\tan.hpp">
+      <Filter>impl\math\trigonometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\trigonometric\tan.inl">
+      <Filter>impl\math\trigonometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\trigonometric\tan_vector.inl">
+      <Filter>impl\math\trigonometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\trigonometric\trigonometric.hpp">
+      <Filter>impl\math\trigonometric</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\trigonometry.hpp">
+      <Filter>impl\math</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\util\close_enough.hpp">
+      <Filter>impl\math\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\util\hash.hpp">
+      <Filter>impl\math\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\util\type_util.hpp">
+      <Filter>impl\math\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\util\util.hpp">
+      <Filter>impl\math\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\aligned_vector3.hpp">
+      <Filter>impl\math\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\swizzle\swizzle.inl">
+      <Filter>impl\math\vector\swizzle</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\swizzle\swizzle1.hpp">
+      <Filter>impl\math\vector\swizzle</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\swizzle\swizzle2.hpp">
+      <Filter>impl\math\vector\swizzle</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\swizzle\swizzle3.hpp">
+      <Filter>impl\math\vector\swizzle</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\swizzle\swizzle4.hpp">
+      <Filter>impl\math\vector\swizzle</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\swizzle\swizzle_base.hpp">
+      <Filter>impl\math\vector\swizzle</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\vector.hpp">
+      <Filter>impl\math\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\vector1.hpp">
+      <Filter>impl\math\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\vector1.inl">
+      <Filter>impl\math\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\vector2.hpp">
+      <Filter>impl\math\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\vector3.hpp">
+      <Filter>impl\math\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\vector3.inl">
+      <Filter>impl\math\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\vector4.hpp">
+      <Filter>impl\math\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\vector4.inl">
+      <Filter>impl\math\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\vector_base.hpp">
+      <Filter>impl\math\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\vector\vector_base.inl">
+      <Filter>impl\math\vector</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\time\stopwatch.hpp">
+      <Filter>impl\time</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\time\time_point.hpp">
+      <Filter>impl\time</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\time\time_span.hpp">
+      <Filter>impl\time</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\util\assert.hpp">
+      <Filter>impl\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\util\concepts.hpp">
+      <Filter>impl\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\util\error_handling.hpp">
+      <Filter>impl\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\util\hash.hpp">
+      <Filter>impl\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\util\hash.inl">
+      <Filter>impl\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\util\meta.hpp">
+      <Filter>impl\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\util\primitives.hpp">
+      <Filter>impl\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\util\string_util.hpp">
+      <Filter>impl\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\util\type_util.hpp">
+      <Filter>impl\util</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\util\utilities.hpp">
+      <Filter>impl\util</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="delete_me.cpp" />
+    <ClCompile Include="impl\logging\logger.cpp">
+      <Filter>impl\logging</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\logging\logging.cpp">
+      <Filter>impl\logging</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\math\random\random_number_engine.cpp">
+      <Filter>impl\math\random</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\math\random\randomnumbergenerator.cpp">
+      <Filter>impl\math\random</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\math\vector\vector1.cpp">
+      <Filter>impl\math\vector</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\util\error_handling.cpp">
+      <Filter>impl\util</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\util\hash.cpp">
+      <Filter>impl\util</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="impl\math\arithmetic\division_quaternion.inl" />
+    <None Include="impl\math\arithmetic\division.inl" />
+  </ItemGroup>
+</Project>

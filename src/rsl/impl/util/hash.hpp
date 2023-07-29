@@ -4,6 +4,7 @@
 
 #include "primitives.hpp"
 #include "string_util.hpp"
+#include "type_util.hpp"
 #include "../defines.hpp"
 
 namespace rsl
