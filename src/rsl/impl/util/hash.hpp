@@ -4,6 +4,7 @@
 
 #include "primitives.hpp"
 #include "string_util.hpp"
+#include "../defines.hpp"
 
 namespace rsl
 {
@@ -78,7 +79,7 @@ namespace rsl
     struct type_hash_base
     {
         friend struct type_reference;
-
+        virtual ~type_hash_base() = default;
         virtual id_type local() const noexcept RYTHE_PURE;
         virtual std::string_view local_name() const noexcept RYTHE_PURE;
         virtual id_type global() const noexcept RYTHE_PURE;
@@ -160,10 +161,10 @@ namespace rsl
         }
     };
 
-    RYTHE_CLANG_SUPPRESS_WARNING_PUSH
-    RYTHE_GCC_SUPPRESS_WARNING_PUSH
-    RYTHE_CLANG_SUPPRESS_WARNING("-Wdelete-abstract-non-virtual-dtor")
-    RYTHE_GCC_SUPPRESS_WARNING("-Wdelete-abstract-non-virtual-dtor")
+    RYTHE_CLANG_SUPPRESS_WARNING_PUSH;
+    RYTHE_GCC_SUPPRESS_WARNING_PUSH;
+    RYTHE_CLANG_SUPPRESS_WARNING("-Wdelete-abstract-non-virtual-dtor");
+    RYTHE_GCC_SUPPRESS_WARNING("-Wdelete-abstract-non-virtual-dtor");
 
     struct type_reference
     {
@@ -189,8 +190,8 @@ namespace rsl
         operator id_type() const;
     };
 
-    RYTHE_GCC_SUPPRESS_WARNING_POP
-    RYTHE_CLANG_SUPPRESS_WARNING_POP
+    RYTHE_GCC_SUPPRESS_WARNING_POP;
+    RYTHE_CLANG_SUPPRESS_WARNING_POP;
 
     namespace detail
     {
