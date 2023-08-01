@@ -84,7 +84,7 @@ namespace rsl
         return value->global_name();
     }
 
-    type_reference::operator rsl::id_type() const
+    type_reference::operator id_type() const
     {
         return value->local();
     }

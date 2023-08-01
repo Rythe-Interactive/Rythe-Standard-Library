@@ -20,7 +20,7 @@ namespace rsl::math
         template<typename scalar, typename VectorType>
         [[nodiscard]] r_always_inline constexpr scalar _perlin_2d_impl_(VectorType value) noexcept
         {
-            using scalar2 = vector<scalar, 2>;
+            //using scalar2 = vector<scalar, 2>;
 
             int2 floored = ifloor<int32>(value);
 
@@ -46,7 +46,7 @@ namespace rsl::math
         template<typename scalar, typename VectorType>
         [[nodiscard]] r_always_inline constexpr scalar _perlin_2d_impl_(VectorType value, vector<scalar, 2>& derivative) noexcept
         {
-            using scalar2 = vector<scalar, 2>;
+            //using scalar2 = vector<scalar, 2>;
 
             int2 floored = ifloor<int32>(value);
 
@@ -152,7 +152,7 @@ namespace rsl::math
     [[nodiscard]] r_always_inline constexpr auto perlin(VectorType&& value, int_least<sizeof(vector_scalar_t<VectorType>)> seed) noexcept
     {
         constexpr size_type dimensions = make_vector_t<VectorType>::size;
-        using scalar = typename make_vector_t<VectorType>::scalar;
+        //using scalar = typename make_vector_t<VectorType>::scalar;
         static_assert(is_vector_or_scalar_v<VectorType> && make_vector_t<VectorType>::size <= 3, "Input type must be a vector of size 3 or lower.");
         if constexpr (dimensions == 1)
             return detail::_perlin_1d_impl_(value);
@@ -168,7 +168,7 @@ namespace rsl::math
     [[nodiscard]] r_always_inline constexpr auto perlin(VectorType&& value, decay_vector_t<VectorType>& derivative, int_least<sizeof(vector_scalar_t<VectorType>)> seed) noexcept
     {
         constexpr size_type dimensions = make_vector_t<VectorType>::size;
-        using scalar = typename make_vector_t<VectorType>::scalar;
+        //using scalar = typename make_vector_t<VectorType>::scalar;
         static_assert(is_vector_or_scalar_v<VectorType> && make_vector_t<VectorType>::size <= 3, "Input type must be a vector of size 3 or lower.");
         if constexpr (dimensions == 1)
             return detail::_perlin_1d_impl_(value, derivative);

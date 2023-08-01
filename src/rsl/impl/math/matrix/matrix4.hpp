@@ -81,12 +81,25 @@ namespace rsl::math
 
         constexpr matrix& operator=(const matrix&) noexcept = default;
 
-        [[nodiscard]] constexpr row_type& operator[](size_type i) noexcept;
-        [[nodiscard]] constexpr const row_type& operator[](size_type i) const noexcept;
+        [[nodiscard]] constexpr row_type& operator[](size_type i) noexcept
+        {
+            rsl_assert_msg((i >= 0) && (i < row_count), "matrix subscript out of range"); return rows[i];
+        }
+        [[nodiscard]] constexpr const row_type& operator[](size_type i) const noexcept
+        {
+            rsl_assert_msg((i >= 0) && (i < row_count), "matrix subscript out of range"); return rows[i];
+        }
     };
 
+    template<typename Scalar>
+   const matrix<Scalar, 4, 4> matrix<Scalar, 4, 4>::identity = matrix<Scalar, 4, 4>(1.0f);
+   template<typename Scalar>
+   const matrix<Scalar, 4, 4> matrix<Scalar, 4, 4>::zero = matrix<Scalar, 4, 4>(0.0f);
+
     using float4x4 = matrix<float32, 4, 4>;
+    using mat4 = float4x4;
     using double4x4 = matrix<float64, 4, 4>;
+    using dmat4 = double4x4;
 }
 
 #include "../quaternion/matrix_quat_conv.inl"

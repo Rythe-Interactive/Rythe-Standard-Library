@@ -96,7 +96,7 @@ namespace rsl
         std::string_view name;
         id_type value = invalid_id;
 
-        constexpr operator rsl::id_type () const noexcept;
+        constexpr operator id_type () const noexcept;
 
         constexpr type_hash() noexcept : value(localTypeHash<T>()), name(localNameOfType<T>()) {}
 
@@ -162,10 +162,10 @@ namespace rsl
         }
     };
 
-    RYTHE_CLANG_SUPPRESS_WARNING_PUSH;
-    RYTHE_GCC_SUPPRESS_WARNING_PUSH;
-    RYTHE_CLANG_SUPPRESS_WARNING("-Wdelete-abstract-non-virtual-dtor");
-    RYTHE_GCC_SUPPRESS_WARNING("-Wdelete-abstract-non-virtual-dtor");
+    RYTHE_CLANG_SUPPRESS_WARNING_PUSH
+    RYTHE_GCC_SUPPRESS_WARNING_PUSH
+    RYTHE_CLANG_SUPPRESS_WARNING("-Wdelete-abstract-non-virtual-dtor")
+    RYTHE_GCC_SUPPRESS_WARNING("-Wdelete-abstract-non-virtual-dtor")
 
     struct type_reference
     {

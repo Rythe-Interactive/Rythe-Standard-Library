@@ -849,6 +849,7 @@
     <ClInclude Include="impl\util\utilities.hpp">
       <Filter>impl\util</Filter>
     </ClInclude>
+    <ClInclude Include="impl\math\matrix\util.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="delete_me.cpp" />
@@ -877,5 +878,6 @@
   <ItemGroup>
     <None Include="impl\math\arithmetic\division_quaternion.inl" />
     <None Include="impl\math\arithmetic\division.inl" />
+    <None Include="impl\math\matrix\util.inl" />
   </ItemGroup>
 </Project>

@@ -94,8 +94,13 @@ namespace rsl::math
     const aligned_vector3<Scalar> aligned_vector3<Scalar>::zero(static_cast<Scalar>(0));
 
     using aligned_float3 = aligned_vector3<float32>;
+    using aligned_vec3 = aligned_float3;
     using aligned_double3 = aligned_vector3<float64>;
+    using aligned_dvec3 = aligned_double3;
     using aligned_int3 = aligned_vector3<int>;
+    using aligned_ivec3 = aligned_int3;
     using aligned_uint3 = aligned_vector3<uint>;
+    using aligned_uvec3 = aligned_uint3;
     using aligned_bool3 = aligned_vector3<bool>;
+    using aligned_bvec3 = aligned_bool3;
 }

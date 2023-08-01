@@ -134,7 +134,7 @@ namespace rsl::math::noise
     [[nodiscard]] r_always_inline constexpr auto value(VectorType&& value, int_least<sizeof(vector_scalar_t<VectorType>)> seed) noexcept
     {
         constexpr size_type dimensions = vector_size_v<VectorType>;
-        using scalar = vector_scalar_t<VectorType>;
+        //using scalar = vector_scalar_t<VectorType>;
         static_assert(is_vector_or_scalar_v<VectorType> && make_vector_t<VectorType>::size <= 3, "Input type must be a vector of size 3 or lower.");
         if constexpr (dimensions == 1)
             return detail::_value_1d_impl_(seed, value);
@@ -150,7 +150,7 @@ namespace rsl::math::noise
     [[nodiscard]] r_always_inline constexpr auto value(VectorType&& value, decay_vector_t<VectorType>& derivative, int_least<sizeof(vector_scalar_t<VectorType>)> seed) noexcept
     {
         constexpr size_type dimensions = vector_size_v<VectorType>;
-        using scalar = vector_scalar_t<VectorType>;
+        //using scalar = vector_scalar_t<VectorType>;
         static_assert(is_vector_or_scalar_v<VectorType> && dimensions <= 3, "Input type must be a vector of size 3 or lower.");
         if constexpr (dimensions == 1)
             return detail::_value_1d_impl_(seed, value, derivative);

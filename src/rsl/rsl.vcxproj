@@ -283,6 +283,7 @@
     <ClInclude Include="impl\math\matrix\matrix4.hpp" />
     <ClInclude Include="impl\math\matrix\matrix_base.hpp" />
     <ClInclude Include="impl\math\matrix\matrix_base.inl" />
+    <ClInclude Include="impl\math\matrix\util.hpp" />
     <ClInclude Include="impl\math\noise\common.hpp" />
     <ClInclude Include="impl\math\noise\noise.hpp" />
     <ClInclude Include="impl\math\noise\perlin.hpp" />
@@ -362,6 +363,7 @@
   <ItemGroup>
     <None Include="impl\math\arithmetic\division.inl" />
     <None Include="impl\math\arithmetic\division_quaternion.inl" />
+    <None Include="impl\math\matrix\util.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

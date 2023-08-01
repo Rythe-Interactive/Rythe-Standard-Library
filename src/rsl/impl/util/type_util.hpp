@@ -444,11 +444,6 @@ namespace rsl {
     /**@brief Returns hash of a certain string
      * @param name Name you wish to hash
      */
-    id_type nameHash(const std::string& name);
-
-    /**@brief Returns hash of a certain string
-     * @param name Name you wish to hash
-     */
     constexpr id_type nameHash(const std::string_view& name) noexcept
     {
         id_type hash = 0xcbf29ce484222325;
@@ -467,21 +462,24 @@ namespace rsl {
 
         return hash;
     }
-
-    id_type nameHash(const std::string& name)
-    {
-#if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
-        static std::hash<std::string> hasher{};
-        if (!name.empty() && name[name.size() - 1] == '\0')
-            return nameHash(std::string_view(name));
-
-        return hasher(name);
-#else
-        // std::hash returns a different hash on GCC and Clang on Linux for certain CPU architectures.
-        // These certain different hashes are faster to compute but can create issues if they aren't the same.
-        return nameHash(std::string_view(name));
-#endif
-    }
+//
+//    /**@brief Returns hash of a certain string
+// * @param name Name you wish to hash
+// */
+//    id_type nameHash(const std::string& name)
+//    {
+//#if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
+//        static std::hash<std::string> hasher{};
+//        if (!name.empty() && name[name.size() - 1] == '\0')
+//            return nameHash(std::string_view(name));
+//
+//        return hasher(name);
+//#else
+//        // std::hash returns a different hash on GCC and Clang on Linux for certain CPU architectures.
+//        // These certain different hashes are faster to compute but can create issues if they aren't the same.
+//        return nameHash(std::string_view(name));
+//#endif
+//    }
 
     
     /**@brief Returns compile-time evaluable hash of the type name.
