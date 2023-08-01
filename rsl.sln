@@ -1,20 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{106671EC-7C26-ED22-4561-36A0B1E031FF}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rsl", "src\rsl\rsl.vcxproj", "{16A7880B-82B0-887C-0B2C-9F7C7734947C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug64|x64 = Debug64|x64
-		Release64|x64 = Release64|x64
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{16A7880B-82B0-887C-0B2C-9F7C7734947C}.Debug64|x64.ActiveCfg = Debug64|x64
-		{16A7880B-82B0-887C-0B2C-9F7C7734947C}.Debug64|x64.Build.0 = Debug64|x64
-		{16A7880B-82B0-887C-0B2C-9F7C7734947C}.Release64|x64.ActiveCfg = Release64|x64
-		{16A7880B-82B0-887C-0B2C-9F7C7734947C}.Release64|x64.Build.0 = Release64|x64
+		{16A7880B-82B0-887C-0B2C-9F7C7734947C}.Debug|x64.ActiveCfg = Debug|x64
+		{16A7880B-82B0-887C-0B2C-9F7C7734947C}.Debug|x64.Build.0 = Debug|x64
+		{16A7880B-82B0-887C-0B2C-9F7C7734947C}.Release|x64.ActiveCfg = Release|x64
+		{16A7880B-82B0-887C-0B2C-9F7C7734947C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{16A7880B-82B0-887C-0B2C-9F7C7734947C} = {106671EC-7C26-ED22-4561-36A0B1E031FF}
 	EndGlobalSection
 EndGlobal
