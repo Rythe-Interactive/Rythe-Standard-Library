@@ -22,7 +22,7 @@ namespace rsl::math
         {
             //using scalar2 = vector<scalar, 2>;
 
-            int2 floored = ifloor<int32>(value);
+            //int2 floored = ifloor<int32>(value);
 
             //int32v x0 = FS_Convertf32_i32(xs) * int32v(FnPrimes::X);
             //int32v y0 = FS_Convertf32_i32(ys) * int32v(FnPrimes::Y);
@@ -48,7 +48,7 @@ namespace rsl::math
         {
             //using scalar2 = vector<scalar, 2>;
 
-            int2 floored = ifloor<int32>(value);
+            //int2 floored = ifloor<int32>(value);
 
             //int32v x0 = FS_Convertf32_i32(xs) * int32v(FnPrimes::X);
             //int32v y0 = FS_Convertf32_i32(ys) * int32v(FnPrimes::Y);
