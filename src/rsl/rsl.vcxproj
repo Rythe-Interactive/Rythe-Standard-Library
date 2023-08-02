@@ -66,25 +66,25 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugOGL Win64|x64'">
-    <OutDir>..\..\build\DebugOGL\</OutDir>
+    <OutDir>$(SolutionDir)bin\lib\</OutDir>
     <IntDir>$(SolutionDir)bin\obj\Win64\DebugOGL\rsl\</IntDir>
     <TargetName>rsl-d</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDX11 Win64|x64'">
-    <OutDir>..\..\build\DebugDX11\</OutDir>
+    <OutDir>$(SolutionDir)bin\lib\</OutDir>
     <IntDir>$(SolutionDir)bin\obj\Win64\DebugDX11\rsl\</IntDir>
     <TargetName>rsl-d</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOGL Win64|x64'">
-    <OutDir>..\..\build\ReleaseOGL\</OutDir>
+    <OutDir>$(SolutionDir)bin\lib\</OutDir>
     <IntDir>$(SolutionDir)bin\obj\Win64\ReleaseOGL\rsl\</IntDir>
     <TargetName>rsl</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDX11 Win64|x64'">
-    <OutDir>..\..\build\ReleaseDX11\</OutDir>
+    <OutDir>$(SolutionDir)bin\lib\</OutDir>
     <IntDir>$(SolutionDir)bin\obj\Win64\ReleaseDX11\rsl\</IntDir>
     <TargetName>rsl</TargetName>
     <TargetExt>.lib</TargetExt>
@@ -105,7 +105,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib;..\..\lib;..\..\build\DebugOGL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDX11 Win64|x64'">
@@ -124,7 +124,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib;..\..\lib;..\..\build\DebugDX11;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOGL Win64|x64'">
@@ -147,7 +147,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib;..\..\lib;..\..\build\ReleaseOGL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDX11 Win64|x64'">
@@ -170,7 +170,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib;..\..\lib;..\..\build\ReleaseDX11;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

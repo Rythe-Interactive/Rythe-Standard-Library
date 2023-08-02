@@ -11,10 +11,9 @@ files {
     "src/**.cpp"
 }
 
-targetdir "build/%{cfg.buildcfg}"
+targetdir "$(SolutionDir)bin\\lib\\"
 libdirs { 
-    "lib/", 
-    "build/%{cfg.buildcfg}/"
+    "$(SolutionDir)bin\\lib\\"
  }
 
 
