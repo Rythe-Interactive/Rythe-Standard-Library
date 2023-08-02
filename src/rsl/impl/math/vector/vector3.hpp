@@ -141,8 +141,13 @@ namespace rsl::math
     const vector<Scalar, 3> vector<Scalar, 3>::zero(static_cast<Scalar>(0));
 
     using float3 = vector<float32, 3>;
+    using vec3 = float3;
     using double3 = vector<float64, 3>;
+    using dvec3 = double3;
     using int3 = vector<int, 3>;
+    using ivec3 = int3;
     using uint3 = vector<uint, 3>;
+    using uvec3 = uint3;
     using bool3 = vector<bool, 3>;
+    using bvec3 = bool3;
 }

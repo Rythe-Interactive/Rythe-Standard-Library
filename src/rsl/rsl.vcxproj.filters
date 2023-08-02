@@ -432,6 +432,12 @@
     <ClInclude Include="impl\math\arithmetic\division.hpp">
       <Filter>impl\math\arithmetic</Filter>
     </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\division.inl">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\division_quaternion.inl">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
     <ClInclude Include="impl\math\arithmetic\multiplication.hpp">
       <Filter>impl\math\arithmetic</Filter>
     </ClInclude>
@@ -654,6 +660,12 @@
     <ClInclude Include="impl\math\matrix\matrix_base.inl">
       <Filter>impl\math\matrix</Filter>
     </ClInclude>
+    <ClInclude Include="impl\math\matrix\util.hpp">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\math\matrix\util.inl">
+      <Filter>impl\math\matrix</Filter>
+    </ClInclude>
     <ClInclude Include="impl\math\noise\common.hpp">
       <Filter>impl\math\noise</Filter>
     </ClInclude>
@@ -873,9 +885,5 @@
     <ClCompile Include="impl\util\hash.cpp">
       <Filter>impl\util</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="impl\math\arithmetic\division_quaternion.inl" />
-    <None Include="impl\math\arithmetic\division.inl" />
   </ItemGroup>
 </Project>

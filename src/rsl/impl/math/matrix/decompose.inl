@@ -6,13 +6,13 @@ namespace rsl::math
     template<typename Scalar>
     [[nodiscard]] vector<Scalar, 3> scale(const matrix<Scalar, 4, 4>& mat) noexcept
     {
-        return { length(mat[0].xyz), length(mat[1].xyz), length(mat[2].xyz) }
+        return { length(mat[0].xyz), length(mat[1].xyz), length(mat[2].xyz) };
     }
 
     template<typename Scalar>
     [[nodiscard]] vector<Scalar, 3> scale(const matrix<Scalar, 3, 3>& mat) noexcept
     {
-        return { length(mat[0].xyz), length(mat[1].xyz), length(mat[2].xyz) }
+        return { length(mat[0].xyz), length(mat[1].xyz), length(mat[2].xyz) };
     }
 
     template<typename Scalar>
@@ -31,9 +31,9 @@ namespace rsl::math
             Scalar root = ::std::sqrt(trace + static_cast<Scalar>(1));
             result.w = static_cast<Scalar>(0.5) * root;
             root = static_cast<Scalar>(0.5) / root;
-            result.x = root * (orientationMat[1].z - orientationMat[2].y);
-            result.y = root * (orientationMat[2].x - orientationMat[0].z);
-            result.z = root * (orientationMat[0].y - orientationMat[1].x);
+            result.i = root * (orientationMat[1].z - orientationMat[2].y);
+            result.j = root * (orientationMat[2].x - orientationMat[0].z);
+            result.k = root * (orientationMat[0].y - orientationMat[1].x);
         }
         else
         {

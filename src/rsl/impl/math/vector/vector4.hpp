@@ -161,8 +161,13 @@ namespace rsl::math
     const vector<Scalar, 4> vector<Scalar, 4>::zero(static_cast<Scalar>(0));
 
     using float4 = vector<float32, 4>;
+    using vec4 = float4;
     using double4 = vector<float64, 4>;
+    using dvec4 = double4;
     using int4 = vector<int, 4>;
+    using ivec4 = int4;
     using uint4 = vector<uint, 4>;
+    using uvec4 = uint4;
     using bool4 = vector<bool, 4>;
+    using bvec4 = bool4;
 }

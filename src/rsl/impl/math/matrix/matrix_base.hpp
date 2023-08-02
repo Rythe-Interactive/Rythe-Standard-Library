@@ -49,3 +49,5 @@ namespace rsl::math
         [[nodiscard]] constexpr const row_type& operator[](size_type i) const noexcept;
     };
 }
+
+#include "matrix_base.inl"

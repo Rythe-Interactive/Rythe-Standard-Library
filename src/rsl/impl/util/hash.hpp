@@ -5,6 +5,7 @@
 #include "primitives.hpp"
 #include "string_util.hpp"
 #include "type_util.hpp"
+#include "../defines.hpp"
 
 namespace rsl
 {
@@ -79,7 +80,7 @@ namespace rsl
     struct type_hash_base
     {
         friend struct type_reference;
-
+        virtual ~type_hash_base() = default;
         virtual id_type local() const noexcept RYTHE_PURE;
         virtual std::string_view local_name() const noexcept RYTHE_PURE;
         virtual id_type global() const noexcept RYTHE_PURE;
@@ -95,7 +96,7 @@ namespace rsl
         std::string_view name;
         id_type value = invalid_id;
 
-        constexpr operator rsl::id_type () const noexcept;
+        constexpr operator id_type () const noexcept;
 
         constexpr type_hash() noexcept : value(localTypeHash<T>()), name(localNameOfType<T>()) {}
 
@@ -190,8 +191,8 @@ namespace rsl
         operator id_type() const;
     };
 
-    RYTHE_GCC_SUPPRESS_WARNING_POP
-    RYTHE_CLANG_SUPPRESS_WARNING_POP
+    RYTHE_GCC_SUPPRESS_WARNING_POP;
+    RYTHE_CLANG_SUPPRESS_WARNING_POP;
 
     namespace detail
     {

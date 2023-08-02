@@ -33,9 +33,9 @@ namespace rsl
     inline constexpr name_hash::name_hash(const string_literal<N>& name) noexcept
         : value(nameHash<N>(name)) {}
 
-    //constexpr name_hash literals::operator""_hs(cstring src)
-    //{
-    //    return name_hash{ nameHash(src)};
-    //}
+    constexpr name_hash literals::operator""_hs(cstring src)
+    {
+        return name_hash{ nameHash(src)};
+    }
 
 }

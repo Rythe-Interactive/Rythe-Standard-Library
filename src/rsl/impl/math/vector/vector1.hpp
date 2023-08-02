@@ -82,10 +82,15 @@ namespace rsl::math
     };
 
     using float1 = vector<float32, 1>;
+    using vec1 = float1;
     using double1 = vector<float64, 1>;
+    using dvec1 = double1;
     using int1 = vector<int, 1>;
+    using ivec1 = int1;
     using uint1 = vector<uint, 1>;
+    using uvec1 = uint1;
     using bool1 = vector<bool, 1>;
+    using bvec1 = bool1;
 }
 
 #include "vector1.inl"

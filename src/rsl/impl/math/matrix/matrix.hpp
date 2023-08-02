@@ -6,7 +6,9 @@
 #include "determinant.hpp"
 #include "adjoint.hpp"
 #include "decompose.hpp"
+#include "util.hpp"
 
 #include "matrix_base.inl"
 #include "determinant.inl"
 #include "decompose.inl"
+#include "util.inl"
