@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <vector>
 #include <functional>
+#include <algorithm>
 
 #include "delegate_base.hpp"
 
@@ -25,9 +26,16 @@ namespace rsl {
         invocation_element m_invocation;
 
         constexpr delegate(invocation_element&& e) : m_invocation(e) {}
-
     public:
         constexpr delegate() = default;
+
+        template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
+        constexpr delegate(T& instance) : m_invocation(base::template createElement<T, TMethod>(instance)) {}
+
+        template<typename T, ReturnType(T::* TMethod)(ParamTypes...) const>
+        constexpr delegate(T const& instance) : m_invocation(base::template createElement<T, TMethod>(instance)) {}
+
+        constexpr delegate(ReturnType(*TMethod)(ParamTypes...)) : m_invocation(base::template createElement<&TMethod>()) {}
 
         template <functor Functor>
             requires std::invocable<Functor, ParamTypes...>&& std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>

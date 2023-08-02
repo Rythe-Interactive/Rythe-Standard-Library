@@ -42,7 +42,7 @@ namespace rsl {
         }
 
         constexpr multicast_delegate& remove(const value_type& e) {
-            std::erase(std::remove(begin(), end(), e), end());
+            m_invocationList.erase(std::remove(begin(), end(), e), end());
             return *this;
         }
 
@@ -103,8 +103,6 @@ namespace rsl {
         constexpr bool operator !=(const delegate_type& other) const { return !(*this == other); }
 
         constexpr multicast_delegate& push_back(const delegate_type& del) { return push_back(del.m_invocation); }
-
-        constexpr multicast_delegate& push_back(delegate_type&& del) { return push_back(del.m_invocation); }
 
         template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>
         constexpr multicast_delegate& push_back(T& instance) { return push_back(base::template createElement<T, TMethod>(instance)); }
