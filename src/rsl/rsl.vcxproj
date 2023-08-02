@@ -1,12 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="DebugOGL Win64|x64">
+      <Configuration>DebugOGL Win64</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="DebugDX11 Win64|x64">
+      <Configuration>DebugDX11 Win64</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseOGL Win64|x64">
+      <Configuration>ReleaseOGL Win64</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseDX11 Win64|x64">
+      <Configuration>ReleaseDX11 Win64</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -17,13 +25,25 @@
     <RootNamespace>rsl</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugOGL Win64|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDX11 Win64|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>ClangCL</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOGL Win64|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>ClangCL</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDX11 Win64|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
@@ -32,31 +52,49 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='DebugOGL Win64|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='DebugDX11 Win64|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='ReleaseOGL Win64|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='ReleaseDX11 Win64|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\build\Debug\</OutDir>
-    <IntDir>obj\Debug\</IntDir>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugOGL Win64|x64'">
+    <OutDir>..\..\build\DebugOGL\</OutDir>
+    <IntDir>$(SolutionDir)bin\obj\Win64\DebugOGL\rsl\</IntDir>
+    <TargetName>rsl-d</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDX11 Win64|x64'">
+    <OutDir>..\..\build\DebugDX11\</OutDir>
+    <IntDir>$(SolutionDir)bin\obj\Win64\DebugDX11\rsl\</IntDir>
+    <TargetName>rsl-d</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOGL Win64|x64'">
+    <OutDir>..\..\build\ReleaseOGL\</OutDir>
+    <IntDir>$(SolutionDir)bin\obj\Win64\ReleaseOGL\rsl\</IntDir>
     <TargetName>rsl</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\..\build\Release\</OutDir>
-    <IntDir>obj\Release\</IntDir>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDX11 Win64|x64'">
+    <OutDir>..\..\build\ReleaseDX11\</OutDir>
+    <IntDir>$(SolutionDir)bin\obj\Win64\ReleaseDX11\rsl\</IntDir>
     <TargetName>rsl</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugOGL Win64|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src\impl;impl;..\..\impl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ARBROOK_INTERNAL;PROJECT_NAME=rsl;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\rsl\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -67,15 +105,34 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\lib;..\..\build\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib;..\..\lib;..\..\build\DebugOGL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDX11 Win64|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src\impl;impl;..\..\impl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ARBROOK_INTERNAL;PROJECT_NAME=rsl;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\rsl\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib;..\..\lib;..\..\build\DebugDX11;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseOGL Win64|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>ARBROOK_INTERNAL;PROJECT_NAME=rsl;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\rsl\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -90,183 +147,33 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>..\..\lib;..\..\build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib;..\..\lib;..\..\build\ReleaseOGL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDX11 Win64|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>ARBROOK_INTERNAL;PROJECT_NAME=rsl;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\rsl\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib;..\..\lib;..\..\build\ReleaseDX11;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tests\third_party\catch2\extras\catch_amalgamated.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\fuzzing\NullOStream.h" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\catch_benchmark.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\catch_benchmark_all.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\catch_chronometer.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\catch_clock.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\catch_constructor.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\catch_environment.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\catch_estimate.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\catch_execution_plan.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\catch_optimizer.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\catch_outlier_classification.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\catch_sample_analysis.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_analyse.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_benchmark_function.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_benchmark_stats.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_benchmark_stats_fwd.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_complete_invoke.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_estimate_clock.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_measure.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_repeat.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_run_for_at_least.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_stats.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_timing.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_all.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_approx.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_assertion_info.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_assertion_result.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_config.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_get_random_seed.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_message.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_section_info.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_session.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_tag_alias.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_tag_alias_autoregistrar.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_template_test_macros.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_test_case_info.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_test_macros.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_test_spec.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_timer.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_tostring.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_totals.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_translate_exception.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_version.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\catch_version_macros.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\generators\catch_generator_exception.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\generators\catch_generators.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\generators\catch_generators_adapters.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\generators\catch_generators_all.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\generators\catch_generators_random.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\generators\catch_generators_range.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_all.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_capture.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_config.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_enum_values_registry.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_exception.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_generatortracker.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_registry_hub.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_reporter.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_reporter_factory.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_tag_alias_registry.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_test_invoker.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_testcase.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_assertion_handler.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_case_insensitive_comparisons.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_case_sensitive.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_clara.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_commandline.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_compare_traits.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_compiler_capabilities.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_config_android_logwrite.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_config_counter.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_config_uncaught_exceptions.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_config_wchar.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_console_colour.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_console_width.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_container_nonmembers.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_context.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_debug_console.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_debugger.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_decomposer.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_enforce.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_enum_values_registry.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_errno_guard.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_exception_translator_registry.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_fatal_condition_handler.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_floating_point_helpers.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_getenv.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_is_permutation.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_istream.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_lazy_expr.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_leak_detector.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_list.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_logical_traits.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_message_info.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_meta.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_move_and_forward.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_noncopyable.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_optional.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_output_redirect.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_parse_numbers.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_platform.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_polyfills.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_preprocessor.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_preprocessor_remove_parens.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_random_number_generator.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_random_seed_generation.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_reporter_registry.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_reporter_spec_parser.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_result_type.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_reusable_string_stream.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_run_context.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_section.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_sharding.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_singletons.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_source_line_info.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_startup_exception_registry.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_stdstreams.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_stream_end_stop.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_string_manip.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_stringref.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_tag_alias_registry.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_template_test_registry.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_case_info_hasher.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_case_registry_impl.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_case_tracker.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_failure_exception.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_macro_impl.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_registry.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_run_info.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_spec_parser.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_textflow.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_to_string.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_uncaught_exceptions.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_unique_name.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_unique_ptr.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_void_type.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_wildcard_pattern.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_windows_h_proxy.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_xmlwriter.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_all.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_container_properties.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_contains.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_exception.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_floating_point.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_predicate.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_quantifiers.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_range_equals.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_string.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_templated.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_vector.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\matchers\internal\catch_matchers_impl.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_automake.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_common_base.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_compact.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_console.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_cumulative_base.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_event_listener.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_helpers.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_junit.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_multi.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_registrars.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_sonarqube.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_streaming_base.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_tap.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_teamcity.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_xml.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporters_all.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\tests\SelfTest\helpers\parse_test_spec.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\tests\SelfTest\helpers\range_test_helpers.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\tests\SelfTest\helpers\type_with_lit_0_comparisons.hpp" />
-    <ClInclude Include="..\..\tests\third_party\catch2\third_party\clara.hpp" />
     <ClInclude Include="impl\containers\buffered_string.hpp" />
     <ClInclude Include="impl\containers\delegate.hpp" />
     <ClInclude Include="impl\containers\delegate_base.hpp" />
@@ -527,214 +434,6 @@
     <ClInclude Include="impl\util\utilities.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tests\test_all\source.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\.conan\test_package\test_package.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\010-TestCase.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\020-TestCase-1.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\020-TestCase-2.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\030-Asn-Require-Check.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\100-Fix-Section.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\110-Fix-ClassFixture.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\120-Bdd-ScenarioGivenWhenThen.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\210-Evt-EventListeners.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\231-Cfg-OutputStreams.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\300-Gen-OwnGenerator.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\301-Gen-MapTypeConversion.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\302-Gen-Table.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\310-Gen-VariablesInGenerators.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\examples\311-Gen-CustomCapture.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\extras\catch_amalgamated.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\fuzzing\NullOStream.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\fuzzing\fuzz_TestSpecParser.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\fuzzing\fuzz_XmlWriter.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\fuzzing\fuzz_textflow.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\benchmark\catch_chronometer.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_benchmark_function.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_run_for_at_least.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\benchmark\detail\catch_stats.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_approx.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_assertion_result.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_config.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_get_random_seed.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_message.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_registry_hub.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_session.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_tag_alias_autoregistrar.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_test_case_info.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_test_spec.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_timer.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_tostring.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_totals.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_translate_exception.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\catch_version.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\generators\catch_generator_exception.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\generators\catch_generators.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\generators\catch_generators_random.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_capture.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_config.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_exception.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_generatortracker.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_registry_hub.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_reporter.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_reporter_factory.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\interfaces\catch_interfaces_testcase.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_assertion_handler.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_case_insensitive_comparisons.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_clara.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_commandline.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_console_colour.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_context.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_debug_console.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_debugger.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_decomposer.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_enforce.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_enum_values_registry.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_errno_guard.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_exception_translator_registry.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_fatal_condition_handler.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_floating_point_helpers.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_getenv.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_istream.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_lazy_expr.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_leak_detector.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_list.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_main.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_message_info.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_output_redirect.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_parse_numbers.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_polyfills.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_random_number_generator.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_random_seed_generation.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_reporter_registry.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_reporter_spec_parser.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_result_type.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_reusable_string_stream.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_run_context.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_section.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_singletons.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_source_line_info.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_startup_exception_registry.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_stdstreams.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_string_manip.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_stringref.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_tag_alias_registry.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_case_info_hasher.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_case_registry_impl.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_case_tracker.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_failure_exception.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_registry.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_test_spec_parser.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_textflow.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_uncaught_exceptions.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_wildcard_pattern.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\internal\catch_xmlwriter.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_container_properties.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_exception.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_floating_point.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_predicate.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_quantifiers.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_string.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\matchers\catch_matchers_templated.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\matchers\internal\catch_matchers_impl.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_automake.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_common_base.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_compact.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_console.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_cumulative_base.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_event_listener.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_helpers.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_junit.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_multi.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_registrars.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_sonarqube.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_streaming_base.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_tap.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_teamcity.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\src\catch2\reporters\catch_reporter_xml.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X01-PrefixedMacros.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X02-DisabledMacros.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X03-DisabledExceptions-DefaultHandler.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X04-DisabledExceptions-CustomHandler.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X05-DeferredStaticChecks.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X10-FallbackStringifier.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X11-DisableStringification.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X12-CustomDebugBreakMacro.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X21-PartialTestCaseEvents.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X22-BenchmarksInCumulativeReporter.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X23-CasingInReporterNames.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X24-ListenerStdoutCaptureInMultireporter.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X25-ListenerCanAskForCapturedStdout.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X26-ReporterPreferencesForPassingAssertionsIsRespected.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X27-CapturedStdoutInTestCaseEvents.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X28-ListenersGetEventsBeforeReporters.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X29-CustomArgumentsForReporters.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X30-BazelReporter.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X31-DuplicatedTestCases.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X32-DuplicatedTestCasesDifferentTags.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X33-DuplicatedTestCaseMethods.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X34-DuplicatedTestCaseMethodsDifferentFixtures.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X35-DuplicatedReporterNames.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X90-WindowsHeaderInclusion.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X91-AmalgamatedCatch.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X92-NoTests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\ExtraTests\X93-AllSkipped.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\Algorithms.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\Clara.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\CmdLine.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\CmdLineHelpers.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\ColourImpl.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\Details.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\FloatingPoint.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\GeneratorsImpl.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\InternalBenchmark.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\Parse.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\PartTracker.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\RandomNumberGeneration.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\Reporters.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\Sharding.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\Stream.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\String.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\StringManip.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\Tag.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\TestCaseInfoHasher.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\TestSpec.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\TestSpecParser.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\TextFlow.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\ToString.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\Traits.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\UniquePtr.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\IntrospectiveTests\Xml.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\TestRegistrations.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\TimingTests\Sleep.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Approx.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\BDD.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Benchmark.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Class.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Compilation.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Condition.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Decomposition.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\EnumToString.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Exception.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Generators.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Matchers.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\MatchersRanges.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Message.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Misc.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Skip.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\ToStringByte.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\ToStringChrono.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\ToStringGeneral.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\ToStringOptional.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\ToStringPair.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\ToStringTuple.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\ToStringVariant.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\ToStringVector.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\ToStringWhich.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\Tricky.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\UsageTests\VariadicMacros.tests.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tests\SelfTest\helpers\parse_test_spec.cpp" />
-    <ClCompile Include="..\..\tests\third_party\catch2\tools\misc\coverage-helper.cpp" />
     <ClCompile Include="delete_me.cpp" />
     <ClCompile Include="impl\logging\logger.cpp" />
     <ClCompile Include="impl\logging\logging.cpp" />
