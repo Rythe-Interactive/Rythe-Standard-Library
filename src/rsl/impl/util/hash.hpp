@@ -93,8 +93,8 @@ namespace rsl
     template<typename T>
     struct type_hash : public type_hash_base
     {
-        std::string_view name;
         id_type value = invalid_id;
+        std::string_view name;
 
         constexpr operator id_type () const noexcept;
 
