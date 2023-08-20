@@ -2,8 +2,8 @@
 #include <utility>
 #include <functional>
 
-#include "impl/util/type_util.hpp"
-#include "impl/util/primitives.hpp"
+#include "../util/type_util.hpp"
+#include "../util/primitives.hpp"
 
 namespace rythe::core
 {

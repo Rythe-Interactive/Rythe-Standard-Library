@@ -211,6 +211,7 @@
     <ClInclude Include="impl\math\arithmetic\division.hpp" />
     <ClInclude Include="impl\math\arithmetic\division.inl" />
     <ClInclude Include="impl\math\arithmetic\division_quaternion.inl" />
+    <ClInclude Include="impl\math\arithmetic\division_vector.inl" />
     <ClInclude Include="impl\math\arithmetic\multiplication.hpp" />
     <ClInclude Include="impl\math\arithmetic\multiplication.inl" />
     <ClInclude Include="impl\math\arithmetic\multiplication_matrix.inl" />
