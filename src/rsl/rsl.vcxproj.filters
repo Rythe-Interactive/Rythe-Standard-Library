@@ -438,6 +438,9 @@
     <ClInclude Include="impl\math\arithmetic\division_quaternion.inl">
       <Filter>impl\math\arithmetic</Filter>
     </ClInclude>
+    <ClInclude Include="impl\math\arithmetic\division_vector.inl">
+      <Filter>impl\math\arithmetic</Filter>
+    </ClInclude>
     <ClInclude Include="impl\math\arithmetic\multiplication.hpp">
       <Filter>impl\math\arithmetic</Filter>
     </ClInclude>

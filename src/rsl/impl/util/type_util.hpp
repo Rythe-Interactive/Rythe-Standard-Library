@@ -64,7 +64,7 @@ namespace rsl {
     namespace internal {
         struct any_type {
             template<typename T>
-            constexpr operator T(); // implicit conversion to any type.
+            constexpr operator T&(); // implicit conversion to any type.
         };
 
         template<typename Func, size_type... paramCounts>

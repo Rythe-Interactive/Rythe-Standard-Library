@@ -21,28 +21,28 @@ namespace fmt
 
 	};
 
-	template <>
-	struct formatter<std::thread::id>
-	{
-		constexpr const char* parse(format_parse_context& ctx)
-		{
-			auto it = ctx.begin(), end = ctx.end();
+	//template <>
+	//struct formatter<std::thread::id>
+	//{
+	//	constexpr const char* parse(format_parse_context& ctx)
+	//	{
+	//		auto it = ctx.begin(), end = ctx.end();
 
-			if (!it)
-				return nullptr;
+	//		if (!it)
+	//			return nullptr;
 
-			if (it != end && *it != '}')
-				throw format_error("invalid format");
-			return it++;
-		}
+	//		if (it != end && *it != '}')
+	//			throw format_error("invalid format");
+	//		return it++;
+	//	}
 
-		template <typename FormatContext>
-		auto format(const std::thread::id& p, FormatContext& ctx) {
-			std::ostringstream oss;
-			oss << p;
-			return format_to(ctx.out(), "{}", oss.str());
-		}
-	};
+	//	template <typename FormatContext>
+	//	auto format(const std::thread::id& p, FormatContext& ctx) {
+	//		std::ostringstream oss;
+	//		oss << p;
+	//		return format_to(ctx.out(), "{}", oss.str());
+	//	}
+	//};
 
 
 	template <>
