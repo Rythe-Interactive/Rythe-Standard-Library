@@ -1,4 +1,4 @@
-createProject ("include","rythe-standard-library","StaticLib")
+createProject ("include","rsl","StaticLib")
 includedirs {
     "$(SolutionDir)include/rythe-standard-library/src/"
 }
