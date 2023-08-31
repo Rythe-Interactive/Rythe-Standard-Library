@@ -20,13 +20,42 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 DEALINGS IN THE SOFTWARE.
 
 ]]--
+function createProject(groupName,projectName,kindName)
+    print("Building " .. projectName)
+    group ("" .. groupName)
+    project ("" .. projectName)
+        kind (""..kindName)
+        location ("src/"..projectName)
+        architecture "x64"
+        toolset "clang"
+        language "C++"
+        cppdialect "C++20"
+        targetdir "$(SolutionDir)bin\\lib"
+        libdirs {"$(SolutionDir)bin\\lib\\"}
+        objdir "$(SolutionDir)bin\\obj"
+        defines {"ARBROOK_INTERNAL", "PROJECT_NAME="..projectName}
+        filter "configurations:Debug*"
+            defines {"DEBUG"}
+            symbols "On"
+            targetsuffix "-d"
+        filter "configurations:Release*"
+            defines {"NDEBUG"}
+            optimize "On"
+        filter "configurations:*OGL"
+            defines {"RenderingAPI_OGL=0","RenderingAPI=0"}
+        
+        filter "configurations:*DX11"
+            defines {"RenderingAPI_DX11=1","RenderingAPI=1"}  
 
+        filter {}
+    group ""
+end
 
 -- root workspace, all sub-project should be included
 workspace "rsl"
     configurations { "Debug64", "Release64" }
-
-include "src/rsl/build-rsl.lua"
+    
+include "build-rythe-standard-library.lua"
 
 project "*"
     includedirs { "src/rsl/impl/"}
@@ -36,8 +65,6 @@ project "*"
 
         
     filter "configurations:Debug*"
-        -- buildoptions { "-fsanitize=address,undefined" }
-        -- linkoptions { "-fsanitize=address,undefined" }
         defines {"DEBUG"}
         symbols "On"
 

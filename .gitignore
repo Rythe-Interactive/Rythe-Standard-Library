@@ -3,3 +3,5 @@ build
 src/rsl/obj
 *.vcxproj
 *.filters
+*.user
+*.sln

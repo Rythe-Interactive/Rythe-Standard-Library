@@ -5,7 +5,7 @@
 #include "../util/type_util.hpp"
 #include "../util/primitives.hpp"
 
-namespace rythe::core
+namespace rsl
 {
     template <class T>
     struct pair_range
