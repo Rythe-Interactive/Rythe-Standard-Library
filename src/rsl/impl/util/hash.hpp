@@ -37,12 +37,6 @@ namespace rsl
         return hasher(val);
     }
 
-    template<typename T>
-    constexpr static size_type typeHash()
-    {
-        return typeid(T).hash_code();
-    }
-
      constexpr id_type combine_hash(id_type seed, id_type value);
 
     struct name_hash
@@ -216,6 +210,13 @@ namespace rsl
     namespace literals
     {
         constexpr name_hash operator""_hs(cstring src);
+    }
+
+
+    template<typename T>
+    constexpr static size_type typeHash()
+    {
+        return make_hash<T>();
     }
 
 }

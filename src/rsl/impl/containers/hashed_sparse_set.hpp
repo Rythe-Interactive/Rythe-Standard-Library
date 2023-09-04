@@ -296,6 +296,7 @@ namespace rsl
 #pragma endregion
 
 #pragma region emplace
+
         /**@brief Construct item in place.
          * @param arguments Arguments to pass to the item constructor.
          */
