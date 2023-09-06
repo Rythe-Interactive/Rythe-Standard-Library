@@ -16,14 +16,14 @@ namespace rsl::math
 	[[nodiscard]] matrix<Scalar, 4, 4> lookAt(vector<Scalar, 3> pos, vector<Scalar, 3> center, vector<Scalar, 3> up) noexcept;
 
 	template<typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> transpose(matrix<Scalar,4,4> matrix) noexcept;
+	[[nodiscard]] matrix<Scalar, 4, 4> transpose(matrix<Scalar,4,4> mat) noexcept;
 
 	template<typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> translate(matrix<Scalar, 4, 4> matrix, vector<Scalar, 3> pos) noexcept;
+	[[nodiscard]] matrix<Scalar, 4, 4> translate(matrix<Scalar, 4, 4> mat, vector<Scalar, 3> pos) noexcept;
+	/*template<typename Scalar>
+	[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> matrix, quaternion<Scalar> orientation) noexcept;*/
 	template<typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> matrix, quaternion<Scalar> orientation) noexcept;
+	[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> mat, Scalar rad, vector<Scalar, 3> axis) noexcept;
 	template<typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> matrix, Scalar rad, vector<Scalar, 3> axis) noexcept;
-	template<typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> scale(matrix<Scalar, 4, 4> matrix, vector<Scalar, 3> scale) noexcept;
+	[[nodiscard]] matrix<Scalar, 4, 4> scale(matrix<Scalar, 4, 4> mat, vector<Scalar, 3> scale) noexcept;
 }

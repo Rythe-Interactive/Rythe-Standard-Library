@@ -86,7 +86,7 @@ namespace fmt
 		auto format(const rsl::math::vec2& p, FormatContext& ctx) {
 			// auto format(const point &p, FormatContext &ctx) -> decltype(ctx.out()) // c++11
 			  // ctx.out() is an output iterator to write to.
-			return format_to(
+			return fmt::v9::format_to(
 				ctx.out(),
 				presentation == 'f' ? "({:.1f}, {:.1f})" : "({:.1e}, {:.1e})",
 				p.x, p.y);
@@ -109,7 +109,7 @@ namespace fmt
 
 		template <typename FormatContext>
 		auto format(const rsl::math::ivec2& p, FormatContext& ctx) {
-			return format_to(
+			return fmt::v9::format_to(
 				ctx.out(),
 				"({}, {})",
 				p.x, p.y);
@@ -136,7 +136,7 @@ namespace fmt
 
 		template <typename FormatContext>
 		auto format(const rsl::math::vec3& p, FormatContext& ctx) {
-			return format_to(
+			return fmt::v9::format_to(
 				ctx.out(),
 				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e})",
 				p.x, p.y, p.z);
@@ -159,7 +159,7 @@ namespace fmt
 
 		template <typename FormatContext>
 		auto format(const rsl::math::ivec3& p, FormatContext& ctx) {
-			return format_to(
+			return fmt::v9::format_to(
 				ctx.out(),
 				"({}, {}, {})",
 				p.x, p.y, p.z);
@@ -186,10 +186,48 @@ namespace fmt
 
 		template <typename FormatContext>
 		auto format(const rsl::math::vec4& p, FormatContext& ctx) {
-			return format_to(
+			return fmt::v9::format_to(
 				ctx.out(),
 				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})",
 				p.x, p.y, p.z, p.w);
+		}
+	};
+
+	template <>
+	struct formatter<rsl::math::mat4> : fmt::formatter<std::string> {
+		char presentation = 'f';
+
+		constexpr const char* parse(format_parse_context& ctx) {
+			auto it = ctx.begin(), end = ctx.end();
+
+			if (!it)
+				return nullptr;
+
+			if (it != end && (*it == 'f' || *it == 'e')) presentation = *it++;
+
+			if (it != end && *it != '}')
+				throw format_error("invalid format");
+
+			return it;
+		}
+
+		template <typename FormatContext>
+		auto format(const rsl::math::mat4& p, FormatContext& ctx) const -> decltype(ctx.out())
+		{
+			return fmt::v9::format_to(
+				ctx.out(),
+				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
+				"({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
+				"({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
+				"({:.1f}, {:.1f}, {:.1f}, {:.1f})" :
+				"({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
+				"({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
+				"({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
+				"({:.1e}, {:.1e}, {:.1e}, {:.1e})",
+				p[0][0], p[0][1], p[0][2], p[0][3],
+				p[1][0], p[1][1], p[1][2], p[1][3],
+				p[2][0], p[2][1], p[2][2], p[2][3],
+				p[3][0], p[3][1], p[3][2], p[3][3]);
 		}
 	};
 
