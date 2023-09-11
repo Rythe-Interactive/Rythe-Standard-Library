@@ -86,7 +86,7 @@ namespace fmt
 		auto format(const rsl::math::vec2& p, FormatContext& ctx) {
 			// auto format(const point &p, FormatContext &ctx) -> decltype(ctx.out()) // c++11
 			  // ctx.out() is an output iterator to write to.
-			return fmt::v9::format_to(
+			return format_to(
 				ctx.out(),
 				presentation == 'f' ? "({:.1f}, {:.1f})" : "({:.1e}, {:.1e})",
 				p.x, p.y);
@@ -109,7 +109,7 @@ namespace fmt
 
 		template <typename FormatContext>
 		auto format(const rsl::math::ivec2& p, FormatContext& ctx) {
-			return fmt::v9::format_to(
+			return format_to(
 				ctx.out(),
 				"({}, {})",
 				p.x, p.y);
@@ -136,7 +136,7 @@ namespace fmt
 
 		template <typename FormatContext>
 		auto format(const rsl::math::vec3& p, FormatContext& ctx) {
-			return fmt::v9::format_to(
+			return format_to(
 				ctx.out(),
 				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e})",
 				p.x, p.y, p.z);
@@ -159,7 +159,7 @@ namespace fmt
 
 		template <typename FormatContext>
 		auto format(const rsl::math::ivec3& p, FormatContext& ctx) {
-			return fmt::v9::format_to(
+			return format_to(
 				ctx.out(),
 				"({}, {}, {})",
 				p.x, p.y, p.z);
@@ -186,7 +186,7 @@ namespace fmt
 
 		template <typename FormatContext>
 		auto format(const rsl::math::vec4& p, FormatContext& ctx) {
-			return fmt::v9::format_to(
+			return format_to(
 				ctx.out(),
 				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})",
 				p.x, p.y, p.z, p.w);
@@ -214,7 +214,7 @@ namespace fmt
 		template <typename FormatContext>
 		auto format(const rsl::math::mat4& p, FormatContext& ctx) const -> decltype(ctx.out())
 		{
-			return fmt::v9::format_to(
+			return format_to(
 				ctx.out(),
 				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
 				"({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
