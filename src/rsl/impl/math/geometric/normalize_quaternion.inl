@@ -11,7 +11,7 @@ namespace rsl::math::detail
     {
         using quat_type = quaternion<Scalar>;
 
-        [[nodiscard]] r_always_inline static quat_type compute(const quat_type& q) noexcept
+        [[nodiscard]] rythe_always_inline static quat_type compute(const quat_type& q) noexcept
         {
             return q / length(q);
         }

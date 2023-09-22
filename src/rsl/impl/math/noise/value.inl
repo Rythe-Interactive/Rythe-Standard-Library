@@ -6,7 +6,7 @@ namespace rsl::math::noise
     namespace detail
     {
         template<typename scalar, typename int_scalar = int_least<sizeof(scalar)>>
-        [[nodiscard]] r_always_inline constexpr scalar _value_1d_impl_(int_scalar seed, scalar value) noexcept
+        [[nodiscard]] rythe_always_inline constexpr scalar _value_1d_impl_(int_scalar seed, scalar value) noexcept
         {
             int_scalar floored = ifloor<int_scalar>(value);
             int_scalar start = floored * primes<int_scalar>.x;
@@ -15,7 +15,7 @@ namespace rsl::math::noise
         }
 
         template<typename scalar, typename int_scalar = int_least<sizeof(scalar)>>
-        [[nodiscard]] r_always_inline constexpr scalar _value_1d_impl_(int_scalar seed, scalar value, scalar& derivative) noexcept
+        [[nodiscard]] rythe_always_inline constexpr scalar _value_1d_impl_(int_scalar seed, scalar value, scalar& derivative) noexcept
         {
             int_scalar floored = ifloor<int_scalar>(value);
             int_scalar start = floored * primes<int_scalar>.x;
@@ -33,7 +33,7 @@ namespace rsl::math::noise
         }
 
         template<typename scalar, typename int_scalar = int_least<sizeof(scalar)>, typename VectorType>
-        [[nodiscard]] r_always_inline constexpr scalar _value_2d_impl_(int_scalar seed, VectorType value) noexcept
+        [[nodiscard]] rythe_always_inline constexpr scalar _value_2d_impl_(int_scalar seed, VectorType value) noexcept
         {
             using scalar2 = vector<scalar, 2>;
             using int_scalar2 = vector<int_scalar, 2>;
@@ -51,7 +51,7 @@ namespace rsl::math::noise
         }
 
         template<typename scalar, typename int_scalar = int_least<sizeof(scalar)>, typename VectorType>
-        [[nodiscard]] r_always_inline constexpr scalar _value_2d_impl_(int_scalar seed, VectorType value, vector<scalar, 2>& derivative) noexcept
+        [[nodiscard]] rythe_always_inline constexpr scalar _value_2d_impl_(int_scalar seed, VectorType value, vector<scalar, 2>& derivative) noexcept
         {
             using scalar2 = vector<scalar, 2>;
             using int_scalar2 = vector<int_scalar, 2>;
@@ -77,7 +77,7 @@ namespace rsl::math::noise
         }
 
         template<typename scalar, typename int_scalar = int_least<sizeof(scalar)>, typename VectorType>
-        [[nodiscard]] r_always_inline constexpr scalar _value_3d_impl_(int_scalar seed, VectorType value) noexcept
+        [[nodiscard]] rythe_always_inline constexpr scalar _value_3d_impl_(int_scalar seed, VectorType value) noexcept
         {
             using scalar3 = vector<scalar, 3>;
             using int_scalar3 = vector<int_scalar, 3>;
@@ -97,7 +97,7 @@ namespace rsl::math::noise
         }
 
         template<typename scalar, typename int_scalar = int_least<sizeof(scalar)>, typename VectorType>
-        [[nodiscard]] r_always_inline constexpr scalar _value_3d_impl_(int_scalar seed, VectorType value, vector<scalar, 3>& derivative) noexcept
+        [[nodiscard]] rythe_always_inline constexpr scalar _value_3d_impl_(int_scalar seed, VectorType value, vector<scalar, 3>& derivative) noexcept
         {
             using scalar2 = vector<scalar, 2>;
             using scalar3 = vector<scalar, 3>;
@@ -131,7 +131,7 @@ namespace rsl::math::noise
     }
 
     template<typename VectorType>
-    [[nodiscard]] r_always_inline constexpr auto value(VectorType&& value, int_least<sizeof(vector_scalar_t<VectorType>)> seed) noexcept
+    [[nodiscard]] rythe_always_inline constexpr auto value(VectorType&& value, int_least<sizeof(vector_scalar_t<VectorType>)> seed) noexcept
     {
         constexpr size_type dimensions = vector_size_v<VectorType>;
        // using scalar = vector_scalar_t<VectorType>;
@@ -147,7 +147,7 @@ namespace rsl::math::noise
     }
 
     template<typename VectorType>
-    [[nodiscard]] r_always_inline constexpr auto value(VectorType&& value, decay_vector_t<VectorType>& derivative, int_least<sizeof(vector_scalar_t<VectorType>)> seed) noexcept
+    [[nodiscard]] rythe_always_inline constexpr auto value(VectorType&& value, decay_vector_t<VectorType>& derivative, int_least<sizeof(vector_scalar_t<VectorType>)> seed) noexcept
     {
         constexpr size_type dimensions = vector_size_v<VectorType>;
         //using scalar = vector_scalar_t<VectorType>;

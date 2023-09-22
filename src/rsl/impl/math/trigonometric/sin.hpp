@@ -12,11 +12,11 @@ namespace rsl::math
 {
     // sin
     template<typename T>
-    [[nodiscard]] r_always_inline auto sin(T&& v) noexcept;
+    [[nodiscard]] rythe_always_inline auto sin(T&& v) noexcept;
 
     // asin
     template<typename T>
-    [[nodiscard]] r_always_inline auto asin(T&& v) noexcept;
+    [[nodiscard]] rythe_always_inline auto asin(T&& v) noexcept;
 }
 
 #include "sin.inl"

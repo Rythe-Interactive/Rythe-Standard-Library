@@ -9,7 +9,7 @@ namespace rsl::math
 {
     // cos
     template<typename T>
-    [[nodiscard]] r_always_inline auto cos(T&& value) noexcept
+    [[nodiscard]] rythe_always_inline auto cos(T&& value) noexcept
     {
         using Type = ::std::remove_cvref_t<T>;
 
@@ -33,7 +33,7 @@ namespace rsl::math
 
     // acos
     template<typename T>
-    [[nodiscard]] r_always_inline auto acos(T&& value) noexcept
+    [[nodiscard]] rythe_always_inline auto acos(T&& value) noexcept
     {
         using Type = ::std::remove_cvref_t<T>;
 

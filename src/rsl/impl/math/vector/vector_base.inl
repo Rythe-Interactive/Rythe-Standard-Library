@@ -62,13 +62,13 @@ namespace rsl::math
     }
 
     template<typename Scalar, size_type Size>
-    [[nodiscard]] r_always_inline Scalar vector<Scalar, Size>::length() const noexcept { return ::rsl::math::length(*this); }
+    [[nodiscard]] rythe_always_inline Scalar vector<Scalar, Size>::length() const noexcept { return ::rsl::math::length(*this); }
 
     template<typename Scalar, size_type Size>
     [[nodiscard]] constexpr Scalar vector<Scalar, Size>::length2() const noexcept { return ::rsl::math::length2(*this); }
 
     template<size_type I, typename Scalar, size_type Size>
-    inline r_always_inline Scalar& get(vector<Scalar, Size>& val) { return val[I]; }
+    inline rythe_always_inline Scalar& get(vector<Scalar, Size>& val) { return val[I]; }
 }
 
 template<::std::size_t I, typename Scalar, ::std::size_t Size>
@@ -77,7 +77,7 @@ struct ::std::tuple_element<I, ::rsl::math::vector<Scalar, Size>> { using type =
 namespace std
 {
     template<::std::size_t I, typename Scalar, ::std::size_t Size>
-    inline r_always_inline Scalar& get(::rsl::math::vector<Scalar, Size>& val) { return ::rsl::math::get<I>(val); }
+    inline rythe_always_inline Scalar& get(::rsl::math::vector<Scalar, Size>& val) { return ::rsl::math::get<I>(val); }
 }
 
 template<typename Scalar, ::std::size_t Size>

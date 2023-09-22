@@ -9,7 +9,7 @@ namespace rsl::math
 {
     // sin
     template<typename T>
-    [[nodiscard]] r_always_inline auto sin(T&& value) noexcept
+    [[nodiscard]] rythe_always_inline auto sin(T&& value) noexcept
     {
         using Type = ::std::remove_cvref_t<T>;
 
@@ -33,7 +33,7 @@ namespace rsl::math
 
     // asin
     template<typename T>
-    [[nodiscard]] r_always_inline auto asin(T&& value) noexcept
+    [[nodiscard]] rythe_always_inline auto asin(T&& value) noexcept
     {
         using Type = ::std::remove_cvref_t<T>;
 

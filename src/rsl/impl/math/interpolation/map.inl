@@ -4,7 +4,7 @@
 namespace rsl::math::detail
 {
     template<typename T, typename InMin, typename InMax, typename OutMin, typename OutMax>
-    [[nodiscard]] r_always_inline constexpr auto _map_impl_(T&& value, InMin&& inMin, InMax&& inMax, OutMin&& outMin, OutMax&& outMax) noexcept
+    [[nodiscard]] rythe_always_inline constexpr auto _map_impl_(T&& value, InMin&& inMin, InMax&& inMax, OutMin&& outMin, OutMax&& outMax) noexcept
     {
         return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
     }
@@ -18,7 +18,7 @@ namespace rsl::math
 {
     // map
     template<typename T, typename InMin, typename InMax, typename OutMin, typename OutMax>
-    [[nodiscard]] r_always_inline constexpr auto map(T&& value, InMin&& inMin, InMax&& inMax, OutMin&& outMin, OutMax&& outMax) noexcept
+    [[nodiscard]] rythe_always_inline constexpr auto map(T&& value, InMin&& inMin, InMax&& inMax, OutMin&& outMin, OutMax&& outMax) noexcept
     {
         using ValueType = ::std::remove_cvref_t<T>;
         using InMinType = ::std::remove_cvref_t<InMin>;
@@ -62,7 +62,7 @@ namespace rsl::math
 
     // map01
     template<typename T, typename InMin, typename InMax>
-    [[nodiscard]] r_always_inline constexpr auto map01(T&& value, InMin&& inMin, InMax&& inMax) noexcept
+    [[nodiscard]] rythe_always_inline constexpr auto map01(T&& value, InMin&& inMin, InMax&& inMax) noexcept
     {
         return map(::std::forward<T>(value), ::std::forward<InMin>(inMin), ::std::forward<InMax>(inMax), zero<T>, one<T>);
     }

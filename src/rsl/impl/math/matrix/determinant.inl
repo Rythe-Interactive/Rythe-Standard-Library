@@ -6,7 +6,7 @@ namespace rsl::math
     namespace detail
     {
         template<typename mat_type>
-        [[nodiscard]] r_always_inline constexpr auto extract_sub_mat(const mat_type& v, size_type rowIdx, size_type colIdx)
+        [[nodiscard]] rythe_always_inline constexpr auto extract_sub_mat(const mat_type& v, size_type rowIdx, size_type colIdx)
         {
             using sub_mat_type = matrix<typename mat_type::scalar, mat_type::row_count - 1, mat_type::col_count - 1>;
 
@@ -40,7 +40,7 @@ namespace rsl::math
             using mat_type = matrix<Scalar, RowCount, ColCount>;
             using sub_mat_type = matrix<Scalar, RowCount - 1, ColCount - 1>;
 
-            [[nodiscard]] r_always_inline constexpr static Scalar compute(const mat_type& v) noexcept
+            [[nodiscard]] rythe_always_inline constexpr static Scalar compute(const mat_type& v) noexcept
             {
                 static_assert(RowCount == ColCount, "Determinants can only be calculated of square matrices");
 
@@ -56,7 +56,7 @@ namespace rsl::math
         {
             using mat_type = matrix<Scalar, 1, 1>;
 
-            [[nodiscard]] r_always_inline constexpr static Scalar compute(const mat_type& v) noexcept
+            [[nodiscard]] rythe_always_inline constexpr static Scalar compute(const mat_type& v) noexcept
             {
                 return v[0][0];
             }
@@ -67,7 +67,7 @@ namespace rsl::math
         {
             using mat_type = matrix<Scalar, 2, 2>;
 
-            [[nodiscard]] r_always_inline constexpr static Scalar compute(const mat_type& v) noexcept
+            [[nodiscard]] rythe_always_inline constexpr static Scalar compute(const mat_type& v) noexcept
             {
                 return v[0][0] * v[1][1] - v[0][1] * v[1][0];
             }
@@ -75,7 +75,7 @@ namespace rsl::math
     }
 
     template<typename mat_type, ::std::enable_if_t<is_matrix_v<mat_type>, bool>>
-    [[nodiscard]] r_always_inline constexpr auto determinant(const mat_type& mat) noexcept
+    [[nodiscard]] rythe_always_inline constexpr auto determinant(const mat_type& mat) noexcept
     {
         return detail::compute_determinant<mat_type>::compute(mat);
     }

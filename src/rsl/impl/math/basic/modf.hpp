@@ -15,7 +15,7 @@ namespace rsl::math
             static constexpr size_type size = Size;
             using value_type = vector<Scalar, size>;
 
-            inline r_always_inline static value_type compute(const value_type& val, value_type& integer) noexcept
+            inline rythe_always_inline static value_type compute(const value_type& val, value_type& integer) noexcept
             {
                     value_type result;
                     for (size_type i = 0; i < size; i++)
@@ -31,7 +31,7 @@ namespace rsl::math
             using value_type = vector<Scalar, size>;
 
             template<typename RET>
-            inline r_always_inline static value_type compute(Scalar val, RET& integer) noexcept
+            inline rythe_always_inline static value_type compute(Scalar val, RET& integer) noexcept
             {
                 if constexpr (is_vector_v<RET>)
                     return ::std::modf(val, &integer[0]);
@@ -42,7 +42,7 @@ namespace rsl::math
     }
 
     template<typename T, typename RET>
-    inline r_always_inline static auto modf(const T& val, RET& integer)
+    inline rythe_always_inline static auto modf(const T& val, RET& integer)
     {
         if constexpr (is_vector_v<T>)
         {

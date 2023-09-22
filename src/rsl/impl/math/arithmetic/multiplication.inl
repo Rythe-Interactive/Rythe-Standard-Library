@@ -10,7 +10,7 @@ namespace rsl::math
 {
     // mul
     template<typename TypeA, typename TypeB >
-    [[nodiscard]] r_always_inline constexpr auto mul(TypeA&& a, TypeB&& b) noexcept
+    [[nodiscard]] rythe_always_inline constexpr auto mul(TypeA&& a, TypeB&& b) noexcept
     {
         using A = ::std::remove_cvref_t<TypeA>;
         using B = ::std::remove_cvref_t<TypeB>;
@@ -55,21 +55,21 @@ namespace rsl::math
 
     // operator *
     template<typename TypeA, typename TypeB, std::enable_if_t<is_linear_algebraic_construct_v<TypeA> || is_linear_algebraic_construct_v<TypeB>, bool>>
-    [[nodiscard]] r_always_inline constexpr auto operator*(TypeA&& a, TypeB&& b) noexcept
+    [[nodiscard]] rythe_always_inline constexpr auto operator*(TypeA&& a, TypeB&& b) noexcept
     {
         return mul(std::forward<TypeA>(a), std::forward<TypeB>(b));
     }
 
     // mul_assign
     template<typename TypeA, typename TypeB>
-    r_always_inline constexpr TypeA& mul_assign(TypeA& a, TypeB&& b) noexcept
+    rythe_always_inline constexpr TypeA& mul_assign(TypeA& a, TypeB&& b) noexcept
     {
         return a = a * b;
     }
 
     // operator *=
     template<typename TypeA, typename TypeB, std::enable_if_t<is_linear_algebraic_construct_v<TypeA> || is_linear_algebraic_construct_v<TypeB>, bool>>
-    r_always_inline constexpr TypeA& operator*=(TypeA& a, TypeB&& b) noexcept
+    rythe_always_inline constexpr TypeA& operator*=(TypeA& a, TypeB&& b) noexcept
     {
         return a = a * b;
     }

@@ -6,7 +6,7 @@
 namespace rsl::math
 {
     template<typename A, typename B>
-    [[nodiscard]] r_always_inline constexpr auto min(A&& a, B&& b)
+    [[nodiscard]] rythe_always_inline constexpr auto min(A&& a, B&& b)
     {
         if constexpr (is_vector_v<A> && is_vector_v<B>)
         {
@@ -28,7 +28,7 @@ namespace rsl::math
     }
 
     template<typename A, typename B>
-    [[nodiscard]] r_always_inline constexpr auto max(A&& a, B&& b)
+    [[nodiscard]] rythe_always_inline constexpr auto max(A&& a, B&& b)
     {
         if constexpr (is_vector_v<A> && is_vector_v<B>)
         {
@@ -50,7 +50,7 @@ namespace rsl::math
     }
 
     template<typename In, typename Min, typename Max>
-    [[nodiscard]] r_always_inline constexpr auto clamp(In&& in, Min&& min, Max&& max)
+    [[nodiscard]] rythe_always_inline constexpr auto clamp(In&& in, Min&& min, Max&& max)
     {
         if constexpr (is_vector_v<In> && is_vector_v<Min> && is_vector_v<Max>)
         {
@@ -98,7 +98,7 @@ namespace rsl::math
     }
 
     template<typename In>
-    [[nodiscard]] r_always_inline constexpr auto saturate(In&& in)
+    [[nodiscard]] rythe_always_inline constexpr auto saturate(In&& in)
     {
         using value_type = ::std::remove_cvref_t<In>;
         if constexpr (is_vector_v<value_type>)

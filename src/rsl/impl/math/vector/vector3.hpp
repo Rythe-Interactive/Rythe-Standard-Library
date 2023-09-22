@@ -56,7 +56,7 @@ namespace rsl::math
             rsl_assert_msg((i >= 0) && (i < size), "vector subscript out of range"); return data[i];
         }
 
-        r_always_inline scalar length() const noexcept { return ::rsl::math::length(*this); }
+        rythe_always_inline scalar length() const noexcept { return ::rsl::math::length(*this); }
         constexpr scalar length2() const noexcept { return ::rsl::math::length2(*this); }
     };
 
