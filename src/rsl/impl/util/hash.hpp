@@ -9,35 +9,11 @@
 
 namespace rsl
 {
-    constexpr static size_type hash_combine(size_type seed, size_type hash)
-    {
-        return seed ^ (hash + (0x9e3779b9 + (seed << 6) + (seed >> 2)));
-    }
-
     template<typename hash_type, typename... hash_types>
-    constexpr static size_type hash_combine_multiple(size_type seed, hash_type hash, hash_types... hashes)
-    {
-        static_assert(std::is_same_v<size_type, hash_type>, "Hashes need to be of type: size_type");
-
-        seed ^= (hash + (0x9e3779b9 + (seed << 6) + (seed >> 2)));
-        if constexpr (sizeof...(hash_types) == 1)
-        {
-            return hash_combine(seed, hashes...);
-        }
-        else
-        {
-            return hash_combine_multiple(seed, hashes...);
-        }
-    }
+    constexpr static id_type combine_hash(id_type seed, hash_type hash, hash_types... hashes);
 
     template<typename T>
-    constexpr static size_type hash(const T& val)
-    {
-        constexpr ::std::hash<T> hasher{};
-        return hasher(val);
-    }
-
-     constexpr id_type combine_hash(id_type seed, id_type value);
+    constexpr static id_type hash(const T& val);
 
     struct name_hash
     {
@@ -75,13 +51,13 @@ namespace rsl
     {
         friend struct type_reference;
         virtual ~type_hash_base() = default;
-        virtual id_type local() const noexcept RYTHE_PURE;
-        virtual std::string_view local_name() const noexcept RYTHE_PURE;
-        virtual id_type global() const noexcept RYTHE_PURE;
-        virtual std::string_view global_name() const noexcept RYTHE_PURE;
+        virtual id_type local() const noexcept = 0;
+        virtual std::string_view local_name() const noexcept = 0;
+        virtual id_type global() const noexcept = 0;
+        virtual std::string_view global_name() const noexcept = 0;
 
     protected:
-        virtual type_hash_base* copy() const RYTHE_PURE;
+        virtual type_hash_base* copy() const = 0;
     };
 
     template<typename T>
