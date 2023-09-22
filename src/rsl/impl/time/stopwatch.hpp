@@ -42,4 +42,6 @@ namespace rsl
     };
 
     using timer = stopwatch<>;
+
+    extern const timer main_clock;
 }

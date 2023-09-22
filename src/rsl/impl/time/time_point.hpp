@@ -86,6 +86,8 @@ namespace rsl {
         [[nodiscard]] constexpr rsl::micro_seconds microseconds() const noexcept(std::is_arithmetic_v<rep>)               { return micro_dur<rsl::micro_seconds>().count(); }
         [[nodiscard]] constexpr rsl::nano_seconds  nanoseconds()  const noexcept(std::is_arithmetic_v<rep>)               { return nano_dur<rsl::nano_seconds>().count(); }
     };
+
+    extern const time_point<> genesis;
 }
 
 template <rsl::time_duration_rep precision, rsl::chrono_clock clock_t, rsl::time_duration_rep precision2>
