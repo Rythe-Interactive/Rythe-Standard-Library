@@ -54,12 +54,12 @@ namespace rsl {
 
         template<typename T, ReturnType(T::* method)(ParamTypes...)>
         rythe_always_inline static id_type method_id(const T& obj) {
-            return hash_combine(force_cast<size_type>(&obj), force_cast<size_type>(method));
+            return combine_hash(force_cast<size_type>(&obj), force_cast<size_type>(method));
         }
 
         template<typename T, ReturnType(T::* method)(ParamTypes...) const>
         rythe_always_inline static id_type method_id(const T& obj) {
-            return hash_combine(force_cast<size_type>(&obj), force_cast<size_type>(method));
+            return combine_hash(force_cast<size_type>(&obj), force_cast<size_type>(method));
         }
 
         template<ReturnType(*func)(ParamTypes...)>
@@ -94,7 +94,7 @@ namespace rsl {
         template<functor Functor>
             requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
         rythe_always_inline static id_type functor_id(const Functor& obj) {
-            return hash_combine(force_cast<size_type>(&obj), force_cast<size_type>(&Functor::operator()));
+            return combine_hash(force_cast<size_type>(&obj), force_cast<size_type>(&Functor::operator()));
         }
 
         template<typename T, ReturnType(T::* TMethod)(ParamTypes...)>

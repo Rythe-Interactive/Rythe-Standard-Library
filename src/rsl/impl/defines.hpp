@@ -6,7 +6,7 @@
 
 #define RYTHE_CONCAT(A, B) _RYTHE_CONCAT_IMPL_(A, B)
 
-#define RYTHE_ANONYMOUS_NAME(x) CONCAT(x, __LINE__)
+#define RYTHE_ANONYMOUS_NAME(x) RYTHE_CONCAT(x, __LINE__)
 
 #define RYTHE_ANON_VAR(Type, Category) inline static Type RYTHE_EXPAND(RYTHE_ANONYMOUS_NAME(Category))
 
@@ -14,6 +14,8 @@
 
 #define RYTHE_DEBUG_VALUE 1
 #define RYTHE_RELEASE_VALUE 2
+
+#define R_PAUSE_INSTRUCTION __debugbreak
 
 #if defined(_DEBUG) || defined(DEBUG)
 /**@def RYTHE_DEBUG
@@ -286,6 +288,21 @@ type& operator=(type&&) noexcept = default;
 #   define rythe_always_inline inline
 #endif
 #pragma endregion
+
+#if defined(RYTHE_GCC) || defined(RYTHE_CLANG)
+#   define R_NODISCARD [[nodiscard]]
+#elif defined(RYTHE_MSVC)
+#   define R_NODISCARD
+#else
+#   define R_NODISCARD 
+#endif
+#pragma endregion
+
+#define R_MAYBEUNUSED [[maybe_unused]]
+#define RYTHE_PURE =0
+#define RYTHE_IMPURE {}
+#define RYTHE_IMPURE_RETURN(x) { return (x); }
+#define RYTHE_MIN_THREADS 2
 
 #define RYTHE_HAS_FUNC(x)                                                                                                   \
         template<typename, typename T>                                                                                      \

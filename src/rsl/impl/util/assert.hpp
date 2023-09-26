@@ -9,7 +9,7 @@
 
 #define __rsl_assert_impl(expr, file, line, msg, soft)                                                                          \
 {                                                                                                                               \
-    std::cerr << "Assertion failed:\t" << msg << "\nExpected:\t\t" expr "\nSource:\t\t\t" file ", line " STRINGIFY(line) "\n";  \
+    std::cerr << "Assertion failed:\t" << msg << "\nExpected:\t\t" << expr << "\nSource:\t\t\t" << file << ", line " << RYTHE_STRINGIFY(line) <<"\n";  \
     if constexpr (soft) { __debugbreak(); } else { std::abort(); }                                                              \
 }                                                                                                                               \
 
