@@ -289,19 +289,15 @@ type& operator=(type&&) noexcept = default;
 #endif
 #pragma endregion
 
-#if defined(RYTHE_GCC) || defined(RYTHE_CLANG)
-#   define R_NODISCARD [[nodiscard]]
-#elif defined(RYTHE_MSVC)
-#   define R_NODISCARD
-#else
-#   define R_NODISCARD 
-#endif
-#pragma endregion
+//#if defined(RYTHE_GCC) || defined(RYTHE_CLANG)
+//#   define [[nodiscard]] [[nodiscard]]
+//#elif defined(RYTHE_MSVC)
+//#   define [[nodiscard]]
+//#else
+//#   define [[nodiscard]] 
+//#endif
+//#pragma endregion
 
-#define R_MAYBEUNUSED [[maybe_unused]]
-#define RYTHE_PURE =0
-#define RYTHE_IMPURE {}
-#define RYTHE_IMPURE_RETURN(x) { return (x); }
 #define RYTHE_MIN_THREADS 2
 
 #define RYTHE_HAS_FUNC(x)                                                                                                   \
