@@ -352,7 +352,7 @@ namespace rsl::log
 		}
 
 		//generates a new formatter flag
-		R_NODISCARD std::unique_ptr<custom_flag_formatter> clone() const override
+		[[nodiscard]] std::unique_ptr<custom_flag_formatter> clone() const override
 		{
 			return spdlog::details::make_unique<genesis_formatter_flag>();
 		}
