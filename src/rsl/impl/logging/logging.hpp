@@ -108,8 +108,8 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::ivec2& p, FormatContext& ctx) {
-			return format_to(
+		auto format(rsl::math::ivec2& p, FormatContext& ctx) {
+			return fmt::v8::format_to(
 				ctx.out(),
 				"({}, {})",
 				p.x, p.y);
@@ -284,30 +284,6 @@ namespace fmt
 				p.i, p.j, p.k, p.w);
 		}
 	};
-
-	//template <>
-	//struct formatter<std::string> {
-	//	char presentation = 'f';
-
-	//	constexpr const char* parse(format_parse_context& ctx) {
-	//		auto it = ctx.begin(), end = ctx.end();
-
-	//		if (!it)
-	//			return nullptr;
-
-	//		if (it != end && (*it == 'f' || *it == 'e')) presentation = *it++;
-
-	//		if (it != end && *it != '}')
-	//			throw format_error("invalid format");
-
-	//		return it;
-	//	}
-
-	//	template <typename FormatContext>
-	//	auto format(const std::string& p, FormatContext& ctx) {
-	//		return format_to(ctx.out(), "{}", p);
-	//	}
-	//};
 }
 
 namespace rsl::log

@@ -491,5 +491,96 @@ namespace rsl {
         return nameHash(localNameOfType<T>());
     }
 
+
+    template<typename Iterator>
+    void appendBinaryData(Iterator first, Iterator last, byte_vec& data);
+
+    template<typename T>
+    void appendBinaryData(T* value, byte_vec& data)
+    {
+        if constexpr (has_resize<std::remove_const_t<T>, void(const std::size_t)>::value)
+        {
+            auto first = value->begin();
+            auto last = value->end();
+
+            uint64 arrSize = std::distance(first, last) * sizeof(typename decltype(first)::value_type);
+
+            for (int i = 0; i < sizeof(uint64); i++)
+                data.push_back(reinterpret_cast<const byte*>(&arrSize)[i]);
+
+            for (auto it = first; it != last; ++it)
+                appendBinaryData(&*it, data);
+        }
+        else
+        {
+            for (int i = 0; i < sizeof(T); i++)
+                data.push_back(reinterpret_cast<const byte*>(value)[i]);
+        }
+    }
+
+    template<typename Iterator>
+    void appendBinaryData(Iterator first, Iterator last, byte_vec& data)
+    {
+        uint64 arrSize = std::distance(first, last) * sizeof(typename Iterator::value_type);
+        appendBinaryData(&arrSize, data);
+
+        for (Iterator it = first; it != last; ++it)
+            appendBinaryData(&*it, data); // dereference iterator to get reference, then get the address to get a pointer.
+    }
+
+    template<typename T>
+    void retrieveBinaryData(T& value, byte_vec::const_iterator& start);
+
+    template<typename Iterator>
+    void retrieveBinaryData(Iterator first, Iterator last, byte_vec::const_iterator& start);
+
+    template<typename T>
+    uint64 retrieveArraySize(byte_vec::const_iterator start)
+    {
+        uint64 arrSize;
+        retrieveBinaryData(arrSize, start);
+        if (arrSize % sizeof(T) == 0)
+            return arrSize / sizeof(T);
+        return 0;
+    }
+
+    template<typename T>
+    void retrieveBinaryData(T& value, byte_vec::const_iterator& start)
+    {
+        if constexpr (has_resize<T, void(std::size_t)>::value)
+        {
+            uint64 arrSize = retrieveArraySize<typename T::value_type>(start);
+            value.resize(arrSize);
+
+            retrieveBinaryData(value.begin(), value.end(), start);
+        }
+        else
+        {
+            memcpy(&value, &*start, sizeof(T));
+
+            start += sizeof(T);
+        }
+    }
+
+    template<typename Iterator>
+    void retrieveBinaryData(Iterator first, Iterator last, byte_vec::const_iterator& start)
+    {
+        uint64 arrSize;
+        retrieveBinaryData(arrSize, start);
+
+        uint64 dist = std::distance(first, last) * sizeof(typename Iterator::value_type);
+        if (dist > arrSize)
+            dist = arrSize;
+
+        Iterator valueIt = first;
+
+        for (byte_vec::const_iterator it = start; it != (start + dist); ++valueIt)
+        {
+            retrieveBinaryData(*valueIt, it);
+        }
+
+        start += arrSize;
+    }
+
 }
 
