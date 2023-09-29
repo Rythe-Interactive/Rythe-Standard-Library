@@ -9,8 +9,8 @@ namespace rsl::math
     quaternion<Scalar> angleAxis(Scalar angle, float3 axis)
     {
         Scalar const a(angle);
-        Scalar const s = sin(a * static_cast<T>(0.5));
+        Scalar const s = sin(a * static_cast<Scalar>(0.5));
 
-        return quaternion<Scalar>(cos(a * static_cast<T>(0.5)), v * s);
+        return quaternion<Scalar>(cos(a * static_cast<Scalar>(0.5)), axis * s);
     }
 }

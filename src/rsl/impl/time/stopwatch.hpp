@@ -41,7 +41,7 @@ namespace rsl
         rythe_always_inline void rewind(span_type time)       noexcept(std::is_arithmetic_v<time_type>) { m_start += std::chrono::duration_cast<typename clock_type::duration>(time.duration); }
     };
 
-    using timer = stopwatch<>;
+    //using timer = stopwatch<>;
 
-    extern const timer main_clock;
+    //extern const timer main_clock;
 }
