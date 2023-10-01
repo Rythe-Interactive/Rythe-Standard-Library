@@ -23,6 +23,16 @@ namespace rsl
             }
         };
 
+        class genesis_formatter_flag : public spdlog::custom_flag_formatter
+        {
+            void format([[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest);
+
+            std::unique_ptr<custom_flag_formatter> clone() const override
+            {
+                return spdlog::details::make_unique<genesis_formatter_flag>();
+            }
+        };
+
         class thread_name_formatter_flag : public spdlog::custom_flag_formatter
         {
             void format([[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest) override

@@ -69,7 +69,12 @@ namespace rsl::math
         explicit constexpr matrix(const quaternion<Scal>& orientation) noexcept;
 
         template<typename Scal, ::std::enable_if_t<!::std::is_same_v<scalar, Scal>, bool> = true>
-        constexpr explicit matrix(const matrix<Scal, row_count, col_count>& other) noexcept;
+        constexpr explicit matrix(const matrix<Scal, row_count, col_count>& other) noexcept
+        {
+            for (size_type i = 0; i < size; i++)
+                data[i] = static_cast<Scal>(other.data[i]);
+        }
+
 
         template<typename mat_type, ::std::enable_if_t<3 != mat_type::row_count || 3 != mat_type::col_count, bool> = true>
         constexpr matrix(const mat_type& other) noexcept;

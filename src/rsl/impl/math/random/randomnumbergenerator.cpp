@@ -26,7 +26,7 @@ namespace rsl::math
 
     [[nodiscard]] uint_max RandomNumberGenerator::generate() noexcept
     {
-#if defined(LEGION_VALIDATE)
+#if defined(RYTHE_VALIDATE)
         if (!engine)
             return 0; // should report an error with improved error system down the line.
 #endif

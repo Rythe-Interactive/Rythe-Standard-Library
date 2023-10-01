@@ -108,8 +108,8 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(rsl::math::ivec2& p, FormatContext& ctx) {
-			return fmt::v8::format_to(
+		auto format(const rsl::math::ivec2& p, FormatContext& ctx) -> decltype(ctx.out()) {
+			return format_to(
 				ctx.out(),
 				"({}, {})",
 				p.x, p.y);
