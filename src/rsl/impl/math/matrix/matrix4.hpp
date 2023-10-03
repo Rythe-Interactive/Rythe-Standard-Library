@@ -1,6 +1,7 @@
 #pragma once
 #include "matrix_base.hpp"
 #include "column/column_base.hpp"
+#include "../vector/vector3.hpp"
 #include "../vector/vector4.hpp"
 
 namespace rsl::math

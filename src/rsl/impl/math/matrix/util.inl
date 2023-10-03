@@ -6,14 +6,14 @@ namespace rsl::math
 	template<typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar rads, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
 	{
-		Scalar const tanHalfFovy = tan(rads / static_cast<Scalar>(2));
+		Scalar const invTanHalfFovy = static_cast<Scalar>(1) / tan(rads / static_cast<Scalar>(2));
 
 		matrix<Scalar, 4, 4> result(static_cast<Scalar>(0));
-		result[0][0] = static_cast<Scalar>(1) / (tanHalfFovy);
-		result[1][1] = static_cast<Scalar>(1) / (aspect * tanHalfFovy);
+		result[0][0] = invTanHalfFovy;
+		result[1][1] =  aspect * invTanHalfFovy;
 		result[2][2] = farZ / (farZ - nearZ);
 		result[2][3] = static_cast<Scalar>(1);
-		result[3][2] = -(nearZ * farZ) / (farZ - nearZ);
+		result[3][2] = -nearZ * (farZ / (farZ - nearZ));
 		result[3][3] = static_cast<Scalar>(1.0f);
 		return result;
 	}
