@@ -111,7 +111,7 @@ namespace fmt
 		auto format(const rsl::math::ivec2& p, FormatContext& ctx) -> decltype(ctx.out()) {
 			return format_to(
 				ctx.out(),
-				"({}, {})",
+				format_string<rsl::math::ivec2>("({}, {})"),
 				p.x, p.y);
 		}
 	};

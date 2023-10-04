@@ -76,8 +76,18 @@ namespace rsl::math
         }
 
 
+
         template<typename mat_type, ::std::enable_if_t<3 != mat_type::row_count || 3 != mat_type::col_count, bool> = true>
-        constexpr matrix(const mat_type& other) noexcept;
+        constexpr matrix(const mat_type& other) noexcept
+        {
+            constexpr size_type min_row = row_count < mat_type::row_count ? row_count : mat_type::row_count;
+            constexpr size_type min_col = col_count < mat_type::col_count ? col_count : mat_type::col_count;
+
+            for (size_type i = 0; i < min_row; i++)
+                for (size_type j = 0; j < min_col; j++)
+                    rows[i][j] = static_cast<scalar>(other[i][j]);
+        }
+
 
         constexpr matrix& operator=(const matrix&) noexcept = default;
 
