@@ -161,11 +161,11 @@
 #endif
 
 #if defined(RYTHE_MSVC)
-#   define RYTHE_COMPILER_WARNING(desc) __pragma(message(__FILE__ "(" STRINGIFY(__LINE__) ") : warning: " #desc))
-#   define RYTHE_COMPILER_ERROR(desc) __pragma(message(__FILE__ "(" STRINGIFY(__LINE__) ") : error: " #desc))
+#   define RYTHE_COMPILER_WARNING(desc) __pragma(message(__FILE__ "(" RYTHE_STRINGIFY(__LINE__) ") : warning: " #desc))
+#   define RYTHE_COMPILER_ERROR(desc) __pragma(message(__FILE__ "(" RYTHE_STRINGIFY(__LINE__) ") : error: " #desc))
 #elif defined(RYTHE_GCC) || defined(RYTHE_CLANG)
-#   define RYTHE_COMPILER_WARNING(desc) _Pragma(STRINGIFY(GCC warning desc))
-#   define RYTHE_COMPILER_ERROR(desc) _Pragma(STRINGIFY(GCC error desc))
+#   define RYTHE_COMPILER_WARNING(desc) _Pragma(RYTHE_STRINGIFY(GCC warning desc))
+#   define RYTHE_COMPILER_ERROR(desc) _Pragma(RYTHE_STRINGIFY(GCC error desc))
 #endif
 
 #define RULE_OF_5(type)\

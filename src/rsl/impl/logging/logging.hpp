@@ -188,7 +188,7 @@ namespace fmt
 		auto format(const rsl::math::vec4& p, FormatContext& ctx) {
 			return format_to(
 				ctx.out(),
-				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})",
+				format_string<rsl::math::vec4>(presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})"),
 				p.x, p.y, p.z, p.w);
 		}
 	};
@@ -216,14 +216,14 @@ namespace fmt
 		{
 			return format_to(
 				ctx.out(),
-				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
+				format_string<rsl::math::mat4>(presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
 				"({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
 				"({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
 				"({:.1f}, {:.1f}, {:.1f}, {:.1f})" :
 				"({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
 				"({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
 				"({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
-				"({:.1e}, {:.1e}, {:.1e}, {:.1e})",
+				"({:.1e}, {:.1e}, {:.1e}, {:.1e})"),
 				p[0][0], p[0][1], p[0][2], p[0][3],
 				p[1][0], p[1][1], p[1][2], p[1][3],
 				p[2][0], p[2][1], p[2][2], p[2][3],
