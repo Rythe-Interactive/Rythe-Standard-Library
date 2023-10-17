@@ -73,7 +73,7 @@ namespace rsl::math::detail
 			vector<Scalar, 4> Dot0(m[0] * Row0);
 			Scalar Dot1 = (Dot0.x + Dot0.y) + (Dot0.z + Dot0.w);
 
-			Scalar OneOverDeterminant = static_cast<Scalar>(1) / Dot1;
+			//Scalar OneOverDeterminant = static_cast<Scalar>(1) / Dot1;
 
 			matrix<Scalar, 4, 4> result(Inverse[0] / Dot1, Inverse[1] / Dot1, Inverse[2] / Dot1, Inverse[3] / Dot1);
 			return result;
