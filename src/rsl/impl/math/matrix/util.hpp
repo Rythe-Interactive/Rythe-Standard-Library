@@ -37,14 +37,10 @@ namespace rsl::math
     }
 
     template<typename Scalar>
-    [[nodiscard]] Scalar orientedAngle(vector<Scalar, 3> x, vector<Scalar, 3> y, vector<Scalar, 3> z)
+    [[nodiscard]] Scalar orientedAngle(vector<Scalar, 3> x, vector<Scalar, 3> y, vector<Scalar, 3> ref)
     {
-        //Scalar const Angle(acos(clamp(dot(x, y), static_cast<Scalar>(-1), static_cast<Scalar>(1))));
-
-        //if (close_enough(y, rotate(x, Angle)))
-        //    return Angle;
-        //else
-        //    return -Angle;
+        Scalar const Angle(acos(clamp(dot(x, y), static_cast<Scalar>(-1), static_cast<Scalar>(1))));
+        return dot(ref, cross(x, y)) < static_cast<Scalar>(0) ? Angle : -Angle;
     }
 
     template<typename Scalar>

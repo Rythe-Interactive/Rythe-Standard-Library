@@ -138,7 +138,7 @@ namespace fmt
 		auto format(const rsl::math::vec3& p, FormatContext& ctx) {
 			return format_to(
 				ctx.out(),
-				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e})",
+				format_string<rsl::math::vec3>(presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e})"),
 				p.x, p.y, p.z);
 		}
 	};
