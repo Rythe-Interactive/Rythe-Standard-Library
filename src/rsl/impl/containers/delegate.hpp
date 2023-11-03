@@ -83,7 +83,7 @@ namespace rsl {
         constexpr delegate& operator =(const delegate&) = default;
 
         template <invocable Functor>
-        requires std::invocable<Functor, ParamTypes...>&& std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+            requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
         constexpr delegate& operator =(const Functor& instance) {
             m_invocation = base::template createElement<Functor>(instance);
             return *this;

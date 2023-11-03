@@ -6,45 +6,19 @@ namespace rsl::math
     namespace detail
     {
         template<typename scalar>
-        [[nodiscard]] rythe_always_inline constexpr scalar _perlin_1d_impl_(scalar value) noexcept
+        [[nodiscard]] rythe_always_inline constexpr scalar _perlin_1d_impl_([[maybe_unused]] scalar value) noexcept
         {
 
         }
 
         template<typename scalar>
-        [[nodiscard]] rythe_always_inline constexpr scalar _perlin_1d_impl_(scalar value, scalar& derivative) noexcept
+        [[nodiscard]] rythe_always_inline constexpr scalar _perlin_1d_impl_([[maybe_unused]] scalar value, [[maybe_unused]] scalar& derivative) noexcept
         {
 
         }
 
         template<typename scalar, typename VectorType>
-        [[nodiscard]] rythe_always_inline constexpr scalar _perlin_2d_impl_(VectorType value) noexcept
-        {
-            //using scalar2 = vector<scalar, 2>;
-
-            //int2 floored = ifloor<int32>(value);
-
-            //int32v x0 = FS_Convertf32_i32(xs) * int32v(FnPrimes::X);
-            //int32v y0 = FS_Convertf32_i32(ys) * int32v(FnPrimes::Y);
-            //int32v x1 = x0 + int32v(FnPrimes::X);
-            //int32v y1 = y0 + int32v(FnPrimes::Y);
-
-            //float32v xf0 = xs = x - xs;
-            //float32v yf0 = ys = y - ys;
-            //float32v xf1 = xf0 - float32v(1);
-            //float32v yf1 = yf0 - float32v(1);
-
-            //xs = FnUtils::InterpQuintic(xs);
-            //ys = FnUtils::InterpQuintic(ys);
-
-            //return float32v(0.579106986522674560546875f) * FnUtils::Lerp(
-            //    FnUtils::Lerp(FnUtils::GetGradientDot(FnUtils::HashPrimes(seed, x0, y0), xf0, yf0), FnUtils::GetGradientDot(FnUtils::HashPrimes(seed, x1, y0), xf1, yf0), xs),
-            //    FnUtils::Lerp(FnUtils::GetGradientDot(FnUtils::HashPrimes(seed, x0, y1), xf0, yf1), FnUtils::GetGradientDot(FnUtils::HashPrimes(seed, x1, y1), xf1, yf1), xs), ys);
-
-        }
-
-        template<typename scalar, typename VectorType>
-        [[nodiscard]] rythe_always_inline constexpr scalar _perlin_2d_impl_(VectorType value, vector<scalar, 2>& derivative) noexcept
+        [[nodiscard]] rythe_always_inline constexpr scalar _perlin_2d_impl_([[maybe_unused]] VectorType value) noexcept
         {
             //using scalar2 = vector<scalar, 2>;
 
@@ -70,7 +44,33 @@ namespace rsl::math
         }
 
         template<typename scalar, typename VectorType>
-        [[nodiscard]] rythe_always_inline constexpr scalar _perlin_3d_impl_(VectorType value) noexcept
+        [[nodiscard]] rythe_always_inline constexpr scalar _perlin_2d_impl_([[maybe_unused]] VectorType value, [[maybe_unused]] vector<scalar, 2>& derivative) noexcept
+        {
+            //using scalar2 = vector<scalar, 2>;
+
+            //int2 floored = ifloor<int32>(value);
+
+            //int32v x0 = FS_Convertf32_i32(xs) * int32v(FnPrimes::X);
+            //int32v y0 = FS_Convertf32_i32(ys) * int32v(FnPrimes::Y);
+            //int32v x1 = x0 + int32v(FnPrimes::X);
+            //int32v y1 = y0 + int32v(FnPrimes::Y);
+
+            //float32v xf0 = xs = x - xs;
+            //float32v yf0 = ys = y - ys;
+            //float32v xf1 = xf0 - float32v(1);
+            //float32v yf1 = yf0 - float32v(1);
+
+            //xs = FnUtils::InterpQuintic(xs);
+            //ys = FnUtils::InterpQuintic(ys);
+
+            //return float32v(0.579106986522674560546875f) * FnUtils::Lerp(
+            //    FnUtils::Lerp(FnUtils::GetGradientDot(FnUtils::HashPrimes(seed, x0, y0), xf0, yf0), FnUtils::GetGradientDot(FnUtils::HashPrimes(seed, x1, y0), xf1, yf0), xs),
+            //    FnUtils::Lerp(FnUtils::GetGradientDot(FnUtils::HashPrimes(seed, x0, y1), xf0, yf1), FnUtils::GetGradientDot(FnUtils::HashPrimes(seed, x1, y1), xf1, yf1), xs), ys);
+
+        }
+
+        template<typename scalar, typename VectorType>
+        [[nodiscard]] rythe_always_inline constexpr scalar _perlin_3d_impl_([[maybe_unused]] VectorType value) noexcept
         {
             //const auto floored = ifloor<int32>(value);
             //const auto iv = vector<scalar, 3>(floored.x & 255, floored.y & 255, floored.z & 255);
@@ -109,7 +109,7 @@ namespace rsl::math
         }
 
         template<typename scalar, typename VectorType>
-        [[nodiscard]] rythe_always_inline constexpr scalar _perlin_3d_impl_(VectorType value, vector<scalar, 3>& derivative) noexcept
+        [[nodiscard]] rythe_always_inline constexpr scalar _perlin_3d_impl_([[maybe_unused]] VectorType value, [[maybe_unused]] vector<scalar, 3>& derivative) noexcept
         {
             //const auto floored = ifloor<int32>(value);
             //const auto iv = vector<scalar, 3>(floored.x & 255, floored.y & 255, floored.z & 255);
@@ -149,7 +149,7 @@ namespace rsl::math
     }
 
     template<typename VectorType>
-    [[nodiscard]] rythe_always_inline constexpr auto perlin(VectorType&& value, int_least<sizeof(vector_scalar_t<VectorType>)> seed) noexcept
+    [[nodiscard]] rythe_always_inline constexpr auto perlin(VectorType&& value, [[maybe_unused]] int_least<sizeof(vector_scalar_t<VectorType>)> seed) noexcept
     {
         constexpr size_type dimensions = make_vector_t<VectorType>::size;
         //using scalar = typename make_vector_t<VectorType>::scalar;
@@ -165,7 +165,7 @@ namespace rsl::math
     }
 
     template<typename VectorType>
-    [[nodiscard]] rythe_always_inline constexpr auto perlin(VectorType&& value, decay_vector_t<VectorType>& derivative, int_least<sizeof(vector_scalar_t<VectorType>)> seed) noexcept
+    [[nodiscard]] rythe_always_inline constexpr auto perlin(VectorType&& value, decay_vector_t<VectorType>& derivative, [[maybe_unused]] int_least<sizeof(vector_scalar_t<VectorType>)> seed) noexcept
     {
         constexpr size_type dimensions = make_vector_t<VectorType>::size;
         //using scalar = typename make_vector_t<VectorType>::scalar;
