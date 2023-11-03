@@ -33,6 +33,14 @@
 #   define RYTHE_CONFIGURATION RYTHE_RELEASE_VALUE
 #endif
 
+namespace rsl {
+#if defined(RYTHE_VALIDATE)
+    constexpr static bool RYTHE_VALIDATE_ON = true;
+#else
+    constexpr static bool RYTHE_VALIDATE_ON = false;
+#endif
+}
+
 #if !defined(RYTHE_WARNING_VALIDATION_LEVEL)
 #   define RYTHE_WARNING_VALIDATION_LEVEL 3
 #endif
@@ -159,11 +167,11 @@
 #endif
 
 #if defined(RYTHE_MSVC)
-#   define RYTHE_COMPILER_WARNING(desc) __pragma(message(__FILE__ "(" STRINGIFY(__LINE__) ") : warning: " #desc))
-#   define RYTHE_COMPILER_ERROR(desc) __pragma(message(__FILE__ "(" STRINGIFY(__LINE__) ") : error: " #desc))
+#   define RYTHE_COMPILER_WARNING(desc) __pragma(message(__FILE__ "(" RYTHE_STRINGIFY(__LINE__) ") : warning: " RYTHE_STRINGIFY(desc)))
+#   define RYTHE_COMPILER_ERROR(desc) __pragma(message(__FILE__ "(" RYTHE_STRINGIFY(__LINE__) ") : error: " RYTHE_STRINGIFY(desc)))
 #elif defined(RYTHE_GCC) || defined(RYTHE_CLANG)
-#   define RYTHE_COMPILER_WARNING(desc) _Pragma(STRINGIFY(GCC warning desc))
-#   define RYTHE_COMPILER_ERROR(desc) _Pragma(STRINGIFY(GCC error desc))
+#   define RYTHE_COMPILER_WARNING(desc) _Pragma(RYTHE_STRINGIFY(GCC warning desc))
+#   define RYTHE_COMPILER_ERROR(desc) _Pragma(RYTHE_STRINGIFY(GCC error desc))
 #endif
 
 #define RULE_OF_5(type)\

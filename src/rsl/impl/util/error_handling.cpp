@@ -1,6 +1,6 @@
 #include "error_handling.hpp"
 
 namespace rsl {
-    thread_local errc error_context::errorCode = success;
-    thread_local buffered_string<RSL_ERR_MESSAGE_MAX_LENGTH> error_context::errorMessage;
+    thread_local buffered_list<error_info, RSL_ERR_MAX_COUNT> error_context::errors;
+    thread_local errid error_context::currentError;
 }

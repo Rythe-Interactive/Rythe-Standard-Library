@@ -133,14 +133,12 @@ namespace rsl {
 
     template<rsl::size_type I, typename Type, typename... Types>
     struct element_at
-#if !defined(DOXY_EXCLUDE)
         : element_at<I - 1, Types...>
     {
     };
 
     template<typename Type, typename... Types>
     struct element_at<0, Type, Types...>
-#endif
     {
         using type = Type;
     };
