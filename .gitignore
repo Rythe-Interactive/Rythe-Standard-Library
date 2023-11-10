@@ -5,3 +5,5 @@ src/rsl/obj
 *.filters
 *.user
 *.sln
+bin/lib
+bin/obj
