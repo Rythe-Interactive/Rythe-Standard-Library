@@ -5,12 +5,11 @@
 
 namespace rsl::math
 {
-    template<typename Scalar>
-    quaternion<Scalar> angleAxis(Scalar angle, float3 axis)
-    {
-        Scalar const a(angle);
-        Scalar const s = sin(a * static_cast<Scalar>(0.5));
+	template<typename Scalar>
+	quaternion<Scalar> angleAxis(Scalar angle, float3 axis)
+	{
+		Scalar const a(angle * static_cast<Scalar>(0.5));
 
-        return quaternion<Scalar>(cos(a * static_cast<Scalar>(0.5)), axis * s);
-    }
+		return quaternion<Scalar>(cos(a), sin(a) * axis);
+	}
 }

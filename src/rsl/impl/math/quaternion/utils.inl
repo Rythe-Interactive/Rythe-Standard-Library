@@ -27,10 +27,10 @@ namespace rsl::math
     }
 
     template<typename Scalar>
-    [[nodiscard]] rythe_always_inline quaternion<Scalar> quaternion<Scalar>::angle_axis(scalar angle, const vec_type& vec) noexcept
+    [[nodiscard]] rythe_always_inline quaternion<Scalar> quaternion<Scalar>::angle_axis(Scalar angle, const vec_type& vec) noexcept
     {
         auto halfAngle = angle * static_cast<scalar>(0.5);
-        return quaternion<scalar>(::std::cos(halfAngle), ::std::sin(halfAngle) * vec);
+        return quaternion<Scalar>(::std::cos(halfAngle), ::std::sin(halfAngle) * vec);
     }
 
     template<typename Scalar>
@@ -77,4 +77,5 @@ namespace rsl::math
     {
         return quaternion<Scalar>(_quat.w,-_quat.i,-_quat.j,-_quat.k);
     }
+
 }

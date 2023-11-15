@@ -109,6 +109,23 @@ namespace rsl::math
     using quat = quaternion<float32>;
     using quat64 = quaternion<float64>;
     using quat_max = quaternion<float_max>;
+
+    template<typename Scalar>
+    [[nodiscard]] rythe_always_inline quaternion<Scalar> toQuat(const vector<Scalar, 3>& _eulerAngles) noexcept
+    {
+        vector<Scalar,3> c = math::cos(_eulerAngles * static_cast<Scalar>(0.5));
+        vector<Scalar,3> s = math::sin(_eulerAngles * static_cast<Scalar>(0.5));
+
+        quaternion<Scalar> result;
+        result.w = c.x * c.y * c.z + s.x * s.y * s.z;
+        result.i = s.x * c.y * c.z - c.x * s.y * s.z;
+        result.j = c.x * s.y * c.z + s.x * c.y * s.z;
+        result.k = c.x * c.y * s.z - s.x * s.y * c.z;
+        return result;
+    }
 }
+
+
+
 
 #include "matrix_quat_conv.inl"
