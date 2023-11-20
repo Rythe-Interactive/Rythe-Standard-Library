@@ -88,7 +88,7 @@ namespace fmt
 			  // ctx.out() is an output iterator to write to.
 			return format_to(
 				ctx.out(),
-				presentation == 'f' ? "({:.1f}, {:.1f})" : "({:.1e}, {:.1e})",
+				format_string<rsl::math::vec2>(presentation == 'f' ? "({:.1f}, {:.1f})" : "({:.1e}, {:.1e})"),
 				p.x, p.y);
 		}
 	};
