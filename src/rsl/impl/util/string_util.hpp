@@ -396,6 +396,16 @@ namespace rsl
         return s;
     }
 
+    static inline std::wstring to_wstring(const std::string& s)
+    {
+        return { s.begin(), s.end() };
+    }
+
+    static inline std::wstring to_wstring(const char* c)
+    {
+        return to_wstring(std::string{ c });
+    }
+
 
 #if !defined(DOXY_EXCLUDE)
     template<rsl::size_type N>
