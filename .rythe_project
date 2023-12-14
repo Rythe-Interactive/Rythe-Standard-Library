@@ -5,6 +5,7 @@ local project = {
     dependencies = {
         "public third_party/spdlog"
     },
+    defines = { "RYTHE_INTERNAL" }
 }
 
 return project
