@@ -1,0 +1,7 @@
+local project = {
+    alias = "rsl",
+    namespace = "rsl",
+    additional_types = { "test" },
+}
+
+return project
