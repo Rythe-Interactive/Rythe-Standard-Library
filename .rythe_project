@@ -2,6 +2,9 @@ local project = {
     alias = "rsl",
     namespace = "rsl",
     additional_types = { "test" },
+    dependencies = {
+        "public third_party/spdlog"
+    },
 }
 
 return project
