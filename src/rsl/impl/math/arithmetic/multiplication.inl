@@ -24,6 +24,10 @@ namespace rsl::math
         {
             return detail::compute_multiplication<make_quat_t<B>>::compute(std::forward<TypeA>(a), std::forward<TypeB>(b));
         }
+        else if constexpr (is_vector_v<B> && is_quat_v<A>)
+        {
+            return detail::compute_multiplication<make_quat_t<A>>::compute(std::forward<TypeA>(a), std::forward<TypeB>(b));
+        }
         else if constexpr (is_matrix_v<A> && is_matrix_v<B>)
         {
             using scalar = elevated_t<typename A::scalar, typename B::scalar>;
@@ -46,6 +50,14 @@ namespace rsl::math
         else if constexpr (is_vector_v<A> || is_vector_v<B>)
         {            
             return detail::compute_multiplication<vector_type_t<A, B>>::compute(std::forward<TypeA>(a), std::forward<TypeB>(b));
+        }
+        else if constexpr (is_quat_v<A> && is_scalar_v<B>)
+        {
+            return detail::compute_multiplication<make_quat_t<B>>::compute(std::forward<TypeA>(a), std::forward<TypeB>(b));
+        }
+        else if constexpr (is_scalar_v<A> && is_quat_v<B>)
+        {
+            return detail::compute_multiplication<make_quat_t<A>>::compute(std::forward<TypeA>(a), std::forward<TypeB>(b));
         }
         else
         {

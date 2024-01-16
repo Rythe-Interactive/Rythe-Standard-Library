@@ -194,6 +194,42 @@ namespace fmt
 	};
 
 	template <>
+	struct formatter<rsl::math::mat3> : fmt::formatter<std::string> {
+		char presentation = 'f';
+
+		constexpr const char* parse(format_parse_context& ctx) {
+			auto it = ctx.begin(), end = ctx.end();
+
+			if (!it)
+				return nullptr;
+
+			if (it != end && (*it == 'f' || *it == 'e')) presentation = *it++;
+
+			if (it != end && *it != '}')
+				throw format_error("invalid format");
+
+			return it;
+		}
+
+		template <typename FormatContext>
+		auto format(const rsl::math::mat3& p, FormatContext& ctx) const -> decltype(ctx.out())
+		{
+			return format_to(
+				ctx.out(),
+				format_string<rsl::math::mat3>(presentation == 'f' ? 
+					"({:.1f}, {:.1f}, {:.1f})\n"
+					"({:.1f}, {:.1f}, {:.1f})\n"
+					"({:.1f}, {:.1f}, {:.1f})" :
+					"({:.1e}, {:.1e}, {:.1e})\n"
+					"({:.1e}, {:.1e}, {:.1e})\n"
+					"({:.1e}, {:.1e}, {:.1e})"),
+				p[0][0], p[0][1], p[0][2],
+				p[1][0], p[1][1], p[1][2],
+				p[2][0], p[2][1], p[2][2]);
+		}
+	};
+
+	template <>
 	struct formatter<rsl::math::mat4> : fmt::formatter<std::string> {
 		char presentation = 'f';
 
@@ -253,7 +289,7 @@ namespace fmt
 		auto format(const rsl::math::color& p, FormatContext& ctx) {
 			return format_to(
 				ctx.out(),
-				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})",
+				format_string<rsl::math::color>(presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})"),
 				p.r, p.g, p.b, p.a);
 		}
 	};
@@ -280,7 +316,7 @@ namespace fmt
 		auto format(const rsl::math::quat& p, FormatContext& ctx) {
 			return format_to(
 				ctx.out(),
-				presentation == 'f' ? "(({:.1f}, {:.1f}, {:.1f}),r: {:.1f})" : "(({:.1e}, {:.1e}, {:.1e}),r: {:.1e})",
+				format_string<rsl::math::quat>(presentation == 'f' ? "(({:.1f}, {:.1f}, {:.1f}),r: {:.1f})" : "(({:.1e}, {:.1e}, {:.1e}),r: {:.1e})"),
 				p.i, p.j, p.k, p.w);
 		}
 	};
