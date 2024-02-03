@@ -3,6 +3,9 @@
 #define RYTHE_VALIDATE
 
 #include <rsl/delegate>
+#include <rsl/primitives>
+#include <rsl/containers>
+
 //#include <rsl/buffered_string>
 //#include <rsl/time>
 //
@@ -43,7 +46,14 @@ static std::vector<size_t> createVec(size_t idx) {
     return vec;
 }
 
-TEST_CASE("multicast_delegate", "[delecates]")
+TEST_CASE("any", "[any]")
+{
+    rsl::any<sizeof("Hello World")> temp = "Hello World";
+
+    std::cout << rsl::any_cast<std::string>(temp);
+}
+
+TEST_CASE("multicast_delegate", "[delegates]")
 {
     rsl::multicast_delegate<void()> del;
 

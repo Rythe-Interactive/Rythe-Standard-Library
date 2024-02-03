@@ -20,12 +20,12 @@ namespace rsl
         {
         }
 
-        R_NODISCARD auto& begin() const
+        [[nodiscard]] auto& begin() const
         {
             return range.first;
         }
 
-        R_NODISCARD auto& end() const
+        [[nodiscard]] auto& end() const
         {
             return range.second;
         }
@@ -253,11 +253,11 @@ namespace rsl
     public:
 
         explicit keys_only(PairIteratorContainer& cont) : m_container(cont) {}
-        R_NODISCARD auto begin() const
+        [[nodiscard]] auto begin() const
         {
             return key_only_iterator<PairIteratorContainer>(m_container.begin());
         }
-        R_NODISCARD auto end() const
+        [[nodiscard]] auto end() const
         {
             return key_only_iterator<PairIteratorContainer>(m_container.end());
         }
@@ -277,11 +277,11 @@ namespace rsl
 
         explicit values_only(PairIteratorContainer& cont) : m_container(cont) {}
 
-        R_NODISCARD auto begin() const
+        [[nodiscard]] auto begin() const
         {
             return value_only_iterator<PairIteratorContainer>(m_container.begin());
         }
-        R_NODISCARD auto end() const
+        [[nodiscard]] auto end() const
         {
             return value_only_iterator<PairIteratorContainer>(m_container.end());
         }
