@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <any>
 
 static size_t counter;
 
@@ -46,12 +47,20 @@ static std::vector<size_t> createVec(size_t idx) {
     return vec;
 }
 
-TEST_CASE("any", "[any]")
+struct testComp
 {
-    rsl::any<sizeof("Hello World")> temp = "Hello World";
+    std::string content;
+    const char* printout()
+    {
+        return content.c_str();
+    }
+};
 
-    std::cout << rsl::any_cast<std::string>(temp);
-}
+//int main()
+//{
+//    rsl::any<sizeof(testComp)> temp = testComp{.content = "Hello Wolrd"};
+//    std::cout << rsl::any_cast<testComp>(temp).printout();
+//}
 
 TEST_CASE("multicast_delegate", "[delegates]")
 {
