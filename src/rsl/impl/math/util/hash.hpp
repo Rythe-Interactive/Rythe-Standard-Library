@@ -52,7 +52,8 @@ struct ::std::hash<::rsl::math::vector<Scalar, 3>>
     constexpr static ::std::hash<Scalar> hasher{};
     inline rythe_always_inline::std::size_t operator()(const ::rsl::math::vector<Scalar, 3>& vec) const noexcept
     {
-        return ::rsl::hash_combine_multiple(hasher(vec.x), hasher(vec.y), hasher(vec.z));
+        return rsl::hash(col);
+        //return ::rsl::hash_combine_multiple(hasher(vec.x), hasher(vec.y), hasher(vec.z));
     }
 };
 
@@ -62,7 +63,8 @@ struct ::std::hash<::rsl::math::vector<Scalar, 4>>
     constexpr static ::std::hash<Scalar> hasher{};
     inline rythe_always_inline::std::size_t operator()(const ::rsl::math::vector<Scalar, 4>& vec) const noexcept
     {
-        return ::rsl::hash_combine_multiple(hasher(vec.x), hasher(vec.y), hasher(vec.z), hasher(vec.w));
+        return rsl::hash(col);
+        //return ::rsl::hash_combine_multiple(hasher(vec.x), hasher(vec.y), hasher(vec.z), hasher(vec.w));
     }
 };
 
@@ -72,7 +74,8 @@ struct ::std::hash<::rsl::math::color>
     constexpr static ::std::hash<rsl::float32> hasher{};
     inline rythe_always_inline::std::size_t operator()(const ::rsl::math::color& col) const noexcept
     {
-        return ::rsl::hash_combine_multiple(hasher(col.r), hasher(col.g), hasher(col.b), hasher(col.a));
+        return rsl::hash(col);
+      // return ::rsl::hash_combine_multiple(hasher(col.r), hasher(col.g), hasher(col.b), hasher(col.a));
     }
 };
 
@@ -82,7 +85,8 @@ struct ::std::hash<::rsl::math::dcolor>
     constexpr static ::std::hash<rsl::float64> hasher{};
     inline rythe_always_inline::std::size_t operator()(const ::rsl::math::dcolor& col) const noexcept
     {
-        return ::rsl::hash_combine_multiple(hasher(col.r), hasher(col.g), hasher(col.b), hasher(col.a));
+        return rsl::hash(col);
+        //return ::rsl::hash_combine_multiple(hasher(col.r), hasher(col.g), hasher(col.b), hasher(col.a));
     }
 };
 
