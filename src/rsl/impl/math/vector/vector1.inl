@@ -38,15 +38,4 @@ namespace rsl::math
 		rsl_assert_msg((i >= 0) && (i < size), "vector subscript out of range");
 		return data[i];
 	}
-
-	template <typename scalar>
-	constexpr scalar vector<scalar, 1>::length() const noexcept
-	{
-		return x;
-	}
-	template <typename scalar>
-	constexpr scalar vector<scalar, 1>::length2() const noexcept
-	{
-		return x * x;
-	}
 } // namespace rsl::math

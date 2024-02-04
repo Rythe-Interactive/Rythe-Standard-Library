@@ -86,8 +86,8 @@ namespace rsl::math
 			return data[i];
 		}
 
-		rythe_always_inline scalar length() const noexcept { return ::rsl::math::length(*this); }
-		constexpr scalar length2() const noexcept { return ::rsl::math::length2(*this); }
+		rythe_always_inline scalar length() const noexcept;
+		constexpr scalar length2() const noexcept;
 	};
 
 	template <typename Scalar>

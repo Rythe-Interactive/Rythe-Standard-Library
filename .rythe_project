@@ -3,7 +3,7 @@ local project = {
     namespace = "rsl",
     additional_types = { "test" },
     dependencies = {
-        "public third_party/spdlog"
+        "public third_party/spdlog:header-only"
     },
     defines = { "RYTHE_INTERNAL" }
 }

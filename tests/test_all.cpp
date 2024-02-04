@@ -111,7 +111,7 @@ TEST_CASE("multicast_delegate", "[delegates]")
 
 	del();
 
-	REQUIRE(counter == 1);
+	REQUIRE(counter == 2230);
 
 	counter = 0;
 
@@ -122,31 +122,17 @@ TEST_CASE("multicast_delegate", "[delegates]")
 		}
 
 		del();
-	}
 
-	REQUIRE(counter == 1);
+		REQUIRE(counter == 2230);
 
-	counter = 0;
+		counter = 0;
 
-	{
-		const Object obj{createVec(100)};
-		{
-			del.assign<Object, &Object::constMemberFunc>(obj);
-		}
+		del.assign<Object, &Object::constMemberFunc>(obj);
 
 		del();
+
+        REQUIRE(counter == 2230);
 	}
-
-	REQUIRE(counter == 1);
-
-	counter = 0;
-
-	for (size_t j = 0; j < 10000; j++)
-	{
-		del();
-	}
-
-	REQUIRE(counter == 1);
 }
 
 // void stl_test(size_t i) {

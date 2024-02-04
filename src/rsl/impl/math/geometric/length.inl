@@ -42,4 +42,16 @@ namespace rsl::math
 		auto det = determinant(m);
 		return det * det;
 	}
+
+	template <typename Scalar, size_type Size>
+	[[nodiscard]] rythe_always_inline Scalar vector<Scalar, Size>::length() const noexcept
+	{
+		return ::rsl::math::length(*this);
+	}
+
+	template <typename Scalar, size_type Size>
+	[[nodiscard]] constexpr Scalar vector<Scalar, Size>::length2() const noexcept
+	{
+		return ::rsl::math::length2(*this);
+	}
 } // namespace rsl::math

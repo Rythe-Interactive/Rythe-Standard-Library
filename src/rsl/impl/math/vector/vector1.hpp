@@ -85,8 +85,8 @@ namespace rsl::math
 			return data[i];
 		}
 
-		constexpr scalar length() const noexcept { return x; }
-		constexpr scalar length2() const noexcept { return x * x; }
+		constexpr scalar length() const noexcept;
+		constexpr scalar length2() const noexcept;
 	};
 
 	using float1 = vector<float32, 1>;
