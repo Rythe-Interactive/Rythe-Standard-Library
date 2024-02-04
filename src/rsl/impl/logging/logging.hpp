@@ -8,21 +8,20 @@
 
 #include "spdlog_include.hpp"
 
-#include "../util/primitives.hpp"
-#include "../math/vector/vector.hpp"
 #include "../math/color.hpp"
 #include "../math/quaternion/quaternion.hpp"
+#include "../math/vector/vector.hpp"
+#include "../util/primitives.hpp"
 
 namespace fmt
 {
 	struct gog
 	{
 		std::thread t;
-
 	};
 
-	//template <>
-	//struct formatter<std::thread::id>
+	// template <>
+	// struct formatter<std::thread::id>
 	//{
 	//	constexpr const char* parse(format_parse_context& ctx)
 	//	{
@@ -46,31 +45,34 @@ namespace fmt
 
 
 	template <>
-	struct formatter<rsl::math::vec2> {
+	struct formatter<rsl::math::vec2>
+	{
 		// Presentation format: 'f' - fixed, 'e' - exponential.
 		char presentation = 'f';
 
 		// Parses format specifications of the form ['f' | 'e'].
-		constexpr const char* parse(format_parse_context& ctx) {
+		constexpr const char* parse(format_parse_context& ctx)
+		{
 			// auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) // c++11
-			  // [ctx.begin(), ctx.end()) is a character range that contains a part of
-			  // the format string starting from the format specifications to be parsed,
-			  // e.g. in
-			  //
-			  //   fmt::format("{:f} - point of interest", point{1, 2});
-			  //
-			  // the range will contain "f} - point of interest". The formatter should
-			  // parse specifiers until '}' or the end of the range. In this example
-			  // the formatter should parse the 'f' specifier and return an iterator
-			  // pointing to '}'.
+			// [ctx.begin(), ctx.end()) is a character range that contains a part of
+			// the format string starting from the format specifications to be parsed,
+			// e.g. in
+			//
+			//   fmt::format("{:f} - point of interest", point{1, 2});
+			//
+			// the range will contain "f} - point of interest". The formatter should
+			// parse specifiers until '}' or the end of the range. In this example
+			// the formatter should parse the 'f' specifier and return an iterator
+			// pointing to '}'.
 
-			  // Parse the presentation format and store it in the formatter:
+			// Parse the presentation format and store it in the formatter:
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
 				return nullptr;
 
-			if (it != end && (*it == 'f' || *it == 'e')) presentation = *it++;
+			if (it != end && (*it == 'f' || *it == 'e'))
+				presentation = *it++;
 
 			// Check if reached the end of the range:
 			if (it != end && *it != '}')
@@ -83,20 +85,24 @@ namespace fmt
 		// Formats the point p using the parsed format specification (presentation)
 		// stored in this formatter.
 		template <typename FormatContext>
-		auto format(const rsl::math::vec2& p, FormatContext& ctx) {
+		auto format(const rsl::math::vec2& p, FormatContext& ctx)
+		{
 			// auto format(const point &p, FormatContext &ctx) -> decltype(ctx.out()) // c++11
-			  // ctx.out() is an output iterator to write to.
+			// ctx.out() is an output iterator to write to.
 			return format_to(
 				ctx.out(),
 				presentation == 'f' ? "({:.1f}, {:.1f})" : "({:.1e}, {:.1e})",
-				p.x, p.y);
+				p.x, p.y
+			);
 		}
 	};
 
 	template <>
-	struct formatter<rsl::math::ivec2> {
+	struct formatter<rsl::math::ivec2>
+	{
 
-		constexpr const char* parse(format_parse_context& ctx) {
+		constexpr const char* parse(format_parse_context& ctx)
+		{
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
@@ -108,25 +114,30 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::ivec2& p, FormatContext& ctx) {
+		auto format(const rsl::math::ivec2& p, FormatContext& ctx)
+		{
 			return format_to(
 				ctx.out(),
 				"({}, {})",
-				p.x, p.y);
+				p.x, p.y
+			);
 		}
 	};
 
 	template <>
-	struct formatter<rsl::math::vec3> {
+	struct formatter<rsl::math::vec3>
+	{
 		char presentation = 'f';
 
-		constexpr const char* parse(format_parse_context& ctx) {
+		constexpr const char* parse(format_parse_context& ctx)
+		{
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
 				return nullptr;
 
-			if (it != end && (*it == 'f' || *it == 'e')) presentation = *it++;
+			if (it != end && (*it == 'f' || *it == 'e'))
+				presentation = *it++;
 
 			if (it != end && *it != '}')
 				throw format_error("invalid format");
@@ -135,18 +146,22 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::vec3& p, FormatContext& ctx) {
+		auto format(const rsl::math::vec3& p, FormatContext& ctx)
+		{
 			return format_to(
 				ctx.out(),
 				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e})",
-				p.x, p.y, p.z);
+				p.x, p.y, p.z
+			);
 		}
 	};
 
 	template <>
-	struct formatter<rsl::math::ivec3> {
+	struct formatter<rsl::math::ivec3>
+	{
 
-		constexpr const char* parse(format_parse_context& ctx) {
+		constexpr const char* parse(format_parse_context& ctx)
+		{
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
@@ -158,25 +173,30 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::ivec3& p, FormatContext& ctx) {
+		auto format(const rsl::math::ivec3& p, FormatContext& ctx)
+		{
 			return format_to(
 				ctx.out(),
 				"({}, {}, {})",
-				p.x, p.y, p.z);
+				p.x, p.y, p.z
+			);
 		}
 	};
 
 	template <>
-	struct formatter<rsl::math::vec4> {
+	struct formatter<rsl::math::vec4>
+	{
 		char presentation = 'f';
 
-		constexpr const char* parse(format_parse_context& ctx) {
+		constexpr const char* parse(format_parse_context& ctx)
+		{
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
 				return nullptr;
 
-			if (it != end && (*it == 'f' || *it == 'e')) presentation = *it++;
+			if (it != end && (*it == 'f' || *it == 'e'))
+				presentation = *it++;
 
 			if (it != end && *it != '}')
 				throw format_error("invalid format");
@@ -185,25 +205,30 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::vec4& p, FormatContext& ctx) {
+		auto format(const rsl::math::vec4& p, FormatContext& ctx)
+		{
 			return format_to(
 				ctx.out(),
 				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})",
-				p.x, p.y, p.z, p.w);
+				p.x, p.y, p.z, p.w
+			);
 		}
 	};
 
 	template <>
-	struct formatter<rsl::math::mat4> : fmt::formatter<std::string> {
+	struct formatter<rsl::math::mat4> : fmt::formatter<std::string>
+	{
 		char presentation = 'f';
 
-		constexpr const char* parse(format_parse_context& ctx) {
+		constexpr const char* parse(format_parse_context& ctx)
+		{
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
 				return nullptr;
 
-			if (it != end && (*it == 'f' || *it == 'e')) presentation = *it++;
+			if (it != end && (*it == 'f' || *it == 'e'))
+				presentation = *it++;
 
 			if (it != end && *it != '}')
 				throw format_error("invalid format");
@@ -217,31 +242,35 @@ namespace fmt
 			return format_to(
 				ctx.out(),
 				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
-				"({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
-				"({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
-				"({:.1f}, {:.1f}, {:.1f}, {:.1f})" :
-				"({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
-				"({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
-				"({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
-				"({:.1e}, {:.1e}, {:.1e}, {:.1e})",
+									  "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
+									  "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
+									  "({:.1f}, {:.1f}, {:.1f}, {:.1f})"
+									: "({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
+									  "({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
+									  "({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
+									  "({:.1e}, {:.1e}, {:.1e}, {:.1e})",
 				p[0][0], p[0][1], p[0][2], p[0][3],
 				p[1][0], p[1][1], p[1][2], p[1][3],
 				p[2][0], p[2][1], p[2][2], p[2][3],
-				p[3][0], p[3][1], p[3][2], p[3][3]);
+				p[3][0], p[3][1], p[3][2], p[3][3]
+			);
 		}
 	};
 
 	template <>
-	struct formatter<rsl::math::color> {
+	struct formatter<rsl::math::color>
+	{
 		char presentation = 'f';
 
-		constexpr const char* parse(format_parse_context& ctx) {
+		constexpr const char* parse(format_parse_context& ctx)
+		{
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
 				return nullptr;
 
-			if (it != end && (*it == 'f' || *it == 'e')) presentation = *it++;
+			if (it != end && (*it == 'f' || *it == 'e'))
+				presentation = *it++;
 
 			if (it != end && *it != '}')
 				throw format_error("invalid format");
@@ -250,25 +279,30 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::color& p, FormatContext& ctx) {
+		auto format(const rsl::math::color& p, FormatContext& ctx)
+		{
 			return format_to(
 				ctx.out(),
 				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})",
-				p.r, p.g, p.b, p.a);
+				p.r, p.g, p.b, p.a
+			);
 		}
 	};
 
 	template <>
-	struct formatter<rsl::math::quat> {
+	struct formatter<rsl::math::quat>
+	{
 		char presentation = 'f';
 
-		constexpr const char* parse(format_parse_context& ctx) {
+		constexpr const char* parse(format_parse_context& ctx)
+		{
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
 				return nullptr;
 
-			if (it != end && (*it == 'f' || *it == 'e')) presentation = *it++;
+			if (it != end && (*it == 'f' || *it == 'e'))
+				presentation = *it++;
 
 			if (it != end && *it != '}')
 				throw format_error("invalid format");
@@ -277,16 +311,18 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::quat& p, FormatContext& ctx) {
+		auto format(const rsl::math::quat& p, FormatContext& ctx)
+		{
 			return format_to(
 				ctx.out(),
 				presentation == 'f' ? "(({:.1f}, {:.1f}, {:.1f}),r: {:.1f})" : "(({:.1e}, {:.1e}, {:.1e}),r: {:.1e})",
-				p.i, p.j, p.k, p.w);
+				p.i, p.j, p.k, p.w
+			);
 		}
 	};
 
-	//template <>
-	//struct formatter<std::string> {
+	// template <>
+	// struct formatter<std::string> {
 	//	char presentation = 'f';
 
 	//	constexpr const char* parse(format_parse_context& ctx) {
@@ -308,7 +344,7 @@ namespace fmt
 	//		return format_to(ctx.out(), "{}", p);
 	//	}
 	//};
-}
+} // namespace fmt
 
 namespace rsl::log
 {
@@ -321,7 +357,7 @@ namespace rsl::log
 		logger_ptr fileLogger;
 		logger_ptr consoleLogger = spdlog::stdout_color_mt("console-logger");
 		logger_ptr undecoratedLogger = spdlog::stdout_color_mt("undecorated-logger");
-		//async::rw_spinlock threadNamesLock;
+		// async::rw_spinlock threadNamesLock;
 		std::unordered_map<std::thread::id, std::string> threadNames;
 
 		static impl& get()
@@ -338,20 +374,19 @@ namespace rsl::log
 	public:
 		void format(const spdlog::details::log_msg& msg, const std::tm& tm_time, spdlog::memory_buf_t& dest) override
 		{
-			//get seconds since engine start
+			// get seconds since engine start
 			const auto now = std::chrono::high_resolution_clock::now();
 			const auto time_since_genesis = now - genesis;
 			const auto seconds = std::chrono::duration_cast<std::chrono::duration<float, std::ratio<1, 1>>>(time_since_genesis).count();
 
-			//convert to "--s.ms---"
+			// convert to "--s.ms---"
 			const auto str = std::to_string(seconds);
 
-			//append to data
+			// append to data
 			dest.append(str.data(), str.data() + str.size());
-
 		}
 
-		//generates a new formatter flag
+		// generates a new formatter flag
 		std::unique_ptr<custom_flag_formatter> clone() const override
 		{
 			return spdlog::details::make_unique<genesis_formatter_flag>();
@@ -362,13 +397,13 @@ namespace rsl::log
 	{
 		void format(const spdlog::details::log_msg& msg, const std::tm& tm_time, spdlog::memory_buf_t& dest) override
 		{
-			//std::string thread_ident;
+			// std::string thread_ident;
 			thread_local static std::string* thread_ident;
 
 			if (!thread_ident)
 			{
 				auto& inst = impl::get();
-				//async::readonly_guard guard(inst.threadNamesLock);
+				// async::readonly_guard guard(inst.threadNamesLock);
 
 				if (inst.threadNames.count(std::this_thread::get_id()))
 				{
@@ -379,13 +414,13 @@ namespace rsl::log
 					std::ostringstream oss;
 					oss << std::this_thread::get_id();
 					{
-						//async::readwrite_guard wguard(inst.threadNamesLock);
+						// async::readwrite_guard wguard(inst.threadNamesLock);
 						thread_ident = &inst.threadNames[std::this_thread::get_id()];
 					}
 					*thread_ident = oss.str();
 
-					//NOTE(algo-ryth-mix): this conversion is not portable 
-					//thread_ident = std::to_string(rythe::core::force_value_cast<uint>(std::this_thread::get_id()));
+					// NOTE(algo-ryth-mix): this conversion is not portable
+					// thread_ident = std::to_string(rythe::core::force_value_cast<uint>(std::this_thread::get_id()));
 				}
 			}
 
@@ -394,7 +429,6 @@ namespace rsl::log
 		std::unique_ptr<custom_flag_formatter> clone() const override
 		{
 			return spdlog::details::make_unique<thread_name_formatter_flag>();
-
 		}
 	};
 
@@ -418,12 +452,12 @@ namespace rsl::log
 
 	enum struct severity
 	{
-		trace,  // lowest severity
+		trace, // lowest severity
 		debug,
 		info,
 		warn,
 		error,
-		fatal   // highest severity
+		fatal // highest severity
 	};
 
 	constexpr severity severity_trace = severity::trace;
@@ -437,12 +471,12 @@ namespace rsl::log
 	{
 		switch (s)
 		{
-		case severity_trace:return spdlog::level::trace;
-		case severity_debug:return spdlog::level::debug;
-		case severity_info: return spdlog::level::info;
-		case severity_warn: return spdlog::level::warn;
-		case severity_error:return spdlog::level::err;
-		case severity_fatal:return spdlog::level::critical;
+			case severity_trace: return spdlog::level::trace;
+			case severity_debug: return spdlog::level::debug;
+			case severity_info: return spdlog::level::info;
+			case severity_warn: return spdlog::level::warn;
+			case severity_error: return spdlog::level::err;
+			case severity_fatal: return spdlog::level::critical;
 		}
 		return spdlog::level::err;
 	}
@@ -464,7 +498,7 @@ namespace rsl::log
 	template <class... Args, class FormatString>
 	void undecoratedln(severity s, const FormatString& format, Args&&... a)
 	{
-		//I need to get back to this
+		// I need to get back to this
 		impl::get().undecoratedLogger->log(args2spdlog(s), format, std::forward<Args>(a)...);
 	}
 
@@ -479,85 +513,85 @@ namespace rsl::log
 	}
 
 	/** @brief same as println but with severity = trace */
-	template<class... Args, class FormatString>
+	template <class... Args, class FormatString>
 	void undecoratedTrace(const FormatString& format, Args&&... a)
 	{
 		undecoratedln(severity::trace, format, std::forward<Args>(a)...);
 	}
 
 	/** @brief same as println but with severity = debug */
-	template<class... Args, class FormatString>
-	void undecoratedDebug(const FormatString& format, Args&&...a)
+	template <class... Args, class FormatString>
+	void undecoratedDebug(const FormatString& format, Args&&... a)
 	{
 		undecoratedln(severity::debug, format, std::forward<Args>(a)...);
 	}
 
 	/** @brief same as undecoratedln but with severity = info */
-	template<class... Args, class FormatString>
-	void undecoratedInfo(const FormatString& format, Args&&...a)
+	template <class... Args, class FormatString>
+	void undecoratedInfo(const FormatString& format, Args&&... a)
 	{
 		undecoratedln(severity::info, format, std::forward<Args>(a)...);
 	}
 
 	/** @brief same as undecoratedln but with severity = warn */
-	template<class... Args, class FormatString>
-	void undecoratedWarn(const FormatString& format, Args&&...a)
+	template <class... Args, class FormatString>
+	void undecoratedWarn(const FormatString& format, Args&&... a)
 	{
 		undecoratedln(severity::warn, format, std::forward<Args>(a)...);
 	}
 
 	/** @brief same as undecoratedln but with severity = error */
-	template<class... Args, class FormatString>
-	void undecoratedError(const FormatString& format, Args&&...a)
+	template <class... Args, class FormatString>
+	void undecoratedError(const FormatString& format, Args&&... a)
 	{
 		undecoratedln(severity::error, format, std::forward<Args>(a)...);
 	}
 
 	/** @brief same as undecoratedln but with severity = fatal */
-	template<class... Args, class FormatString>
-	void undecoratedFatal(const FormatString& format, Args&&...a)
+	template <class... Args, class FormatString>
+	void undecoratedFatal(const FormatString& format, Args&&... a)
 	{
 		undecoratedln(severity::fatal, format, std::forward<Args>(a)...);
 	}
 
 	/** @brief same as println but with severity = trace */
-	template<class... Args, class FormatString>
+	template <class... Args, class FormatString>
 	void trace(const FormatString& format, Args&&... a)
 	{
 		println(severity::trace, format, std::forward<Args>(a)...);
 	}
 
 	/** @brief same as println but with severity = debug */
-	template<class... Args, class FormatString>
-	void debug(const FormatString& format, Args&&...a)
+	template <class... Args, class FormatString>
+	void debug(const FormatString& format, Args&&... a)
 	{
 		println(severity::debug, format, std::forward<Args>(a)...);
 	}
 
 	/** @brief same as println but with severity = info */
-	template<class... Args, class FormatString>
-	void info(const FormatString& format, Args&&...a)
+	template <class... Args, class FormatString>
+	void info(const FormatString& format, Args&&... a)
 	{
 		println(severity::info, format, std::forward<Args>(a)...);
 	}
 
 	/** @brief same as println but with severity = warn */
-	template<class... Args, class FormatString>
-	void warn(const FormatString& format, Args&&...a)
+	template <class... Args, class FormatString>
+	void warn(const FormatString& format, Args&&... a)
 	{
 		println(severity::warn, format, std::forward<Args>(a)...);
 	}
 
 	/** @brief same as println but with severity = error */
-	template<class... Args, class FormatString>
-	void error(const FormatString& format, Args&&...a)
+	template <class... Args, class FormatString>
+	void error(const FormatString& format, Args&&... a)
 	{
 		println(severity::error, format, std::forward<Args>(a)...);
 	}
 
 	/** @brief same as println but with severity = fatal */
-	template<class... Args, class FormatString>
-	void fatal(const FormatString& format, Args&&...a)
+	template <class... Args, class FormatString>
+	void fatal(const FormatString& format, Args&&... a)
 	{
 		println(severity::fatal, format, std::forward<Args>(a)...);
 	}
@@ -603,12 +637,12 @@ namespace rsl::log
 			undecoratedInfo("== Initializing Logger");
 			return 0;
 		}
-	}
+	} // namespace detail
 
 	/** @brief sets up logging (do not call, invoked by engine) */
 	inline void setup()
 	{
 		[[maybe_unused]] static auto v = detail::_setup_impl();
 	}
-}
+} // namespace rsl::log
 #undef logger

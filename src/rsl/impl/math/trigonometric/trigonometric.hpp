@@ -1,4 +1,4 @@
 #pragma once
-#include "sin.hpp"
 #include "cos.hpp"
+#include "sin.hpp"
 #include "tan.hpp"

@@ -1,4 +1,4 @@
 #pragma once
 #include "common.hpp"
-#include "value.hpp"
 #include "perlin.hpp"
+#include "value.hpp"

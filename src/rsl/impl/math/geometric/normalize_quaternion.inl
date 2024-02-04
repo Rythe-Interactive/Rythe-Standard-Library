@@ -3,17 +3,17 @@
 
 namespace rsl::math::detail
 {
-    template<typename T>
-    struct compute_normalize;
+	template <typename T>
+	struct compute_normalize;
 
-    template<typename Scalar>
-    struct compute_normalize<quaternion<Scalar>>
-    {
-        using quat_type = quaternion<Scalar>;
+	template <typename Scalar>
+	struct compute_normalize<quaternion<Scalar>>
+	{
+		using quat_type = quaternion<Scalar>;
 
-        [[nodiscard]] rythe_always_inline static quat_type compute(const quat_type& q) noexcept
-        {
-            return q / length(q);
-        }
-    };
-}
+		[[nodiscard]] rythe_always_inline static quat_type compute(const quat_type& q) noexcept
+		{
+			return q / length(q);
+		}
+	};
+} // namespace rsl::math::detail
