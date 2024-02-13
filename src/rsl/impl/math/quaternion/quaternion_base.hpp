@@ -4,6 +4,7 @@
 #include "../../util/assert.hpp"
 #include "../../util/primitives.hpp"
 
+#include "../constants.hpp"
 #include "../vector/vector.hpp"
 #include "../util/type_util.hpp"
 
@@ -111,10 +112,17 @@ namespace rsl::math
 	using quat_max = quaternion<float_max>;
 
 	template<typename Scalar>
+	[[nodiscard]] rythe_always_inline quaternion<Scalar> toQuat(Scalar x, Scalar y, Scalar z) noexcept
+	{
+		return toQuat(vector<Scalar, 3>(x, y, z));
+	}
+
+	template<typename Scalar>
 	[[nodiscard]] rythe_always_inline quaternion<Scalar> toQuat(const vector<Scalar, 3>& _eulerAngles) noexcept
 	{
-		vector<Scalar, 3> c = math::cos(_eulerAngles * static_cast<Scalar>(0.5));
-		vector<Scalar, 3> s = math::sin(_eulerAngles * static_cast<Scalar>(0.5));
+		vector<Scalar, 3> rad_eulerAngles = vector<Scalar, 3>(math::radians(_eulerAngles.x), math::radians(_eulerAngles.y), math::radians(_eulerAngles.z));
+		vector<Scalar, 3> c = math::cos(rad_eulerAngles * static_cast<Scalar>(0.5));
+		vector<Scalar, 3> s = math::sin(rad_eulerAngles * static_cast<Scalar>(0.5));
 
 		quaternion<Scalar> result;
 		result.w = c.x * c.y * c.z + s.x * s.y * s.z;
@@ -122,6 +130,36 @@ namespace rsl::math
 		result.j = c.x * s.y * c.z + s.x * c.y * s.z;
 		result.k = c.x * c.y * s.z - s.x * s.y * c.z;
 		return result;
+	}
+
+
+	template<typename Scalar>
+	[[nodiscard]] rythe_always_inline vector<Scalar, 3> toEuler(Scalar w, Scalar i, Scalar j, Scalar k) noexcept
+	{
+		return toEuler(quaternion<Scalar>(w, i, j, k));
+	}
+
+	template<typename Scalar>
+	[[nodiscard]] rythe_always_inline vector<Scalar, 3> toEuler(quaternion<Scalar> q) noexcept
+	{
+		vector<Scalar, 3> angles;
+
+		// roll (x-axis rotation)
+		double sinr_cosp = 2 * (q.w * q.i + q.j * q.k);
+		double cosr_cosp = 1 - 2 * (q.i * q.i + q.j * q.j);
+		angles.x = math::rad2deg(std::atan2(sinr_cosp, cosr_cosp));
+
+		// pitch (y-axis rotation)
+		double sinp = std::sqrt(1 + 2 * (q.w * q.j - q.i * q.k));
+		double cosp = std::sqrt(1 - 2 * (q.w * q.j - q.i * q.k));
+		angles.y = math::rad2deg(2 * std::atan2(sinp, cosp) - math::pi() / 2);
+
+		// yaw (z-axis rotation)
+		double siny_cosp = 2 * (q.w * q.k + q.i * q.j);
+		double cosy_cosp = 1 - 2 * (q.j * q.j + q.k * q.k);
+		angles.z = math::rad2deg(std::atan2(siny_cosp, cosy_cosp));
+
+		return angles;
 	}
 }
 
