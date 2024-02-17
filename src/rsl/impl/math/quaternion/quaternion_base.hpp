@@ -62,6 +62,9 @@ namespace rsl::math
 		static const quaternion rotate_x_90;
 		static const quaternion rotate_y_90;
 		static const quaternion rotate_z_90;
+		static const quaternion rotate_x_neg90;
+		static const quaternion rotate_y_neg90;
+		static const quaternion rotate_z_neg90;
 		static const quaternion rotate_x_180;
 		static const quaternion rotate_y_180;
 		static const quaternion rotate_z_180;
@@ -97,6 +100,14 @@ namespace rsl::math
 	const quaternion<Scalar> quaternion<Scalar>::rotate_y_90(static_cast<Scalar>(cos45), static_cast<Scalar>(0), static_cast<Scalar>(sin45), static_cast<Scalar>(0));
 	template<typename Scalar>
 	const quaternion<Scalar> quaternion<Scalar>::rotate_z_90(static_cast<Scalar>(cos45), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(sin45));
+
+	template<typename Scalar>
+	const quaternion<Scalar> quaternion<Scalar>::rotate_x_neg90(static_cast<Scalar>(cos45), -static_cast<Scalar>(sin45), static_cast<Scalar>(0), static_cast<Scalar>(0));
+	template<typename Scalar>
+	const quaternion<Scalar> quaternion<Scalar>::rotate_y_neg90(static_cast<Scalar>(cos45), static_cast<Scalar>(0), -static_cast<Scalar>(sin45), static_cast<Scalar>(0));
+	template<typename Scalar>
+	const quaternion<Scalar> quaternion<Scalar>::rotate_z_neg90(static_cast<Scalar>(cos45), static_cast<Scalar>(0), static_cast<Scalar>(0), -static_cast<Scalar>(sin45));
+
 	template<typename Scalar>
 	const quaternion<Scalar> quaternion<Scalar>::rotate_x_180(static_cast<Scalar>(0), static_cast<Scalar>(1), static_cast<Scalar>(0), static_cast<Scalar>(0));
 	template<typename Scalar>
