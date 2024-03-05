@@ -4,24 +4,38 @@
 namespace rsl::math
 {
 	template<typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar rads, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
+	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar degrees, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
 	{
-		Scalar const invTanHalfFovy = static_cast<Scalar>(1) / tan(rads * static_cast<Scalar>(0.5));
+		Scalar const tanHalfFovy = tan(radians(degrees) *static_cast<Scalar>(0.5));
 
 		matrix<Scalar, 4, 4> result(static_cast<Scalar>(0));
-		result[0][0] = invTanHalfFovy;
-		result[1][1] = aspect * invTanHalfFovy;
-		result[2][2] = farZ / (farZ - nearZ);
+		result[0][0] = 1.0f / (aspect * tanHalfFovy);
+		result[1][1] = 1.0f / (tanHalfFovy);
+		result[2][2] = (farZ + nearZ) / (farZ - nearZ);
 		result[2][3] = static_cast<Scalar>(1);
-		result[3][2] = -nearZ * (farZ / (farZ - nearZ));
-		result[3][3] = static_cast<Scalar>(0.0);
+		result[3][2] = -(2.0f * farZ * nearZ) / (farZ - nearZ);
+		return result;
+	}
+
+	template<typename Scalar>
+	[[nodiscard]] matrix<Scalar, 4, 4> orthographic(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar nearZ, Scalar farZ) noexcept
+	{
+		matrix<Scalar, 4, 4> result(static_cast<Scalar>(1.0));
+		result[0][0] = static_cast<Scalar>(2.0) / (right - left);
+		result[1][1] = static_cast<Scalar>(2.0) / (top - bottom);
+		result[2][2] = static_cast<Scalar>(1.0) / (farZ - nearZ);
+
+		result[3][0] = -(right + left) / (right - left);
+		result[3][1] = -(top + bottom) / (top - bottom);
+		result[3][2] = -nearZ / (farZ - nearZ);
+
 		return result;
 	}
 
 	template<typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> lookAt(vector<Scalar, 3> position, vector<Scalar, 3> target, vector<Scalar, 3> up) noexcept
 	{
-		vector<Scalar, 3> const forward(normalize(position - target));
+		vector<Scalar, 3> const forward(normalize(target - position));
 		vector<Scalar, 3> const right(normalize(cross(up, forward)));
 		vector<Scalar, 3> const newup(normalize(cross(forward, right)));
 
@@ -30,24 +44,21 @@ namespace rsl::math
 		result[0][0] = right.x;
 		result[1][0] = right.y;
 		result[2][0] = right.z;
-		result[3][0] = -dot(right, position);
 
 		//New Up
 		result[0][1] = newup.x;
 		result[1][1] = newup.y;
 		result[2][1] = newup.z;
-		result[3][1] = -dot(newup, position);
 
 		//New Forward
 		result[0][2] = forward.x;
 		result[1][2] = forward.y;
 		result[2][2] = forward.z;
-		result[3][2] = -dot(forward, position);
 
-		result[0][3] = static_cast<Scalar>(0);
-		result[1][3] = static_cast<Scalar>(0);
-		result[2][3] = static_cast<Scalar>(0);
-		result[3][3] = static_cast<Scalar>(1);
+		result[3][0] = -dot(right, target);
+		result[3][1] = -dot(newup, target);
+		result[3][2] = -dot(forward, target);
+
 		return result;
 	}
 
