@@ -6,13 +6,13 @@ namespace rsl::math
 	template<typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar degrees, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
 	{
-		Scalar const tanHalfFovy = tan(radians(degrees) *static_cast<Scalar>(0.5));
+		Scalar const tanHalfFovy = tan(radians(degrees) * static_cast<Scalar>(0.5));
 
-		matrix<Scalar, 4, 4> result(static_cast<Scalar>(0));
+		matrix<Scalar, 4, 4> result(static_cast<Scalar>(0.0));
 		result[0][0] = 1.0f / (aspect * tanHalfFovy);
 		result[1][1] = 1.0f / (tanHalfFovy);
 		result[2][2] = (farZ + nearZ) / (farZ - nearZ);
-		result[2][3] = static_cast<Scalar>(1);
+		result[2][3] = static_cast<Scalar>(1.0);
 		result[3][2] = -(2.0f * farZ * nearZ) / (farZ - nearZ);
 		return result;
 	}
@@ -55,9 +55,9 @@ namespace rsl::math
 		result[1][2] = forward.y;
 		result[2][2] = forward.z;
 
-		result[3][0] = -dot(right, target);
-		result[3][1] = -dot(newup, target);
-		result[3][2] = -dot(forward, target);
+		result[3][0] = -dot(right, position);
+		result[3][1] = -dot(newup, position);
+		result[3][2] = -dot(forward, position);
 
 		return result;
 	}

@@ -12,7 +12,7 @@
 namespace rsl::math
 {
 	template<typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar rads, Scalar fov, Scalar nearZ, Scalar farZ) noexcept;
+	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar degrees, Scalar fov, Scalar nearZ, Scalar farZ) noexcept;
 	template<typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> orthographic(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar nearZ, Scalar farZ) noexcept;
 	template<typename Scalar>
