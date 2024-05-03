@@ -9,6 +9,238 @@
 
 namespace rsl
 {
+	template <typename T, T Val>
+	struct integral_constant
+	{
+		static constexpr T value = Val;
+
+		using value_type = T;
+		using type = integral_constant;
+
+		constexpr operator value_type() const noexcept
+		{
+			return value;
+		}
+
+		[[nodiscard]] constexpr value_type operator()() const noexcept
+		{
+			return value;
+		}
+	};
+
+	template <bool Val>
+	using bool_constant = integral_constant<bool, Val>;
+
+	using true_type = bool_constant<true>;
+	using false_type = bool_constant<false>;
+
+
+	template <typename, typename>
+	inline constexpr bool is_same_v = false;
+
+	template <typename T>
+	inline constexpr bool is_same_v<T, T> = true;
+
+	template <typename LHS, typename RHS>
+	struct is_same : bool_constant<is_same_v<LHS, RHS>>
+	{
+	};
+
+	template <bool Test, typename TrueType, typename FalseType>
+	struct conditional
+	{
+		using type = TrueType;
+	};
+
+	template <typename TrueType, typename FalseType>
+	struct conditional<false, TrueType, FalseType>
+	{
+		using type = FalseType;
+	};
+
+	template <bool Test, typename TrueType, typename FalseType>
+	using conditional_t = typename conditional<Test, TrueType, FalseType>::type;
+
+	template <typename T>
+	struct remove_reference
+	{
+		using type = T;
+	};
+
+	template <typename T>
+	struct remove_reference<T&>
+	{
+		using type = T;
+	};
+
+	template <typename T>
+	struct remove_reference<T&&>
+	{
+		using type = T;
+	};
+
+	template <typename T>
+	using remove_reference_t = typename remove_reference<T>::type;
+
+	template <typename T>
+	struct remove_cv
+	{
+		using type = T;
+	};
+
+	template <typename T>
+	struct remove_cv<const T>
+	{
+		using type = T;
+	};
+
+	template <typename T>
+	struct remove_cv<volatile T>
+	{
+		using type = T;
+	};
+
+	template <typename T>
+	struct remove_cv<const volatile T>
+	{
+		using type = T;
+	};
+
+	template <typename T>
+	using remove_cv_t = typename remove_cv<T>::type;
+
+	template <typename T>
+	using remove_cvr = remove_cv<remove_reference_t<T>>;
+
+	template <typename T>
+	using remove_cvr_t = typename remove_cvr<T>::type;
+
+	template <typename T>
+	inline constexpr bool is_void_v = is_same_v<remove_cv_t<T>, void>;
+
+	template <typename T>
+	struct is_void : bool_constant<is_void_v<T>>
+	{
+	};
+
+	template <class... Types>
+	using void_t = void;
+
+	template <typename>
+	inline constexpr bool is_const_v = false;
+
+	template <typename T>
+	inline constexpr bool is_const_v<const T> = true;
+
+	template <typename T>
+	struct is_const : bool_constant<is_const_v<T>>
+	{
+	};
+
+	template <typename>
+	inline constexpr bool is_reference_v = false;
+
+	template <typename T>
+	inline constexpr bool is_reference_v<T&> = true;
+
+	template <typename T>
+	inline constexpr bool is_reference_v<T&&> = true;
+
+	template <typename T>
+	struct is_reference : bool_constant<is_reference_v<T>>
+	{
+	};
+
+	template <typename T>
+	inline constexpr bool is_function_v = !is_const_v<const T> && !is_reference_v<T>;
+
+	template <typename T>
+	struct is_function : bool_constant<is_function_v<T>>
+	{
+	};
+
+	namespace internal
+	{
+		// pointer type cannot be formed
+		template <typename T, class = void>
+		struct add_pointer_impl
+		{
+			using type = T;
+		};
+
+		// pointer type can be formed
+		template <typename T>
+		struct add_pointer_impl<T, void_t<remove_reference_t<T>*>>
+		{
+			using type = remove_reference_t<T>*;
+		};
+	} // namespace internal
+
+	template <typename T>
+	struct add_pointer
+	{
+		using type = typename internal::add_pointer_impl<T>::type;
+	};
+
+	template <typename T>
+	using add_pointer_t = typename internal::add_pointer_impl<T>::type;
+
+	template <typename>
+	inline constexpr bool is_array_v = false;
+
+	template <typename T, size_type I>
+	inline constexpr bool is_array_v<T[I]> = true;
+
+	template <typename T>
+	inline constexpr bool is_array_v<T[]> = true;
+
+	template <typename T>
+	struct is_array : bool_constant<is_array_v<T>>
+	{
+	};
+
+	// remove array extent
+	template <typename T>
+	struct remove_extent
+	{
+		using type = T;
+	};
+
+	template <typename T, size_type I>
+	struct remove_extent<T[I]>
+	{
+		using type = T;
+	};
+
+	template <typename T>
+	struct remove_extent<T[]>
+	{
+		using type = T;
+	};
+
+	template <typename T>
+	using remove_extent_t = typename remove_extent<T>::type;
+
+	namespace internal
+	{
+		template <typename T>
+		struct decay_impl
+		{
+			using T1 = remove_reference_t<T>;
+			using T2 = conditional_t<is_function_v<T1>, add_pointer<T1>, remove_cv<T1>>;
+			using type = typename conditional_t<is_array_v<T1>, add_pointer<remove_extent_t<T1>>, T2>::type;
+		};
+	} // namespace internal
+
+	template <typename T>
+	struct decay
+	{
+		using type = internal::decay_impl<T>::type;
+	};
+
+	template <typename T>
+	using decay_t = typename internal::decay_impl<T>::type;
+
 	template <template <typename...> typename T, typename U, size_type I, typename... Args>
 	struct make_sequence : make_sequence<T, U, I - 1, Args..., U>
 	{
@@ -29,7 +261,7 @@ namespace rsl
 	constexpr bool is_specialization_v<Template<Types...>, Template> = true;
 
 	template <typename Type, template <typename...> typename Template>
-	struct is_specialization : std::bool_constant<is_specialization_v<Type, Template>>
+	struct is_specialization : bool_constant<is_specialization_v<Type, Template>>
 	{
 	};
 
@@ -109,10 +341,9 @@ namespace rsl
 	constexpr bool is_ratio_v<std::ratio<numerator, denominator>> = true;
 
 	template <typename Type>
-	struct is_ratio : std::bool_constant<is_ratio_v<Type>>
+	struct is_ratio : bool_constant<is_ratio_v<Type>>
 	{
 	};
-
 
 	template <typename derived_type, typename base_type>
 	using inherits_from = typename std::enable_if<std::is_base_of<base_type, derived_type>::value, int>::type;
@@ -120,19 +351,13 @@ namespace rsl
 	template <typename derived_type, typename base_type>
 	using doesnt_inherit_from = typename std::enable_if<!std::is_base_of<base_type, derived_type>::value, int>::type;
 
-	template <typename T>
-	using remove_cvr = std::remove_cv<std::remove_reference_t<T>>;
-
-	template <typename T>
-	using remove_cvr_t = typename remove_cvr<T>::type;
-
 	template <class T>
-	struct is_vector : public std::false_type
+	struct is_vector : public false_type
 	{
 	};
 
 	template <class T>
-	struct is_vector<std::vector<T>> : public std::true_type
+	struct is_vector<std::vector<T>> : public true_type
 	{
 	};
 
@@ -166,11 +391,11 @@ namespace rsl
 	private:
 		template <typename _T, typename... _Args>
 		static constexpr auto check(void*)
-			-> decltype(void(_T{std::declval<_Args>()...}), std::true_type());
+			-> decltype(void(_T{std::declval<_Args>()...}), true_type());
 
 		template <typename...>
 		static constexpr auto check(...)
-			-> std::false_type;
+			-> false_type;
 
 		using type = decltype(check<T, Args...>(nullptr));
 
@@ -242,8 +467,6 @@ namespace rsl
 	{
 		return type_name<std::remove_cvref_t<T>>();
 	}
-
-
 
 #if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
 	namespace detail
