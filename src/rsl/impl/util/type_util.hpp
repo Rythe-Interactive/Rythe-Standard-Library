@@ -17,15 +17,9 @@ namespace rsl
 		using value_type = T;
 		using type = integral_constant;
 
-		constexpr operator value_type() const noexcept
-		{
-			return value;
-		}
+		constexpr operator value_type() const noexcept { return value; }
 
-		[[nodiscard]] constexpr value_type operator()() const noexcept
-		{
-			return value;
-		}
+		[[nodiscard]] constexpr value_type operator()() const noexcept { return value; }
 	};
 
 	template <bool Val>
@@ -65,6 +59,12 @@ namespace rsl
 	struct remove_reference
 	{
 		using type = T;
+	};
+
+	template <typename T>
+	struct remove_reference<const T&>
+	{
+		using type = const T;
 	};
 
 	template <typename T>
@@ -162,7 +162,7 @@ namespace rsl
 	namespace internal
 	{
 		// pointer type cannot be formed
-		template <typename T, class = void>
+		template <typename T, typename = void>
 		struct add_pointer_impl
 		{
 			using type = T;
@@ -172,7 +172,43 @@ namespace rsl
 		template <typename T>
 		struct add_pointer_impl<T, void_t<remove_reference_t<T>*>>
 		{
-			using type = remove_reference_t<T>*;
+			using type = remove_reference<T>::type*;
+		};
+
+        template<typename T>
+        struct add_const_impl
+        {
+            using type = const T;
+        };
+
+        template<typename T>
+        struct add_const_impl<T&>
+        {
+            using type = const T&;
+        };
+
+        template<typename T>
+        struct add_const_impl<T&&>
+        {
+            using type = T&&;
+        };
+
+        template<typename T>
+        struct add_const_impl<T*>
+        {
+            using type = const T*;
+		};
+
+		template <typename T>
+		struct add_move_impl
+		{
+			using type = T&&;
+		};
+
+		template <typename T>
+		struct add_move_impl<const T>
+		{
+			using type = T&&;
 		};
 	} // namespace internal
 
@@ -184,6 +220,24 @@ namespace rsl
 
 	template <typename T>
 	using add_pointer_t = typename internal::add_pointer_impl<T>::type;
+
+	template <class T>
+	struct add_const
+	{
+		using type = typename internal::add_const_impl<T>::type;
+	};
+
+	template <class T>
+	using add_const_t = typename add_const<T>::type;
+
+	template <class T>
+	struct add_move
+	{
+		using type = typename internal::add_move_impl<T>::type;
+	};
+
+	template <class T>
+	using add_move_t = typename add_move<T>::type;
 
 	template <typename>
 	inline constexpr bool is_array_v = false;
@@ -329,7 +383,8 @@ namespace rsl
 	constexpr bool is_invocable_v = is_invocable<Func, maxParams>::value;
 
 	template <typename Func, size_type maxParams = 32>
-	constexpr bool is_function_ptr_v = (std::is_empty_v<Func> || std::is_pointer_v<Func>) && is_invocable_v<Func, maxParams>;
+	constexpr bool is_function_ptr_v =
+		(std::is_empty_v<Func> || std::is_pointer_v<Func>) && is_invocable_v<Func, maxParams>;
 
 	template <typename Func, size_type maxParams = 32>
 	constexpr bool is_functor_v = requires { &Func::operator(); } && is_invocable_v<Func, maxParams>;
@@ -390,12 +445,10 @@ namespace rsl
 	{
 	private:
 		template <typename _T, typename... _Args>
-		static constexpr auto check(void*)
-			-> decltype(void(_T{std::declval<_Args>()...}), true_type());
+		static constexpr auto check(void*) -> decltype(void(_T{std::declval<_Args>()...}), true_type());
 
 		template <typename...>
-		static constexpr auto check(...)
-			-> false_type;
+		static constexpr auto check(...) -> false_type;
 
 		using type = decltype(check<T, Args...>(nullptr));
 
@@ -429,6 +482,85 @@ namespace rsl
 
 	template <rsl::size_type I, typename Check, typename... Types>
 	inline constexpr bool element_at_is_same_as_v = element_at_is_same_as<I, Check, Types...>::value;
+
+	struct ref_signal
+	{
+	};
+
+	struct move_signal
+	{
+	};
+
+	struct const_signal
+	{
+	};
+
+	struct pointer_signal
+	{
+	};
+
+	template <typename T, typename... DecorationSignals>
+	struct decorate_type;
+
+	template <typename T, typename DecorationSignal>
+	struct decorate_type<T, DecorationSignal>
+	{
+		static_assert(false, "Uknown signal.");
+	};
+
+	template <typename T>
+	struct decorate_type<T>
+	{
+		using type = T;
+	};
+
+	template <typename T, typename DecorationSignal, typename... Rest>
+	struct decorate_type<T, DecorationSignal, Rest...>
+	{
+		using type = decorate_type<typename decorate_type<T, DecorationSignal>::type, Rest...>::type;
+	};
+
+	template <typename T>
+	struct decorate_type<T, ref_signal>
+	{
+		using type = T&;
+	};
+
+	template <typename T>
+	struct decorate_type<T, move_signal>
+	{
+		using type = add_move_t<T>;
+	};
+
+	template <typename T>
+	struct decorate_type<T, const_signal>
+	{
+		using type = add_const_t<T>;
+	};
+
+	template <typename T>
+	struct decorate_type<T, pointer_signal>
+	{
+		using type = add_pointer<T>::type;
+	};
+
+	template <typename T, typename... DecorationSignals>
+	using decorate_type_t = decorate_type<T, DecorationSignals...>::type;
+
+	template <typename T, typename... DecorationSignals>
+	struct optional_param
+	{
+		using type = decorate_type<T, DecorationSignals...>::type;
+	};
+
+	template <typename... DecorationSignals>
+	struct optional_param<void, DecorationSignals...>
+	{
+		using type = void;
+	};
+
+	template <typename T, typename... DecorationSignals>
+	using optional_param_t = optional_param<T, DecorationSignals...>::type;
 
 #if defined(RYTHE_MSVC)
 
@@ -548,9 +680,7 @@ namespace rsl
 		{
 			switch (*p2)
 			{
-				case '[':
-					++count;
-					break;
+				case '[': ++count; break;
 				case ']':
 				case ';':
 					--count;
@@ -563,8 +693,7 @@ namespace rsl
 #elif defined(RYTHE_MSVC)
 		cstring p = __FUNCSIG__;
 
-		while (*p != 'T' || *(p + 1) != 'y' || *(p + 2) != 'p' || *(p + 3) != 'e' || *(p + 4) != '<')
-			p++;
+		while (*p != 'T' || *(p + 1) != 'y' || *(p + 2) != 'p' || *(p + 3) != 'e' || *(p + 4) != '<') p++;
 
 		while (*p++ != ' ');
 
@@ -576,9 +705,7 @@ namespace rsl
 		{
 			switch (*p2)
 			{
-				case '<':
-					++count;
-					break;
+				case '<': ++count; break;
 				case '>':
 					--count;
 					if (!count)
