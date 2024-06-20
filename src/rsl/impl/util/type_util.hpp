@@ -2,6 +2,7 @@
 #include <concepts>
 #include <ratio>
 #include <utility>
+#include <type_traits>
 
 #include "../defines.hpp"
 #include "primitives.hpp"
@@ -9,6 +10,12 @@
 
 namespace rsl
 {
+    template<typename T>
+	[[nodiscard]] T* addressof(T& val) noexcept
+	{
+		return ::std::addressof(val);
+	}
+
 	template <typename T, T Val>
 	struct integral_constant
 	{
@@ -28,6 +35,13 @@ namespace rsl
 	using true_type = bool_constant<true>;
 	using false_type = bool_constant<false>;
 
+	template <typename T>
+	inline constexpr bool is_empty_v = ::std::is_empty_v<T>;
+
+    template <typename T>
+	struct is_empty : bool_constant<is_empty_v<T>>
+	{
+	};
 
 	template <typename, typename>
 	inline constexpr bool is_same_v = false;
@@ -175,40 +189,28 @@ namespace rsl
 			using type = remove_reference<T>::type*;
 		};
 
-        template<typename T>
-        struct add_const_impl
-        {
-            using type = const T;
-        };
-
-        template<typename T>
-        struct add_const_impl<T&>
-        {
-            using type = const T&;
-        };
-
-        template<typename T>
-        struct add_const_impl<T&&>
-        {
-            using type = T&&;
-        };
-
-        template<typename T>
-        struct add_const_impl<T*>
-        {
-            using type = const T*;
+		template <typename T>
+		struct add_const_impl
+		{
+			using type = const T;
 		};
 
 		template <typename T>
-		struct add_move_impl
+		struct add_const_impl<T&>
+		{
+			using type = const T&;
+		};
+
+		template <typename T>
+		struct add_const_impl<T&&>
 		{
 			using type = T&&;
 		};
 
 		template <typename T>
-		struct add_move_impl<const T>
+		struct add_const_impl<T*>
 		{
-			using type = T&&;
+			using type = const T*;
 		};
 	} // namespace internal
 
@@ -230,14 +232,44 @@ namespace rsl
 	template <class T>
 	using add_const_t = typename add_const<T>::type;
 
-	template <class T>
-	struct add_move
+	template <typename T, typename = void>
+	struct add_ref
 	{
-		using type = typename internal::add_move_impl<T>::type;
+		using lvalue = T;
+		using rvalue = T;
+	};
+
+	template <typename T>
+	struct add_ref<T, void_t<T&>>
+	{
+		using lvalue = T&;
+		using rvalue = T&&;
+	};
+
+	template <typename T>
+	struct add_ref<const T, void_t<const T&>>
+	{
+		using lvalue = const T&;
+		using rvalue = const T&&;
 	};
 
 	template <class T>
-	using add_move_t = typename add_move<T>::type;
+	struct add_lval_ref
+	{
+		using type = typename add_ref<T>::lvalue;
+	};
+
+	template <class T>
+	using add_lval_ref_t = typename add_lval_ref<T>::type;
+
+	template <class T>
+	struct add_rval_ref
+	{
+		using type = typename add_ref<T>::rvalue;
+	};
+
+	template <class T>
+	using add_rval_ref_t = typename add_rval_ref<T>::type;
 
 	template <typename>
 	inline constexpr bool is_array_v = false;
@@ -483,13 +515,17 @@ namespace rsl
 	template <rsl::size_type I, typename Check, typename... Types>
 	inline constexpr bool element_at_is_same_as_v = element_at_is_same_as<I, Check, Types...>::value;
 
-	struct ref_signal
+	struct lval_ref_signal
 	{
 	};
 
-	struct move_signal
+	using ref_signal = lval_ref_signal;
+
+	struct rval_ref_signal
 	{
 	};
+
+	using move_signal = rval_ref_signal;
 
 	struct const_signal
 	{
@@ -521,46 +557,46 @@ namespace rsl
 	};
 
 	template <typename T>
-	struct decorate_type<T, ref_signal>
+	struct decorate_type<T, lval_ref_signal>
 	{
-		using type = T&;
+		using type = typename add_lval_ref<T>::type;
 	};
 
 	template <typename T>
-	struct decorate_type<T, move_signal>
+	struct decorate_type<T, rval_ref_signal>
 	{
-		using type = add_move_t<T>;
+		using type = typename add_rval_ref<T>::type;
 	};
 
 	template <typename T>
 	struct decorate_type<T, const_signal>
 	{
-		using type = add_const_t<T>;
+		using type = typename add_const<T>::type;
 	};
 
 	template <typename T>
 	struct decorate_type<T, pointer_signal>
 	{
-		using type = add_pointer<T>::type;
+		using type = typename add_pointer<T>::type;
 	};
 
 	template <typename T, typename... DecorationSignals>
 	using decorate_type_t = decorate_type<T, DecorationSignals...>::type;
 
-	template <typename T, typename... DecorationSignals>
-	struct optional_param
+    template<typename T, typename = void>
+    struct is_always_equal
+    {
+        using type = bool_constant<is_empty_v<T>>;
+    };
+
+    template <typename T>
+	struct is_always_equal<T, void_t<typename T::is_always_equal>>
 	{
-		using type = decorate_type<T, DecorationSignals...>::type;
+		using type = typename T::is_always_equal;
 	};
 
-	template <typename... DecorationSignals>
-	struct optional_param<void, DecorationSignals...>
-	{
-		using type = void;
-	};
-
-	template <typename T, typename... DecorationSignals>
-	using optional_param_t = optional_param<T, DecorationSignals...>::type;
+    template<typename T>
+    using is_always_equal_t = is_always_equal<T>::type;
 
 #if defined(RYTHE_MSVC)
 
