@@ -6,7 +6,6 @@
 #include "common.hpp"
 
 #include "../defines.hpp"
-#include "container_util.hpp"
 #include "string_util.hpp"
 
 namespace rsl
@@ -19,7 +18,7 @@ namespace rsl
 	template <typename T, typename... Args>
 		requires requires(void* ptr, Args&&... args) { ::new (ptr) T(static_cast<Args&&>(args)...); }
 	constexpr T* construct_at(T* const location, Args&&... args)
-		noexcept(noexcept(::new(static_cast<void*>(location)) T(::rsl::forward<Args>(args)...))) 
+		noexcept(noexcept(::new(static_cast<void*>(location)) T(::rsl::forward<Args>(args)...)))
 	{
 		return ::new (static_cast<void*>(location)) T(::rsl::forward<Args>(args)...);
 	}
@@ -53,8 +52,14 @@ namespace rsl
 		}
 	} // namespace internal
 
+	template <typename T, size_type Size>
+	[[nodiscard]] constexpr T* begin(T (&arr)[Size]) noexcept;
+
+	template <typename T, size_type Size>
+	[[nodiscard]] constexpr T* end(T (&arr)[Size]) noexcept;
+
 	template <typename T>
-	constexpr void destroy_at(T* const location) noexcept 
+	constexpr void destroy_at(T* const location) noexcept
 	{
 		if constexpr (is_array_v<T>)
 		{
@@ -502,8 +507,22 @@ namespace rsl
 	template <typename T>
 	using is_always_equal_t = is_always_equal<T>::type;
 
+	template <typename Derived, typename Base>
+	concept derived_from = ::std::derived_from<Derived, Base>; // Compiler magic behind the scenes.
+
+	template <typename T1, typename T2>
+	concept same_as = ::std::same_as<T1, T2>;
+
 	template <typename From, typename To>
 	concept convertible_to = ::std::convertible_to<From, To>; // Compiler magic behind the scenes.
+
+	template <typename LHS, typename RHS>
+	concept assignable_from =
+		is_lvalue_reference_v<LHS> &&
+		::std::common_reference_with<const remove_reference_t<LHS>&, const remove_reference_t<RHS>&> &&
+		requires(LHS lhs, RHS&& rhs) {
+			{ lhs = static_cast<RHS&&>(rhs) } -> same_as<LHS>;
+		};
 
 #define RYTHE_HAS_FUNC(x)                                                                                              \
 	template <typename, typename T>                                                                                    \
