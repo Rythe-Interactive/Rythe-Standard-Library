@@ -14,7 +14,7 @@ namespace rsl
 	// See https://github.com/microsoft/STL/issues/2620 and https://github.com/microsoft/STL/pull/2624 for further
 	// context. Theoretically the constraint should be superior cross compilers, but bugs inside MSVC has in the past
 	// prevented it from working propperly in all edge cases. I don't care about these edge cases nor do I care about
-	// past versions on MSVC.
+	// past versions of MSVC.
 	template <typename T, typename... Args>
 		requires requires(void* ptr, Args&&... args) { ::new (ptr) T(static_cast<Args&&>(args)...); }
 	constexpr T* construct_at(T* const location, Args&&... args)
@@ -156,23 +156,6 @@ namespace rsl
 
 	template <typename... Types>
 	using index_sequence_for = make_index_sequence<sizeof...(Types)>;
-
-
-	template <typename T>
-	T returns_exactly() noexcept; // not defined
-
-	template <typename T>
-	[[nodiscard]] T fake_copy_init(T) noexcept;
-	// fake_copy_init<T>(E):
-	// (1) has type T [decay_t<decltype((E))> if T is deduced],
-	// (2) is well-formed if and only if E is implicitly convertible to T and T is destructible, and
-	// (3) is non-throwing if and only if both conversion from decltype((E)) to T and destruction of T are non-throwing.
-
-	template <typename T>
-	add_rval_ref_t<T> declval() noexcept
-	{
-		static_assert(always_false_v<T>, "Calling declval is ill-formed.");
-	}
 
 	namespace internal
 	{
@@ -318,14 +301,17 @@ namespace rsl
 	inline constexpr bool is_nothrow_invocable_args_ret_v =
 		internal::select_invoke_traits<Callable, Args...>::template is_nothrow_invocable_ret<ReturnType>::value;
 
+	struct any_type
+	{
+		template <typename T>
+		constexpr operator T&(); // implicit conversion to any type.
+
+		template <typename T>
+		constexpr any_type(const T&); // implicit conversion from any type.
+	};
+
 	namespace internal
 	{
-		struct any_type
-		{
-			template <typename T>
-			constexpr operator T&(); // implicit conversion to any type.
-		};
-
 		template <typename Func, size_type... paramCounts>
 		constexpr bool test_invocable_impl([[maybe_unused]] integer_sequence<size_type, paramCounts...> int_seq)
 		{
@@ -359,13 +345,11 @@ namespace rsl
 	{
 	};
 
-	// std::is_base_of uses compiler magic behind the scenes.
 	template <typename derived_type, typename base_type>
-	using inherits_from = typename enable_if<::std::is_base_of<base_type, derived_type>::value, int>::type;
+	using inherits_from = typename enable_if<::rsl::is_base_of_v<base_type, derived_type>, int>::type;
 
-	// std::is_base_of uses compiler magic behind the scenes.
 	template <typename derived_type, typename base_type>
-	using doesnt_inherit_from = typename enable_if<!::std::is_base_of<base_type, derived_type>::value, int>::type;
+	using doesnt_inherit_from = typename enable_if<!::rsl::is_base_of_v<base_type, derived_type>, int>::type;
 
 	template <template <typename> typename Compare, typename T, T A, T B>
 	struct do_compare
@@ -495,7 +479,7 @@ namespace rsl
 	template <typename T, typename = void>
 	struct is_always_equal
 	{
-		using type = bool_constant<is_empty_v<T>>;
+		using type = bool_constant<::rsl::is_empty_v<T>>;
 	};
 
 	template <typename T>
@@ -507,61 +491,166 @@ namespace rsl
 	template <typename T>
 	using is_always_equal_t = is_always_equal<T>::type;
 
-	template <typename Derived, typename Base>
-	concept derived_from = ::std::derived_from<Derived, Base>; // Compiler magic behind the scenes.
-
 	template <typename T1, typename T2>
-	concept same_as = ::std::same_as<T1, T2>;
+	concept same_as = ::rsl::is_same_v<T1, T2>;
+
+	template <typename Derived, typename Base>
+	concept derived_from =
+		::rsl::is_base_of_v<Base, Derived> && ::rsl::is_convertible_v<const volatile Derived*, const volatile Base*>;
 
 	template <typename From, typename To>
-	concept convertible_to = ::std::convertible_to<From, To>; // Compiler magic behind the scenes.
+	concept convertible_to = ::rsl::is_convertible_v<From, To> && requires { static_cast<To>(::rsl::declval<From>()); };
 
 	template <typename LHS, typename RHS>
 	concept assignable_from =
-		is_lvalue_reference_v<LHS> &&
-		::std::common_reference_with<const remove_reference_t<LHS>&, const remove_reference_t<RHS>&> &&
+		::rsl::is_lvalue_reference_v<LHS> &&
+		::std::common_reference_with<const ::rsl::remove_reference_t<LHS>&, const ::rsl::remove_reference_t<RHS>&> &&
 		requires(LHS lhs, RHS&& rhs) {
 			{ lhs = static_cast<RHS&&>(rhs) } -> same_as<LHS>;
 		};
 
+	template <class _Ty>
+	concept destructible = __is_nothrow_destructible(_Ty);
+
+	template <class _Ty, class... _ArgTys>
+	concept constructible_from = destructible<_Ty> && __is_constructible(_Ty, _ArgTys...);
+
+	template <class _Ty>
+	concept default_initializable = constructible_from<_Ty> && requires {
+		_Ty{};
+		::new (static_cast<void*>(nullptr)) _Ty; // is-default-initializable<_Ty>
+	};
+
+	template <class _Ty>
+	concept move_constructible = constructible_from<_Ty, _Ty> && convertible_to<_Ty, _Ty>;
+
+	template <class _Ty>
+	concept swappable = requires(_Ty& __x, _Ty& __y) { _RANGES swap(__x, __y); };
+
+	template <class _Ty1, class _Ty2>
+	concept swappable_with = _STD common_reference_with<_Ty1, _Ty2> && requires(_Ty1&& __t, _Ty2&& __u) {
+		_RANGES swap(static_cast<_Ty1&&>(__t), static_cast<_Ty1&&>(__t));
+		_RANGES swap(static_cast<_Ty2&&>(__u), static_cast<_Ty2&&>(__u));
+		_RANGES swap(static_cast<_Ty1&&>(__t), static_cast<_Ty2&&>(__u));
+		_RANGES swap(static_cast<_Ty2&&>(__u), static_cast<_Ty1&&>(__t));
+	};
+
+	template <class _Ty>
+	concept copy_constructible =
+		move_constructible<_Ty> && constructible_from<_Ty, _Ty&> && convertible_to<_Ty&, _Ty> &&
+		constructible_from<_Ty, const _Ty&> && convertible_to<const _Ty&, _Ty> && constructible_from<_Ty, const _Ty> &&
+		convertible_to<const _Ty, _Ty>;
+
+	template <class _Ty>
+	concept _Boolean_testable_impl = convertible_to<_Ty, bool>;
+
+	template <class _Ty>
+	concept _Boolean_testable = _Boolean_testable_impl<_Ty> && requires(_Ty&& __t) {
+		{ !static_cast<_Ty&&>(__t) } -> _Boolean_testable_impl;
+	};
+
+	template <class _Ty1, class _Ty2>
+	concept _Half_equality_comparable =
+		requires(const remove_reference_t<_Ty1>& __x, const remove_reference_t<_Ty2>& __y) {
+			{ __x == __y } -> _Boolean_testable;
+			{ __x != __y } -> _Boolean_testable;
+		};
+
+	template <class _Ty1, class _Ty2>
+	concept _Weakly_equality_comparable_with =
+		_Half_equality_comparable<_Ty1, _Ty2> && _Half_equality_comparable<_Ty2, _Ty1>;
+
+	template <class _Ty>
+	concept equality_comparable = _Half_equality_comparable<_Ty, _Ty>;
+
+	template <class _Ty>
+	concept movable = is_object_v<_Ty> && move_constructible<_Ty> && assignable_from<_Ty&, _Ty> && swappable<_Ty>;
+
+	template <class _Ty>
+	concept copyable = copy_constructible<_Ty> && movable<_Ty> && assignable_from<_Ty&, _Ty&> &&
+					   assignable_from<_Ty&, const _Ty&> && assignable_from<_Ty&, const _Ty>;
+
+	template <class _Ty>
+	concept semiregular = copyable<_Ty> && default_initializable<_Ty>;
+
+	template <class _Ty>
+	concept regular = semiregular<_Ty> && equality_comparable<_Ty>;
+
+	template <class _FTy, class... _ArgTys>
+	concept invocable = requires(_FTy&& _Fn, _ArgTys&&... _Args) {
+		_STD invoke(static_cast<_FTy&&>(_Fn), static_cast<_ArgTys&&>(_Args)...);
+	};
+
+	template <class _FTy, class... _ArgTys>
+	concept regular_invocable = invocable<_FTy, _ArgTys...>;
+
+	template <class _FTy, class... _ArgTys>
+	concept predicate = regular_invocable<_FTy, _ArgTys...> && _Boolean_testable<invoke_result_t<_FTy, _ArgTys...>>;
+
+	template <class _FTy, class _Ty1, class _Ty2>
+	concept relation = predicate<_FTy, _Ty1, _Ty1> && predicate<_FTy, _Ty2, _Ty2> && predicate<_FTy, _Ty1, _Ty2> &&
+					   predicate<_FTy, _Ty2, _Ty1>;
+
+	template <class _FTy, class _Ty1, class _Ty2>
+	concept equivalence_relation = relation<_FTy, _Ty1, _Ty2>;
+
+	template <class _FTy, class _Ty1, class _Ty2>
+	concept strict_weak_order = relation<_FTy, _Ty1, _Ty2>;
+
 #define RYTHE_HAS_FUNC(x)                                                                                              \
-	template <typename, typename T>                                                                                    \
-	struct RYTHE_CONCAT(has_, x)                                                                                       \
+	namespace internal                                                                                                 \
 	{                                                                                                                  \
-		static_assert(                                                                                                 \
-			::rsl::integral_constant<bool_t<T>, false>::value, "Second template param needs to be of function type."   \
-		);                                                                                                             \
-	};                                                                                                                 \
-                                                                                                                       \
-	template <typename C, typename Ret, typename... Args>                                                              \
-	struct RYTHE_CONCAT(has_, x)<C, Ret(Args...)>                                                                      \
-	{                                                                                                                  \
-		static constexpr bool value = requires(C& val, Args&&... args) {                                               \
-			{ val.x(::rsl::forward<Args>(args)...) } -> ::rsl::convertible_to<Ret>;                                    \
+		template <typename, typename T>                                                                                \
+		struct RYTHE_CONCAT(has_, RYTHE_CONCAT(x, _impl))                                                              \
+		{                                                                                                              \
+			static_assert(                                                                                             \
+				::rsl::integral_constant<bool_t<T>, false>::value,                                                     \
+				"Second template param needs to be of function type."                                                  \
+			);                                                                                                         \
 		};                                                                                                             \
-	};                                                                                                                 \
+                                                                                                                       \
+		template <typename C, typename Ret, typename... Args>                                                          \
+		struct RYTHE_CONCAT(has_, RYTHE_CONCAT(x, _impl))<C, Ret(Args...)>                                             \
+		{                                                                                                              \
+			static constexpr bool value = requires(C& val, Args&&... args) {                                           \
+				{ val.x(::rsl::forward<Args>(args)...) } -> ::rsl::convertible_to<Ret>;                                \
+			};                                                                                                         \
+		};                                                                                                             \
+	}                                                                                                                  \
                                                                                                                        \
 	template <typename C, typename F>                                                                                  \
-	constexpr bool RYTHE_CONCAT(has_, RYTHE_CONCAT(x, _v)) = RYTHE_CONCAT(has_, x)<C, F>::value;                       \
-                                                                                                                       \
-	template <typename, typename T>                                                                                    \
-	struct RYTHE_CONCAT(has_static_, x)                                                                                \
-	{                                                                                                                  \
-		static_assert(                                                                                                 \
-			::rsl::integral_constant<bool_t<T>, false>::value, "Second template param needs to be of function type."   \
-		);                                                                                                             \
-	};                                                                                                                 \
-                                                                                                                       \
-	template <typename C, typename Ret, typename... Args>                                                              \
-	struct RYTHE_CONCAT(has_static_, x)<C, Ret(Args...)>                                                               \
-	{                                                                                                                  \
-		static constexpr bool value = requires(Args&&... args) {                                                       \
-			{ C::x(::rsl::forward<Args>(args)...) } -> ::rsl::convertible_to<Ret>;                                     \
-		};                                                                                                             \
-	};                                                                                                                 \
+	constexpr bool RYTHE_CONCAT(has_, RYTHE_CONCAT(x, _v)) =                                                           \
+		RYTHE_CONCAT(internal::has_, RYTHE_CONCAT(x, _impl))<C, F>::value;                                             \
                                                                                                                        \
 	template <typename C, typename F>                                                                                  \
-	constexpr bool RYTHE_CONCAT(has_static_, RYTHE_CONCAT(x, _v)) = RYTHE_CONCAT(has_static_, x)<C, F>::value;
+	concept RYTHE_CONCAT(has_, x) = RYTHE_CONCAT(has_, RYTHE_CONCAT(x, _v))<C, F>;                                     \
+                                                                                                                       \
+	namespace internal                                                                                                 \
+	{                                                                                                                  \
+		template <typename, typename T>                                                                                \
+		struct RYTHE_CONCAT(has_static_, RYTHE_CONCAT(x, _impl))                                                       \
+		{                                                                                                              \
+			static_assert(                                                                                             \
+				::rsl::integral_constant<bool_t<T>, false>::value,                                                     \
+				"Second template param needs to be of function type."                                                  \
+			);                                                                                                         \
+		};                                                                                                             \
+                                                                                                                       \
+		template <typename C, typename Ret, typename... Args>                                                          \
+		struct RYTHE_CONCAT(has_static_, RYTHE_CONCAT(x, _impl))<C, Ret(Args...)>                                      \
+		{                                                                                                              \
+			static constexpr bool value = requires(Args&&... args) {                                                   \
+				{ C::x(::rsl::forward<Args>(args)...) } -> ::rsl::convertible_to<Ret>;                                 \
+			};                                                                                                         \
+		};                                                                                                             \
+	}                                                                                                                  \
+                                                                                                                       \
+	template <typename C, typename F>                                                                                  \
+	constexpr bool RYTHE_CONCAT(has_static_, RYTHE_CONCAT(x, _v)) =                                                    \
+		RYTHE_CONCAT(internal::has_static_, RYTHE_CONCAT(x, _impl))<C, F>::value;                                      \
+                                                                                                                       \
+	template <typename C, typename F>                                                                                  \
+	concept RYTHE_CONCAT(has_static_, x) = RYTHE_CONCAT(has_static_, RYTHE_CONCAT(x, _v))<C, F>;
 
 #if defined(RYTHE_MSVC)
 

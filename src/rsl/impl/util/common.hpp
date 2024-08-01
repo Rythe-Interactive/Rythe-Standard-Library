@@ -95,6 +95,7 @@ namespace rsl
 	template <bool Test, typename TrueType, typename FalseType>
 	using conditional_t = typename conditional<Test, TrueType, FalseType>::type;
 
+	// Implementation details of conjunction<...> and disjunction<...>
 	namespace internal
 	{
 		template <bool First_value, typename First, typename... Rest>
@@ -284,7 +285,7 @@ namespace rsl
 	{
 	};
 
-	template <class>
+	template <typename>
 	inline constexpr bool is_rvalue_reference_v = false; // determine whether type argument is an rvalue reference
 
 	template <typename T>
@@ -309,14 +310,7 @@ namespace rsl
 	{
 	};
 
-	template <typename T>
-	inline constexpr bool is_function_v = !is_const_v<const T> && !is_reference_v<T>;
-
-	template <typename T>
-	struct is_function : bool_constant<is_function_v<T>>
-	{
-	};
-
+	// Implementation details of add_XXXX<...>
 	namespace internal
 	{
 		// pointer type cannot be formed
@@ -415,6 +409,40 @@ namespace rsl
 	template <typename T>
 	using add_rval_ref_t = typename add_rval_ref<T>::type;
 
+	// Only function types and reference types can't be const qualified.
+	template <typename T>
+	inline constexpr bool is_function_v = !is_const_v<const T> && !is_reference_v<T>;
+
+	template <typename T>
+	struct is_function : bool_constant<is_function_v<T>>
+	{
+	};
+
+	// Only function types and reference types can't be const qualified.
+	template <typename T>
+	inline constexpr bool is_object_v = is_const_v<const T> && !is_void_v<T>;
+
+	template <typename T>
+	struct is_object : bool_constant<is_object_v<T>>
+	{
+	};
+
+	template <typename T, typename... Args>
+	inline constexpr bool is_constructible_v =
+		::std::is_constructible_v<T, Args...>; // Uses compiler magic behind the scenes.
+
+	template <typename T, typename... Args>
+	struct is_constructible : bool_constant<is_constructible_v<T, Args...>>
+	{
+		// determine whether T can be direct-initialized with Args...
+	};
+
+	template <typename T>
+	struct is_copy_constructible :
+		::rsl::is_constructible<T, typename ::rsl::add_lval_ref<typename ::rsl::add_const<T>::type>::type>
+	{
+	};
+
 	template <typename>
 	inline constexpr bool is_array_v = false;
 
@@ -429,19 +457,19 @@ namespace rsl
 	{
 	};
 
-	template <class T, unsigned int I = 0>
-	inline constexpr size_type extent_v = 0; // determine extent of dimension I of array T
+	template <typename T, unsigned int I = 0>
+	inline constexpr size_type extent_v = 0; // Determine extent of dimension I of array T.
 
-	template <class T, size_type N>
+	template <typename T, size_type N>
 	inline constexpr size_type extent_v<T[N], 0> = N;
 
-	template <class T, unsigned int I, size_type N>
+	template <typename T, unsigned int I, size_type N>
 	inline constexpr size_type extent_v<T[N], I> = extent_v<T, I - 1>;
 
-	template <class T, unsigned int I>
+	template <typename T, unsigned int I>
 	inline constexpr size_type extent_v<T[], I> = extent_v<T, I - 1>;
 
-	template <class T, unsigned int I = 0>
+	template <typename T, unsigned int I = 0>
 	struct extent : integral_constant<size_type, extent_v<T, I>>
 	{
 	};
@@ -468,6 +496,7 @@ namespace rsl
 	template <typename T>
 	using remove_extent_t = typename remove_extent<T>::type;
 
+	// Implementation details of decay_t<...>
 	namespace internal
 	{
 		template <typename T>
@@ -479,6 +508,23 @@ namespace rsl
 		};
 	} // namespace internal
 
+
+	template <typename T>
+	T returns_exactly() noexcept; // not defined
+
+	template <typename T>
+	[[nodiscard]] T fake_copy_init(T) noexcept;
+	// fake_copy_init<T>(E):
+	// (1) has type T [decay_t<decltype((E))> if T is deduced],
+	// (2) is well-formed if and only if E is implicitly convertible to T and T is destructible, and
+	// (3) is non-throwing if and only if both conversion from decltype((E)) to T and destruction of T are non-throwing.
+
+	template <typename T>
+	add_rval_ref_t<T> declval() noexcept
+	{
+		static_assert(always_false_v<T>, "Calling declval is ill-formed.");
+	}
+
 	template <typename T>
 	struct decay
 	{
@@ -489,10 +535,228 @@ namespace rsl
 	using decay_t = typename internal::decay_impl<T>::type;
 
 	template <typename T>
-	[[nodiscard]] T* addressof(T& val) noexcept
+	using is_union = ::std::is_union<T>; // Compiler magic behind the scenes.
+
+	template <typename T>
+	inline constexpr bool is_union_v = is_union<T>::value;
+
+	// Implementation details of is_class<...>
+	namespace internal
+	{
+		// Test if member object pointers of this type are valid.
+		template <typename T>
+		bool_constant<!is_union<T>::value> test_is_class(int T::*);
+
+		template <typename>
+		false_type test_is_class(...);
+	} // namespace internal
+
+	template <typename T>
+	struct is_class : decltype(internal::test_is_class<T>(nullptr))
+	{
+	};
+
+	template <typename T>
+	inline constexpr bool is_class_v = is_class<T>::value;
+
+	// Implementation details of is_base_of<...>
+	namespace internal
+	{
+		template <typename Base>
+		true_type test_ptr_conv(const volatile Base*);
+		template <typename>
+		false_type test_ptr_conv(const volatile void*);
+
+		template <typename Base, typename Derived>
+		auto test_is_base_of(int) -> decltype(test_ptr_conv<Base>(static_cast<Derived*>(nullptr)));
+		template <typename, typename>
+		auto test_is_base_of(...) -> true_type; // Private or ambiguous base.
+	} // namespace internal
+
+	template <typename Base, typename Derived>
+	struct is_base_of :
+		bool_constant<
+			is_class_v<Base> && is_class_v<Derived>&& decltype(internal::test_is_base_of<Base, Derived>(0))::value>
+	{
+	};
+
+	template <typename Base, typename Derived>
+	inline constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
+
+	// Implementation details of is_convertible<...>
+	namespace internal
+	{
+		template <typename T>
+		auto test_returnable(int) -> decltype(void(static_cast<T (*)()>(nullptr)), true_type{});
+		template <typename>
+		auto test_returnable(...) -> false_type;
+
+		template <typename From, typename To>
+		auto test_implicitly_convertible(int
+		) -> decltype(void(::rsl::declval<void (&)(To)>()(::rsl::declval<From>())), true_type{});
+		template <typename, typename>
+		auto test_implicitly_convertible(...) -> false_type;
+	} // namespace internal
+
+	template <typename From, typename To>
+	struct is_convertible :
+		bool_constant<
+			(decltype(internal::test_returnable<To>(0))::value &&
+			 decltype(internal::test_implicitly_convertible<From, To>(0))::value) ||
+			(is_void_v<From> && is_void_v<To>)>
+	{
+	};
+
+	template <typename From, typename To>
+	inline constexpr bool is_convertible_v = is_convertible<From, To>::value;
+
+	template <typename... T>
+	struct common_type;
+
+	template <typename... T>
+	using common_type_t = typename common_type<T...>::type;
+
+	template <>
+	struct common_type<>
+	{
+	};
+
+	template <typename T1>
+	struct common_type<T1> : common_type<T1, T1>
+	{
+	};
+
+    // Implementation details of common_type<...>
+    namespace internal
+	{
+        // Type of the outcome of a ternary statment if a ternary statement is valid.
+		template <typename T1, typename T2>
+		using ternary_result_test = decltype(false ? ::rsl::declval<T1>() : ::rsl::declval<T2>());
+
+		template <typename T1, typename T2, typename = void>
+		struct ternary_result_type
+		{
+            // No common type can be found, ternary statement isn't valid.
+		};
+
+		template <typename T1, typename T2>
+		struct ternary_result_type<T1, T2, void_t<ternary_result_test<const T1&, const T2&>>>
+		{
+            // Common type if valid.
+			using type = remove_cvr_t<ternary_result_test<const T1&, const T2&>>;
+		};
+
+		template <typename T1, typename T2, typename = void>
+		struct decayed_ternary_result_type : ternary_result_type<T1, T2>
+		{
+		};
+
+		template <typename T1, typename T2>
+		struct decayed_ternary_result_type<T1, T2, void_t<ternary_result_test<T1, T2>>>
+		{
+            // Decayed common type.
+			using type = decay_t<ternary_result_test<T1, T2>>;
+		};
+
+		template <typename T1, typename T2, typename _Decayed1 = decay_t<T1>, typename _Decayed2 = decay_t<T2>>
+		struct common_type_2_types : common_type<_Decayed1, _Decayed2>
+		{
+		};
+
+		template <typename T1, typename T2>
+		struct common_type_2_types<T1, T2, T1, T2> : decayed_ternary_result_type<T1, T2>
+		{
+		};
+
+		template <typename _Void, typename T1, typename T2, typename... Rest>
+		struct common_type_multi
+		{
+		};
+
+		template <typename T1, typename T2, typename... Rest>
+		struct common_type_multi<void_t<common_type_t<T1, T2>>, T1, T2, Rest...> :
+			common_type<common_type_t<T1, T2>, Rest...>
+		{
+		};
+	} // namespace internal
+
+	template <typename T1, typename T2>
+	struct common_type<T1, T2> : internal::common_type_2_types<T1, T2>
+	{
+	};
+
+	template <typename T1, typename T2, typename... Rest>
+	struct common_type<T1, T2, Rest...> : internal::common_type_multi<void, T1, T2, Rest...>
+	{
+	};
+
+	// Implementation details of copy_qualifiers<...>
+	namespace internal
+	{
+		template <typename From>
+		struct copy_qualifiers_impl
+		{
+			template <typename To>
+			using result = To;
+		};
+		template <typename From>
+		struct copy_qualifiers_impl<const From>
+		{
+			template <typename To>
+			using result = const To;
+		};
+		template <typename From>
+		struct copy_qualifiers_impl<volatile From>
+		{
+			template <typename To>
+			using result = volatile To;
+		};
+		template <typename From>
+		struct copy_qualifiers_impl<const volatile From>
+		{
+			template <typename To>
+			using result = const volatile To;
+		};
+	} // namespace internal
+
+	template <typename From, typename To>
+	using copy_qualifiers_t = internal::copy_qualifiers_impl<From>::template result<To>;
+
+	template <typename From, typename To>
+	struct copy_qualifiers
+	{
+		using type = internal::copy_qualifiers_impl<From>::template result<To>;
+	};
+
+	template <typename, typename, template <typename> typename, template <typename> typename>
+	struct basic_common_reference
+	{
+	};
+
+	template <typename...>
+	struct common_reference;
+
+	template <typename... _Types>
+	using common_reference_t = common_reference<_Types...>::type;
+
+	template <>
+	struct common_reference<>
+	{
+	};
+
+	template <typename T>
+	struct common_reference<T>
+	{
+		using type = T;
+	};
+	template <typename T>
+	[[nodiscard]] constexpr T* addressof(T& val) noexcept
 	{
 		return ::std::addressof(val); // Compiler magic behind the scenes.
 	}
+
+	template <typename T>
+	const T* addressof(const T&&) = delete;
 
 	template <typename T>
 	[[nodiscard]] constexpr T&& forward(remove_reference_t<T>& val) noexcept
@@ -520,4 +784,4 @@ namespace rsl
 	{
 		return ::rsl::move(val);
 	}
-}
+} // namespace rsl
