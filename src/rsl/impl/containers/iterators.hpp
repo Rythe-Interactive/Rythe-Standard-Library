@@ -262,10 +262,10 @@ namespace rsl
 	};
 
 	template <class PairIteratorContainer>
-	class keys_only
+	class keys_only_view
 	{
 	public:
-		explicit keys_only(PairIteratorContainer& cont)
+		explicit keys_only_view(PairIteratorContainer& cont)
 			: m_container(cont)
 		{
 		}
@@ -284,14 +284,14 @@ namespace rsl
 
 #if !defined(DOXY_EXCLUDE)
 	template <class PairIteratorContainer>
-	keys_only(PairIteratorContainer&) -> keys_only<PairIteratorContainer>;
+	keys_only_view(PairIteratorContainer&) -> keys_only_view<PairIteratorContainer>;
 #endif
 
 	template <class PairIteratorContainer>
-	class values_only
+	class values_only_view
 	{
 	public:
-		explicit values_only(PairIteratorContainer& cont)
+		explicit values_only_view(PairIteratorContainer& cont)
 			: m_container(cont)
 		{
 		}
@@ -311,7 +311,6 @@ namespace rsl
 
 #if !defined(DOXY_EXCLUDE)
 	template <class PairIteratorContainer>
-	values_only(PairIteratorContainer&) -> values_only<PairIteratorContainer>;
+	values_only_view(PairIteratorContainer&) -> values_only_view<PairIteratorContainer>;
 #endif
-
 } // namespace rsl

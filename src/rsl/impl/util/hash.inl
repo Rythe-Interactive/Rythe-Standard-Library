@@ -6,9 +6,16 @@ namespace rsl
 	template <typename hash_type, typename... hash_types>
 	rythe_always_inline constexpr static id_type combine_hash(id_type a_seed, hash_type a_hash, hash_types... a_hashes)
 	{
-		static_assert(std::is_same_v<id_type, hash_type>, "Hashes need to be of type: size_type");
+		static_assert(std::is_same_v<id_type, hash_type>, "Hashes need to be of type: id_type");
 
-		a_seed ^= (a_hash + (0x9e3779b9 + (a_seed << 6) + (a_seed >> 2)));
+		if constexpr (sizeof(id_type) >= 8)
+		{
+			a_seed ^= (a_hash + (0x517cc1b727220a95 + (a_seed << 6) + (a_seed >> 2)));
+		}
+		else
+		{
+			a_seed ^= (a_hash + (0x9e3779b9 + (a_seed << 6) + (a_seed >> 2)));
+		}
 
 		if constexpr (sizeof...(hash_types) != 0)
 		{

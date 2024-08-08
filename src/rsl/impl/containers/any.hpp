@@ -5,17 +5,6 @@
 #include "..\util\primitives.hpp"
 namespace rsl
 {
-	class bad_any_cast : public std::bad_cast
-	{
-		const char* what() const noexcept override
-		{
-			return "Bad rsl::any_cast";
-		}
-	};
-	[[noreturn]] inline void throw_bad_any_cast()
-	{
-		throw bad_any_cast{};
-	}
 	template <size_type maxSize>
 	class any
 	{

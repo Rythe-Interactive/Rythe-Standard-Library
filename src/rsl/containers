@@ -3,5 +3,5 @@
 #include "buffered_string"
 #include "delegate"
 #include "impl/containers/any.hpp"
-#include "impl/containers/iterator_tricks.hpp"
+#include "impl/containers/iterators.hpp"
 #include "impl/containers/hashed_sparse_set.hpp"

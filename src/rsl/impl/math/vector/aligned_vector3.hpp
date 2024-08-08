@@ -5,12 +5,12 @@
 
 namespace rsl::math
 {
-	template <typename Scalar>
-	struct alignas(sizeof(Scalar) * 4) aligned_vector3 : vector_base
+	template <typename Scalar, size_type alignment = sizeof(Scalar) * 4>
+	struct alignas(alignment) aligned_vector3 : vector_base
 	{
 		using scalar = Scalar;
 		static constexpr size_type size = 3;
-		using type = aligned_vector3<Scalar>;
+		using type = aligned_vector3<Scalar, alignment>;
 
 		union
 		{
@@ -21,8 +21,6 @@ namespace rsl::math
 			_MATH_SWIZZLE_3_3_(scalar);
 			_MATH_SWIZZLE_3_4_(scalar);
 		};
-
-		byte padding[sizeof(Scalar)];
 
 		constexpr aligned_vector3() noexcept
 			: xyz(static_cast<scalar>(0), static_cast<scalar>(0), static_cast<scalar>(0))
@@ -90,22 +88,22 @@ namespace rsl::math
 		constexpr scalar length2() const noexcept;
 	};
 
-	template <typename Scalar>
-	const aligned_vector3<Scalar> aligned_vector3<Scalar>::up(static_cast<Scalar>(0), static_cast<Scalar>(1), static_cast<Scalar>(0));
-	template <typename Scalar>
-	const aligned_vector3<Scalar> aligned_vector3<Scalar>::down(static_cast<Scalar>(0), static_cast<Scalar>(-1), static_cast<Scalar>(0));
-	template <typename Scalar>
-	const aligned_vector3<Scalar> aligned_vector3<Scalar>::right(static_cast<Scalar>(1), static_cast<Scalar>(0), static_cast<Scalar>(0));
-	template <typename Scalar>
-	const aligned_vector3<Scalar> aligned_vector3<Scalar>::left(static_cast<Scalar>(-1), static_cast<Scalar>(0), static_cast<Scalar>(0));
-	template <typename Scalar>
-	const aligned_vector3<Scalar> aligned_vector3<Scalar>::forward(static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(1));
-	template <typename Scalar>
-	const aligned_vector3<Scalar> aligned_vector3<Scalar>::backward(static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(-1));
-	template <typename Scalar>
-	const aligned_vector3<Scalar> aligned_vector3<Scalar>::one(static_cast<Scalar>(1));
-	template <typename Scalar>
-	const aligned_vector3<Scalar> aligned_vector3<Scalar>::zero(static_cast<Scalar>(0));
+	template <typename Scalar, size_type alignment>
+	const aligned_vector3<Scalar, alignment> aligned_vector3<Scalar, alignment>::up(static_cast<Scalar>(0), static_cast<Scalar>(1), static_cast<Scalar>(0));
+	template <typename Scalar, size_type alignment>
+	const aligned_vector3<Scalar, alignment> aligned_vector3<Scalar, alignment>::down(static_cast<Scalar>(0), static_cast<Scalar>(-1), static_cast<Scalar>(0));
+	template <typename Scalar, size_type alignment>
+	const aligned_vector3<Scalar, alignment> aligned_vector3<Scalar, alignment>::right(static_cast<Scalar>(1), static_cast<Scalar>(0), static_cast<Scalar>(0));
+	template <typename Scalar, size_type alignment>
+	const aligned_vector3<Scalar, alignment> aligned_vector3<Scalar, alignment>::left(static_cast<Scalar>(-1), static_cast<Scalar>(0), static_cast<Scalar>(0));
+	template <typename Scalar, size_type alignment>
+	const aligned_vector3<Scalar, alignment> aligned_vector3<Scalar, alignment>::forward(static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(1));
+	template <typename Scalar, size_type alignment>
+	const aligned_vector3<Scalar, alignment> aligned_vector3<Scalar, alignment>::backward(static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(-1));
+	template <typename Scalar, size_type alignment>
+	const aligned_vector3<Scalar, alignment> aligned_vector3<Scalar, alignment>::one(static_cast<Scalar>(1));
+	template <typename Scalar, size_type alignment>
+	const aligned_vector3<Scalar, alignment> aligned_vector3<Scalar, alignment>::zero(static_cast<Scalar>(0));
 
 	using aligned_float3 = aligned_vector3<float32>;
 	using aligned_vec3 = aligned_float3;
