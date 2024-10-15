@@ -83,8 +83,8 @@ namespace rsl::math
 		{
 		};
 
-		template <typename Scalar>
-		struct _is_vector_impl<aligned_vector3<Scalar>> : ::std::true_type
+		template <typename Scalar, size_type alignment>
+		struct _is_vector_impl<aligned_vector3<Scalar, alignment>> : ::std::true_type
 		{
 		};
 
@@ -313,10 +313,10 @@ namespace rsl::math
 			constexpr static auto value = vector<Scalar, Size>(static_cast<Scalar>(v));
 		};
 
-		template <typename Scalar, size_type v>
-		struct _uniform_value_impl_<aligned_vector3<Scalar>, v>
+		template <typename Scalar, size_type alignment, size_type v>
+		struct _uniform_value_impl_<aligned_vector3<Scalar, alignment>, v>
 		{
-			constexpr static auto value = aligned_vector3<Scalar>(static_cast<Scalar>(v));
+			constexpr static auto value = aligned_vector3<Scalar, alignment>(static_cast<Scalar>(v));
 		};
 
 		template <typename Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, size_type v>

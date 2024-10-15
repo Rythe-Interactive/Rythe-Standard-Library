@@ -30,7 +30,7 @@ namespace rsl
 	template <time_duration_rep precision = days>
 	using days_duration = std::chrono::duration<precision, std::ratio_multiply<std::ratio<24>, std::chrono::hours::period>>;
 
-	template <time_duration_rep precision = fast_time>
+	template <time_duration_rep precision = time32>
 	struct time_span
 	{
 		using time_type = precision;

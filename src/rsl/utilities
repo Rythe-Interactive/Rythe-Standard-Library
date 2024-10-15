@@ -1,4 +1,5 @@
 #pragma once
 
 #include "impl/util/utilities.hpp"
+#include "impl/util/enum_flags.hpp"
 #include "impl/util/assert.hpp"

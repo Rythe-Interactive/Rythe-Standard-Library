@@ -14,7 +14,7 @@ namespace rsl
 		requires specialization_of<typename Clock::duration, std::chrono::duration>;
 	};
 
-	template <time_duration_rep precision = fast_time, chrono_clock clock_t = std::chrono::high_resolution_clock>
+	template <time_duration_rep precision = time32, chrono_clock clock_t = std::chrono::high_resolution_clock>
 	struct time_point
 	{ // represents a point in time
 	private:

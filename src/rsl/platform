@@ -1,0 +1,3 @@
+#pragma once
+#include "impl/platform/platform.hpp"
+#include "impl/platform/platform_dependent_var.hpp"

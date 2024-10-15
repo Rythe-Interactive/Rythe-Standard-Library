@@ -5,8 +5,11 @@
 
 namespace rsl
 {
+	template <class T>
+	concept enum_type = std::is_enum_v<T>;
+
 	template <typename Func>
-	concept invocable = is_invocable_v<Func>;
+	concept invocable_undetermined = is_invocable_v<Func>;
 
 	template <typename Func>
 	concept function_ptr = is_function_ptr_v<Func>;

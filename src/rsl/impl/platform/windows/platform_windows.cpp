@@ -1,3 +1,5 @@
+#include "../../defines.hpp"
+
 #if RYTHE_PLATFORM_WINDOWS
 
 	#define WIN32_LEAN_AND_MEAN

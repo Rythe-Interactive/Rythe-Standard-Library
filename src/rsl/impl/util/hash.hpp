@@ -1,15 +1,16 @@
 #pragma once
+#include <span>
+#include <unordered_map>
 
 #include "../defines.hpp"
 #include "primitives.hpp"
-#include "../containers/span.hpp"
 #include "string_util.hpp"
 #include "type_util.hpp"
 
 namespace rsl
 {
     template <typename T>
-	constexpr size_type fnv1a_hash_bytes(size_type base, span<byte>);
+	constexpr size_type fnv1a_hash_bytes(size_type base, std::span<byte>);
 
 	template <typename hash_type, typename... hash_types>
 	constexpr static id_type combine_hash(id_type seed, hash_type hash, hash_types... hashes);

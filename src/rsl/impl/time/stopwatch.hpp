@@ -9,7 +9,7 @@
 
 namespace rsl
 {
-	template <time_duration_rep precision = fast_time, chrono_clock clock_t = std::chrono::high_resolution_clock>
+	template <time_duration_rep precision = time32, chrono_clock clock_t = std::chrono::high_resolution_clock>
 	struct stopwatch
 	{
 	public:
