@@ -68,11 +68,18 @@ namespace rsl
 
 #pragma region /////////////////////////////////// Operating system /////////////////////////////////////
 
+#define RYTHE_WINDOWS_INDEX 0
+#define RYTHE_LINUX_INDEX 1
+#define RYTHE_MAX_PLATFORMS 2
+
 #if defined(_WIN64)
-	#define RYTHE_WINDOWS
+    #define RYTHE_PLATFORM_INDEX RYTHE_WINDOWS_INDEX
 #elif defined(__linux__)
-	#define RYTHE_LINUX
+	#define RYTHE_PLATFORM_INDEX RYTHE_LINUX_INDEX
 #endif
+
+#define RYTHE_PLATFORM_WINDOWS (RYTHE_PLATFORM_INDEX == RYTHE_WINDOWS_INDEX)
+#define RYTHE_PLATFORM_LINUX (RYTHE_PLATFORM_INDEX == RYTHE_LINUX_INDEX)
 
 #pragma endregion
 

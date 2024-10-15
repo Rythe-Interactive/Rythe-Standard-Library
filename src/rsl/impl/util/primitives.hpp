@@ -27,6 +27,19 @@ namespace rsl
 	using float32 = float;
 	using float64 = double;
 	using float_max = long double;
+    
+	using u8 = uint8_t;
+	using u16 = uint16_t;
+	using u32 = uint32_t;
+	using u64 = uint64_t;
+
+	using i8 = int8_t;
+	using i16 = int16_t;
+	using i32 = int32_t;
+	using i64 = int64_t;
+
+    using f32 = float32;
+    using f64 = float64;
 
 	using time32 = float32;
 	using time64 = float64;
@@ -61,21 +74,13 @@ namespace rsl
 	using micro_seconds = time64;
 	using nano_seconds = time_large;
 
-	using fast_time = time32;
-	using fast_hours = fast_time;
-	using fast_minutes = fast_time;
-	using fast_seconds = fast_time;
-	using fast_milli_seconds = fast_time;
-	using fast_micro_seconds = fast_time;
-	using fast_nano_seconds = fast_time;
-
-	using precise_time = time64;
-	using precise_hours = precise_time;
-	using precise_minutes = precise_time;
-	using precise_seconds = precise_time;
-	using precise_milli_seconds = precise_time;
-	using precise_micro_seconds = precise_time;
-	using precise_nano_seconds = precise_time;
+    using days_f = time32;
+	using hours_f = time32;
+	using minutes_f = time32;
+	using seconds_f = time32;
+	using milli_seconds_f = time32;
+	using micro_seconds_f = time64;
+	using nano_seconds_f = float_max;
 
 	enum npos_type : size_type
 	{
