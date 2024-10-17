@@ -73,7 +73,7 @@ namespace rsl
 #define RYTHE_MAX_PLATFORMS 2
 
 #if defined(_WIN64)
-    #define RYTHE_PLATFORM_INDEX RYTHE_WINDOWS_INDEX
+	#define RYTHE_PLATFORM_INDEX RYTHE_WINDOWS_INDEX
 #elif defined(__linux__)
 	#define RYTHE_PLATFORM_INDEX RYTHE_LINUX_INDEX
 #endif
@@ -175,83 +175,104 @@ namespace rsl
 #endif
 
 #if defined(RYTHE_MSVC)
-	#define RYTHE_COMPILER_WARNING(desc) __pragma(message(__FILE__ "(" RYTHE_STRINGIFY(__LINE__) ") : warning: " RYTHE_STRINGIFY(desc)))
-	#define RYTHE_COMPILER_ERROR(desc) __pragma(message(__FILE__ "(" RYTHE_STRINGIFY(__LINE__) ") : error: " RYTHE_STRINGIFY(desc)))
+	#define RYTHE_COMPILER_WARNING(desc)                                                                               \
+		__pragma(message(__FILE__ "(" RYTHE_STRINGIFY(__LINE__) ") : warning: " RYTHE_STRINGIFY(desc)))
+	#define RYTHE_COMPILER_ERROR(desc)                                                                                 \
+		__pragma(message(__FILE__ "(" RYTHE_STRINGIFY(__LINE__) ") : error: " RYTHE_STRINGIFY(desc)))
 #elif defined(RYTHE_GCC) || defined(RYTHE_CLANG)
 	#define RYTHE_COMPILER_WARNING(desc) _Pragma(RYTHE_STRINGIFY(GCC warning desc))
 	#define RYTHE_COMPILER_ERROR(desc) _Pragma(RYTHE_STRINGIFY(GCC error desc))
 #endif
 
-#define RULE_OF_5(type)                     \
-	type() = default;                       \
-	type(const type&) = default;            \
-	type(type&&) = default;                 \
-	type& operator=(const type&) = default; \
-	type& operator=(type&&) = default;      \
+#pragma endregion
+
+#pragma region /////////////////////////////////////// Utilities ////////////////////////////////////////
+
+#define DECLARE_OPAQUE_HANDLE(name)                                                                                    \
+	enum struct name : rsl::ptr_type                                                                                   \
+	{                                                                                                                  \
+		invalid                                                                                                        \
+	};                                                                                                                 \
+	[[maybe_unused]] constexpr name invalid_##name = name::invalid;
+
+#define DECLARE_OPAQUE_HANDLE_INVALID_VALUE(name, invalidValue)                                                        \
+	enum struct name : rsl::ptr_type                                                                                   \
+	{                                                                                                                  \
+		invalid = invalidValue                                                                                         \
+	};                                                                                                                 \
+	[[maybe_unused]] constexpr name invalid_##name = name::invalid;
+
+#define RULE_OF_5(type)                                                                                                \
+	type() = default;                                                                                                  \
+	type(const type&) = default;                                                                                       \
+	type(type&&) = default;                                                                                            \
+	type& operator=(const type&) = default;                                                                            \
+	type& operator=(type&&) = default;                                                                                 \
 	~type() = default;
 
-#define RULE_OF_5_NOEXCEPT(type)                     \
-	type() noexcept = default;                       \
-	type(const type&) noexcept = default;            \
-	type(type&&) noexcept = default;                 \
-	type& operator=(const type&) noexcept = default; \
-	type& operator=(type&&) noexcept = default;      \
+#define RULE_OF_5_NOEXCEPT(type)                                                                                       \
+	type() noexcept = default;                                                                                         \
+	type(const type&) noexcept = default;                                                                              \
+	type(type&&) noexcept = default;                                                                                   \
+	type& operator=(const type&) noexcept = default;                                                                   \
+	type& operator=(type&&) noexcept = default;                                                                        \
 	~type() = default;
 
-#define NO_DEF_CTOR_RULE5(type)             \
-	type(const type&) = default;            \
-	type(type&&) = default;                 \
-	type& operator=(const type&) = default; \
-	type& operator=(type&&) = default;      \
+#define NO_DEF_CTOR_RULE5(type)                                                                                        \
+	type(const type&) = default;                                                                                       \
+	type(type&&) = default;                                                                                            \
+	type& operator=(const type&) = default;                                                                            \
+	type& operator=(type&&) = default;                                                                                 \
 	~type() = default;
 
-#define NO_DEF_CTOR_RULE5_NOEXCEPT(type)             \
-	type(const type&) noexcept = default;            \
-	type(type&&) noexcept = default;                 \
-	type& operator=(const type&) noexcept = default; \
-	type& operator=(type&&) noexcept = default;      \
+#define NO_DEF_CTOR_RULE5_NOEXCEPT(type)                                                                               \
+	type(const type&) noexcept = default;                                                                              \
+	type(type&&) noexcept = default;                                                                                   \
+	type& operator=(const type&) noexcept = default;                                                                   \
+	type& operator=(type&&) noexcept = default;                                                                        \
 	~type() = default;
 
-#define NO_DTOR_RULE5(type)                 \
-	type() = default;                       \
-	type(const type&) = default;            \
-	type(type&&) = default;                 \
-	type& operator=(const type&) = default; \
+#define NO_DTOR_RULE5(type)                                                                                            \
+	type() = default;                                                                                                  \
+	type(const type&) = default;                                                                                       \
+	type(type&&) = default;                                                                                            \
+	type& operator=(const type&) = default;                                                                            \
 	type& operator=(type&&) = default;
 
-#define NO_DTOR_RULE5_NOEXCEPT(type)                 \
-	type() noexcept = default;                       \
-	type(const type&) noexcept = default;            \
-	type(type&&) noexcept = default;                 \
-	type& operator=(const type&) noexcept = default; \
+#define NO_DTOR_RULE5_NOEXCEPT(type)                                                                                   \
+	type() noexcept = default;                                                                                         \
+	type(const type&) noexcept = default;                                                                              \
+	type(type&&) noexcept = default;                                                                                   \
+	type& operator=(const type&) noexcept = default;                                                                   \
 	type& operator=(type&&) noexcept = default;
 
-#define COPY_FUNCS(type)         \
-	type(const type&) = default; \
+#define COPY_FUNCS(type)                                                                                               \
+	type(const type&) = default;                                                                                       \
 	type& operator=(const type&) = default;
 
-#define COPY_FUNCS_DECO(pre, type, post)  \
-	pre type(const type&) post = default; \
+#define COPY_FUNCS_DECO(pre, type, post)                                                                               \
+	pre type(const type&) post = default;                                                                              \
 	pre type& operator=(const type&) post = default;
 
-#define COPY_FUNCS_NOEXCEPT(type)         \
-	type(const type&) noexcept = default; \
+#define COPY_FUNCS_NOEXCEPT(type)                                                                                      \
+	type(const type&) noexcept = default;                                                                              \
 	type& operator=(const type&) noexcept = default;
 
-#define MOVE_FUNCS(type)    \
-	type(type&&) = default; \
+#define MOVE_FUNCS(type)                                                                                               \
+	type(type&&) = default;                                                                                            \
 	type& operator=(type&&) = default;
 
-#define MOVE_FUNCS_DECO(pre, type, post) \
-	pre type(type&&) post = default;     \
+#define MOVE_FUNCS_DECO(pre, type, post)                                                                               \
+	pre type(type&&) post = default;                                                                                   \
 	pre type& operator=(type&&) post = default;
 
-#define MOVE_FUNCS_NOEXCEPT(type)    \
-	type(type&&) noexcept = default; \
+#define MOVE_FUNCS_NOEXCEPT(type)                                                                                      \
+	type(type&&) noexcept = default;                                                                                   \
 	type& operator=(type&&) noexcept = default;
 
 #pragma endregion
 
+#pragma region ////////////////////////////////// Language convention ///////////////////////////////////
 
 #if defined(RYTHE_WINDOWS) && !defined(RYTHE_WINDOWS_USE_CDECL)
 /**@def RYTHE_CCONV
@@ -263,8 +284,6 @@ namespace rsl
 #else
 	#define RYTHE_CCONV
 #endif
-
-#pragma region ////////////////////////////////// Language convention ///////////////////////////////////
 
 /**@def RYTHE_CPP17V
  * @brief the version number of c++17 as long
@@ -292,7 +311,7 @@ namespace rsl
 
 #pragma endregion
 
-#pragma region ///////////////////////////////////// Attributes /////////////////////////////////////////
+#pragma region /////////////////////////////////////// Attributes ///////////////////////////////////////
 
 #if defined(RYTHE_GCC) || defined(RYTHE_CLANG)
 	#define rythe_always_inline __attribute__((always_inline))
