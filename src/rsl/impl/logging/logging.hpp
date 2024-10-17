@@ -372,7 +372,10 @@ namespace rsl::log
 	class genesis_formatter_flag : public spdlog::custom_flag_formatter
 	{
 	public:
-		void format(const spdlog::details::log_msg& msg, const std::tm& tm_time, spdlog::memory_buf_t& dest) override
+		void format(
+			[[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time,
+			spdlog::memory_buf_t& dest
+		) override
 		{
 			// get seconds since engine start
 			const auto now = std::chrono::high_resolution_clock::now();
@@ -395,7 +398,10 @@ namespace rsl::log
 
 	class thread_name_formatter_flag : public spdlog::custom_flag_formatter
 	{
-		void format(const spdlog::details::log_msg& msg, const std::tm& tm_time, spdlog::memory_buf_t& dest) override
+		void format(
+			[[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time,
+			spdlog::memory_buf_t& dest
+		) override
 		{
 			// std::string thread_ident;
 			thread_local static std::string* thread_ident;
@@ -433,7 +439,7 @@ namespace rsl::log
 	};
 
 
-	inline static void initLogger(logger_ptr& logger, std::string_view loggerName = "")
+	inline static void initLogger(logger_ptr& logger, [[maybe_unused]] std::string_view loggerName = "")
 	{
 		auto f = std::make_unique<spdlog::pattern_formatter>();
 

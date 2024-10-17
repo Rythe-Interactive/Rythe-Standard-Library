@@ -3,6 +3,10 @@
 #include "../util/primitives.hpp"
 #include "../defines.hpp"
 
+#if RYTHE_PLATFORM_WINDOWS
+	#include "windows/winplatformdef.h"
+#endif
+
 namespace rsl
 {
 	class dynamic_library;

@@ -26,7 +26,10 @@ namespace rsl
 
 		class thread_name_formatter_flag : public spdlog::custom_flag_formatter
 		{
-			void format([[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest) override
+			void format(
+				[[maybe_unused]] const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time,
+				[[maybe_unused]] spdlog::memory_buf_t& dest
+			) override
 			{
 				////std::string thread_ident;
 				// thread_local static std::string* thread_ident;
