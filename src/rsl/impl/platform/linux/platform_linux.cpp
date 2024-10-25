@@ -2,7 +2,7 @@
 
 #if RYTHE_PLATFORM_LINUX
 
-#include <dlfcn.h>
+	#include <dlfcn.h>
 
 namespace rsl
 {
@@ -16,6 +16,12 @@ namespace rsl
 	void* platform::get_symbol(dynamic_library library, cstring symbolName)
 	{
 		return dlsym(library.m_handle, symbolName);
+	}
+
+	void dynamic_library::release()
+	{
+		dlclose(m_handle);
+		m_handle = nullptr;
 	}
 } // namespace rsl
 

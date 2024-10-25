@@ -23,7 +23,13 @@ namespace rsl
 
 	void* platform::get_symbol(dynamic_library library, cstring symbolName)
 	{
-		return reinterpret_cast<void*>(GetProcAddress(library.m_handle, symbolName));
+		return std::bit_cast<void*>(GetProcAddress(library.m_handle, symbolName));
+	}
+
+	void dynamic_library::release()
+	{
+		FreeLibrary(m_handle);
+		m_handle = nullptr;
 	}
 } // namespace rsl
 

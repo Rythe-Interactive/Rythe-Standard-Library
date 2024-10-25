@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../util/primitives.hpp"
+#include <bit>
+
 #include "../defines.hpp"
+#include "../util/primitives.hpp"
 
 #if RYTHE_PLATFORM_WINDOWS
 	#include "windows/winplatformdef.h"
@@ -30,10 +32,15 @@ namespace rsl
 	class dynamic_library
 	{
 	public:
-		template<typename T>
-		T get_symbol(cstring symbolName) const { return reinterpret_cast<T>(platform::get_symbol(*this, symbolName)); }
+		template <typename T>
+		T get_symbol(cstring symbolName) const
+		{
+			return std::bit_cast<T>(platform::get_symbol(*this, symbolName));
+		}
 
 		operator bool() const { return m_handle; }
+
+		void release();
 
 	private:
 		using platform_specific_handle = RYTHE_DYNAMIC_LIBRARY_HANDLE_IMPL;
