@@ -75,7 +75,7 @@ namespace rsl
 		}
 
 		template <enum_type T>
-		constexpr T set_flag(T value, T flag, bool isSet)
+		constexpr T set_flag(T value, T flag, bool isSet = true)
 		{
 			if (isSet != has_flag(value, flag))
 			{
