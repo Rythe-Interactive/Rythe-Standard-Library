@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "../util/primitives.hpp"
-#include "iterator_tricks.hpp"
+#include "iterators.hpp"
 
 /**
  * @file hashed_sparse_set.hpp
