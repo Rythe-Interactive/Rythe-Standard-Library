@@ -1,0 +1,11 @@
+local project = {
+    alias = "rsl",
+    namespace = "rsl",
+    additional_types = { "test" },
+    dependencies = {
+        "public third_party/spdlog:header-only"
+    },
+    defines = { "RYTHE_INTERNAL" }
+}
+
+return project
