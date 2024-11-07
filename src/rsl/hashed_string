@@ -1,0 +1,3 @@
+#pragma once
+
+#include "impl/containers/hashed_string.hpp"
