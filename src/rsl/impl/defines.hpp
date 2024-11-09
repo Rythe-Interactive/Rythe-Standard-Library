@@ -33,15 +33,6 @@
 	#define RYTHE_CONFIGURATION RYTHE_RELEASE_VALUE
 #endif
 
-namespace rsl
-{
-#if defined(RYTHE_VALIDATE)
-	constexpr bool RYTHE_VALIDATE_ON = true;
-#else
-	constexpr bool RYTHE_VALIDATE_ON = false;
-#endif
-} // namespace rsl
-
 #if !defined(RYTHE_HIGH_IMPACT_VALIDATION_LEVEL)
 	#define RYTHE_HIGH_IMPACT_VALIDATION_LEVEL 3
 #endif
@@ -54,17 +45,31 @@ namespace rsl
 	#define RYTHE_LOW_IMPACT_VALIDATION_LEVEL 1
 #endif
 
+#define RYTHE_VALIDATION_LEVEL_NONE 0
+
 #if !defined(RYTHE_VALIDATION_LEVEL)
 	#if defined(RYTHE_VALIDATE)
 		#define RYTHE_VALIDATION_LEVEL RYTHE_HIGH_IMPACT_VALIDATION_LEVEL
 	#else
-		#define RYTHE_VALIDATION_LEVEL 0
+		#define RYTHE_VALIDATION_LEVEL RYTHE_VALIDATION_LEVEL_NONE
 	#endif
-#elif RYTHE_VALIDATION_LEVEL != 0
+#elif RYTHE_VALIDATION_LEVEL != RYTHE_VALIDATION_LEVEL_NONE
 	#if !defined(RYTHE_VALIDATE)
 		#define RYTHE_VALIDATE
 	#endif
+#elif defined(RYTHE_VALIDATE)
+	#undef RYTHE_VALIDATE
 #endif
+
+namespace rsl
+{
+#if defined(RYTHE_VALIDATE)
+	constexpr bool RYTHE_VALIDATE_ON = true;
+#else
+	constexpr bool RYTHE_VALIDATE_ON = false;
+#endif
+} // namespace rsl
+
 
 #pragma region /////////////////////////////////// Operating system /////////////////////////////////////
 
