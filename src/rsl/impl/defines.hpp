@@ -36,27 +36,27 @@
 namespace rsl
 {
 #if defined(RYTHE_VALIDATE)
-	constexpr static bool RYTHE_VALIDATE_ON = true;
+	constexpr bool RYTHE_VALIDATE_ON = true;
 #else
-	constexpr static bool RYTHE_VALIDATE_ON = false;
+	constexpr bool RYTHE_VALIDATE_ON = false;
 #endif
 } // namespace rsl
 
-#if !defined(RYTHE_WARNING_VALIDATION_LEVEL)
-	#define RYTHE_WARNING_VALIDATION_LEVEL 3
+#if !defined(RYTHE_HIGH_IMPACT_VALIDATION_LEVEL)
+	#define RYTHE_HIGH_IMPACT_VALIDATION_LEVEL 3
 #endif
 
-#if !defined(RYTHE_ERROR_VALIDATION_LEVEL)
-	#define RYTHE_ERROR_VALIDATION_LEVEL 2
+#if !defined(RYTHE_MEDIUM_IMPACT_VALIDATION_LEVEL)
+	#define RYTHE_MEDIUM_IMPACT_VALIDATION_LEVEL 2
 #endif
 
-#if !defined(RYTHE_FATAL_VALIDATION_LEVEL)
-	#define RYTHE_FATAL_VALIDATION_LEVEL 1
+#if !defined(RYTHE_LOW_IMPACT_VALIDATION_LEVEL)
+	#define RYTHE_LOW_IMPACT_VALIDATION_LEVEL 1
 #endif
 
 #if !defined(RYTHE_VALIDATION_LEVEL)
 	#if defined(RYTHE_VALIDATE)
-		#define RYTHE_VALIDATION_LEVEL 3
+		#define RYTHE_VALIDATION_LEVEL RYTHE_HIGH_IMPACT_VALIDATION_LEVEL
 	#else
 		#define RYTHE_VALIDATION_LEVEL 0
 	#endif

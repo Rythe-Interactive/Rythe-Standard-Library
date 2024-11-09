@@ -164,14 +164,14 @@ namespace rsl
 		constexpr void push_back(const value_type& value) noexcept(move_construct_noexcept && !RYTHE_VALIDATE_ON)
 		{
 			size_type oldSize = m_size++;
-			rsl_assert_msg(m_size <= maxSize, "out of range");
+			rsl_assert_out_of_range(m_size <= maxSize);
 			copy_construct_from_unsafe_impl(oldSize, m_size, &value);
 		}
 
 		constexpr void push_back(value_type&& value) noexcept(move_construct_noexcept && !RYTHE_VALIDATE_ON)
 		{
 			size_type oldSize = m_size++;
-			rsl_assert_msg(m_size <= maxSize, "out of range");
+			rsl_assert_out_of_range(m_size <= maxSize);
 			move_construct_from_unsafe_impl(oldSize, m_size, &value);
 		}
 
@@ -179,20 +179,20 @@ namespace rsl
 		constexpr value_type& emplace_back(Args&&... args) noexcept(construct_noexcept<Args...> && !RYTHE_VALIDATE_ON)
 		{
 			size_type oldSize = m_size++;
-			rsl_assert_msg(m_size <= maxSize, "out of range");
+			rsl_assert_out_of_range(m_size <= maxSize);
 			emplace_unsafe_impl(oldSize, m_size, std::forward<Args>(args)...);
 			return m_buffer[m_size - 1].value;
 		}
 
 		constexpr reference at(size_type i) noexcept(!RYTHE_VALIDATE_ON)
 		{
-			rsl_assert_msg(i < m_size, "out of range");
+			rsl_assert_out_of_range(i < m_size);
 			return m_buffer[i].value;
 		}
 
 		constexpr const_reference at(size_type i) const noexcept(!RYTHE_VALIDATE_ON)
 		{
-			rsl_assert_msg(i < m_size, "out of range");
+			rsl_assert_out_of_range(i < m_size);
 			return m_buffer[i].value;
 		}
 

@@ -28,7 +28,7 @@ namespace rsl
 #endif
 
 #if defined(RSL_ERR_MAX_COUNT)
-	RYTHE_COMPILER_WARNING("RSL_ERR_MAX_COUNT cannot be user defined, use RSL_ERR_ID_UNDERLYING instead")
+	RYTHE_COMPILER_ERROR("RSL_ERR_MAX_COUNT cannot be user defined, use RSL_ERR_ID_UNDERLYING instead")
 #endif
 
 	using errid = RSL_ERR_ID_UNDERLYING;
@@ -100,9 +100,9 @@ namespace rsl
 
 		virtual ~result_base()
 		{
-			rsl_assert_msg(getError() == success, getError().message);
+			rsl_hard_assert_msg(getError() == success, getError().message);
 
-#if RYTHE_VALIDATION_LEVEL >= RYTHE_WARNING_VALIDATION_LEVEL
+#if RYTHE_VALIDATION_LEVEL >= RYTHE_HIGH_IMPACT_VALIDATION_LEVEL
 			for (auto& warning : getWarnings())
 			{
 				rsl_soft_assert_msg(warning == success, warning.message);

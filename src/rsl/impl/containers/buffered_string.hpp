@@ -95,13 +95,13 @@ namespace rsl
 
 		constexpr reference at(size_type i)
 		{
-			rsl_assert_msg(i < m_size, "out of range");
+			rsl_assert_out_of_range(i < m_size);
 			return m_buffer[i];
 		}
 
 		constexpr const_reference at(size_type i) const
 		{
-			rsl_assert_msg(i < m_size, "out of range");
+			rsl_assert_out_of_range(i < m_size);
 			return m_buffer[i];
 		}
 

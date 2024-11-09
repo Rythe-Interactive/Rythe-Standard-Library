@@ -93,12 +93,12 @@ namespace rsl::math
 
 		[[nodiscard]] constexpr row_type& operator[](size_type i) noexcept
 		{
-			rsl_assert_msg((i >= 0) && (i < row_count), "matrix subscript out of range");
+			rsl_assert_out_of_range_msg((i >= 0) && (i < row_count), "matrix subscript out of range");
 			return rows[i];
 		}
 		[[nodiscard]] constexpr const row_type& operator[](size_type i) const noexcept
 		{
-			rsl_assert_msg((i >= 0) && (i < row_count), "matrix subscript out of range");
+			rsl_assert_out_of_range_msg((i >= 0) && (i < row_count), "matrix subscript out of range");
 			return rows[i];
 		}
 	};

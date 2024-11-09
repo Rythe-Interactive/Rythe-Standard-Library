@@ -55,12 +55,12 @@ namespace rsl::math
 
 		constexpr scalar& operator[](size_type i) noexcept
 		{
-			rsl_assert_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
 			return data[i];
 		}
 		constexpr const scalar& operator[](size_type i) const noexcept
 		{
-			rsl_assert_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
 			return data[i];
 		}
 
@@ -138,12 +138,12 @@ namespace rsl::math
 
 		constexpr scalar& operator[](size_type i) noexcept
 		{
-			rsl_assert_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
 			return data[i];
 		}
 		constexpr const scalar& operator[](size_type i) const noexcept
 		{
-			rsl_assert_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
 			return data[i];
 		}
 
