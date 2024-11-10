@@ -9,7 +9,7 @@ namespace rsl
 {
 	enum class endian
 	{
-#ifdef RYTHE_WINDOWS
+#if RYTHE_PLATFORM_WINDOWS
 		little = 0,
 		big = 1,
 		native = little

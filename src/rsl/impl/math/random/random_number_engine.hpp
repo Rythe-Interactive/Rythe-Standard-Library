@@ -1,7 +1,10 @@
 #pragma once
-#include <random>
-
 #include "../../defines.hpp"
+
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4267)
+#include <random>
+RYTHE_MSVC_SUPPRESS_WARNING_POP
+
 #include "../../util/primitives.hpp"
 
 namespace rsl::math

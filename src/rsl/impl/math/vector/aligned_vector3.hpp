@@ -3,6 +3,8 @@
 #include "swizzle/swizzle3.hpp"
 #include "vector_base.hpp"
 
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201)
+
 namespace rsl::math
 {
 	template <typename Scalar, size_type alignment = sizeof(Scalar) * 4>
@@ -116,3 +118,5 @@ namespace rsl::math
 	using aligned_bool3 = aligned_vector3<bool>;
 	using aligned_bvec3 = aligned_bool3;
 } // namespace rsl::math
+
+RYTHE_MSVC_SUPPRESS_WARNING_POP

@@ -385,13 +385,13 @@ namespace rsl::math
 		constexpr auto _int_least_impl()
 		{
 			if constexpr (size <= 1)
-				return int_least8();
+				return int_least8_t();
 			else if constexpr (size <= 2)
-				return int_least16();
+				return int_least16_t();
 			else if constexpr (size <= 4)
-				return int_least32();
+				return int_least32_t();
 			else if constexpr (size <= 8)
-				return int_least64();
+				return int_least64_t();
 			else
 				static_assert(size <= 8, "unsupported type size");
 		}

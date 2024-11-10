@@ -4,6 +4,8 @@
 #include "vector_base.hpp"
 #include "vector_base.inl"
 
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201)
+
 namespace rsl::math
 {
 	template <typename Scalar>
@@ -130,7 +132,9 @@ namespace rsl::math
 			y = mask & 2;
 			z = mask & 4;
 		}
-		constexpr bitfield8 mask() const noexcept { return static_cast<bitfield8>(x | y << 1u | z << 2u); }
+		constexpr bitfield8 mask() const noexcept
+		{ return static_cast<bitfield8>(static_cast<uint32>(x) | static_cast<uint32>(y) << 1u | static_cast<uint32>(z) << 2u);
+		}
 
 		constexpr operator bool() const noexcept { return x && y && z; }
 
@@ -179,3 +183,5 @@ namespace rsl::math
 	using bool3 = vector<bool, 3>;
 	using bvec3 = bool3;
 } // namespace rsl::math
+
+RYTHE_MSVC_SUPPRESS_WARNING_POP

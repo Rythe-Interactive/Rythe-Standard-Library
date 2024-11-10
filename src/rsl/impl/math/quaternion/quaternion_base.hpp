@@ -7,6 +7,8 @@
 #include "../util/type_util.hpp"
 #include "../vector/vector.hpp"
 
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201)
+
 namespace rsl::math
 {
 	template <typename Scalar, size_type RowCount, size_type ColCount>
@@ -135,3 +137,5 @@ namespace rsl::math
 } // namespace rsl::math
 
 #include "matrix_quat_conv.inl"
+
+RYTHE_MSVC_SUPPRESS_WARNING_POP

@@ -3,6 +3,8 @@
 #include "column/column_base.hpp"
 #include "matrix_base.hpp"
 
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201)
+
 namespace rsl::math
 {
 	template <typename Scalar>
@@ -115,3 +117,5 @@ namespace rsl::math
 } // namespace rsl::math
 
 #include "../quaternion/matrix_quat_conv.inl"
+
+RYTHE_MSVC_SUPPRESS_WARNING_POP

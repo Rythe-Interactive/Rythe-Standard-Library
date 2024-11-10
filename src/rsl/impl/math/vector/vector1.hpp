@@ -2,6 +2,8 @@
 #include "swizzle/swizzle1.hpp"
 #include "vector_base.hpp"
 
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201)
+
 namespace rsl::math
 {
 	template <typename Scalar>
@@ -102,3 +104,5 @@ namespace rsl::math
 } // namespace rsl::math
 
 #include "vector1.inl"
+
+RYTHE_MSVC_SUPPRESS_WARNING_POP
