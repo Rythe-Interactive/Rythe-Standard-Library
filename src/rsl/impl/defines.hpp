@@ -318,11 +318,64 @@ namespace rsl
 
 #pragma region /////////////////////////////////////// Attributes ///////////////////////////////////////
 
-#if defined(RYTHE_GCC) || defined(RYTHE_CLANG)
-	#define rythe_always_inline __attribute__((always_inline))
+#if defined(RYTHE_GCC)
+	#define rythe_always_inline gnu::always_inline
+#elif defined(RYTHE_CLANG)
+	#define rythe_always_inline clang::always_inline
 #elif defined(RYTHE_MSVC)
-	#define rythe_always_inline __forceinline
+	#define rythe_always_inline msvc::forceinline
 #else
-	#define rythe_always_inline inline
+	#define rythe_always_inline
 #endif
+
+#if defined(RYTHE_GCC)
+	#define rythe_allocating gnu::allocating
+#elif defined(RYTHE_CLANG)
+	#define rythe_allocating clang::allocating
+#elif defined(RYTHE_MSVC)
+	#define rythe_allocating
+#else
+	#define rythe_allocating
+#endif
+
+#if defined(RYTHE_GCC)
+	#define rythe_open_enum gnu::enum_extensibility(open)
+#elif defined(RYTHE_CLANG)
+	#define rythe_open_enum clang::enum_extensibility(open)
+#elif defined(RYTHE_MSVC)
+	#define rythe_open_enum 
+#else
+	#define rythe_open_enum
+#endif
+
+#if defined(RYTHE_GCC)
+	#define rythe_closed_enum gnu::enum_extensibility(closed)
+#elif defined(RYTHE_CLANG)
+	#define rythe_closed_enum clang::enum_extensibility(closed)
+#elif defined(RYTHE_MSVC)
+	#define rythe_closed_enum 
+#else
+	#define rythe_closed_enum
+#endif
+
+#if defined(RYTHE_GCC)
+	#define rythe_flag_enum gnu::flag_enum
+#elif defined(RYTHE_CLANG)
+	#define rythe_flag_enum clang::flag_enum
+#elif defined(RYTHE_MSVC)
+	#define rythe_flag_enum
+#else
+	#define rythe_flag_enum
+#endif
+
+#if defined(RYTHE_GCC)
+	#define rythe_preferred_name(name) gnu::preferred_name(name)
+#elif defined(RYTHE_CLANG)
+	#define rythe_preferred_name(name) clang::preferred_name(name)
+#elif defined(RYTHE_MSVC)
+	#define rythe_preferred_name(name)
+#else
+	#define rythe_preferred_name(name)
+#endif
+
 #pragma endregion

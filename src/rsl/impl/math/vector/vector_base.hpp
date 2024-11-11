@@ -38,7 +38,7 @@ namespace rsl::math
 		[[nodiscard]] constexpr scalar& operator[](size_type i) noexcept;
 		[[nodiscard]] constexpr const scalar& operator[](size_type i) const noexcept;
 
-		[[nodiscard]] rythe_always_inline scalar length() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] scalar length() const noexcept;
 		[[nodiscard]] constexpr scalar length2() const noexcept;
 	};
 } // namespace rsl::math

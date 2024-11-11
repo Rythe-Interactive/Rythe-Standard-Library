@@ -9,32 +9,32 @@
 namespace rsl::math
 {
 	template <typename Scalar>
-	[[nodiscard]] rythe_always_inline vector<Scalar, 3> quaternion<Scalar>::right() noexcept
+	[[nodiscard]] [[rythe_always_inline]] vector<Scalar, 3> quaternion<Scalar>::right() noexcept
 	{
 		return vec_type::right * *this;
 	}
 
 	template <typename Scalar>
-	[[nodiscard]] rythe_always_inline vector<Scalar, 3> quaternion<Scalar>::forward() noexcept
+	[[nodiscard]] [[rythe_always_inline]] vector<Scalar, 3> quaternion<Scalar>::forward() noexcept
 	{
 		return vec_type::forward * *this;
 	}
 
 	template <typename Scalar>
-	[[nodiscard]] rythe_always_inline vector<Scalar, 3> quaternion<Scalar>::up() noexcept
+	[[nodiscard]] [[rythe_always_inline]] vector<Scalar, 3> quaternion<Scalar>::up() noexcept
 	{
 		return vec_type::up * *this;
 	}
 
 	template <typename Scalar>
-	[[nodiscard]] rythe_always_inline quaternion<Scalar> quaternion<Scalar>::angle_axis(scalar angle, const vec_type& vec) noexcept
+	[[nodiscard]] [[rythe_always_inline]] quaternion<Scalar> quaternion<Scalar>::angle_axis(scalar angle, const vec_type& vec) noexcept
 	{
 		auto halfAngle = angle * static_cast<scalar>(0.5);
 		return quaternion<scalar>(::std::cos(halfAngle), ::std::sin(halfAngle) * vec);
 	}
 
 	template <typename Scalar>
-	[[nodiscard]] rythe_always_inline quaternion<Scalar> quaternion<Scalar>::look_at(const vec_type& _pos, const vec_type& _center, const vec_type& _up) noexcept
+	[[nodiscard]] [[rythe_always_inline]] quaternion<Scalar> quaternion<Scalar>::look_at(const vec_type& _pos, const vec_type& _center, const vec_type& _up) noexcept
 	{
 		vec_type const forward(normalize(_center - _pos));
 		vec_type const right(normalize(cross(_up, forward)));
@@ -76,7 +76,7 @@ namespace rsl::math
 	}
 
 	template <typename Scalar>
-	[[nodiscard]] rythe_always_inline quaternion<Scalar> quaternion<Scalar>::conjugate(const quaternion<Scalar>& _quat) noexcept
+	[[nodiscard]] [[rythe_always_inline]] quaternion<Scalar> quaternion<Scalar>::conjugate(const quaternion<Scalar>& _quat) noexcept
 	{
 		return quaternion<Scalar>(_quat.w, -_quat.i, -_quat.j, -_quat.k);
 	}

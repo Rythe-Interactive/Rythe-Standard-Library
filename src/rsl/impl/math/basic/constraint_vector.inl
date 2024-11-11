@@ -12,7 +12,7 @@ namespace rsl::math::detail
 		using vec_type = vector<Scalar, Size>;
 
 		template <typename AType, typename BType>
-		[[nodiscard]] rythe_always_inline constexpr static auto compute_min(AType&& a, BType&& b)
+		[[nodiscard]] [[rythe_always_inline]] constexpr static auto compute_min(AType&& a, BType&& b)
 		{
 			using A = ::std::remove_cvref_t<AType>;
 			using AVec = make_vector_t<AType>;
@@ -34,7 +34,7 @@ namespace rsl::math::detail
 		}
 
 		template <typename AType, typename BType>
-		[[nodiscard]] rythe_always_inline constexpr static auto compute_max(AType&& a, BType&& b)
+		[[nodiscard]] [[rythe_always_inline]] constexpr static auto compute_max(AType&& a, BType&& b)
 		{
 			using A = ::std::remove_cvref_t<AType>;
 			using AVec = make_vector_t<AType>;
@@ -56,7 +56,8 @@ namespace rsl::math::detail
 		}
 
 		template <typename InType, typename MinType, typename MaxType>
-		[[nodiscard]] rythe_always_inline constexpr static auto compute_clamp(InType&& in, MinType&& min, MaxType&& max)
+		[[nodiscard]] [[rythe_always_inline]] constexpr static auto
+		compute_clamp(InType&& in, MinType&& min, MaxType&& max)
 		{
 			using In = ::std::remove_cvref_t<InType>;
 			using InVec = make_vector_t<InType>;

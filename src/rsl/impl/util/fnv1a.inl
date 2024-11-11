@@ -11,7 +11,7 @@ namespace rsl::internal::fnv1a
 	constexpr u32 offset_basis_32 = 2166136261u;
 	constexpr u32 prime_32 = 16777619u;
 
-	rythe_always_inline constexpr id_type select_prime() noexcept
+	[[rythe_always_inline]] constexpr id_type select_prime() noexcept
 	{
 		if constexpr (sizeof(id_type) >= sizeof(u64))
 		{
@@ -23,7 +23,7 @@ namespace rsl::internal::fnv1a
 		}
 	}
 
-	rythe_always_inline constexpr id_type select_basis() noexcept
+	[[rythe_always_inline]] constexpr id_type select_basis() noexcept
 	{
 		if constexpr (sizeof(id_type) >= sizeof(u64))
 		{

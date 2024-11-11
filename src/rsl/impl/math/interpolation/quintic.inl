@@ -5,14 +5,14 @@
 namespace rsl::math::detail
 {
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto _quintic_impl_(T&& v) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto _quintic_impl_(T&& v) noexcept
 	{
 		using scalar = ::std::remove_cvref_t<T>;
 		return v * v * v * (v * (v * static_cast<scalar>(6) - static_cast<scalar>(15)) + static_cast<scalar>(10));
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto _quintic_derivative_impl_(T&& v) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto _quintic_derivative_impl_(T&& v) noexcept
 	{
 		using scalar = ::std::remove_cvref_t<T>;
 		const auto sqr = v - static_cast<scalar>(1);
@@ -20,7 +20,7 @@ namespace rsl::math::detail
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline auto _inverse_quintic_impl_(T&& v) noexcept
+	[[nodiscard]] [[rythe_always_inline]] auto _inverse_quintic_impl_(T&& v) noexcept
 	{
 		using scalar = ::std::remove_cvref_t<T>;
 
@@ -44,7 +44,7 @@ namespace rsl::math::detail
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto _inverse_quintic_derivative_impl_(T&& v) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto _inverse_quintic_derivative_impl_(T&& v) noexcept
 	{
 		using scalar = ::std::remove_cvref_t<T>;
 		constexpr auto sqr = static_cast<scalar>(1) - v;
@@ -60,7 +60,7 @@ namespace rsl::math
 {
 	// quintic
 	template <typename TypeMin, typename TypeMax, typename ValueType>
-	[[nodiscard]] rythe_always_inline constexpr auto quintic(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
+	[[nodiscard]] constexpr auto quintic(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 	{
 		using A = ::std::remove_cvref_t<TypeMin>;
 		using B = ::std::remove_cvref_t<TypeMax>;
@@ -90,7 +90,7 @@ namespace rsl::math
 
 	// quintic
 	template <typename ValueType>
-	[[nodiscard]] rythe_always_inline constexpr auto quintic(ValueType&& value) noexcept
+	[[nodiscard]] constexpr auto quintic(ValueType&& value) noexcept
 	{
 		using T = ::std::remove_cvref_t<ValueType>;
 
@@ -114,7 +114,7 @@ namespace rsl::math
 
 	// quintic_derivative
 	template <typename TypeMin, typename TypeMax, typename ValueType>
-	[[nodiscard]] rythe_always_inline constexpr auto quintic_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
+	[[nodiscard]] constexpr auto quintic_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 	{
 		using A = ::std::remove_cvref_t<TypeMin>;
 		using B = ::std::remove_cvref_t<TypeMax>;
@@ -144,7 +144,7 @@ namespace rsl::math
 
 	// quintic_derivative
 	template <typename ValueType>
-	[[nodiscard]] rythe_always_inline constexpr auto quintic_derivative(ValueType&& value) noexcept
+	[[nodiscard]] constexpr auto quintic_derivative(ValueType&& value) noexcept
 	{
 		using T = ::std::remove_cvref_t<ValueType>;
 
@@ -168,7 +168,7 @@ namespace rsl::math
 
 	// inverse_quintic
 	template <typename TypeMin, typename TypeMax, typename ValueType>
-	[[nodiscard]] rythe_always_inline auto inverse_quintic(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
+	[[nodiscard]] auto inverse_quintic(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 	{
 		using A = ::std::remove_cvref_t<TypeMin>;
 		using B = ::std::remove_cvref_t<TypeMax>;
@@ -198,7 +198,7 @@ namespace rsl::math
 
 	// inverse_quintic
 	template <typename ValueType>
-	[[nodiscard]] rythe_always_inline auto inverse_quintic(ValueType&& value) noexcept
+	[[nodiscard]] auto inverse_quintic(ValueType&& value) noexcept
 	{
 		using T = ::std::remove_cvref_t<ValueType>;
 
@@ -222,7 +222,7 @@ namespace rsl::math
 
 	// inverse_quintic_derivative
 	template <typename TypeMin, typename TypeMax, typename ValueType>
-	[[nodiscard]] rythe_always_inline auto inverse_quintic_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
+	[[nodiscard]] auto inverse_quintic_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 	{
 		using A = ::std::remove_cvref_t<TypeMin>;
 		using B = ::std::remove_cvref_t<TypeMax>;
@@ -252,7 +252,7 @@ namespace rsl::math
 
 	// inverse_quintic_derivative
 	template <typename ValueType>
-	[[nodiscard]] rythe_always_inline auto inverse_quintic_derivative(ValueType&& value) noexcept
+	[[nodiscard]] auto inverse_quintic_derivative(ValueType&& value) noexcept
 	{
 		using T = ::std::remove_cvref_t<ValueType>;
 

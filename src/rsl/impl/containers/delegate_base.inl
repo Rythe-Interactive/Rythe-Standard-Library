@@ -72,13 +72,13 @@ namespace rsl
 		}
 
 		template <typename T, ReturnType (T::*method)(ParamTypes...)>
-		rythe_always_inline static id_type method_id(const T& obj)
+		static id_type method_id(const T& obj)
 		{
 			return combine_hash(force_cast<size_type>(&obj), force_cast<size_type>(method));
 		}
 
 		template <typename T, ReturnType (T::*method)(ParamTypes...) const>
-		rythe_always_inline static id_type method_id(const T& obj)
+		static id_type method_id(const T& obj)
 		{
 			return combine_hash(force_cast<size_type>(&obj), force_cast<size_type>(method));
 		}
@@ -90,7 +90,7 @@ namespace rsl
 		}
 
 		template <ReturnType (*func)(ParamTypes...)>
-		rythe_always_inline static id_type function_id()
+		static id_type function_id()
 		{
 			return force_cast<size_type>(func);
 		}
@@ -104,7 +104,7 @@ namespace rsl
 
 		template <invocable Func>
 			requires std::invocable<Func, ParamTypes...> && std::same_as<std::invoke_result_t<Func, ParamTypes...>, ReturnType> && (!functor<Func>)
-		rythe_always_inline static id_type function_ptr_id(Func obj)
+		static id_type function_ptr_id(Func obj)
 		{
 			return force_cast<size_type>(obj);
 		}
@@ -119,32 +119,32 @@ namespace rsl
 
 		template <functor Functor>
 			requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
-		rythe_always_inline static id_type functor_id(const Functor& obj)
+		static id_type functor_id(const Functor& obj)
 		{
 			return combine_hash(force_cast<size_type>(&obj), force_cast<size_type>(&Functor::operator()));
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		rythe_always_inline static invocation_element createElement(T& instance)
+		static invocation_element createElement(T& instance)
 		{
 			return invocation_element(&instance, method_stub<T, TMethod>, method_id<T, TMethod>(instance));
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-		rythe_always_inline static invocation_element createElement(const T& instance)
+		static invocation_element createElement(const T& instance)
 		{
 			return invocation_element(const_cast<void*>(static_cast<const void*>(&instance)), const_method_stub<T, TMethod>, method_id<T, TMethod>(instance));
 		}
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
-		rythe_always_inline static invocation_element createElement()
+		static invocation_element createElement()
 		{
 			return invocation_element(nullptr, function_stub<TMethod>, function_id<TMethod>());
 		}
 
 		template <invocable Functor>
 			requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
-		rythe_always_inline static invocation_element createElement(const Functor& instance)
+		static invocation_element createElement(const Functor& instance)
 		{
 			if constexpr (!is_functor_v<Functor>)
 			{

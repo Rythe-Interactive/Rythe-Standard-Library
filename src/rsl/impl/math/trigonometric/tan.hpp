@@ -12,11 +12,11 @@ namespace rsl::math
 {
 	// tan
 	template <typename T>
-	[[nodiscard]] rythe_always_inline auto tan(T&& v) noexcept;
+	[[nodiscard]] [[rythe_always_inline]] auto tan(T&& v) noexcept;
 
 	// atan
 	template <typename T>
-	[[nodiscard]] rythe_always_inline auto atan(T&& v) noexcept;
+	[[nodiscard]] [[rythe_always_inline]] auto atan(T&& v) noexcept;
 } // namespace rsl::math
 
 #include "tan.inl"

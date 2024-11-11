@@ -11,7 +11,7 @@ namespace rsl::math::detail
 	{
 		using vec_type = vector<Scalar, Size>;
 
-		[[nodiscard]] rythe_always_inline static vec_type compute(const vec_type& v) noexcept
+		[[nodiscard]] [[rythe_always_inline]] static vec_type compute(const vec_type& v) noexcept
 		{
 			return v / length(v);
 		}
@@ -22,7 +22,7 @@ namespace rsl::math::detail
 	{
 		using vec_type = vector<Scalar, 1u>;
 
-		[[nodiscard]] rythe_always_inline static Scalar compute([[maybe_unused]] Scalar v) noexcept
+		[[nodiscard]] [[rythe_always_inline]] static Scalar compute([[maybe_unused]] Scalar v) noexcept
 		{
 			return static_cast<Scalar>(1);
 		}

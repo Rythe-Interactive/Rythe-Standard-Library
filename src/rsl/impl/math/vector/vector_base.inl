@@ -70,7 +70,7 @@ namespace rsl::math
 	}
 
 	template <size_type I, typename Scalar, size_type Size>
-	inline rythe_always_inline Scalar& get(vector<Scalar, Size>& val)
+	inline Scalar& get(vector<Scalar, Size>& val)
 	{
 		return val[I];
 	}
@@ -85,7 +85,7 @@ struct ::std::tuple_element<I, ::rsl::math::vector<Scalar, Size>>
 namespace std
 {
 	template <::std::size_t I, typename Scalar, ::std::size_t Size>
-	inline rythe_always_inline Scalar& get(::rsl::math::vector<Scalar, Size>& val)
+	inline Scalar& get(::rsl::math::vector<Scalar, Size>& val)
 	{
 		return ::rsl::math::get<I>(val);
 	}

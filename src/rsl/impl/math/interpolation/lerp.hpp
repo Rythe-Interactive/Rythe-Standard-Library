@@ -10,7 +10,7 @@ namespace rsl::math
 {
 	// lerp
 	template <typename TypeA, typename TypeB, typename InterpType>
-	[[nodiscard]] rythe_always_inline constexpr auto lerp(TypeA&& a, TypeB&& b, InterpType&& t) noexcept;
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto lerp(TypeA&& a, TypeB&& b, InterpType&& t) noexcept;
 } // namespace rsl::math
 
 #include "lerp.inl"

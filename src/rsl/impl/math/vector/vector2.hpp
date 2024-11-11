@@ -81,9 +81,9 @@ namespace rsl::math
 			return data[i];
 		}
 
-		rythe_always_inline scalar length() const noexcept { return ::rsl::math::length(*this); }
+		[[rythe_always_inline]] scalar length() const noexcept { return ::rsl::math::length(*this); }
 		constexpr scalar length2() const noexcept { return ::rsl::math::length2(*this); }
-		rythe_always_inline scalar angle() const noexcept { return static_cast<scalar>(::std::atan2(y, x)); }
+		[[rythe_always_inline]] scalar angle() const noexcept { return static_cast<scalar>(::std::atan2(y, x)); }
 	};
 
 	template <>

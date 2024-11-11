@@ -75,7 +75,7 @@ namespace rsl::math
 			return data[i];
 		}
 
-		rythe_always_inline scalar length() const noexcept;
+		[[rythe_always_inline]] scalar length() const noexcept;
 		constexpr scalar length2() const noexcept;
 	};
 

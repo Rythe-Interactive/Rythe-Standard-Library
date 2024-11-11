@@ -14,7 +14,7 @@ namespace rsl::math
 			static constexpr size_type size = Size;
 			using value_type = vector<Scalar, size>;
 
-			rythe_always_inline static value_type compute(const value_type& v) noexcept
+			[[rythe_always_inline]] static value_type compute(const value_type& v) noexcept
 			{
 				value_type result;
 				for (size_type i; i < size; i++)
@@ -29,7 +29,7 @@ namespace rsl::math
 			static constexpr size_type size = 1u;
 			using value_type = vector<Scalar, size>;
 
-			rythe_always_inline static Scalar compute(Scalar v) noexcept
+			[[rythe_always_inline]] static Scalar compute(Scalar v) noexcept
 			{
 				return static_cast<Scalar>(1) / ::std::sqrt(v);
 			}
@@ -41,7 +41,7 @@ namespace rsl::math
 			static constexpr size_type size = 2u;
 			using value_type = vector<Scalar, size>;
 
-			rythe_always_inline static value_type compute(const value_type& v) noexcept
+			[[rythe_always_inline]] static value_type compute(const value_type& v) noexcept
 			{
 				return value_type{static_cast<Scalar>(1) / ::std::sqrt(v[0]), static_cast<Scalar>(1) / ::std::sqrt(v[1])};
 			}
@@ -53,7 +53,7 @@ namespace rsl::math
 			static constexpr size_type size = 3u;
 			using value_type = vector<Scalar, size>;
 
-			rythe_always_inline static value_type compute(const value_type& v) noexcept
+			[[rythe_always_inline]] static value_type compute(const value_type& v) noexcept
 			{
 				return value_type{
 					static_cast<Scalar>(1) / ::std::sqrt(v[0]),
@@ -69,7 +69,7 @@ namespace rsl::math
 			static constexpr size_type size = 4u;
 			using value_type = vector<Scalar, size>;
 
-			rythe_always_inline static value_type compute(const value_type& v) noexcept
+			[[rythe_always_inline]] static value_type compute(const value_type& v) noexcept
 			{
 				return value_type{
 					static_cast<Scalar>(1) / ::std::sqrt(v[0]),
@@ -82,13 +82,13 @@ namespace rsl::math
 	} // namespace detail
 
 	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>, bool> = true>
-	rythe_always_inline static auto inverse_sqrt(const vec_type& v) noexcept
+	[[rythe_always_inline]] static auto inverse_sqrt(const vec_type& v) noexcept
 	{
 		return detail::compute_inv_sqrt<typename vec_type::scalar, vec_type::size>::compute(v);
 	}
 
 	template <typename Scalar>
-	rythe_always_inline static Scalar inverse_sqrt(Scalar v) noexcept
+	[[rythe_always_inline]] static Scalar inverse_sqrt(Scalar v) noexcept
 	{
 		return detail::compute_inv_sqrt<Scalar, 1>::compute(v);
 	}

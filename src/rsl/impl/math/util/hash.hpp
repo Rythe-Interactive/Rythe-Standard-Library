@@ -14,7 +14,7 @@
 template <typename Scalar, ::std::size_t Size, ::std::size_t... args>
 struct ::std::hash<::rsl::math::swizzle<Scalar, Size, args...>>
 {
-	inline rythe_always_inline::std::size_t operator()(const ::rsl::math::swizzle<Scalar, Size, args...>& vec) const noexcept
+	::std::size_t operator()(const ::rsl::math::swizzle<Scalar, Size, args...>& vec) const noexcept
 	{
 		return ::rsl::hash_value(typename ::rsl::math::swizzle<Scalar, Size, args...>::conv_type(vec));
 	}

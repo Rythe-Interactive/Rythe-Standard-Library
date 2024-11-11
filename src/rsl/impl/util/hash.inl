@@ -5,7 +5,7 @@
 
 namespace rsl
 {
-	rythe_always_inline constexpr id_type hash_bytes(span<const byte> bytes, id_type seed) noexcept
+	constexpr id_type hash_bytes(span<const byte> bytes, id_type seed) noexcept
 	{
 		for (byte b : bytes)
 		{
@@ -16,7 +16,7 @@ namespace rsl
 		return seed;
 	}
 
-	rythe_always_inline constexpr id_type hash_string(string_view str, id_type seed) noexcept
+	constexpr id_type hash_string(string_view str, id_type seed) noexcept
 	{
 		for (char b : str)
 		{
@@ -28,7 +28,7 @@ namespace rsl
 	}
 
 	template <same_as<id_type>... hash_types>
-	rythe_always_inline constexpr id_type combine_hash(id_type a_seed, id_type a_hash, hash_types... a_hashes) noexcept
+	constexpr id_type combine_hash(id_type a_seed, id_type a_hash, hash_types... a_hashes) noexcept
 	{
 		if constexpr (sizeof(id_type) >= 8)
 		{
@@ -50,7 +50,7 @@ namespace rsl
 	}
 
 	template <typename T>
-	rythe_always_inline constexpr id_type hash_value(const T& val) noexcept
+	constexpr id_type hash_value(const T& val) noexcept
 	{
 		return hash_bytes(internal::fnv1a::offset_basis, std::span(std::bit_cast<const byte*>(&val), sizeof(T)));
 	}

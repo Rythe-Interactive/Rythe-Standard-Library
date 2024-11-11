@@ -30,13 +30,13 @@ namespace rsl
 	}
 
 	template <typename To, typename From>
-	rythe_always_inline To force_cast(From& f)
+	[[rythe_always_inline]] To force_cast(From& f)
 	{
 		return *reinterpret_cast<To*>(&f);
 	}
 
 	template <typename To, typename From>
-	rythe_always_inline const To force_cast(const From& f)
+	[[rythe_always_inline]] const To force_cast(const From& f)
 	{
 		return *reinterpret_cast<const To*>(&f);
 	}

@@ -147,13 +147,13 @@ namespace rsl
 	template <>
 	struct hash<hashed_string>
 	{
-		rythe_always_inline constexpr id_type operator()(const hashed_string& val) const noexcept { return val.value; }
+		[[rythe_always_inline]] constexpr id_type operator()(const hashed_string& val) const noexcept { return val.value; }
 	};
 
 	template <>
 	struct hash<hashed_string_view>
 	{
-		rythe_always_inline constexpr id_type operator()(const hashed_string_view& val) const noexcept
+		[[rythe_always_inline]] constexpr id_type operator()(const hashed_string_view& val) const noexcept
 		{
 			return val.value;
 		}

@@ -11,7 +11,7 @@ namespace rsl::math::detail
 	{
 		using mat_type = matrix<Scalar, RowCount, ColCount>;
 
-		[[nodiscard]] rythe_always_inline static mat_type compute(const mat_type& m) noexcept
+		[[nodiscard]] [[rythe_always_inline]] static mat_type compute(const mat_type& m) noexcept
 		{
 			static_assert(RowCount == ColCount, "Determinants can only be calculated of square matrices");
 

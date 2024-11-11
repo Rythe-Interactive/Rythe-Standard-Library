@@ -14,7 +14,7 @@ namespace rsl::math
 			using mat_type = matrix<Scalar, RowCount, ColCount>;
 			using sub_mat_type = matrix<Scalar, RowCount - 1, ColCount - 1>;
 
-			[[nodiscard]] rythe_always_inline constexpr static auto compute(const mat_type& v) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr static auto compute(const mat_type& v) noexcept
 			{
 				static_assert(RowCount == ColCount, "Adjoint can only be calculated of square matrices");
 
@@ -35,7 +35,7 @@ namespace rsl::math
 	} // namespace detail
 
 	template <typename mat_type, ::std::enable_if_t<is_matrix_v<mat_type>, bool>>
-	[[nodiscard]] rythe_always_inline constexpr auto adjoint(const mat_type& mat) noexcept
+	[[nodiscard]] constexpr auto adjoint(const mat_type& mat) noexcept
 	{
 		return detail::compute_adjoint<mat_type>::compute(mat);
 	}

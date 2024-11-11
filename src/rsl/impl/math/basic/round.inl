@@ -6,7 +6,7 @@ namespace rsl::math
 	namespace detail
 	{
 		template <typename Target, round_mode Mode, typename T>
-		[[nodiscard]] rythe_always_inline constexpr Target _round_impl_(T val) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr Target _round_impl_(T val) noexcept
 		{
 			using value_type = ::std::remove_cvref_t<T>;
 			if constexpr (::std::is_integral_v<value_type>)
@@ -42,7 +42,7 @@ namespace rsl::math
 			using value_type = vector<Scalar, size>;
 
 			template <typename Target>
-			[[nodiscard]] rythe_always_inline constexpr static auto compute(const value_type& val) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr static auto compute(const value_type& val) noexcept
 			{
 				vector<Target, size> result;
 				for (size_type i = 0; i < size; i++)
@@ -58,14 +58,14 @@ namespace rsl::math
 			using value_type = vector<Scalar, size>;
 
 			template <typename Target>
-			[[nodiscard]] rythe_always_inline constexpr static auto compute(const value_type& val) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr static auto compute(const value_type& val) noexcept
 			{
 				return _round_impl_<Target, Mode>(val[0]);
 			}
 		};
 
 		template <round_mode Mode, typename T>
-		[[nodiscard]] rythe_always_inline constexpr auto _auto_adv_round_(T&& val) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto _auto_adv_round_(T&& val) noexcept
 		{
 			using value_type = ::std::remove_cvref_t<T>;
 			if constexpr (is_vector_v<value_type>)
@@ -80,7 +80,7 @@ namespace rsl::math
 	} // namespace detail
 
 	template <typename Target, round_mode Mode, typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto adv_round(T&& val) noexcept
+	[[nodiscard]] constexpr auto adv_round(T&& val) noexcept
 	{
 		using value_type = ::std::remove_cvref_t<T>;
 		if constexpr (is_vector_v<value_type>)
@@ -94,73 +94,73 @@ namespace rsl::math
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto round(T&& val) noexcept
+	[[nodiscard]] constexpr auto round(T&& val) noexcept
 	{
 		return detail::_auto_adv_round_<round_mode::round>(val);
 	}
 
 	template <typename Integer, typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto iround(T&& val) noexcept
+	[[nodiscard]] constexpr auto iround(T&& val) noexcept
 	{
 		return adv_round<Integer, round_mode::round>(val);
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto uround(T&& val) noexcept
+	[[nodiscard]] constexpr auto uround(T&& val) noexcept
 	{
 		return adv_round<uint, round_mode::round>(val);
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto ceil(T&& val) noexcept
+	[[nodiscard]] constexpr auto ceil(T&& val) noexcept
 	{
 		return detail::_auto_adv_round_<round_mode::ceil>(val);
 	}
 
 	template <typename Integer, typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto iceil(T&& val) noexcept
+	[[nodiscard]] constexpr auto iceil(T&& val) noexcept
 	{
 		return adv_round<Integer, round_mode::ceil>(val);
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto uceil(T&& val) noexcept
+	[[nodiscard]] constexpr auto uceil(T&& val) noexcept
 	{
 		return adv_round<uint, round_mode::ceil>(val);
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto floor(T&& val) noexcept
+	[[nodiscard]] constexpr auto floor(T&& val) noexcept
 	{
 		return detail::_auto_adv_round_<round_mode::floor>(val);
 	}
 
 	template <typename Integer, typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto ifloor(T&& val) noexcept
+	[[nodiscard]] constexpr auto ifloor(T&& val) noexcept
 	{
 		return adv_round<Integer, round_mode::floor>(val);
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto ufloor(T&& val) noexcept
+	[[nodiscard]] constexpr auto ufloor(T&& val) noexcept
 	{
 		return adv_round<uint, round_mode::floor>(val);
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto trunc(T&& val) noexcept
+	[[nodiscard]] constexpr auto trunc(T&& val) noexcept
 	{
 		return detail::_auto_adv_round_<round_mode::trunc>(val);
 	}
 
 	template <typename Integer, typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto itrunc(T&& val) noexcept
+	[[nodiscard]] constexpr auto itrunc(T&& val) noexcept
 	{
 		return adv_round<Integer, round_mode::trunc>(val);
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto utrunc(T&& val) noexcept
+	[[nodiscard]] constexpr auto utrunc(T&& val) noexcept
 	{
 		return adv_round<uint, round_mode::trunc>(val);
 	}

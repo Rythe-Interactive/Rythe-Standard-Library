@@ -4,28 +4,28 @@
 namespace rsl::math::detail
 {
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto _smoothstep_impl_(T&& v) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto _smoothstep_impl_(T&& v) noexcept
 	{
 		using scalar = ::std::remove_cvref_t<T>;
 		return v * v * (static_cast<scalar>(3) - static_cast<scalar>(2) * v);
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline constexpr auto _smoothstep_derivative_impl_(T&& v) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto _smoothstep_derivative_impl_(T&& v) noexcept
 	{
 		using scalar = ::std::remove_cvref_t<T>;
 		return static_cast<scalar>(-6) * (v - static_cast<scalar>(1)) * v;
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline auto _inverse_smoothstep_impl_(T&& v) noexcept
+	[[nodiscard]] [[rythe_always_inline]] auto _inverse_smoothstep_impl_(T&& v) noexcept
 	{
 		using scalar = ::std::remove_cvref_t<T>;
 		return static_cast<scalar>(0.5) - sin(asin(static_cast<scalar>(1) - static_cast<scalar>(2) * v) / static_cast<scalar>(3));
 	}
 
 	template <typename T>
-	[[nodiscard]] rythe_always_inline auto _inverse_smoothstep_derivative_impl_(T&& v) noexcept
+	[[nodiscard]] [[rythe_always_inline]] auto _inverse_smoothstep_derivative_impl_(T&& v) noexcept
 	{
 		using scalar = ::std::remove_cvref_t<T>;
 		const auto denom = static_cast<scalar>(3) / sqrt(-(v - 1) * v);
@@ -41,7 +41,7 @@ namespace rsl::math
 {
 	// smoothstep
 	template <typename TypeMin, typename TypeMax, typename ValueType>
-	[[nodiscard]] rythe_always_inline constexpr auto smoothstep(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
+	[[nodiscard]] constexpr auto smoothstep(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 	{
 		using A = ::std::remove_cvref_t<TypeMin>;
 		using B = ::std::remove_cvref_t<TypeMax>;
@@ -71,7 +71,7 @@ namespace rsl::math
 
 	// smoothstep
 	template <typename ValueType>
-	[[nodiscard]] rythe_always_inline constexpr auto smoothstep(ValueType&& value) noexcept
+	[[nodiscard]] constexpr auto smoothstep(ValueType&& value) noexcept
 	{
 		using T = ::std::remove_cvref_t<ValueType>;
 
@@ -95,7 +95,7 @@ namespace rsl::math
 
 	// smoothstep_derivative
 	template <typename TypeMin, typename TypeMax, typename ValueType>
-	[[nodiscard]] rythe_always_inline constexpr auto smoothstep_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
+	[[nodiscard]] constexpr auto smoothstep_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 	{
 		using A = ::std::remove_cvref_t<TypeMin>;
 		using B = ::std::remove_cvref_t<TypeMax>;
@@ -125,7 +125,7 @@ namespace rsl::math
 
 	// smoothstep_derivative
 	template <typename ValueType>
-	[[nodiscard]] rythe_always_inline constexpr auto smoothstep_derivative(ValueType&& value) noexcept
+	[[nodiscard]] constexpr auto smoothstep_derivative(ValueType&& value) noexcept
 	{
 		using T = ::std::remove_cvref_t<ValueType>;
 
@@ -149,7 +149,7 @@ namespace rsl::math
 
 	// inverse_smoothstep
 	template <typename TypeMin, typename TypeMax, typename ValueType>
-	[[nodiscard]] rythe_always_inline auto inverse_smoothstep(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
+	[[nodiscard]] auto inverse_smoothstep(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 	{
 		using A = ::std::remove_cvref_t<TypeMin>;
 		using B = ::std::remove_cvref_t<TypeMax>;
@@ -179,7 +179,7 @@ namespace rsl::math
 
 	// inverse_smoothstep
 	template <typename ValueType>
-	[[nodiscard]] rythe_always_inline auto inverse_smoothstep(ValueType&& value) noexcept
+	[[nodiscard]] auto inverse_smoothstep(ValueType&& value) noexcept
 	{
 		using T = ::std::remove_cvref_t<ValueType>;
 
@@ -203,7 +203,7 @@ namespace rsl::math
 
 	// inverse_smoothstep_derivative
 	template <typename TypeMin, typename TypeMax, typename ValueType>
-	[[nodiscard]] rythe_always_inline auto inverse_smoothstep_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
+	[[nodiscard]] auto inverse_smoothstep_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 	{
 		using A = ::std::remove_cvref_t<TypeMin>;
 		using B = ::std::remove_cvref_t<TypeMax>;
@@ -233,7 +233,7 @@ namespace rsl::math
 
 	// inverse_smoothstep_derivative
 	template <typename ValueType>
-	[[nodiscard]] rythe_always_inline auto inverse_smoothstep_derivative(ValueType&& value) noexcept
+	[[nodiscard]] auto inverse_smoothstep_derivative(ValueType&& value) noexcept
 	{
 		using T = ::std::remove_cvref_t<ValueType>;
 
