@@ -191,17 +191,120 @@ namespace rsl
 
 #pragma endregion
 
+#pragma region ////////////////////////////////// Language convention ///////////////////////////////////
+
+#if defined(RYTHE_WINDOWS) && !defined(RYTHE_WINDOWS_USE_CDECL)
+/**@def RYTHE_CCONV
+ * @brief the calling convention exported functions will use in the args engine
+ */
+	#define RYTHE_CCONV __fastcall
+#elif defined(RYTHE_MSVC)
+	#define RYTHE_CCONV __cdecl
+#else
+	#define RYTHE_CCONV
+#endif
+
+/**@def RYTHE_CPP17V
+ * @brief the version number of c++17 as long
+ */
+#define RYTHE_CPP17V 201703L
+
+/**@def NO_MANGLING
+ * @brief exports functions with C style names instead of C++ mangled names
+ */
+#define RYTHE_NO_MANGLING extern "C"
+
+/**@def RYTHE_FUNC
+ * @brief export setting + calling convention used by the engine
+ */
+#define RYTHE_FUNC RYTHE_CCONV
+
+/**@def RYTHE_INTERFACE
+ * @brief un-mangled function name +  export setting + calling convention used by the engine
+ */
+#define RYTHE_INTERFACE RYTHE_NO_MANGLING RYTHE_CCONV
+
+#if !defined(__FUNC__)
+	#define __FUNC__ __func__
+#endif
+
+#pragma endregion
+
+#pragma region /////////////////////////////////////// Attributes ///////////////////////////////////////
+
+#if defined(RYTHE_GCC)
+	#define rythe_always_inline gnu::always_inline
+#elif defined(RYTHE_CLANG)
+	#define rythe_always_inline clang::always_inline
+#elif defined(RYTHE_MSVC)
+	#define rythe_always_inline msvc::forceinline
+#else
+	#define rythe_always_inline
+#endif
+
+#if defined(RYTHE_GCC)
+	#define rythe_allocating gnu::allocating
+#elif defined(RYTHE_CLANG)
+	#define rythe_allocating clang::allocating
+#elif defined(RYTHE_MSVC)
+	#define rythe_allocating
+#else
+	#define rythe_allocating
+#endif
+
+#if defined(RYTHE_GCC)
+	#define rythe_open_enum gnu::enum_extensibility(open)
+#elif defined(RYTHE_CLANG)
+	#define rythe_open_enum clang::enum_extensibility(open)
+#elif defined(RYTHE_MSVC)
+	#define rythe_open_enum
+#else
+	#define rythe_open_enum
+#endif
+
+#if defined(RYTHE_GCC)
+	#define rythe_closed_enum gnu::enum_extensibility(closed)
+#elif defined(RYTHE_CLANG)
+	#define rythe_closed_enum clang::enum_extensibility(closed)
+#elif defined(RYTHE_MSVC)
+	#define rythe_closed_enum
+#else
+	#define rythe_closed_enum
+#endif
+
+#if defined(RYTHE_GCC)
+	#define rythe_flag_enum gnu::flag_enum
+#elif defined(RYTHE_CLANG)
+	#define rythe_flag_enum clang::flag_enum
+#elif defined(RYTHE_MSVC)
+	#define rythe_flag_enum
+#else
+	#define rythe_flag_enum
+#endif
+
+#if defined(RYTHE_GCC)
+	#define rythe_preferred_name(name) gnu::preferred_name(name)
+#elif defined(RYTHE_CLANG)
+	#define rythe_preferred_name(name) clang::preferred_name(name)
+#elif defined(RYTHE_MSVC)
+	#define rythe_preferred_name(name)
+#else
+	#define rythe_preferred_name(name)
+#endif
+
+#pragma endregion
+
 #pragma region /////////////////////////////////////// Utilities ////////////////////////////////////////
 
 #define DECLARE_OPAQUE_HANDLE(name)                                                                                    \
-	enum struct name : rsl::ptr_type                                                                                   \
+	enum struct [[rythe_open_enum]] name : rsl::ptr_type                                                               \
 	{                                                                                                                  \
-		invalid                                                                                                        \
+		invalid = 0                                                                                                    \
 	};                                                                                                                 \
 	[[maybe_unused]] constexpr name invalid_##name = name::invalid;
 
 #define DECLARE_OPAQUE_HANDLE_INVALID_VALUE(name, invalidValue)                                                        \
-	enum struct name : rsl::ptr_type                                                                                   \
+	enum struct [[rythe_open_enum]] name : rsl::ptr_type                                                               \
 	{                                                                                                                  \
 		invalid = invalidValue                                                                                         \
 	};                                                                                                                 \
@@ -274,108 +377,5 @@ namespace rsl
 #define MOVE_FUNCS_NOEXCEPT(type)                                                                                      \
 	type(type&&) noexcept = default;                                                                                   \
 	type& operator=(type&&) noexcept = default;
-
-#pragma endregion
-
-#pragma region ////////////////////////////////// Language convention ///////////////////////////////////
-
-#if defined(RYTHE_WINDOWS) && !defined(RYTHE_WINDOWS_USE_CDECL)
-/**@def RYTHE_CCONV
- * @brief the calling convention exported functions will use in the args engine
- */
-	#define RYTHE_CCONV __fastcall
-#elif defined(RYTHE_MSVC)
-	#define RYTHE_CCONV __cdecl
-#else
-	#define RYTHE_CCONV
-#endif
-
-/**@def RYTHE_CPP17V
- * @brief the version number of c++17 as long
- */
-#define RYTHE_CPP17V 201703L
-
-/**@def NO_MANGLING
- * @brief exports functions with C style names instead of C++ mangled names
- */
-#define RYTHE_NO_MANGLING extern "C"
-
-/**@def RYTHE_FUNC
- * @brief export setting + calling convention used by the engine
- */
-#define RYTHE_FUNC RYTHE_CCONV
-
-/**@def RYTHE_INTERFACE
- * @brief un-mangled function name +  export setting + calling convention used by the engine
- */
-#define RYTHE_INTERFACE RYTHE_NO_MANGLING RYTHE_CCONV
-
-#if !defined(__FUNC__)
-	#define __FUNC__ __func__
-#endif
-
-#pragma endregion
-
-#pragma region /////////////////////////////////////// Attributes ///////////////////////////////////////
-
-#if defined(RYTHE_GCC)
-	#define rythe_always_inline gnu::always_inline
-#elif defined(RYTHE_CLANG)
-	#define rythe_always_inline clang::always_inline
-#elif defined(RYTHE_MSVC)
-	#define rythe_always_inline msvc::forceinline
-#else
-	#define rythe_always_inline
-#endif
-
-#if defined(RYTHE_GCC)
-	#define rythe_allocating gnu::allocating
-#elif defined(RYTHE_CLANG)
-	#define rythe_allocating clang::allocating
-#elif defined(RYTHE_MSVC)
-	#define rythe_allocating
-#else
-	#define rythe_allocating
-#endif
-
-#if defined(RYTHE_GCC)
-	#define rythe_open_enum gnu::enum_extensibility(open)
-#elif defined(RYTHE_CLANG)
-	#define rythe_open_enum clang::enum_extensibility(open)
-#elif defined(RYTHE_MSVC)
-	#define rythe_open_enum 
-#else
-	#define rythe_open_enum
-#endif
-
-#if defined(RYTHE_GCC)
-	#define rythe_closed_enum gnu::enum_extensibility(closed)
-#elif defined(RYTHE_CLANG)
-	#define rythe_closed_enum clang::enum_extensibility(closed)
-#elif defined(RYTHE_MSVC)
-	#define rythe_closed_enum 
-#else
-	#define rythe_closed_enum
-#endif
-
-#if defined(RYTHE_GCC)
-	#define rythe_flag_enum gnu::flag_enum
-#elif defined(RYTHE_CLANG)
-	#define rythe_flag_enum clang::flag_enum
-#elif defined(RYTHE_MSVC)
-	#define rythe_flag_enum
-#else
-	#define rythe_flag_enum
-#endif
-
-#if defined(RYTHE_GCC)
-	#define rythe_preferred_name(name) gnu::preferred_name(name)
-#elif defined(RYTHE_CLANG)
-	#define rythe_preferred_name(name) clang::preferred_name(name)
-#elif defined(RYTHE_MSVC)
-	#define rythe_preferred_name(name)
-#else
-	#define rythe_preferred_name(name)
-#endif
 
 #pragma endregion
