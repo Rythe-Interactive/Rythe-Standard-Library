@@ -88,6 +88,38 @@ namespace rsl
 
 #pragma endregion
 
+#pragma region ////////////////////////////////// Target architecture ///////////////////////////////////
+
+#if defined(_M_AMD64) || defined(_M_X64) || defined(__x86_64__) || defined(__amd64__)
+	#define RYTHE_ARCH_X86_64
+#endif
+
+#if defined(__i386__) || defined(__i386) || defined(_M_IX86) || defined(_X86_)
+	#define RYTHE_ARCH_X86_32
+#endif
+
+#if defined(__arm__) || defined(__thumb__) || defined(_ARM) || defined(_M_ARM) || defined(_M_ARMT) ||                  \
+	defined(__TARGET_ARCH_ARM) || defined(__TARGET_ARCH_THUMB)
+	#if defined(__aarch64__) || defined(_M_ARM64)
+		#define RYTHE_ARCH_ARM64
+    #else
+	    #define RYTHE_ARCH_ARM
+	#endif
+#endif
+
+
+#if defined(__riscv)
+	#if __riscv_xlen == 32
+		#define RYTHE_ARCH_RISCV32
+	#elif __riscv_xlen == 64
+		#define RYTHE_ARCH_RISCV32
+	#else
+		#define RYTHE_ARCH_RISCV_UNKNOWN
+	#endif
+#endif
+
+#pragma endregion
+
 #pragma region //////////////////////////////////// Detect compiler /////////////////////////////////////
 
 #if defined(__clang__)
