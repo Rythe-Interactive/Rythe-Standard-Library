@@ -277,7 +277,7 @@ namespace rsl
 #if defined(RYTHE_GCC)
 	#define rythe_allocating gnu::allocating
 #elif defined(RYTHE_CLANG)
-	#define rythe_allocating clang::allocating
+	#define rythe_allocating
 #elif defined(RYTHE_MSVC)
 	#define rythe_allocating
 #else
