@@ -1,9 +1,137 @@
 #pragma once
 
+#include "../containers/constexpr_string.hpp"
+#include "hash.hpp"
 #include "type_util.hpp"
 
 namespace rsl
 {
+	namespace internal
+	{
+		template <typename T>
+		consteval auto compiler_dependent_type_name() noexcept
+		{
+			string_view functionName = __RYTHE_FULL_FUNC__;
+			string_view typeName;
+
+#if defined(RYTHE_MSVC)
+			auto first = functionName.find_first_of('<') + 1;
+			auto end = functionName.find_last_of('>');
+			if (auto t = functionName.find_first_of(' ', first) + 1; t < end)
+			{
+				first = t;
+			}
+
+			typeName = functionName.substr(first, end - first);
+#elif defined(RYTHE_GCC)
+			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
+			typeName = functionName.substr(first, functionName.find_last_of(';') - first);
+#elif defined(RYTHE_CLANG)
+			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
+			typeName = functionName.substr(first, functionName.find_last_of(']') - first);
+#else
+			typeName = functionName;
+#endif
+			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
+			ret.copy_from(typeName);
+			return ret;
+		}
+
+		template <template <typename...> typename T>
+		consteval auto compiler_dependent_templated_type_name() noexcept
+		{
+			string_view functionName = __RYTHE_FULL_FUNC__;
+			string_view typeName;
+
+#if defined(RYTHE_MSVC)
+			auto first = functionName.find_first_of('<') + 1;
+			auto end = functionName.find_last_of('>');
+            if (auto t = functionName.find_first_of(' ', first) + 1; t < end)
+            {
+				first = t;
+            }
+
+			typeName = functionName.substr(first, end - first);
+#elif defined(RYTHE_GCC)
+			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
+			typeName = functionName.substr(first, functionName.find_last_of(';') - first);
+#elif defined(RYTHE_CLANG)
+			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
+			typeName = functionName.substr(first, functionName.find_last_of(']') - first);
+#else
+			typeName = functionName;
+#endif
+			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
+			ret.copy_from(typeName);
+			return ret;
+		}
+
+		template <typename T>
+		struct compose_type_name
+		{
+			consteval static auto get_value() noexcept {
+                constexpr auto ret = compiler_dependent_type_name<T>();
+				return ret.refit<ret.size() + 1>();
+            }
+		};
+
+		template <template <typename...> typename T, typename... Args>
+		struct compose_type_name<T<Args...>>
+		{
+            template<typename A, typename... As, size_type N>
+            consteval static auto add_types(constexpr_string<N> original)
+            {
+				auto ret = original + compose_type_name<A>::get_value();
+
+                if constexpr (sizeof...(As) != 0)
+                { 
+					return add_types<As...>(ret + constexpr_string(", "));
+				}
+				else
+				{
+					return ret;
+				}
+            }
+
+            consteval static auto construct_value() noexcept
+            {
+                auto a = compiler_dependent_templated_type_name<T>();
+				auto b = a + constexpr_string("<");
+				auto c = add_types<Args...>(b) + constexpr_string(">");
+
+				return c;
+            }
+
+			consteval static auto get_value() noexcept
+			{
+				constexpr auto ret = construct_value();
+				return ret.refit<ret.size() + 1>();
+			}
+		};
+
+	} // namespace internal
+
+	template <typename T, size_type N>
+	consteval constexpr_string<N> type_name() noexcept;
+
+	template <>
+	consteval constexpr_string<5> type_name<void>() noexcept
+	{
+		return "void";
+	}
+
+	template <typename T>
+	consteval auto type_name() noexcept
+	{
+		return internal::compose_type_name<remove_cvr_t<T>>::get_value();
+	}
+
+	template <typename T>
+	consteval id_type type_id() noexcept
+	{
+		return hash_string(std::string_view(type_name<T>()));
+	}
+
 	namespace internal
 	{
 		template <typename T>
@@ -41,14 +169,14 @@ namespace rsl
 		{
 			using ptr_type = T;
 			using element_type = Elem;
-			using difference_type = typename internal::get_first_parameter<T>::type;
+			using difference_type = typename get_first_parameter<T>::type;
 
 			template <typename Other>
-			using rebind = typename internal::get_rebind_alias<T, Other>::type;
+			using rebind = typename get_rebind_alias<T, Other>::type;
 
-			[[nodiscard]] static constexpr ptr_type pointer_to(conditional_t<is_void_v<Elem>, char, Elem>& val)
-				noexcept(noexcept(T::pointer_to(val))) /* strengthened */
-			{                                          // Per LWG-3454
+			[[nodiscard]] static constexpr ptr_type pointer_to(conditional_t<is_void_v<Elem>, char, Elem>& val
+			) noexcept(noexcept(T::pointer_to(val))) /* strengthened */
+			{                                        // Per LWG-3454
 				return T::pointer_to(val);
 			}
 		};
@@ -59,8 +187,8 @@ namespace rsl
 		};
 
 		template <typename T, typename _Uty>
-		struct ptr_traits_sfinae_layer<T, _Uty, void_t<typename internal::get_first_parameter<T>::type>> :
-			ptr_traits_base<T, typename internal::get_first_parameter<T>::type>
+		struct ptr_traits_sfinae_layer<T, _Uty, void_t<typename get_first_parameter<T>::type>> :
+			ptr_traits_base<T, typename get_first_parameter<T>::type>
 		{
 		};
 
