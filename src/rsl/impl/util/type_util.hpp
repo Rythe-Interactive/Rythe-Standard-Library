@@ -415,7 +415,7 @@ namespace rsl {
         if (name[size - 1] == '\0')
             size--;
 
-        for (int i = 0; i < size; i++)
+        for (unsigned int i = 0; i < size; i++)
         {
             hash = hash ^ static_cast<const byte>(name[i]);
             hash *= prime;
