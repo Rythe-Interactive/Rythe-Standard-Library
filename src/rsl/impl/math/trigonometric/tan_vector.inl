@@ -15,8 +15,7 @@ namespace rsl::math::detail
 		[[nodiscard]] static auto compute(ValueType&& value) noexcept
 		{
 			vec_type result;
-			for (size_type i = 0; i < Size; i++)
-				result[i] = ::std::tan(value[i]);
+			for (size_type i = 0; i < Size; i++) result[i] = ::std::tan(value[i]);
 
 			return result;
 		}
@@ -25,8 +24,17 @@ namespace rsl::math::detail
 		[[nodiscard]] static auto compute_inverse(ValueType&& value) noexcept
 		{
 			vec_type result;
-			for (size_type i = 0; i < Size; i++)
-				result[i] = ::std::atan(value[i]);
+			for (size_type i = 0; i < Size; i++) result[i] = ::std::atan(value[i]);
+
+			return result;
+		}
+
+		template <typename X, typename Y>
+			requires same_as<remove_cvr_t<X>, remove_cvr_t<Y>>
+		[[nodiscard]] static auto compute_inverse2(X&& x, Y&& y) noexcept
+		{
+			vec_type result;
+			for (size_type i = 0; i < Size; i++) result[i] = ::std::atan2(value[i]);
 
 			return result;
 		}
@@ -47,6 +55,13 @@ namespace rsl::math::detail
 		[[nodiscard]] static auto compute_inverse(ValueType&& value) noexcept
 		{
 			return ::std::atan(value[0]);
+		}
+
+		template <typename X, typename Y>
+			requires same_as<remove_cvr_t<X>, remove_cvr_t<Y>>
+		[[nodiscard]] static auto compute_inverse2(X&& x, Y&& y) noexcept
+		{
+			return ::std::atan2(x[0], y[0]);
 		}
 	};
 } // namespace rsl::math::detail

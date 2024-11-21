@@ -10,13 +10,15 @@
 
 namespace rsl::math
 {
-	// tan
 	template <typename T>
 	[[nodiscard]] [[rythe_always_inline]] auto tan(T&& v) noexcept;
 
-	// atan
 	template <typename T>
 	[[nodiscard]] [[rythe_always_inline]] auto atan(T&& v) noexcept;
+
+	template <typename X, typename Y>
+		requires same_as<remove_cvr_t<X>, remove_cvr_t<Y>>
+	[[nodiscard]] [[rythe_always_inline]] auto atan2(X&& x, Y&& y) noexcept;
 } // namespace rsl::math
 
 #include "tan.inl"

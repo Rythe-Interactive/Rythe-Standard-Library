@@ -42,7 +42,7 @@ namespace rsl::math
 			scalar data[size];
 		};
 
-		constexpr quaternion() noexcept
+		[[rythe_always_inline]] constexpr quaternion() noexcept
 			: w(static_cast<scalar>(1)),
 			  i(static_cast<scalar>(0)),
 			  j(static_cast<scalar>(0)),
@@ -50,9 +50,9 @@ namespace rsl::math
 		{
 		}
 
-		constexpr quaternion(const quaternion&) noexcept = default;
+		[[rythe_always_inline]] constexpr quaternion(const quaternion&) noexcept = default;
 
-		constexpr quaternion(scalar _w, scalar _i, scalar _j, scalar _k) noexcept
+		[[rythe_always_inline]] constexpr quaternion(scalar _w, scalar _i, scalar _j, scalar _k) noexcept
 			: w(static_cast<scalar>(_w)),
 			  i(static_cast<scalar>(_i)),
 			  j(static_cast<scalar>(_j)),
@@ -61,7 +61,7 @@ namespace rsl::math
 		}
 
 		template <typename VecType, ::std::enable_if_t<is_vector_v<VecType> && VecType::size == 3, bool> = true>
-		constexpr quaternion(typename VecType::scalar s, const VecType& v) noexcept
+		[[rythe_always_inline]] constexpr quaternion(typename VecType::scalar s, const VecType& v) noexcept
 			: w(static_cast<scalar>(s)),
 			  i(static_cast<scalar>(v.x)),
 			  j(static_cast<scalar>(v.y)),
@@ -70,7 +70,7 @@ namespace rsl::math
 		}
 
 		template <typename VecType, ::std::enable_if_t<is_vector_v<VecType> && VecType::size == 4, bool> = true>
-		explicit constexpr quaternion(const VecType& other) noexcept
+		[[rythe_always_inline]] explicit constexpr quaternion(const VecType& other) noexcept
 			: w(static_cast<scalar>(other.w)),
 			  i(static_cast<scalar>(other.x)),
 			  j(static_cast<scalar>(other.y)),
@@ -78,8 +78,8 @@ namespace rsl::math
 		{
 		}
 
-		explicit constexpr quaternion(const matrix<scalar, 3, 3>& m) noexcept;
-		explicit constexpr quaternion(const matrix<scalar, 4, 4>& m) noexcept;
+		[[rythe_always_inline]] explicit constexpr quaternion(const matrix<scalar, 3, 3>& m) noexcept;
+		[[rythe_always_inline]] explicit constexpr quaternion(const matrix<scalar, 4, 4>& m) noexcept;
 
 		static const quaternion identity;
 		static const quaternion rotate_x_90;
@@ -91,42 +91,60 @@ namespace rsl::math
 
 		constexpr quaternion& operator=(const quaternion&) noexcept = default;
 
-		[[nodiscard]] constexpr scalar& operator[](size_type i) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept
 		{
 			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "quaternion subscript out of range");
 			return data[i];
 		}
-		[[nodiscard]] constexpr const scalar& operator[](size_type i) const noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept
 		{
 			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "quaternion subscript out of range");
 			return data[i];
 		}
 
-		[[nodiscard]] vec_type right() noexcept;
-		[[nodiscard]] vec_type forward() noexcept;
-		[[nodiscard]] vec_type up() noexcept;
-		[[nodiscard]] static quaternion angle_axis(scalar angle, const vec_type& vec) noexcept;
-		[[nodiscard]] static quaternion look_at(const vec_type& _pos, const vec_type& _center, const vec_type& _up = vec_type::up) noexcept;
-		[[nodiscard]] static quaternion conjugate(const quaternion& _quat) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] vec_type right() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] vec_type forward() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] vec_type up() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] vec_type euler_angles() const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] static quaternion angle_axis(scalar angle, const vec_type& vec) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] static quaternion
+		look_at(const vec_type& _pos, const vec_type& _center, const vec_type& _up = vec_type::up) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] static quaternion conjugate(const quaternion& _quat) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] static quaternion from_euler(const vec_type& euler) noexcept;
 	};
 
 #define sin45 0.70710678118654752440084436210485L
 #define cos45 0.70710678118654752440084436210485L
 
 	template <typename Scalar>
-	const quaternion<Scalar> quaternion<Scalar>::identity(static_cast<Scalar>(1), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(0));
+	const quaternion<Scalar> quaternion<Scalar>::identity(
+		static_cast<Scalar>(1), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(0)
+	);
 	template <typename Scalar>
-	const quaternion<Scalar> quaternion<Scalar>::rotate_x_90(static_cast<Scalar>(cos45), static_cast<Scalar>(sin45), static_cast<Scalar>(0), static_cast<Scalar>(0));
+	const quaternion<Scalar> quaternion<Scalar>::rotate_x_90(
+		static_cast<Scalar>(cos45), static_cast<Scalar>(sin45), static_cast<Scalar>(0), static_cast<Scalar>(0)
+	);
 	template <typename Scalar>
-	const quaternion<Scalar> quaternion<Scalar>::rotate_y_90(static_cast<Scalar>(cos45), static_cast<Scalar>(0), static_cast<Scalar>(sin45), static_cast<Scalar>(0));
+	const quaternion<Scalar> quaternion<Scalar>::rotate_y_90(
+		static_cast<Scalar>(cos45), static_cast<Scalar>(0), static_cast<Scalar>(sin45), static_cast<Scalar>(0)
+	);
 	template <typename Scalar>
-	const quaternion<Scalar> quaternion<Scalar>::rotate_z_90(static_cast<Scalar>(cos45), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(sin45));
+	const quaternion<Scalar> quaternion<Scalar>::rotate_z_90(
+		static_cast<Scalar>(cos45), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(sin45)
+	);
 	template <typename Scalar>
-	const quaternion<Scalar> quaternion<Scalar>::rotate_x_180(static_cast<Scalar>(0), static_cast<Scalar>(1), static_cast<Scalar>(0), static_cast<Scalar>(0));
+	const quaternion<Scalar> quaternion<Scalar>::rotate_x_180(
+		static_cast<Scalar>(0), static_cast<Scalar>(1), static_cast<Scalar>(0), static_cast<Scalar>(0)
+	);
 	template <typename Scalar>
-	const quaternion<Scalar> quaternion<Scalar>::rotate_y_180(static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(1), static_cast<Scalar>(0));
+	const quaternion<Scalar> quaternion<Scalar>::rotate_y_180(
+		static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(1), static_cast<Scalar>(0)
+	);
 	template <typename Scalar>
-	const quaternion<Scalar> quaternion<Scalar>::rotate_z_180(static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(1));
+	const quaternion<Scalar> quaternion<Scalar>::rotate_z_180(
+		static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(1)
+	);
 
 #undef sin45
 #undef cos45

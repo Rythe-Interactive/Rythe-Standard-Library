@@ -6,38 +6,62 @@ namespace rsl::math
 	template <typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar rads, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
 	{
-		Scalar const tanHalfFovy = tan(rads / static_cast<Scalar>(2));
+		Scalar const tanHalfFovy = tan(rads * static_cast<Scalar>(0.5));
+        Scalar inverseFrustumDepth = static_cast<Scalar>(1) / (farZ - nearZ);
 
 		matrix<Scalar, 4, 4> result(static_cast<Scalar>(0));
-		result[0][0] = static_cast<Scalar>(1) / (tanHalfFovy);
-		result[1][1] = static_cast<Scalar>(1) / (aspect * tanHalfFovy);
-		result[2][2] = farZ / (farZ - nearZ);
-		result[2][3] = static_cast<Scalar>(1);
-		result[3][2] = -(nearZ * farZ) / (farZ - nearZ);
-		result[3][3] = static_cast<Scalar>(1.0f);
+
+		result[0][0] = static_cast<Scalar>(1) / (aspect * tanHalfFovy);
+		result[1][1] = static_cast<Scalar>(1) / (tanHalfFovy);
+		result[2][2] = (farZ + nearZ) * inverseFrustumDepth;
+
+        result[2][3] = static_cast<Scalar>(1);
+		result[3][2] = -(static_cast<Scalar>(2) * nearZ * farZ) * inverseFrustumDepth;
+
 		return result;
 	}
 
 	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> lookAt(vector<Scalar, 3> eye, vector<Scalar, 3> center, vector<Scalar, 3> up) noexcept
+	[[nodiscard]] matrix<Scalar, 4, 4>
+	orthographic(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar nearZ, Scalar farZ) noexcept
 	{
-		vector<Scalar, 3> const f(normalize(center - eye));
-		vector<Scalar, 3> const s(normalize(cross(f, up)));
-		vector<Scalar, 3> const u(cross(s, f));
+		vector<Scalar, 3> frustumSize = vector<Scalar, 3>(right, top, farZ) - vector<Scalar, 3>(left, bottom, nearZ);
+		vector<Scalar, 3> inverseFrustumSize = vector<Scalar, 3>(static_cast<Scalar>(1)) / frustumSize;
 
-		matrix<Scalar, 4, 4> result(1);
-		result[0][0] = s.x;
-		result[1][0] = s.y;
-		result[2][0] = s.z;
-		result[0][1] = u.x;
-		result[1][1] = u.y;
-		result[2][1] = u.z;
-		result[0][2] = -f.x;
-		result[1][2] = -f.y;
-		result[2][2] = -f.z;
-		result[3][0] = -dot(s, eye);
-		result[3][1] = -dot(u, eye);
-		result[3][2] = dot(f, eye);
+		vector<Scalar, 3> result0 =
+			vector<Scalar, 3>(static_cast<Scalar>(2), static_cast<Scalar>(2), static_cast<Scalar>(1)) *
+			inverseFrustumSize;
+
+		matrix<Scalar, 4, 4> result(static_cast<Scalar>(1));
+
+		result[0][0] = result0.x;
+		result[1][1] = result0.y;
+		result[2][2] = result0.z;
+
+		result[3].xyz = vector<Scalar, 3>(-(right + left), -(top + bottom), -nearZ) * inverseFrustumSize;
+
+		return result;
+	}
+
+	template <typename Scalar>
+	[[nodiscard]] matrix<Scalar, 4, 4>
+	look_at(vector<Scalar, 3> eye, vector<Scalar, 3> center, vector<Scalar, 3> up) noexcept
+	{
+		const vector<Scalar, 4> f(normalize(center - eye));
+		const vector<Scalar, 4> r(normalize(cross(up, f)));
+		const vector<Scalar, 4> u(cross(f, r)); // Length of u is 1 because the angle between f and r is 90 degrees
+
+		matrix<Scalar, 4, 4> result(static_cast<Scalar>(1));
+		result.col0 = r;
+		result.col1 = u;
+		result.col2 = f;
+
+        vector<Scalar, 3> x{ r.x, u.x, f.x };
+        vector<Scalar, 3> y{ r.y, u.y, f.y };
+		vector<Scalar, 3> z{ r.z, u.z, f.z };
+
+        result.col3 = -(x * eye.xxx + y * eye.yyy + z * eye.zzz);
+
 		return result;
 	}
 
@@ -45,25 +69,10 @@ namespace rsl::math
 	[[nodiscard]] matrix<Scalar, 4, 4> transpose(matrix<Scalar, 4, 4> mat) noexcept
 	{
 		matrix<Scalar, 4, 4> result(1);
-		result[0][0] = mat[0][0];
-		result[0][1] = mat[1][0];
-		result[0][2] = mat[2][0];
-		result[0][3] = mat[3][0];
-
-		result[1][0] = mat[0][1];
-		result[1][1] = mat[1][1];
-		result[1][2] = mat[2][1];
-		result[1][3] = mat[3][1];
-
-		result[2][0] = mat[0][2];
-		result[2][1] = mat[1][2];
-		result[2][2] = mat[2][2];
-		result[2][3] = mat[3][2];
-
-		result[3][0] = mat[0][3];
-		result[3][1] = mat[1][3];
-		result[3][2] = mat[2][3];
-		result[3][3] = mat[3][3];
+		result.row0 = mat.col0;
+		result.row1 = mat.col1;
+		result.row2 = mat.col2;
+		result.row3 = mat.col3;
 		return result;
 	}
 
@@ -74,11 +83,13 @@ namespace rsl::math
 		result[3] = mat[0] * pos[0] + mat[1] * pos[1] + mat[2] * pos[2] + mat[3];
 		return result;
 	}
-	// template<typename Scalar>
+
+    // template<typename Scalar>
 	//[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> matrix, quaternion<Scalar> orientation) noexcept
 	//{
 
 	//}
+
 	template <typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> mat, Scalar rad, vector<Scalar, 3> axis) noexcept
 	{
@@ -109,6 +120,7 @@ namespace rsl::math
 		result[3] = mat[3];
 		return result;
 	}
+
 	template <typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> scale(matrix<Scalar, 4, 4> mat, vector<Scalar, 3> scale) noexcept
 	{

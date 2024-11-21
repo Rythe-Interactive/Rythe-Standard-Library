@@ -12,8 +12,14 @@ namespace rsl::math
 {
 	template <typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar rads, Scalar fov, Scalar nearZ, Scalar farZ) noexcept;
+
+    template <typename Scalar>
+	[[nodiscard]] matrix<Scalar, 4, 4>
+	orthographic(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar nearZ, Scalar farZ) noexcept;
+
 	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> lookAt(vector<Scalar, 3> pos, vector<Scalar, 3> center, vector<Scalar, 3> up) noexcept;
+	[[nodiscard]] matrix<Scalar, 4, 4>
+	look_at(vector<Scalar, 3> eye, vector<Scalar, 3> center, vector<Scalar, 3> up) noexcept;
 
 	template <typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> transpose(matrix<Scalar, 4, 4> mat) noexcept;
