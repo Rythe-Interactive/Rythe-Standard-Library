@@ -608,7 +608,7 @@ namespace rsl
 				"Second template param needs to be of function type."                                                  \
 			);                                                                                                         \
 		};                                                                                                             \
-                                                                                                                       \
+																													   \
 		template <typename C, typename Ret, typename... Args>                                                          \
 		struct RYTHE_CONCAT(has_, RYTHE_CONCAT(x, _impl))<C, Ret(Args...)>                                             \
 		{                                                                                                              \
@@ -617,14 +617,14 @@ namespace rsl
 			};                                                                                                         \
 		};                                                                                                             \
 	}                                                                                                                  \
-                                                                                                                       \
+																													   \
 	template <typename C, typename F>                                                                                  \
 	constexpr bool RYTHE_CONCAT(has_, RYTHE_CONCAT(x, _v)) =                                                           \
 		RYTHE_CONCAT(internal::has_, RYTHE_CONCAT(x, _impl))<C, F>::value;                                             \
-                                                                                                                       \
+																													   \
 	template <typename C, typename F>                                                                                  \
 	concept RYTHE_CONCAT(has_, x) = RYTHE_CONCAT(has_, RYTHE_CONCAT(x, _v))<C, F>;                                     \
-                                                                                                                       \
+																													   \
 	namespace internal                                                                                                 \
 	{                                                                                                                  \
 		template <typename, typename T>                                                                                \
@@ -635,7 +635,7 @@ namespace rsl
 				"Second template param needs to be of function type."                                                  \
 			);                                                                                                         \
 		};                                                                                                             \
-                                                                                                                       \
+																													   \
 		template <typename C, typename Ret, typename... Args>                                                          \
 		struct RYTHE_CONCAT(has_static_, RYTHE_CONCAT(x, _impl))<C, Ret(Args...)>                                      \
 		{                                                                                                              \
@@ -644,310 +644,11 @@ namespace rsl
 			};                                                                                                         \
 		};                                                                                                             \
 	}                                                                                                                  \
-                                                                                                                       \
+																													   \
 	template <typename C, typename F>                                                                                  \
 	constexpr bool RYTHE_CONCAT(has_static_, RYTHE_CONCAT(x, _v)) =                                                    \
 		RYTHE_CONCAT(internal::has_static_, RYTHE_CONCAT(x, _impl))<C, F>::value;                                      \
-                                                                                                                       \
+																													   \
 	template <typename C, typename F>                                                                                  \
 	concept RYTHE_CONCAT(has_static_, x) = RYTHE_CONCAT(has_static_, RYTHE_CONCAT(x, _v))<C, F>;
-
-#if defined(RYTHE_MSVC)
-
-	template <typename T>
-	constexpr std::string_view type_name() noexcept
-	{
-		std::string_view funcName(__FUNCSIG__);
-		auto first = funcName.find_first_of(' ', funcName.find("type_name<") + 11) + 1;
-		return funcName.substr(first, funcName.find_last_of('>') - first);
-	}
-
-#elif defined(RYTHE_GCC)
-
-	template <typename T>
-	constexpr std::string_view type_name() noexcept
-	{
-		std::string_view funcName(__PRETTY_FUNCTION__);
-		auto first = funcName.find_first_not_of(' ', funcName.find_first_of('=') + 1);
-		return funcName.substr(first, funcName.find_last_of(';') - first);
-	}
-
-#elif defined(RYTHE_CLANG)
-
-	template <typename T>
-	constexpr std::string_view type_name() noexcept
-	{
-		std::string_view funcName(__PRETTY_FUNCTION__);
-		auto first = funcName.find_first_not_of(' ', funcName.find_first_of('=') + 1);
-		return funcName.substr(first, funcName.find_last_of(']') - first);
-	}
-
-#endif
-
-	template <typename T>
-	constexpr std::string_view type_name(T&&) noexcept
-	{
-		return type_name<remove_cvr_t<T>>();
-	}
-
-#if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
-	namespace detail
-	{
-		template <typename T>
-		std::string getNameOfTypeImpl()
-		{
-			const std::string name = typeid(T).name();
-			std::vector<std::string> vec = split_string_at<' '>(name);
-			if (vec.size() < 2)
-			{
-				return name;
-			}
-
-			std::string result;
-			for (auto i = 1; i < vec.size(); i++)
-			{
-				if (ends_with(vec[i], "struct"))
-					result += vec[i].substr(0, vec[i].size() - 6);
-				else if (ends_with(vec[i], "class"))
-					result += vec[i].substr(0, vec[i].size() - 5);
-				else
-					result += vec[i];
-			}
-			return result;
-		}
-	} // namespace detail
-#elif defined(RYTHE_GCC)
-
-	#include <cxxabi.h>
-	namespace detail
-	{
-		template <typename T>
-		std::string getNameOfTypeImpl()
-		{
-			// Demangle the typename generated by GCC
-			int status;
-			char* realName = abi::__cxa_demangle(typeid(T).name(), 0, 0, &status);
-			std::string result = {realName};
-			free(realName);
-			return result;
-		}
-	} // namespace detail
-#elif defined(RYTHE_CLANG_GCC)
-
-	#include <cxxabi.h>
-	namespace detail
-	{
-		template <typename T>
-		std::string getNameOfTypeImpl()
-		{
-			// Demangle the typename generated by GCC
-			int status;
-			char* realName = __cxxabiv1::__cxa_demangle(typeid(T).name(), 0, 0, &status);
-			std::string result = {realName};
-			free(realName);
-			return result;
-		}
-	} // namespace detail
-#endif
-
-	/**@brief Returns compile-time evaluable type name.
-	 * @warning This version is not compiler agnostic! If you need it to be compiler agnostic use `nameOfType`.
-	 */
-	template <typename T>
-	constexpr std::string_view localNameOfType() noexcept
-	{
-#if defined(RYTHE_CLANG) || defined(RYTHE_GCC)
-		cstring p = __PRETTY_FUNCTION__;
-
-		while (*p++ != '=');
-
-		for (; *p == ' '; ++p);
-
-		cstring p2 = p;
-		int count = 1;
-
-		for (;; ++p2)
-		{
-			switch (*p2)
-			{
-				case '[': ++count; break;
-				case ']':
-				case ';':
-					--count;
-					if (!count)
-						return {p, size_type(p2 - p)};
-			}
-		}
-
-		return {};
-#elif defined(RYTHE_MSVC)
-		cstring p = __FUNCSIG__;
-
-		while (*p != 'T' || *(p + 1) != 'y' || *(p + 2) != 'p' || *(p + 3) != 'e' || *(p + 4) != '<') p++;
-
-		while (*p++ != ' ');
-
-		cstring p2 = p;
-		int count = 1;
-		size_type size = 0;
-
-		for (; size == 0; ++p2)
-		{
-			switch (*p2)
-			{
-				case '<': ++count; break;
-				case '>':
-					--count;
-					if (!count)
-					{
-						size = (p2 - p);
-					}
-			}
-		}
-
-		return {p, size};
-
-#else
-	#error unknown compiler
-#endif
-	}
-
-
-	/**@brief Returns type name with namespaces other than that it's undecorated.
-	 * @tparam T type of which you want the name.
-	 */
-	template <typename T>
-	cstring nameOfType()
-	{
-		static std::string name = detail::getNameOfTypeImpl<T>();
-		return name.c_str();
-	}
-
-	/**@brief Returns type name with namespaces other than that it's undecorated.
-	 * @tparam T type of which you want the name.
-	 * @param expr Variable of which you wish to auto deduct type.
-	 */
-	template <typename T>
-	cstring nameOfType(T&& expr)
-	{
-		return nameOfType<decay_t<T>>();
-	}
-
-	/**@brief Returns hash of a certain string
-	 * @tparam N Length of the string literal
-	 * @param name Name you wish to hash
-	 * @note Since this version takes a const char[] it can only really be used with data coming from a string literal.
-	 *       Because it takes in a const char[] this function is able to be constexpr and thus have minimal overhead.
-	 */
-	template <size_type N>
-	constexpr id_type nameHash(const char (&name)[N]) noexcept
-	{
-		id_type hash = 0xcbf29ce484222325;
-		constexpr uint64 prime = 0x00000100000001b3;
-
-		size_type size = N;
-		if (name[size - 1] == '\0')
-			size--;
-
-		for (size_type i = 0; i < size; i++)
-		{
-			hash = hash ^ static_cast<const byte>(name[i]);
-			hash *= prime;
-		}
-
-		return hash;
-	}
-
-	/**@brief Returns hash of a certain string
-	 * @tparam N Length of the string literal
-	 * @param name Name you wish to hash
-	 * @note Since this version takes a const char[] it can only really be used with data coming from a string literal.
-	 *       Because it takes in a const char[] this function is able to be constexpr and thus have minimal overhead.
-	 */
-	template <size_type N>
-	constexpr id_type nameHash(const std::array<char, N>& name) noexcept
-	{
-		id_type hash = 0xcbf29ce484222325;
-		constexpr uint64 prime = 0x00000100000001b3;
-
-		size_type size = N;
-		if (name[size - 1] == '\0')
-			size--;
-
-		for (size_type i = 0; i < size; i++)
-		{
-			hash = hash ^ static_cast<const byte>(name[i]);
-			hash *= prime;
-		}
-
-		return hash;
-	}
-
-	/**@brief Returns hash of a certain string
-	 * @param name Name you wish to hash
-	 */
-	constexpr id_type nameHash(cstring name) noexcept
-	{
-		id_type hash = 0xcbf29ce484222325;
-		constexpr uint64 prime = 0x00000100000001b3;
-
-		for (size_type i = 0; i < rsl::constexpr_strlen(name); i++)
-		{
-			hash = hash ^ static_cast<const byte>(name[i]);
-			hash *= prime;
-		}
-
-		return hash;
-	}
-
-	/**@brief Returns hash of a certain string
-	 * @param name Name you wish to hash
-	 */
-	constexpr id_type nameHash(const std::string_view& name) noexcept
-	{
-		id_type hash = 0xcbf29ce484222325;
-		constexpr uint64 prime = 0x00000100000001b3;
-
-		size_type size = name.size();
-
-		if (name[size - 1] == '\0')
-			size--;
-
-		for (size_type i = 0; i < size; i++)
-		{
-			hash = hash ^ static_cast<const byte>(name[i]);
-			hash *= prime;
-		}
-
-		return hash;
-	}
-	//
-	//    /**@brief Returns hash of a certain string
-	// * @param name Name you wish to hash
-	// */
-	//    id_type nameHash(const std::string& name)
-	//    {
-	// #if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
-	//        static std::hash<std::string> hasher{};
-	//        if (!name.empty() && name[name.size() - 1] == '\0')
-	//            return nameHash(std::string_view(name));
-	//
-	//        return hasher(name);
-	// #else
-	//        // std::hash returns a different hash on GCC and Clang on Linux for certain CPU architectures.
-	//        // These certain different hashes are faster to compute but can create issues if they aren't the same.
-	//        return nameHash(std::string_view(name));
-	// #endif
-	//    }
-
-
-	/**@brief Returns compile-time evaluable hash of the type name.
-	 * @warning This version is not compiler agnostic! If you need it to be compiler agnostic use `typeHash`.
-	 */
-	template <typename T>
-	constexpr id_type localTypeHash() noexcept
-	{
-		return nameHash(localNameOfType<T>());
-	}
-
 } // namespace rsl
