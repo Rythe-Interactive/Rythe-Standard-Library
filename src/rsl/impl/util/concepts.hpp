@@ -25,4 +25,7 @@ namespace rsl
 
 	template <typename Type, template <typename...> typename Template>
 	concept specialization_of = is_specialization_v<Type, Template>;
+
+    template<bool value>
+	concept invert = !value;
 } // namespace rsl

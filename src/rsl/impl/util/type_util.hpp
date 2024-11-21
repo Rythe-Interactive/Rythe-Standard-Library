@@ -261,44 +261,44 @@ namespace rsl
 	};
 
 	template <typename Callable, typename... Args>
-	struct is_invocable_args : internal::select_invoke_traits<Callable, Args...>::is_invocable
+	struct is_invocable : internal::select_invoke_traits<Callable, Args...>::is_invocable
 	{
 		// Determines whether Callable is callable with Args
 	};
 
 	template <typename Callable, typename... Args>
-	inline constexpr bool is_invocable_args_v =
-		internal::select_invoke_traits<Callable, Args...>::is_invocable_args::value;
+	inline constexpr bool is_invocable_v =
+		internal::select_invoke_traits<Callable, Args...>::is_invocable::value;
 
 	template <typename Callable, typename... Args>
-	struct is_nothrow_invocable_args : internal::select_invoke_traits<Callable, Args...>::is_nothrow_invocable
+	struct is_nothrow_invocable : internal::select_invoke_traits<Callable, Args...>::is_nothrow_invocable
 	{
 		// Determines whether Callable is nothrow-callable with Args
 	};
 
 	template <typename Callable, typename... Args>
-	inline constexpr bool is_nothrow_invocable_args_v =
+	inline constexpr bool is_nothrow_invocable_v =
 		internal::select_invoke_traits<Callable, Args...>::is_nothrow_invocable::value;
 
 	template <typename ReturnType, typename Callable, typename... Args>
-	struct is_invocable_args_ret : internal::is_invocable_ret_impl<ReturnType, Callable, Args...>
+	struct is_invocable_ret : internal::is_invocable_ret_impl<ReturnType, Callable, Args...>
 	{
 		// Determines whether Callable is callable with Args and return type ReturnType
 	};
 
 	template <typename ReturnType, typename Callable, typename... Args>
-	inline constexpr bool is_invocable_args_ret_v =
+	inline constexpr bool is_invocable_ret_v =
 		internal::is_invocable_ret_impl<ReturnType, Callable, Args...>::value;
 
 	template <typename ReturnType, typename Callable, typename... Args>
-	struct is_nothrow_invocable_args_ret :
+	struct is_nothrow_invocable_ret :
 		internal::select_invoke_traits<Callable, Args...>::template is_nothrow_invocable_ret<ReturnType>
 	{
 		// Determines whether Callable is nothrow-callable with Args and return type ReturnType
 	};
 
 	template <typename ReturnType, typename Callable, typename... Args>
-	inline constexpr bool is_nothrow_invocable_args_ret_v =
+	inline constexpr bool is_nothrow_invocable_ret_v =
 		internal::select_invoke_traits<Callable, Args...>::template is_nothrow_invocable_ret<ReturnType>::value;
 
 	struct any_type
@@ -315,24 +315,24 @@ namespace rsl
 		template <typename Func, size_type... paramCounts>
 		constexpr bool test_invocable_impl([[maybe_unused]] integer_sequence<size_type, paramCounts...> int_seq)
 		{
-			return ((make_sequence_t<is_invocable_args, any_type, paramCounts, Func>::value) || ...);
+			return ((make_sequence_t<is_invocable, any_type, paramCounts, Func>::value) || ...);
 		}
 	} // namespace internal
 
 	template <typename Func, size_type maxParams = 32>
-	struct is_invocable
+	struct is_invocable_any
 	{
 		static constexpr bool value = internal::test_invocable_impl<Func>(make_index_sequence<maxParams>{});
 	};
 
 	template <typename Func, size_type maxParams = 32>
-	constexpr bool is_invocable_v = is_invocable<Func, maxParams>::value;
+	constexpr bool is_invocable_any_v = is_invocable_any<Func, maxParams>::value;
 
 	template <typename Func, size_type maxParams = 32>
-	constexpr bool is_function_ptr_v = (is_empty_v<Func> || is_pointer_v<Func>) && is_invocable_v<Func, maxParams>;
+	constexpr bool is_function_ptr_v = (is_empty_v<Func> || is_pointer_v<Func>) && is_invocable_any_v<Func, maxParams>;
 
 	template <typename Func, size_type maxParams = 32>
-	constexpr bool is_functor_v = requires { &Func::operator(); } && is_invocable_v<Func, maxParams>;
+	constexpr bool is_functor_v = requires { &Func::operator(); } && is_invocable_any_v<Func, maxParams>;
 
 	template <typename Type>
 	constexpr bool is_ratio_v = false; // test for ratio type

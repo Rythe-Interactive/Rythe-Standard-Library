@@ -40,6 +40,7 @@ namespace rsl
 
     using f32 = float32;
     using f64 = float64;
+	using flt_max = float_max;
 
 	using time32 = float32;
 	using time64 = float64;

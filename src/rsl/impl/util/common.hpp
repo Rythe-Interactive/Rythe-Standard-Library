@@ -443,6 +443,56 @@ namespace rsl
 	{
 	};
 
+	template <typename T, typename... Args>
+	inline constexpr bool is_nothrow_constructible_v =
+		::std::is_nothrow_constructible_v<T, Args...>; // Uses compiler magic behind the scenes.
+
+	template <typename T, typename... Args>
+	struct is_nothrow_constructible : bool_constant<is_nothrow_constructible_v<T, Args...>>
+	{
+		// determine whether T can be direct-initialized with Args... in a noexcept way
+	};
+
+	template <typename T>
+	inline constexpr bool is_nothrow_move_constructible_v =
+		::std::is_nothrow_move_constructible_v<T>; // Uses compiler magic behind the scenes.
+
+	template <typename T>
+	struct is_nothrow_move_constructible : bool_constant<is_nothrow_move_constructible_v<T>>
+	{
+		// determine whether T can be direct-initialized with Args... in a noexcept way
+	};
+
+	template <typename T>
+	inline constexpr bool is_trivially_default_constructible_v =
+		::std::is_trivially_default_constructible_v<T>; // Uses compiler magic behind the scenes.
+
+	template <typename T>
+	struct is_trivially_default_constructible : bool_constant<is_trivially_default_constructible_v<T>>
+	{
+		// determine whether T can be direct-initialized with Args... in a noexcept way
+	};
+
+	template <typename T>
+	inline constexpr bool is_trivially_destructible_v =
+		::std::is_trivially_destructible_v<T>; // Uses compiler magic behind the scenes.
+
+	template <typename T>
+	struct is_trivially_destructible : bool_constant<is_trivially_destructible_v<T>>
+	{
+		// determine whether T can be direct-initialized with Args... in a noexcept way
+	};
+
+	template <typename T>
+	inline constexpr bool is_trivially_copy_constructible_v =
+		::std::is_trivially_copy_constructible_v<T>; // Uses compiler magic behind the scenes.
+
+	template <typename T>
+	struct is_trivially_copy_constructible : bool_constant<is_trivially_copy_constructible_v<T>>
+	{
+		// determine whether T can be direct-initialized with Args... in a noexcept way
+	};
+
 	template <typename>
 	inline constexpr bool is_array_v = false;
 
