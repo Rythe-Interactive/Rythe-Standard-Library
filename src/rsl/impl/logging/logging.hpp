@@ -91,8 +91,7 @@ namespace fmt
 			// ctx.out() is an output iterator to write to.
 			return format_to(
 				ctx.out(),
-				presentation == 'f' ? "({:.1f}, {:.1f})" : "({:.1e}, {:.1e})",
-				p.x, p.y
+				format_string<rsl::math::vec2>(presentation == 'f' ? "({:.1f}, {:.1f})" : "({:.1e}, {:.1e})"), p.x, p.y
 			);
 		}
 	};
@@ -116,11 +115,7 @@ namespace fmt
 		template <typename FormatContext>
 		auto format(const rsl::math::ivec2& p, FormatContext& ctx)
 		{
-			return format_to(
-				ctx.out(),
-				"({}, {})",
-				p.x, p.y
-			);
+			return format_to(ctx.out(), "({}, {})", p.x, p.y);
 		}
 	};
 
@@ -150,7 +145,9 @@ namespace fmt
 		{
 			return format_to(
 				ctx.out(),
-				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e})",
+				format_string<rsl::math::vec3>(
+					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e})"
+				),
 				p.x, p.y, p.z
 			);
 		}
@@ -175,11 +172,7 @@ namespace fmt
 		template <typename FormatContext>
 		auto format(const rsl::math::ivec3& p, FormatContext& ctx)
 		{
-			return format_to(
-				ctx.out(),
-				"({}, {}, {})",
-				p.x, p.y, p.z
-			);
+			return format_to(ctx.out(), "({}, {}, {})", p.x, p.y, p.z);
 		}
 	};
 
@@ -209,8 +202,49 @@ namespace fmt
 		{
 			return format_to(
 				ctx.out(),
-				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})",
+				format_string<rsl::math::vec4>(
+					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})"
+				),
 				p.x, p.y, p.z, p.w
+			);
+		}
+	};
+
+	template <>
+	struct formatter<rsl::math::mat3> : fmt::formatter<std::string>
+	{
+		char presentation = 'f';
+
+		constexpr const char* parse(format_parse_context& ctx)
+		{
+			auto it = ctx.begin(), end = ctx.end();
+
+			if (!it)
+				return nullptr;
+
+			if (it != end && (*it == 'f' || *it == 'e'))
+				presentation = *it++;
+
+			if (it != end && *it != '}')
+				throw format_error("invalid format");
+
+			return it;
+		}
+
+		template <typename FormatContext>
+		auto format(const rsl::math::mat3& p, FormatContext& ctx) const -> decltype(ctx.out())
+		{
+			return format_to(
+				ctx.out(),
+				format_string<rsl::math::mat3>(
+					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f})\n"
+										  "({:.1f}, {:.1f}, {:.1f})\n"
+										  "({:.1f}, {:.1f}, {:.1f})"
+										: "({:.1e}, {:.1e}, {:.1e})\n"
+										  "({:.1e}, {:.1e}, {:.1e})\n"
+										  "({:.1e}, {:.1e}, {:.1e})"
+				),
+				p[0][0], p[0][1], p[0][2], p[1][0], p[1][1], p[1][2], p[2][0], p[2][1], p[2][2]
 			);
 		}
 	};
@@ -241,18 +275,18 @@ namespace fmt
 		{
 			return format_to(
 				ctx.out(),
-				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
-									  "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
-									  "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
-									  "({:.1f}, {:.1f}, {:.1f}, {:.1f})"
-									: "({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
-									  "({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
-									  "({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
-									  "({:.1e}, {:.1e}, {:.1e}, {:.1e})",
-				p[0][0], p[0][1], p[0][2], p[0][3],
-				p[1][0], p[1][1], p[1][2], p[1][3],
-				p[2][0], p[2][1], p[2][2], p[2][3],
-				p[3][0], p[3][1], p[3][2], p[3][3]
+				format_string<rsl::math::mat4>(
+					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
+										  "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
+										  "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
+										  "({:.1f}, {:.1f}, {:.1f}, {:.1f})"
+										: "({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
+										  "({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
+										  "({:.1e}, {:.1e}, {:.1e}, {:.1e})\n"
+										  "({:.1e}, {:.1e}, {:.1e}, {:.1e})"
+				),
+				p[0][0], p[0][1], p[0][2], p[0][3], p[1][0], p[1][1], p[1][2], p[1][3], p[2][0], p[2][1], p[2][2],
+				p[2][3], p[3][0], p[3][1], p[3][2], p[3][3]
 			);
 		}
 	};
@@ -283,7 +317,9 @@ namespace fmt
 		{
 			return format_to(
 				ctx.out(),
-				presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})",
+				format_string<rsl::math::color>(
+					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})"
+				),
 				p.r, p.g, p.b, p.a
 			);
 		}
@@ -315,7 +351,10 @@ namespace fmt
 		{
 			return format_to(
 				ctx.out(),
-				presentation == 'f' ? "(({:.1f}, {:.1f}, {:.1f}),r: {:.1f})" : "(({:.1e}, {:.1e}, {:.1e}),r: {:.1e})",
+				format_string<rsl::math::quat>(
+					presentation == 'f' ? "(({:.1f}, {:.1f}, {:.1f}), w: {:.1f})"
+										: "(({:.1e}, {:.1e}, {:.1e}), w: {:.1e})"
+				),
 				p.i, p.j, p.k, p.w
 			);
 		}
@@ -367,7 +406,8 @@ namespace rsl::log
 		}
 	};
 
-	const static inline std::chrono::time_point<std::chrono::high_resolution_clock> genesis = std::chrono::high_resolution_clock::now();
+	const static inline std::chrono::time_point<std::chrono::high_resolution_clock> genesis =
+		std::chrono::high_resolution_clock::now();
 
 	class genesis_formatter_flag : public spdlog::custom_flag_formatter
 	{
@@ -380,7 +420,8 @@ namespace rsl::log
 			// get seconds since engine start
 			const auto now = std::chrono::high_resolution_clock::now();
 			const auto time_since_genesis = now - genesis;
-			const auto seconds = std::chrono::duration_cast<std::chrono::duration<float, std::ratio<1, 1>>>(time_since_genesis).count();
+			const auto seconds =
+				std::chrono::duration_cast<std::chrono::duration<float, std::ratio<1, 1>>>(time_since_genesis).count();
 
 			// convert to "--s.ms---"
 			const auto str = std::to_string(seconds);

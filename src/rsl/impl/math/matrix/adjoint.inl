@@ -18,15 +18,14 @@ namespace rsl::math
 			{
 				static_assert(RowCount == ColCount, "Adjoint can only be calculated of square matrices");
 
-				using fp_type = ::std::conditional_t<::std::is_floating_point_v<Scalar>, Scalar, float_max>;
 
 				mat_type result;
 				for (size_type i = 0; i < RowCount; i++)
 					for (size_type j = 0; j < ColCount; j++)
 					{
 						auto subMat = extract_sub_mat(v, i, j);
-						fp_type s = ::std::pow(static_cast<fp_type>(-1), static_cast<fp_type>(i + j));
-						result[i][j] = static_cast<Scalar>(s * determinant(subMat));
+						Scalar s = static_cast<Scalar>(((i + j) % 2) ? -1 : 1);
+						result[j][i] = static_cast<Scalar>(s * determinant(subMat));
 					}
 
 				return result;

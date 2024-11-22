@@ -11,35 +11,55 @@ namespace rsl::math::detail
 	template <typename Scalar>
 	struct compute_multiplication<quaternion<Scalar>>
 	{
-		using quat_type = quaternion<Scalar>;
+		using value_type = quaternion<Scalar>;
 
-		template <typename AType, typename BType, ::std::enable_if_t<is_quat_v<AType> && is_quat_v<BType>, bool> = true>
+		template <quat_type AType, quat_type BType>
 		[[nodiscard]] constexpr static auto compute(AType&& a, BType&& b) noexcept
 		{
-			quat_type result;
+			value_type result;
 			result.vec = a.w * b.vec + static_cast<Scalar>(b.w) * a.vec + cross(a.vec, b.vec);
 			result.w = a.w * static_cast<Scalar>(b.w) - dot(a.vec, b.vec);
 			return result;
 		}
 
-		template <typename AType, typename BType, ::std::enable_if_t<is_vector_v<AType> && is_quat_v<BType>, bool> = true>
+		template <vector_type AType, quat_type BType>
 		[[nodiscard]] constexpr static auto compute(AType&& a, BType&& b) noexcept
 		{
-			using vec_type = make_vector_t<AType>;
-			using scalar = typename vec_type::scalar;
+			using vec_type = remove_cvr_t<AType>;
 			if constexpr (vec_type::size == 3)
 			{
-				return static_cast<scalar>(2) * dot(b.vec, a) * b.vec + (static_cast<scalar>(b.w) * static_cast<scalar>(b.w) - dot(b.vec, b.vec)) * a + static_cast<scalar>(2) * static_cast<scalar>(b.w) * cross(b.vec, a);
+				return static_cast<Scalar>(2) * dot(b.vec, a) * b.vec +
+					   (static_cast<Scalar>(b.w) * static_cast<Scalar>(b.w) - dot(b.vec, b.vec)) * a +
+					   static_cast<Scalar>(2) * static_cast<Scalar>(b.w) * cross(b.vec, a);
 			}
 			else if constexpr (vec_type::size == 4)
 			{
-				return vec_type(static_cast<scalar>(2) * dot(b.vec, a.xyz) * b.vec + (static_cast<scalar>(b.w) * static_cast<scalar>(b.w) - dot(b.vec, b.vec)) * a.xyz + static_cast<scalar>(2) * static_cast<scalar>(b.w) * cross(b.vec, a.xyz));
+				return vec_type(
+					static_cast<Scalar>(2) * dot(b.vec, a.xyz) * b.vec +
+					(static_cast<Scalar>(b.w) * static_cast<Scalar>(b.w) - dot(b.vec, b.vec)) * a.xyz +
+					static_cast<Scalar>(2) * static_cast<Scalar>(b.w) * cross(b.vec, a.xyz)
+				);
 			}
 			else
 			{
-				vector<scalar, 3> a3 = a;
-				return vec_type(static_cast<scalar>(2) * dot(b.vec, a3) * b.vec + (static_cast<scalar>(b.w) * static_cast<scalar>(b.w) - dot(b.vec, b.vec)) * a3 + static_cast<scalar>(2) * static_cast<scalar>(b.w) * cross(b.vec, a3));
+				vector<Scalar, 3> a3 = a;
+				return vec_type(
+					static_cast<Scalar>(2) * dot(b.vec, a3) * b.vec +
+					(static_cast<Scalar>(b.w) * static_cast<Scalar>(b.w) - dot(b.vec, b.vec)) * a3 +
+					static_cast<Scalar>(2) * static_cast<Scalar>(b.w) * cross(b.vec, a3)
+				);
 			}
+		}
+
+		template <quat_type AType, scalar_type BType>
+		[[nodiscard]] constexpr static auto compute(AType&& a, BType&& b) noexcept
+		{
+			value_type result;
+			result.i = a.i * b;
+			result.j = a.j * b;
+			result.k = a.k * b;
+			result.w = a.w * b;
+			return result;
 		}
 	};
 } // namespace rsl::math::detail

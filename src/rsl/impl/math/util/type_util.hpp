@@ -48,20 +48,22 @@ namespace rsl::math
 	namespace detail
 	{
 		template <typename T>
-		struct _is_scalar_impl : ::std::is_arithmetic<T>
+		struct _is_scalar_impl : is_arithmetic<T>
 		{
 		};
 	} // namespace detail
 
 
 	template <typename T>
-	struct is_scalar : detail::_is_scalar_impl<::std::remove_cvref_t<T>>
+	struct is_scalar : detail::_is_scalar_impl<remove_cvr_t<T>>
 	{
 	};
 
 	template <typename T>
 	constexpr static bool is_scalar_v = is_scalar<T>::value;
 
+    template<typename T>
+	concept scalar_type = is_scalar_v<T>;
 
 	template <typename Scalar, size_type RowCount, size_type ColCount, size_type ColIdx>
 	struct column;
@@ -69,38 +71,41 @@ namespace rsl::math
 	namespace detail
 	{
 		template <typename T>
-		struct _is_vector_impl : ::std::is_base_of<vector_base, T>
+		struct _is_vector_impl : is_base_of<vector_base, T>
 		{
 		};
 
 		template <typename Scalar, size_type Size>
-		struct _is_vector_impl<vector<Scalar, Size>> : ::std::true_type
+		struct _is_vector_impl<vector<Scalar, Size>> : true_type
 		{
 		};
 
 		template <typename Scalar, size_type Size, size_type... args>
-		struct _is_vector_impl<swizzle<Scalar, Size, args...>> : ::std::true_type
+		struct _is_vector_impl<swizzle<Scalar, Size, args...>> : true_type
 		{
 		};
 
 		template <typename Scalar, size_type alignment>
-		struct _is_vector_impl<aligned_vector3<Scalar, alignment>> : ::std::true_type
+		struct _is_vector_impl<aligned_vector3<Scalar, alignment>> : true_type
 		{
 		};
 
 		template <typename Scalar, size_type RowCount, size_type ColCount, size_type ColIdx>
-		struct _is_vector_impl<column<Scalar, RowCount, ColCount, ColIdx>> : ::std::true_type
+		struct _is_vector_impl<column<Scalar, RowCount, ColCount, ColIdx>> : true_type
 		{
 		};
 	} // namespace detail
 
 	template <typename T>
-	struct is_vector : detail::_is_vector_impl<::std::remove_cvref_t<T>>
+	struct is_vector : detail::_is_vector_impl<remove_cvr_t<T>>
 	{
 	};
 
 	template <typename T>
 	constexpr static bool is_vector_v = is_vector<T>::value;
+
+	template <typename T>
+	concept vector_type = is_vector_v<T>;
 
 	namespace detail
 	{
@@ -110,7 +115,7 @@ namespace rsl::math
 			if constexpr (is_vector_v<T>)
 				return v[i];
 			else
-				return ::std::forward<T>(v);
+				return forward<T>(v);
 		}
 
 		template <typename T>
@@ -118,7 +123,7 @@ namespace rsl::math
 		{
 			if constexpr (is_vector_v<T>)
 				return vector<typename T::scalar, T::size>{};
-			else if constexpr (::std::is_arithmetic_v<T>)
+			else if constexpr (is_arithmetic_v<T>)
 				return vector<T, 1>{};
 			else
 				return vector<void, 0>{};
@@ -134,7 +139,7 @@ namespace rsl::math
 				else
 					return vector<typename T::scalar, T::size>{};
 			}
-			else if constexpr (::std::is_arithmetic_v<T>)
+			else if constexpr (is_arithmetic_v<T>)
 				return T{};
 			else
 				return vector<void, 0>{};
@@ -144,7 +149,7 @@ namespace rsl::math
 	template <typename T>
 	struct make_vector
 	{
-		using type = ::std::remove_cvref_t<decltype(detail::_make_vector_impl<::std::remove_cvref_t<T>>())>;
+		using type = remove_cvr_t<decltype(detail::_make_vector_impl<remove_cvr_t<T>>())>;
 	};
 
 	template <typename T>
@@ -153,7 +158,7 @@ namespace rsl::math
 	template <typename T>
 	struct is_vector_or_scalar
 	{
-		constexpr static bool value = !::std::is_same_v<void, typename make_vector_t<T>::scalar>;
+		constexpr static bool value = !is_same_v<void, typename make_vector_t<T>::scalar>;
 	};
 
 	template <typename T>
@@ -181,7 +186,7 @@ namespace rsl::math
 	template <typename T>
 	struct decay_vector
 	{
-		using type = ::std::remove_cvref_t<decltype(detail::_decay_vector_impl<::std::remove_cvref_t<T>>())>;
+		using type = remove_cvr_t<decltype(detail::_decay_vector_impl<remove_cvr_t<T>>())>;
 	};
 
 	template <typename T>
@@ -190,23 +195,26 @@ namespace rsl::math
 	namespace detail
 	{
 		template <typename T>
-		struct _is_matrix_impl : ::std::is_base_of<matrix_base, T>
+		struct _is_matrix_impl : is_base_of<matrix_base, T>
 		{
 		};
 
 		template <typename Scalar, size_type RowCount, size_type ColCount>
-		struct _is_matrix_impl<matrix<Scalar, RowCount, ColCount>> : ::std::true_type
+		struct _is_matrix_impl<matrix<Scalar, RowCount, ColCount>> : true_type
 		{
 		};
 	} // namespace detail
 
 	template <typename T>
-	struct is_matrix : detail::_is_matrix_impl<::std::remove_cvref_t<T>>
+	struct is_matrix : detail::_is_matrix_impl<remove_cvr_t<T>>
 	{
 	};
 
 	template <typename T>
 	constexpr static bool is_matrix_v = is_matrix<T>::value;
+
+	template <typename T>
+	concept matrix_type = is_matrix_v<T>;
 
 	namespace detail
 	{
@@ -217,7 +225,7 @@ namespace rsl::math
 			{
 				return matrix<typename T::scalar, T::row_count, T::col_count>{};
 			}
-			else if constexpr (::std::is_arithmetic_v<T>)
+			else if constexpr (is_arithmetic_v<T>)
 			{
 				return matrix<T, 1, 1>{};
 			}
@@ -231,7 +239,7 @@ namespace rsl::math
 	template <typename T>
 	struct make_matrix
 	{
-		using type = ::std::remove_cvref_t<decltype(detail::_make_matrix_impl<::std::remove_cvref_t<T>>())>;
+		using type = remove_cvr_t<decltype(detail::_make_matrix_impl<remove_cvr_t<T>>())>;
 	};
 
 	template <typename T>
@@ -240,23 +248,26 @@ namespace rsl::math
 	namespace detail
 	{
 		template <typename T>
-		struct _is_quat_impl : ::std::is_base_of<quaternion_base, T>
+		struct _is_quat_impl : is_base_of<quaternion_base, T>
 		{
 		};
 
 		template <typename Scalar>
-		struct _is_quat_impl<quaternion<Scalar>> : ::std::true_type
+		struct _is_quat_impl<quaternion<Scalar>> : true_type
 		{
 		};
 	} // namespace detail
 
 	template <typename T>
-	struct is_quat : detail::_is_quat_impl<::std::remove_cvref_t<T>>
+	struct is_quat : detail::_is_quat_impl<remove_cvr_t<T>>
 	{
 	};
 
 	template <typename T>
 	constexpr static bool is_quat_v = is_quat<T>::value;
+        
+	template <typename T>
+	concept quat_type = is_quat_v<T>;
 
 	namespace detail
 	{
@@ -267,7 +278,7 @@ namespace rsl::math
 			{
 				return quaternion<typename T::scalar>{};
 			}
-			else if constexpr (::std::is_arithmetic_v<T>)
+			else if constexpr (is_arithmetic_v<T>)
 			{
 				return quaternion<T>{};
 			}
@@ -281,7 +292,7 @@ namespace rsl::math
 	template <typename T>
 	struct make_quat
 	{
-		using type = ::std::remove_cvref_t<decltype(detail::_make_quat_impl<::std::remove_cvref_t<T>>())>;
+		using type = remove_cvr_t<decltype(detail::_make_quat_impl<remove_cvr_t<T>>())>;
 	};
 
 	template <typename T>
@@ -295,6 +306,9 @@ namespace rsl::math
 
 	template <typename T>
 	constexpr bool is_linear_algebraic_construct_v = is_linear_algebraic_construct<T>::value;
+
+    template<typename T>
+	concept linear_algebraic_construct = is_linear_algebraic_construct_v<T>;
 
 	namespace detail
 	{
@@ -339,7 +353,7 @@ namespace rsl::math
 	} // namespace detail
 
 	template <typename T, size_type v>
-	struct uniform_value : detail::_uniform_value_impl_<::std::remove_cvref_t<T>, v>
+	struct uniform_value : detail::_uniform_value_impl_<remove_cvr_t<T>, v>
 	{
 	};
 
@@ -361,18 +375,18 @@ namespace rsl::math
 		};
 
 		template <typename IntType>
-		struct _epsilon_int_impl : ::std::integral_constant<IntType, 1>
+		struct _epsilon_int_impl : integral_constant<IntType, 1>
 		{
 		};
 
 		template <typename FPType>
-		struct _epsilon_impl : ::std::conditional_t<::std::is_floating_point_v<FPType>, _epsilon_fp_impl<FPType>, _epsilon_int_impl<FPType>>
+		struct _epsilon_impl : conditional_t<is_floating_point_v<FPType>, _epsilon_fp_impl<FPType>, _epsilon_int_impl<FPType>>
 		{
 		};
 	} // namespace detail
 
 	template <typename FPType>
-	struct epsilon : detail::_epsilon_impl<::std::remove_cvref_t<FPType>>
+	struct epsilon : detail::_epsilon_impl<remove_cvr_t<FPType>>
 	{
 	};
 
@@ -399,8 +413,8 @@ namespace rsl::math
 		template <typename TypeA, typename TypeB>
 		constexpr auto _highest_epsilon_impl()
 		{
-			using A = ::std::remove_cvref_t<TypeA>;
-			using B = ::std::remove_cvref_t<TypeB>;
+			using A = remove_cvr_t<TypeA>;
+			using B = remove_cvr_t<TypeB>;
 			if constexpr (epsilon_v<A> > epsilon_v<B>)
 				return epsilon_v<A>;
 			else
@@ -410,8 +424,8 @@ namespace rsl::math
 		template <typename TypeA, typename TypeB>
 		constexpr auto _lowest_epsilon_impl()
 		{
-			using A = ::std::remove_cvref_t<TypeA>;
-			using B = ::std::remove_cvref_t<TypeB>;
+			using A = remove_cvr_t<TypeA>;
+			using B = remove_cvr_t<TypeB>;
 			if constexpr (epsilon_v<A> < epsilon_v<B>)
 				return epsilon_v<A>;
 			else
@@ -446,7 +460,7 @@ namespace rsl::math
 	template <typename TypeA, typename TypeB>
 	struct lowest_precision
 	{
-		using type = ::std::remove_cvref_t<decltype(highest_epsilon_v<TypeA, TypeB>)>;
+		using type = remove_cvr_t<decltype(highest_epsilon_v<TypeA, TypeB>)>;
 	};
 
 	template <typename TypeA, typename TypeB>
@@ -455,28 +469,29 @@ namespace rsl::math
 	template <typename TypeA, typename TypeB>
 	struct highest_precision
 	{
-		using type = ::std::remove_cvref_t<decltype(lowest_epsilon_v<TypeA, TypeB>)>;
+		using type = remove_cvr_t<decltype(lowest_epsilon_v<TypeA, TypeB>)>;
 	};
 
 	template <typename TypeA, typename TypeB>
 	using highest_precision_t = typename highest_precision<TypeA, TypeB>::type;
 
 	template <typename TypeA, typename TypeB>
-	struct floating_type : ::std::conditional<::std::is_floating_point_v<TypeA> || !::std::is_floating_point_v<TypeB>, ::std::remove_cvref_t<TypeA>, ::std::remove_cvref_t<TypeB>>
+	struct select_floating_type :
+		conditional<is_floating_point_v<TypeA> || !is_floating_point_v<TypeB>, remove_cvr_t<TypeA>, remove_cvr_t<TypeB>>
 	{
 	};
 
 	template <typename TypeA, typename TypeB>
-	using floating_type_t = typename floating_type<TypeA, TypeB>::type;
+	using select_floating_type_t = typename select_floating_type<TypeA, TypeB>::type;
 
 	template <typename TypeA, typename TypeB>
-	struct vector_type
+	struct select_vector_type
 	{
-		using type = make_vector_t<::std::conditional_t<is_vector_v<TypeA> || !is_vector_v<TypeB>, ::std::remove_cvref_t<TypeA>, ::std::remove_cvref_t<TypeB>>>;
+		using type = make_vector_t<conditional_t<is_vector_v<TypeA> || !is_vector_v<TypeB>, remove_cvr_t<TypeA>, remove_cvr_t<TypeB>>>;
 	};
 
 	template <typename TypeA, typename TypeB>
-	using vector_type_t = typename vector_type<TypeA, TypeB>::type;
+	using select_vector_type_t = typename select_vector_type<TypeA, TypeB>::type;
 
 	template <typename T>
 	struct make_signed : ::std::make_signed<T>
@@ -532,7 +547,7 @@ namespace rsl::math
 	using make_unsigned_t = typename make_unsigned<T>::type;
 
 	template <typename A, typename B>
-	struct largest : ::std::conditional<(sizeof(A) > sizeof(B)), A, B>
+	struct largest : conditional<(sizeof(A) > sizeof(B)), A, B>
 	{
 	};
 
@@ -540,7 +555,7 @@ namespace rsl::math
 	using largest_t = typename largest<A, B>::type;
 
 	template <typename A, typename B>
-	struct smallest : ::std::conditional<(sizeof(A) < sizeof(B)), A, B>
+	struct smallest : conditional<(sizeof(A) < sizeof(B)), A, B>
 	{
 	};
 
@@ -550,18 +565,18 @@ namespace rsl::math
 	namespace detail
 	{
 		template <typename A, typename B>
-		struct _elevated_int_impl : ::std::conditional<::std::is_signed_v<A> || ::std::is_signed_v<B>, make_signed_t<largest_t<A, B>>, make_unsigned_t<largest_t<A, B>>>
+		struct _elevated_int_impl : conditional<::std::is_signed_v<A> || ::std::is_signed_v<B>, make_signed_t<largest_t<A, B>>, make_unsigned_t<largest_t<A, B>>>
 		{
 		};
 
 		template <typename A, typename B>
-		struct _elevated_impl : ::std::conditional<::std::is_floating_point_v<A> || ::std::is_floating_point_v<B>, highest_precision_t<A, B>, typename detail::_elevated_int_impl<A, B>::type>
+		struct _elevated_impl : conditional<is_floating_point_v<A> || is_floating_point_v<B>, highest_precision_t<A, B>, typename detail::_elevated_int_impl<A, B>::type>
 		{
 		};
 	} // namespace detail
 
 	template <typename A, typename B>
-	struct elevated : detail::_elevated_impl<::std::remove_cvref_t<A>, ::std::remove_cvref_t<B>>
+	struct elevated : detail::_elevated_impl<remove_cvr_t<A>, remove_cvr_t<B>>
 	{
 	};
 
