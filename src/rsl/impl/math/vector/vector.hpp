@@ -1,5 +1,4 @@
 #pragma once
-#include "aligned_vector3.hpp"
 #include "swizzle/swizzle_base.hpp"
 #include "vector1.hpp"
 #include "vector2.hpp"

@@ -1,7 +1,7 @@
 #pragma once
 #include <concepts>
 
-#include "type_util.hpp"
+#include "common.hpp"
 
 namespace rsl
 {
@@ -9,7 +9,7 @@ namespace rsl
 	concept enum_type = std::is_enum_v<T>;
 
 	template <typename Func>
-	concept invocable_undetermined = is_invocable_v<Func>;
+	concept invocable_undetermined = is_invocable_any_v<Func>;
 
 	template <typename Func>
 	concept function_ptr = is_function_ptr_v<Func>;
@@ -28,4 +28,13 @@ namespace rsl
 
     template<bool value>
 	concept invert = !value;
+
+    template<typename T>
+	concept arithmetic_type = is_arithmetic_v<T>;
+
+	template <typename T1, typename T2>
+	concept same_as = ::rsl::is_same_v<T1, T2>;
+
+	template <typename T1, typename T2>
+	concept not_same_as = !::rsl::is_same_v<T1, T2>;
 } // namespace rsl

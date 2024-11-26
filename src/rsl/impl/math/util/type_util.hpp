@@ -8,9 +8,6 @@
 
 namespace rsl::math
 {
-	template <typename Scalar, size_type alignment>
-	struct alignas(alignment) aligned_vector3;
-
 	struct quaternion_base;
 
 	template <typename Scalar>
@@ -62,7 +59,7 @@ namespace rsl::math
 	template <typename T>
 	constexpr static bool is_scalar_v = is_scalar<T>::value;
 
-    template<typename T>
+	template<typename T>
 	concept scalar_type = is_scalar_v<T>;
 
 	template <typename Scalar, size_type RowCount, size_type ColCount, size_type ColIdx>
@@ -82,11 +79,6 @@ namespace rsl::math
 
 		template <typename Scalar, size_type Size, size_type... args>
 		struct _is_vector_impl<swizzle<Scalar, Size, args...>> : true_type
-		{
-		};
-
-		template <typename Scalar, size_type alignment>
-		struct _is_vector_impl<aligned_vector3<Scalar, alignment>> : true_type
 		{
 		};
 
@@ -265,7 +257,7 @@ namespace rsl::math
 
 	template <typename T>
 	constexpr static bool is_quat_v = is_quat<T>::value;
-        
+		
 	template <typename T>
 	concept quat_type = is_quat_v<T>;
 
@@ -307,7 +299,7 @@ namespace rsl::math
 	template <typename T>
 	constexpr bool is_linear_algebraic_construct_v = is_linear_algebraic_construct<T>::value;
 
-    template<typename T>
+	template<typename T>
 	concept linear_algebraic_construct = is_linear_algebraic_construct_v<T>;
 
 	namespace detail
@@ -325,12 +317,6 @@ namespace rsl::math
 		struct _uniform_value_impl_<swizzle<Scalar, Size, args...>, v>
 		{
 			constexpr static auto value = vector<Scalar, Size>(static_cast<Scalar>(v));
-		};
-
-		template <typename Scalar, size_type alignment, size_type v>
-		struct _uniform_value_impl_<aligned_vector3<Scalar, alignment>, v>
-		{
-			constexpr static auto value = aligned_vector3<Scalar, alignment>(static_cast<Scalar>(v));
 		};
 
 		template <typename Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, size_type v>

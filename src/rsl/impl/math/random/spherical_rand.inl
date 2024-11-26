@@ -27,9 +27,7 @@ namespace rsl::math
 		Scalar phi = acos(z);
 		Scalar x = sin(phi) * cos(theta);
 		Scalar y = sin(phi) * sin(theta);
-		if constexpr (alignof(vec_type) == alignof(aligned_vector3<Scalar>))
-			return aligned_vector3<Scalar>(x, y, z) * radii;
-		else
-			return vector<Scalar, 3>(x, y, z) * radii;
+
+		return vector<Scalar, 3>(x, y, z) * radii;
 	}
 } // namespace rsl::math

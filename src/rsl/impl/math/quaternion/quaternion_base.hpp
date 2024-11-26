@@ -6,6 +6,7 @@
 
 #include "../util/type_util.hpp"
 #include "../vector/vector.hpp"
+#include "../trigonometric/angle.hpp"
 
 RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201)
 
@@ -107,7 +108,8 @@ namespace rsl::math
 		[[nodiscard]] [[rythe_always_inline]] vec_type up() const noexcept;
 		[[nodiscard]] [[rythe_always_inline]] vec_type euler_angles() const noexcept;
 
-		[[nodiscard]] [[rythe_always_inline]] static quaternion angle_axis(scalar angle, const vec_type& vec) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] static quaternion
+		angle_axis(radians<scalar> angle, const vec_type& vec) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] static quaternion
 		look_at(const vec_type& _pos, const vec_type& _center, const vec_type& _up = vec_type::up) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] static quaternion conjugate(const quaternion& _quat) noexcept;

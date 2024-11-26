@@ -51,9 +51,9 @@ namespace rsl::math
 	}
 
 	template <typename Scalar>
-	quaternion<Scalar> quaternion<Scalar>::angle_axis(scalar angle, const vec_type& vec) noexcept
+	quaternion<Scalar> quaternion<Scalar>::angle_axis(radians<scalar> angle, const vec_type& vec) noexcept
 	{
-		auto halfAngle = angle * static_cast<scalar>(0.5);
+		auto halfAngle = angle.value * static_cast<scalar>(0.5);
 		return quaternion<scalar>(cos(halfAngle), sin(halfAngle) * vec);
 	}
 
