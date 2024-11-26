@@ -11,7 +11,7 @@ RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201)
 namespace rsl::math
 {
 	template <typename Scalar>
-	struct vector<Scalar, 4> : vector_base
+	struct vector<Scalar, 4>
 	{
 		using scalar = Scalar;
 		static constexpr size_type size = 4;
@@ -80,7 +80,7 @@ namespace rsl::math
 	};
 
 	template <>
-	struct vector<bool, 4> : vector_base
+	struct vector<bool, 4>
 	{
 		using scalar = bool;
 		static constexpr size_type size = 4;
@@ -163,7 +163,7 @@ namespace rsl::math
 			return data[i];
 		}
 
-		constexpr scalar length() const noexcept { return (x && y && z && w) ? 2 : (x || y || z || w); };
+		constexpr scalar length() const noexcept { return x || y || z || w; };
 		constexpr scalar length2() const noexcept { return this->length() * this->length(); }
 	};
 

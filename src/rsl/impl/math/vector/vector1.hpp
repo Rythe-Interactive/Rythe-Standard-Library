@@ -2,67 +2,72 @@
 #include "swizzle/swizzle1.hpp"
 #include "vector_base.hpp"
 
-RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201)
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201) // anonymous struct
 
 namespace rsl::math
 {
-	template <typename Scalar>
-	struct vector<Scalar, 1> : vector_base
+	template <arithmetic_type Scalar, mode Mode>
+	struct vector<Scalar, 1, Mode>
 	{
 		using scalar = Scalar;
 		static constexpr size_type size = 1;
+		static constexpr mode mode = Mode;
 		using type = vector<Scalar, 1>;
+		using storage_type = storage_t<Scalar, size, Mode>;
 
 		union
 		{
-			scalar data[size];
+			storage_type data;
 
-			_MATH_SWIZZLE_1_1_(scalar);
-			_MATH_SWIZZLE_1_2_(scalar);
-			_MATH_SWIZZLE_1_3_(scalar);
-			_MATH_SWIZZLE_1_4_(scalar);
+			_MATH_SWIZZLE_1_1_(scalar, Mode);
+			_MATH_SWIZZLE_1_2_(scalar, Mode);
+			_MATH_SWIZZLE_1_3_(scalar, Mode);
+			_MATH_SWIZZLE_1_4_(scalar, Mode);
 		};
 
-		constexpr vector() noexcept;
-		constexpr vector(const vector&) noexcept = default;
-		constexpr vector(scalar s) noexcept;
+		[[rythe_always_inline]] constexpr vector() noexcept;
+		[[rythe_always_inline]] constexpr vector(const vector&) noexcept = default;
+		[[rythe_always_inline]] constexpr vector(scalar s) noexcept;
+
+		template <typename vec_type>
+			requires not_same_as<Scalar, typename vec_type::scalar> || (vec_type::size != 1)
+		[[rythe_always_inline]] constexpr vector(const vec_type& other) noexcept;
 
 		static const vector one;
 		static const vector zero;
 
-		constexpr vector& operator=(const vector&) noexcept = default;
-		constexpr operator scalar() const noexcept;
+		[[rythe_always_inline]] constexpr vector& operator=(const vector&) noexcept = default;
+		[[nodiscard]] [[rythe_always_inline]] constexpr operator scalar() const noexcept { return x; }
 
-		constexpr scalar& operator[](size_type i) noexcept;
-		constexpr const scalar& operator[](size_type i) const noexcept;
-
-		constexpr scalar length() const noexcept;
-		constexpr scalar length2() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept;
 	};
 
-	template <>
-	struct vector<bool, 1> : vector_base
+	template <mode Mode>
+	struct vector<bool, 1, Mode>
 	{
 		using scalar = bool;
 		static constexpr size_type size = 1;
+		static constexpr mode mode = Mode;
 		using type = vector<bool, 1>;
+		using storage_type = storage_t<scalar, size, Mode>;
 
 		union
 		{
-			scalar data[size];
+			storage_type data;
 
-			_MATH_SWIZZLE_1_1_(scalar);
-			_MATH_SWIZZLE_1_2_(scalar);
-			_MATH_SWIZZLE_1_3_(scalar);
-			_MATH_SWIZZLE_1_4_(scalar);
+			_MATH_SWIZZLE_1_1_(scalar, Mode);
+			_MATH_SWIZZLE_1_2_(scalar, Mode);
+			_MATH_SWIZZLE_1_3_(scalar, Mode);
+			_MATH_SWIZZLE_1_4_(scalar, Mode);
 		};
 
-		constexpr vector() noexcept
+		[[rythe_always_inline]] constexpr vector() noexcept
 			: x(static_cast<scalar>(0))
 		{
 		}
-		constexpr vector(const vector&) noexcept = default;
-		constexpr vector(scalar s) noexcept
+		[[rythe_always_inline]] constexpr vector(const vector&) noexcept = default;
+		[[rythe_always_inline]] constexpr vector(scalar s) noexcept
 			: x(static_cast<scalar>(s))
 		{
 		}
@@ -70,25 +75,14 @@ namespace rsl::math
 		static const vector one;
 		static const vector zero;
 
-		constexpr void set_mask(bitfield8 mask) noexcept { x = mask & 1; }
-		constexpr bitfield8 mask() const noexcept { return static_cast<bitfield8>(x); }
+		[[rythe_always_inline]] constexpr void set_mask(bitfield8 mask) noexcept { x = mask & 1; }
+		[[nodiscard]] [[rythe_always_inline]] constexpr bitfield8 mask() const noexcept { return static_cast<bitfield8>(x); }
 
-		constexpr vector& operator=(const vector&) noexcept = default;
-		constexpr operator scalar() const noexcept { return x; }
+		[[rythe_always_inline]] constexpr vector& operator=(const vector&) noexcept = default;
+		[[nodiscard]] [[rythe_always_inline]] constexpr operator bool() const noexcept { return x; }
 
-		constexpr scalar& operator[](size_type i) noexcept
-		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
-			return data[i];
-		}
-		constexpr const scalar& operator[](size_type i) const noexcept
-		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
-			return data[i];
-		}
-
-		constexpr scalar length() const noexcept;
-		constexpr scalar length2() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept;
 	};
 
 	using float1 = vector<float32, 1>;
@@ -101,8 +95,15 @@ namespace rsl::math
 	using uvec1 = uint1;
 	using bool1 = vector<bool, 1>;
 	using bvec1 = bool1;
-} // namespace rsl::math
 
-#include "vector1.inl"
+#ifdef RYTHE_PCH
+	template struct vector<float32, 1>;
+	template struct vector<float64, 1>;
+	template struct vector<int, 1>;
+	template struct vector<uint, 1>;
+	template struct vector<bool, 1>;
+#endif
+
+} // namespace rsl::math
 
 RYTHE_MSVC_SUPPRESS_WARNING_POP

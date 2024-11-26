@@ -1,44 +1,37 @@
 #pragma once
 #include <tuple>
 
-#include "../../defines.hpp"
 #include "../../util/assert.hpp"
-#include "../../util/primitives.hpp"
+#include "../../util/concepts.hpp"
+#include "../util/storage.hpp"
 
 namespace rsl::math
 {
-	struct vector_base
-	{
-	};
-
-	template <typename Scalar, size_type Size>
-	struct vector : vector_base
+	template <arithmetic_type Scalar, size_type Size, mode Mode = mode::defaultp>
+	struct vector
 	{
 		using scalar = Scalar;
 		static constexpr size_type size = Size;
+		static constexpr mode mode = Mode;
 		using type = vector<Scalar, Size>;
+		using storage_type = storage_t<Scalar, Size, Mode>;
 
-		scalar data[size];
+		storage_type data;
 
 		static const vector one;
 		static const vector zero;
 
-		constexpr vector() noexcept;
-		constexpr vector(const vector&) noexcept = default;
-		explicit constexpr vector(scalar s) noexcept;
+		[[rythe_always_inline]] constexpr vector() noexcept;
+		[[rythe_always_inline]] constexpr vector(const vector&) noexcept = default;
+		[[rythe_always_inline]] explicit constexpr vector(scalar s) noexcept;
 
-		template <typename Scal, ::std::enable_if_t<!::std::is_same_v<scalar, Scal>, bool> = true>
-		constexpr explicit vector(const vector<Scal, size>& other) noexcept;
+		template <typename vec_type>
+			requires not_same_as<Scalar, typename vec_type::scalar> || (vec_type::size != Size)
+		[[rythe_always_inline]] constexpr vector(const vec_type& other) noexcept;
 
-		template <typename vec_type, ::std::enable_if_t<Size != vec_type::size, bool> = true>
-		constexpr vector(const vec_type& other) noexcept;
+		[[rythe_always_inline]] constexpr vector& operator=(const vector&) noexcept = default;
 
-		constexpr vector& operator=(const vector&) noexcept = default;
-
-		[[nodiscard]] constexpr scalar& operator[](size_type i) noexcept;
-		[[nodiscard]] constexpr const scalar& operator[](size_type i) const noexcept;
-
-		[[nodiscard]] [[rythe_always_inline]] scalar length() const noexcept;
-		[[nodiscard]] constexpr scalar length2() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept;
 	};
 } // namespace rsl::math

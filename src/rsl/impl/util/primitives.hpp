@@ -27,7 +27,7 @@ namespace rsl
 	using float32 = float;
 	using float64 = double;
 	using float_max = long double;
-    
+
 	using u8 = uint8_t;
 	using u16 = uint16_t;
 	using u32 = uint32_t;
@@ -38,8 +38,8 @@ namespace rsl
 	using i32 = int32_t;
 	using i64 = int64_t;
 
-    using f32 = float32;
-    using f64 = float64;
+	using f32 = float32;
+	using f64 = float64;
 	using flt_max = float_max;
 
 	using time32 = float32;
@@ -75,7 +75,7 @@ namespace rsl
 	using micro_seconds = time64;
 	using nano_seconds = time_large;
 
-    using days_f = time32;
+	using days_f = time32;
 	using hours_f = time32;
 	using minutes_f = time32;
 	using seconds_f = time32;

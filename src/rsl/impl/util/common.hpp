@@ -1,6 +1,6 @@
 #pragma once
-#include <type_traits>
 #include <ratio>
+#include <type_traits>
 
 #include "primitives.hpp"
 
@@ -239,8 +239,8 @@ namespace rsl
 
 	template <typename T>
 	inline constexpr bool is_integral_v = is_any_of_v<
-		remove_cv_t<T>, bool, char, signed char, unsigned char, wchar_t, char8_t, char16_t, char32_t, short,
-		unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long>;
+		remove_cv_t<T>, bool, char, char, unsigned char, wchar_t, char8_t, char16_t, char32_t, short, unsigned short,
+		int, unsigned int, long, unsigned long, long long, unsigned long long>;
 
 	template <typename T>
 	struct is_integral : bool_constant<is_integral_v<T>>
@@ -261,6 +261,39 @@ namespace rsl
 
 	template <typename T>
 	struct is_arithmetic : bool_constant<is_arithmetic_v<T>>
+	{
+	};
+
+    namespace internal
+	{
+        template <typename T, bool = is_integral_v<T>>
+	    struct sign_info
+	    {
+		    static constexpr bool isSigned = static_cast<remove_cv_t<T>>(-1) < static_cast<remove_cv_t<T>>(0);
+			static constexpr bool isUnsigned = !isSigned;
+	    };
+
+	    template <typename T>
+		struct sign_info<T, false>
+	    {
+			static constexpr bool isSigned = is_floating_point_v<T>;
+			static constexpr bool isUnsigned = false;
+	    };
+	}
+
+	template <typename T>
+	inline constexpr bool is_unsigned_v = internal::sign_info<T>::isUnsigned;
+
+	template <typename T>
+	struct is_unsigned : bool_constant<is_unsigned_v<T>>
+	{
+	};
+
+	template <typename T>
+	inline constexpr bool is_signed_v = internal::sign_info<T>::isSigned;
+
+	template <typename T>
+	struct is_signed : bool_constant<is_signed_v<T>>
 	{
 	};
 
@@ -643,8 +676,8 @@ namespace rsl
 		auto test_returnable(...) -> false_type;
 
 		template <typename From, typename To>
-		auto test_implicitly_convertible(int
-		) -> decltype(void(::rsl::declval<void (&)(To)>()(::rsl::declval<From>())), true_type{});
+		auto test_implicitly_convertible(int)
+			-> decltype(void(::rsl::declval<void (&)(To)>()(::rsl::declval<From>())), true_type{});
 		template <typename, typename>
 		auto test_implicitly_convertible(...) -> false_type;
 	} // namespace internal
@@ -677,23 +710,23 @@ namespace rsl
 	{
 	};
 
-    // Implementation details of common_type<...>
-    namespace internal
+	// Implementation details of common_type<...>
+	namespace internal
 	{
-        // Type of the outcome of a ternary statment if a ternary statement is valid.
+		// Type of the outcome of a ternary statment if a ternary statement is valid.
 		template <typename T1, typename T2>
 		using ternary_result_test = decltype(false ? ::rsl::declval<T1>() : ::rsl::declval<T2>());
 
 		template <typename T1, typename T2, typename = void>
 		struct ternary_result_type
 		{
-            // No common type can be found, ternary statement isn't valid.
+			// No common type can be found, ternary statement isn't valid.
 		};
 
 		template <typename T1, typename T2>
 		struct ternary_result_type<T1, T2, void_t<ternary_result_test<const T1&, const T2&>>>
 		{
-            // Common type if valid.
+			// Common type if valid.
 			using type = remove_cvr_t<ternary_result_test<const T1&, const T2&>>;
 		};
 
@@ -705,7 +738,7 @@ namespace rsl
 		template <typename T1, typename T2>
 		struct decayed_ternary_result_type<T1, T2, void_t<ternary_result_test<T1, T2>>>
 		{
-            // Decayed common type.
+			// Decayed common type.
 			using type = decay_t<ternary_result_test<T1, T2>>;
 		};
 
@@ -941,7 +974,25 @@ namespace rsl
 	};
 
 	template <typename _Ty1, typename _Ty2, typename _Ty3, typename... Rest>
-	struct common_reference<_Ty1, _Ty2, _Ty3, Rest...> : internal::_Fold_common_reference<void, _Ty1, _Ty2, _Ty3, Rest...>
+	struct common_reference<_Ty1, _Ty2, _Ty3, Rest...> :
+		internal::_Fold_common_reference<void, _Ty1, _Ty2, _Ty3, Rest...>
+	{
+	};
+
+	template <typename derived_type, typename base_type>
+	using inherits_from = typename enable_if<::rsl::is_base_of_v<base_type, derived_type>, int>::type;
+
+	template <typename derived_type, typename base_type>
+	using doesnt_inherit_from = typename enable_if<!::rsl::is_base_of_v<base_type, derived_type>, int>::type;
+
+	template <typename Type, template <typename...> typename Template>
+	constexpr bool is_specialization_v = false; // true if and only if Type is a specialization of Template
+
+	template <template <typename...> typename Template, typename... Types>
+	constexpr bool is_specialization_v<Template<Types...>, Template> = true;
+
+	template <typename Type, template <typename...> typename Template>
+	struct is_specialization : bool_constant<is_specialization_v<Type, Template>>
 	{
 	};
 
@@ -980,6 +1031,81 @@ namespace rsl
 	{
 		return ::rsl::move(val);
 	}
+
+	template <template <typename...> typename T, typename U, size_type I, typename... Args>
+	struct make_sequence : make_sequence<T, U, I - 1, Args..., U>
+	{
+	};
+
+	template <template <typename...> typename T, typename U, typename... Args>
+	struct make_sequence<T, U, 0, Args...>
+	{
+		using type = T<Args...>;
+	};
+
+	template <template <typename...> typename T, typename U, size_type I, typename... Args>
+	using make_sequence_t = typename make_sequence<T, U, I, Args...>::type;
+
+	template <typename... Types>
+	struct type_sequence
+	{
+		using tuple_type = ::std::tuple<Types...>; // TODO: Make our own tuple type.
+		constexpr static size_type size = sizeof...(Types);
+	};
+
+	template <typename T>
+	concept type_sequence_c = is_specialization_v<T, type_sequence>;
+
+	template <typename...>
+	struct concat_sequence;
+
+	template <typename... A, typename... B, type_sequence_c C, type_sequence_c... Rest>
+	struct concat_sequence<type_sequence<A...>, type_sequence<B...>, C, Rest...>
+	{
+		using type = typename concat_sequence<type_sequence<A..., B...>, C, Rest...>::type;
+	};
+
+	template <typename... A, typename... B>
+	struct concat_sequence<type_sequence<A...>, type_sequence<B...>>
+	{
+		using type = type_sequence<A..., B...>;
+	};
+
+	template <type_sequence_c... Sequences>
+	using concat_sequence_t = typename concat_sequence<Sequences...>::type;
+
+	template <type_sequence_c Sequence, typename T>
+	struct type_sequence_contains;
+
+	template <typename... Types, typename T>
+	struct type_sequence_contains<type_sequence<Types...>, T> : disjunction<is_same<T, Types>...>
+	{
+	};
+
+	template <type_sequence_c Sequence, typename T>
+	constexpr bool type_sequence_contains_v = type_sequence_contains<Sequence, T>::value;
+
+	template <typename T, T... Vals>
+	struct integer_sequence
+	{ // sequence of integer parameters
+		static_assert(is_integral_v<T>, "integer_sequence<T, I...> requires T to be an integral type.");
+
+		using value_type = T;
+
+		[[nodiscard]] static constexpr size_type size() noexcept { return sizeof...(Vals); }
+	};
+
+	template <typename T, T Size>
+	using make_integer_sequence = __make_integer_seq<integer_sequence, T, Size>;
+
+	template <size_type... Vals>
+	using index_sequence = integer_sequence<size_type, Vals...>;
+
+	template <size_type Size>
+	using make_index_sequence = make_integer_sequence<size_type, Size>;
+
+	template <typename... Types>
+	using index_sequence_for = make_index_sequence<sizeof...(Types)>;
 
 	namespace internal
 	{
@@ -1091,8 +1217,7 @@ namespace rsl
 	};
 
 	template <typename Callable, typename... Args>
-	inline constexpr bool is_invocable_v =
-		internal::select_invoke_traits<Callable, Args...>::is_invocable::value;
+	inline constexpr bool is_invocable_v = internal::select_invoke_traits<Callable, Args...>::is_invocable::value;
 
 	template <typename Callable, typename... Args>
 	struct is_nothrow_invocable : internal::select_invoke_traits<Callable, Args...>::is_nothrow_invocable
@@ -1111,8 +1236,7 @@ namespace rsl
 	};
 
 	template <typename ReturnType, typename Callable, typename... Args>
-	inline constexpr bool is_invocable_ret_v =
-		internal::is_invocable_ret_impl<ReturnType, Callable, Args...>::value;
+	inline constexpr bool is_invocable_ret_v = internal::is_invocable_ret_impl<ReturnType, Callable, Args...>::value;
 
 	template <typename ReturnType, typename Callable, typename... Args>
 	struct is_nothrow_invocable_ret :
@@ -1166,23 +1290,6 @@ namespace rsl
 
 	template <typename Type>
 	struct is_ratio : bool_constant<is_ratio_v<Type>>
-	{
-	};
-
-	template <typename derived_type, typename base_type>
-	using inherits_from = typename enable_if<::rsl::is_base_of_v<base_type, derived_type>, int>::type;
-
-	template <typename derived_type, typename base_type>
-	using doesnt_inherit_from = typename enable_if<!::rsl::is_base_of_v<base_type, derived_type>, int>::type;
-
-	template <typename Type, template <typename...> typename Template>
-	constexpr bool is_specialization_v = false; // true if and only if Type is a specialization of Template
-
-	template <template <typename...> typename Template, typename... Types>
-	constexpr bool is_specialization_v<Template<Types...>, Template> = true;
-
-	template <typename Type, template <typename...> typename Template>
-	struct is_specialization : bool_constant<is_specialization_v<Type, Template>>
 	{
 	};
 } // namespace rsl

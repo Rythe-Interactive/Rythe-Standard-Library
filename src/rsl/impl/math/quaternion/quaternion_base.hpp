@@ -4,9 +4,9 @@
 #include "../../util/assert.hpp"
 #include "../../util/primitives.hpp"
 
+#include "../trigonometric/angle.hpp"
 #include "../util/type_util.hpp"
 #include "../vector/vector.hpp"
-#include "../trigonometric/angle.hpp"
 
 RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201)
 
