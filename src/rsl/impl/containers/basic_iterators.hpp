@@ -29,7 +29,7 @@ namespace rsl
 	{
 	};
 
-    template <class _Ty>
+	template <class _Ty>
 	concept weakly_incrementable = movable<_Ty> && requires(_Ty __i) {
 		typename iter_difference_t<_Ty>;
 		requires _Signed_integer_like<iter_difference_t<_Ty>>;
@@ -37,12 +37,12 @@ namespace rsl
 		__i++;
 	};
 
-    template <class _It>
+	template <class _It>
 	concept input_or_output_iterator = requires(_It __i) {
 		{ *__i } -> _Can_reference;
 	} && weakly_incrementable<_It>;
 
-    _EXPORT_STD template <class _It>
+	_EXPORT_STD template <class _It>
 	concept input_iterator = input_or_output_iterator<_It> && indirectly_readable<_It> && requires {
 		typename _Iter_concept<_It>;
 	} && derived_from<_Iter_concept<_It>, input_iterator_tag>;
@@ -88,11 +88,11 @@ namespace rsl
 	{
 	public:
 		using iterator_type = Iter;
-		using iterator_concept = conditional_t<
-			::std::random_access_iterator<Iter>, random_access_iterator_tag, bidirectional_iterator_tag>;
+		using iterator_concept =
+			conditional_t<::std::random_access_iterator<Iter>, random_access_iterator_tag, bidirectional_iterator_tag>;
 		using iterator_category = conditional_t<
-			derived_from<::std::_Iter_cat_t<Iter>, random_access_iterator_tag>,
-			random_access_iterator_tag, _STD _Iter_cat_t<Iter>>;
+			derived_from<::std::_Iter_cat_t<Iter>, random_access_iterator_tag>, random_access_iterator_tag,
+			_STD _Iter_cat_t<Iter>>;
 
 		using value_type = ::std::_Iter_value_t<Iter>;
 		using difference_type = ::std::_Iter_diff_t<Iter>;
@@ -216,8 +216,8 @@ namespace rsl
 
 		[[nodiscard]] friend constexpr _STD iter_rvalue_reference_t<Iter> iter_move(const reverse_iterator& _It)
 			noexcept(
-			::std::is_nothrow_copy_constructible_v<Iter> && noexcept(_RANGES iter_move(--::rsl::declval<Iter&>()))
-		)
+				::std::is_nothrow_copy_constructible_v<Iter> && noexcept(_RANGES iter_move(--::rsl::declval<Iter&>()))
+			)
 		{
 			auto _Tmp = _It.current;
 			--_Tmp;
@@ -358,8 +358,8 @@ namespace rsl
 
 	template <typename Iter1, typename Iter2>
 	[[nodiscard]] constexpr auto operator-(const reverse_iterator<Iter1>& _Left, const reverse_iterator<Iter2>& _Right)
-		noexcept(noexcept(_Right._Get_current() - _Left._Get_current())
-		) -> decltype(_Right._Get_current() - _Left._Get_current())
+		noexcept(noexcept(_Right._Get_current() - _Left._Get_current()))
+			-> decltype(_Right._Get_current() - _Left._Get_current())
 	{
 		return _Right._Get_current() - _Left._Get_current();
 	}

@@ -21,7 +21,7 @@ namespace rsl
 		constexpr static size_type index = Tag::index;
 		T value;
 
-		template<typename V>
+		template <typename V>
 		constexpr explicit platform_specific_var(V&& v)
 			: value(rsl::forward<V>(v))
 		{

@@ -1,7 +1,7 @@
 #include "smoothstep.hpp"
 #pragma once
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto _smoothstep_impl_(T&& v) noexcept
@@ -21,7 +21,8 @@ namespace rsl::math::detail
 	[[nodiscard]] [[rythe_always_inline]] auto _inverse_smoothstep_impl_(T&& v) noexcept
 	{
 		using scalar = ::std::remove_cvref_t<T>;
-		return static_cast<scalar>(0.5) - sin(asin(static_cast<scalar>(1) - static_cast<scalar>(2) * v) / static_cast<scalar>(3));
+		return static_cast<scalar>(0.5) -
+			   sin(asin(static_cast<scalar>(1) - static_cast<scalar>(2) * v) / static_cast<scalar>(3));
 	}
 
 	template <typename T>
@@ -31,7 +32,7 @@ namespace rsl::math::detail
 		const auto denom = static_cast<scalar>(3) / sqrt(-(v - 1) * v);
 		return cos(asin(static_cast<scalar>(2) * v - static_cast<scalar>(1)) / static_cast<scalar>(3)) / denom;
 	}
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal
 
 #include "smoothstep_vector.inl"
 // #include "smoothstep_matrix.inl"
@@ -50,22 +51,30 @@ namespace rsl::math
 		if constexpr (is_quat_v<A> && is_quat_v<B> && is_quat_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
-			return detail::compute_smoothstep<quaternion<scalar>>::compute(::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<quaternion<scalar>>::compute(
+				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+			);
 		}
 		if constexpr (is_matrix_v<A> && is_matrix_v<B> && is_matrix_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
-			return detail::compute_smoothstep<matrix<scalar, A::row_count, A::col_count>>::compute(::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<matrix<scalar, A::row_count, A::col_count>>::compute(
+				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+			);
 		}
 		if constexpr (is_vector_v<A> && is_vector_v<B> && is_vector_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			constexpr size_type size = min(A::size, min(B::size, T::size));
-			return detail::compute_smoothstep<vector<scalar, size>>::compute(::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<vector<scalar, size>>::compute(
+				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+			);
 		}
 		else
 		{
-			return detail::_smoothstep_impl_(saturate(map01(::std::forward<ValueType>(value), ::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax))));
+			return internal::_smoothstep_impl_(saturate(map01(
+				::std::forward<ValueType>(value), ::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax)
+			)));
 		}
 	}
 
@@ -77,19 +86,24 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<T>)
 		{
-			return detail::compute_smoothstep<quaternion<typename T::scalar>>::compute(::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<quaternion<typename T::scalar>>::compute(::std::forward<ValueType>(value
+			));
 		}
 		if constexpr (is_matrix_v<T>)
 		{
-			return detail::compute_smoothstep<matrix<typename T::scalar, T::row_count, T::col_count>>::compute(::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<matrix<typename T::scalar, T::row_count, T::col_count>>::compute(
+				::std::forward<ValueType>(value)
+			);
 		}
 		if constexpr (is_vector_v<T>)
 		{
-			return detail::compute_smoothstep<vector<typename T::scalar, T::size>>::compute(::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<vector<typename T::scalar, T::size>>::compute(
+				::std::forward<ValueType>(value)
+			);
 		}
 		else
 		{
-			return detail::_smoothstep_impl_(::std::forward<ValueType>(value));
+			return internal::_smoothstep_impl_(::std::forward<ValueType>(value));
 		}
 	}
 
@@ -104,22 +118,30 @@ namespace rsl::math
 		if constexpr (is_quat_v<A> && is_quat_v<B> && is_quat_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
-			return detail::compute_smoothstep<quaternion<scalar>>::compute_derivative(::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<quaternion<scalar>>::compute_derivative(
+				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+			);
 		}
 		if constexpr (is_matrix_v<A> && is_matrix_v<B> && is_matrix_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
-			return detail::compute_smoothstep<matrix<scalar, A::row_count, A::col_count>>::compute_derivative(::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<matrix<scalar, A::row_count, A::col_count>>::compute_derivative(
+				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+			);
 		}
 		if constexpr (is_vector_v<A> && is_vector_v<B> && is_vector_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			constexpr size_type size = min(A::size, min(B::size, T::size));
-			return detail::compute_smoothstep<vector<scalar, size>>::compute_derivative(::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<vector<scalar, size>>::compute_derivative(
+				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+			);
 		}
 		else
 		{
-			return detail::_smoothstep_derivative_impl_(saturate(map01(::std::forward<ValueType>(value), ::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax))));
+			return internal::_smoothstep_derivative_impl_(saturate(map01(
+				::std::forward<ValueType>(value), ::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax)
+			)));
 		}
 	}
 
@@ -131,19 +153,24 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<T>)
 		{
-			return detail::compute_smoothstep<quaternion<typename T::scalar>>::compute_derivative(::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<quaternion<typename T::scalar>>::compute_derivative(
+				::std::forward<ValueType>(value)
+			);
 		}
 		if constexpr (is_matrix_v<T>)
 		{
-			return detail::compute_smoothstep<matrix<typename T::scalar, T::row_count, T::col_count>>::compute_derivative(::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<matrix<typename T::scalar, T::row_count, T::col_count>>::
+				compute_derivative(::std::forward<ValueType>(value));
 		}
 		if constexpr (is_vector_v<T>)
 		{
-			return detail::compute_smoothstep<vector<typename T::scalar, T::size>>::compute_derivative(::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<vector<typename T::scalar, T::size>>::compute_derivative(
+				::std::forward<ValueType>(value)
+			);
 		}
 		else
 		{
-			return detail::_smoothstep_derivative_impl_(::std::forward<ValueType>(value));
+			return internal::_smoothstep_derivative_impl_(::std::forward<ValueType>(value));
 		}
 	}
 
@@ -158,22 +185,30 @@ namespace rsl::math
 		if constexpr (is_quat_v<A> && is_quat_v<B> && is_quat_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
-			return detail::compute_smoothstep<quaternion<scalar>>::compute_inverse(::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<quaternion<scalar>>::compute_inverse(
+				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+			);
 		}
 		if constexpr (is_matrix_v<A> && is_matrix_v<B> && is_matrix_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
-			return detail::compute_smoothstep<matrix<scalar, A::row_count, A::col_count>>::compute_inverse(::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<matrix<scalar, A::row_count, A::col_count>>::compute_inverse(
+				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+			);
 		}
 		if constexpr (is_vector_v<A> && is_vector_v<B> && is_vector_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			constexpr size_type size = min(A::size, min(B::size, T::size));
-			return detail::compute_smoothstep<vector<scalar, size>>::compute_inverse(::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<vector<scalar, size>>::compute_inverse(
+				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+			);
 		}
 		else
 		{
-			return detail::_inverse_smoothstep_impl_(saturate(map01(::std::forward<ValueType>(value), ::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax))));
+			return internal::_inverse_smoothstep_impl_(saturate(map01(
+				::std::forward<ValueType>(value), ::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax)
+			)));
 		}
 	}
 
@@ -185,19 +220,25 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<T>)
 		{
-			return detail::compute_smoothstep<quaternion<typename T::scalar>>::compute_inverse(::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<quaternion<typename T::scalar>>::compute_inverse(
+				::std::forward<ValueType>(value)
+			);
 		}
 		if constexpr (is_matrix_v<T>)
 		{
-			return detail::compute_smoothstep<matrix<typename T::scalar, T::row_count, T::col_count>>::compute_inverse(::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<
+				matrix<typename T::scalar, T::row_count, T::col_count>>::compute_inverse(::std::forward<ValueType>(value
+			));
 		}
 		if constexpr (is_vector_v<T>)
 		{
-			return detail::compute_smoothstep<vector<typename T::scalar, T::size>>::compute_inverse(::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<vector<typename T::scalar, T::size>>::compute_inverse(
+				::std::forward<ValueType>(value)
+			);
 		}
 		else
 		{
-			return detail::_inverse_smoothstep_impl_(::std::forward<ValueType>(value));
+			return internal::_inverse_smoothstep_impl_(::std::forward<ValueType>(value));
 		}
 	}
 
@@ -212,22 +253,30 @@ namespace rsl::math
 		if constexpr (is_quat_v<A> && is_quat_v<B> && is_quat_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
-			return detail::compute_smoothstep<quaternion<scalar>>::compute_inverse_derivative(::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<quaternion<scalar>>::compute_inverse_derivative(
+				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+			);
 		}
 		if constexpr (is_matrix_v<A> && is_matrix_v<B> && is_matrix_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
-			return detail::compute_smoothstep<matrix<scalar, A::row_count, A::col_count>>::compute_inverse_derivative(::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<matrix<scalar, A::row_count, A::col_count>>::compute_inverse_derivative(
+				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+			);
 		}
 		if constexpr (is_vector_v<A> && is_vector_v<B> && is_vector_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			constexpr size_type size = min(A::size, min(B::size, T::size));
-			return detail::compute_smoothstep<vector<scalar, size>>::compute_inverse_derivative(::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<vector<scalar, size>>::compute_inverse_derivative(
+				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+			);
 		}
 		else
 		{
-			return detail::_inverse_smoothstep_derivative_impl_(saturate(map01(::std::forward<ValueType>(value), ::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax))));
+			return internal::_inverse_smoothstep_derivative_impl_(saturate(map01(
+				::std::forward<ValueType>(value), ::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax)
+			)));
 		}
 	}
 
@@ -239,19 +288,24 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<T>)
 		{
-			return detail::compute_smoothstep<quaternion<typename T::scalar>>::compute_inverse_derivative(::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<quaternion<typename T::scalar>>::compute_inverse_derivative(
+				::std::forward<ValueType>(value)
+			);
 		}
 		if constexpr (is_matrix_v<T>)
 		{
-			return detail::compute_smoothstep<matrix<typename T::scalar, T::row_count, T::col_count>>::compute_inverse_derivative(::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<matrix<typename T::scalar, T::row_count, T::col_count>>::
+				compute_inverse_derivative(::std::forward<ValueType>(value));
 		}
 		if constexpr (is_vector_v<T>)
 		{
-			return detail::compute_smoothstep<vector<typename T::scalar, T::size>>::compute_inverse_derivative(::std::forward<ValueType>(value));
+			return internal::compute_smoothstep<vector<typename T::scalar, T::size>>::compute_inverse_derivative(
+				::std::forward<ValueType>(value)
+			);
 		}
 		else
 		{
-			return detail::_inverse_smoothstep_derivative_impl_(::std::forward<ValueType>(value));
+			return internal::_inverse_smoothstep_derivative_impl_(::std::forward<ValueType>(value));
 		}
 	}
 } // namespace rsl::math

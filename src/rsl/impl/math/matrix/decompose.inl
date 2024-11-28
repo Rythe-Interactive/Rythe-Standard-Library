@@ -21,7 +21,9 @@ namespace rsl::math
 		matrix<Scalar, 3, 3> orientationMat;
 
 		for (size_type i = 0; i < 3; i++)
+		{
 			orientationMat[i] = normalize(mat[i].xyz);
+		}
 
 		quaternion<Scalar> result;
 
@@ -41,14 +43,20 @@ namespace rsl::math
 			size_type i = 0;
 
 			if (orientationMat[1].y > orientationMat[0].x)
+			{
 				i = 1;
+			}
 			if (orientationMat[2].z > orientationMat[i][i])
+			{
 				i = 2;
+			}
 
 			size_type j = nextIdx[i];
 			size_type k = nextIdx[j];
 
-			Scalar root = ::std::sqrt(orientationMat[i][i] - orientationMat[j][j] - orientationMat[k][k] + static_cast<Scalar>(1));
+			Scalar root = ::std::sqrt(
+				orientationMat[i][i] - orientationMat[j][j] - orientationMat[k][k] + static_cast<Scalar>(1)
+			);
 
 			result[i] = static_cast<Scalar>(0.5) * root;
 			root = static_cast<Scalar>(0.5) / root;
@@ -66,7 +74,9 @@ namespace rsl::math
 		matrix<Scalar, 3, 3> orientationMat;
 
 		for (size_type i = 0; i < 3; i++)
+		{
 			orientationMat[i] = normalize(mat[i].xyz);
+		}
 
 		quaternion<Scalar> result;
 
@@ -86,14 +96,20 @@ namespace rsl::math
 			size_type i = 0;
 
 			if (orientationMat[1].y > orientationMat[0].x)
+			{
 				i = 1;
+			}
 			if (orientationMat[2].z > orientationMat[i][i])
+			{
 				i = 2;
+			}
 
 			size_type j = nextIdx[i];
 			size_type k = nextIdx[j];
 
-			Scalar root = ::std::sqrt(orientationMat[i][i] - orientationMat[j][j] - orientationMat[k][k] + static_cast<Scalar>(1));
+			Scalar root = ::std::sqrt(
+				orientationMat[i][i] - orientationMat[j][j] - orientationMat[k][k] + static_cast<Scalar>(1)
+			);
 
 			result[i] = static_cast<Scalar>(0.5) * root;
 			root = static_cast<Scalar>(0.5) / root;
@@ -119,10 +135,15 @@ namespace rsl::math
 	}
 
 	template <typename Scalar>
-	void decompose(const matrix<Scalar, 4, 4>& mat, vector<Scalar, 3>& scale, quaternion<Scalar>& orientation, vector<Scalar, 3>& translation) noexcept
+	void decompose(
+		const matrix<Scalar, 4, 4>& mat, vector<Scalar, 3>& scale, quaternion<Scalar>& orientation,
+		vector<Scalar, 3>& translation
+	) noexcept
 	{
 		if (close_enough(mat[3][3], 0))
+		{
 			return;
+		}
 		else if (close_enough(mat[3][3], 1))
 		{
 			scale.x = length(mat[0].xyz);
@@ -133,7 +154,9 @@ namespace rsl::math
 			matrix<Scalar, 3, 3> orientationMat;
 
 			for (size_type i = 0; i < 3; i++)
+			{
 				orientationMat[i] = mat[i].xyz / scale[i];
+			}
 
 			Scalar root;
 			Scalar trace = orientationMat[0].x + orientationMat[1].y + orientationMat[2].z;
@@ -152,14 +175,20 @@ namespace rsl::math
 				size_type i = 0;
 
 				if (orientationMat[1].y > orientationMat[0].x)
+				{
 					i = 1;
+				}
 				if (orientationMat[2].z > orientationMat[i][i])
+				{
 					i = 2;
+				}
 
 				size_type j = nextIdx[i];
 				size_type k = nextIdx[j];
 
-				root = ::std::sqrt(orientationMat[i][i] - orientationMat[j][j] - orientationMat[k][k] + static_cast<Scalar>(1));
+				root = ::std::sqrt(
+					orientationMat[i][i] - orientationMat[j][j] - orientationMat[k][k] + static_cast<Scalar>(1)
+				);
 
 				orientation[i] = static_cast<Scalar>(0.5) * root;
 				root = static_cast<Scalar>(0.5) / root;
@@ -175,8 +204,12 @@ namespace rsl::math
 			// Normalize matrix
 			Scalar inv = static_cast<Scalar>(1) / cpy[3][3];
 			for (size_type i = 0; i < 4; ++i)
+			{
 				for (size_type j = 0; j < 4; ++j)
+				{
 					cpy[i][j] *= inv;
+				}
+			}
 
 			decompose(cpy, scale, orientation, translation);
 		}
@@ -192,7 +225,9 @@ namespace rsl::math
 		matrix<Scalar, 3, 3> orientationMat;
 
 		for (size_type i = 0; i < 3; i++)
+		{
 			orientationMat[i] = mat[i].xyz / scale[i];
+		}
 
 		Scalar root;
 		Scalar trace = orientationMat[0].x + orientationMat[1].y + orientationMat[2].z;
@@ -211,14 +246,20 @@ namespace rsl::math
 			size_type i = 0;
 
 			if (orientationMat[1].y > orientationMat[0].x)
+			{
 				i = 1;
+			}
 			if (orientationMat[2].z > orientationMat[i][i])
+			{
 				i = 2;
+			}
 
 			size_type j = nextIdx[i];
 			size_type k = nextIdx[j];
 
-			root = ::std::sqrt(orientationMat[i][i] - orientationMat[j][j] - orientationMat[k][k] + static_cast<Scalar>(1));
+			root = ::std::sqrt(
+				orientationMat[i][i] - orientationMat[j][j] - orientationMat[k][k] + static_cast<Scalar>(1)
+			);
 
 			orientation[i] = static_cast<Scalar>(0.5) * root;
 			root = static_cast<Scalar>(0.5) / root;
@@ -229,7 +270,9 @@ namespace rsl::math
 	}
 
 	template <typename Scalar>
-	matrix<Scalar, 4, 4> compose(const vector<Scalar, 3>& scale, const quaternion<Scalar>& orientation, const vector<Scalar, 3>& translation) noexcept
+	matrix<Scalar, 4, 4> compose(
+		const vector<Scalar, 3>& scale, const quaternion<Scalar>& orientation, const vector<Scalar, 3>& translation
+	) noexcept
 	{
 		matrix<Scalar, 4, 4> result(orientation);
 		result[3].xyz = translation;

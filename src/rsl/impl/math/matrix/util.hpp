@@ -1,9 +1,7 @@
 #pragma once
-#include "../../util/primitives.hpp"
+#include "predefined.hpp"
 
-#include "../quaternion/quaternion.hpp"
-#include "../vector/vector.hpp"
-#include "matrix4.hpp"
+#include "../../util/primitives.hpp"
 
 #include "../geometric/geometric.hpp"
 #include "../trigonometric/trigonometric.hpp"
@@ -13,7 +11,7 @@ namespace rsl::math
 	template <typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar rads, Scalar fov, Scalar nearZ, Scalar farZ) noexcept;
 
-    template <typename Scalar>
+	template <typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4>
 	orthographic(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar nearZ, Scalar farZ) noexcept;
 

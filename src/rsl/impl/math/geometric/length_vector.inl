@@ -1,7 +1,7 @@
 #pragma once
 #include "length.hpp"
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_length;
@@ -27,15 +27,9 @@ namespace rsl::math::detail
 	{
 		using vec_type = vector<Scalar, 1u>;
 
-		[[nodiscard]] [[rythe_always_inline]] static Scalar compute(Scalar v) noexcept
-		{
-			return v;
-		}
+		[[nodiscard]] [[rythe_always_inline]] static Scalar compute(Scalar v) noexcept { return v; }
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute2(Scalar v) noexcept
-		{
-			return v * v;
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute2(Scalar v) noexcept { return v * v; }
 	};
 
 	template <typename Scalar, size_type Size, size_type... args>
@@ -54,4 +48,4 @@ namespace rsl::math::detail
 			return compute_length<vec_type>::compute(v);
 		}
 	};
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal

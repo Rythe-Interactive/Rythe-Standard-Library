@@ -6,7 +6,7 @@
 
 namespace rsl::math
 {
-	namespace detail
+	namespace internal
 	{
 		template <typename Scalar, size_type Size>
 		struct compute_inv_sqrt
@@ -18,7 +18,9 @@ namespace rsl::math
 			{
 				value_type result;
 				for (size_type i; i < size; i++)
+				{
 					result[i] = static_cast<Scalar>(1) / ::std::sqrt(v[i]);
+				}
 				return result;
 			}
 		};
@@ -43,7 +45,9 @@ namespace rsl::math
 
 			[[rythe_always_inline]] static value_type compute(const value_type& v) noexcept
 			{
-				return value_type{static_cast<Scalar>(1) / ::std::sqrt(v[0]), static_cast<Scalar>(1) / ::std::sqrt(v[1])};
+				return value_type{
+					static_cast<Scalar>(1) / ::std::sqrt(v[0]), static_cast<Scalar>(1) / ::std::sqrt(v[1])
+				};
 			}
 		};
 
@@ -56,8 +60,7 @@ namespace rsl::math
 			[[rythe_always_inline]] static value_type compute(const value_type& v) noexcept
 			{
 				return value_type{
-					static_cast<Scalar>(1) / ::std::sqrt(v[0]),
-					static_cast<Scalar>(1) / ::std::sqrt(v[1]),
+					static_cast<Scalar>(1) / ::std::sqrt(v[0]), static_cast<Scalar>(1) / ::std::sqrt(v[1]),
 					static_cast<Scalar>(1) / ::std::sqrt(v[2])
 				};
 			}
@@ -72,24 +75,22 @@ namespace rsl::math
 			[[rythe_always_inline]] static value_type compute(const value_type& v) noexcept
 			{
 				return value_type{
-					static_cast<Scalar>(1) / ::std::sqrt(v[0]),
-					static_cast<Scalar>(1) / ::std::sqrt(v[1]),
-					static_cast<Scalar>(1) / ::std::sqrt(v[2]),
-					static_cast<Scalar>(1) / ::std::sqrt(v[3])
+					static_cast<Scalar>(1) / ::std::sqrt(v[0]), static_cast<Scalar>(1) / ::std::sqrt(v[1]),
+					static_cast<Scalar>(1) / ::std::sqrt(v[2]), static_cast<Scalar>(1) / ::std::sqrt(v[3])
 				};
 			}
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>, bool> = true>
 	[[rythe_always_inline]] static auto inverse_sqrt(const vec_type& v) noexcept
 	{
-		return detail::compute_inv_sqrt<typename vec_type::scalar, vec_type::size>::compute(v);
+		return internal::compute_inv_sqrt<typename vec_type::scalar, vec_type::size>::compute(v);
 	}
 
 	template <typename Scalar>
 	[[rythe_always_inline]] static Scalar inverse_sqrt(Scalar v) noexcept
 	{
-		return detail::compute_inv_sqrt<Scalar, 1>::compute(v);
+		return internal::compute_inv_sqrt<Scalar, 1>::compute(v);
 	}
 } // namespace rsl::math

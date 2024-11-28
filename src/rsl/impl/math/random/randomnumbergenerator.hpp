@@ -13,7 +13,9 @@ namespace rsl::math
 		static std::unique_ptr<random_number_engine_base> engine;
 
 	public:
-		template <typename T, typename... Args, std::enable_if_t<std::is_base_of_v<random_number_engine_base, T>, bool> = true>
+		template <
+			typename T, typename... Args,
+			std::enable_if_t<std::is_base_of_v<random_number_engine_base, T>, bool> = true>
 		static void setRNGEngine(Args&&... args);
 
 		static void setRNGEngine(std::unique_ptr<random_number_engine_base>&& newEngine) noexcept;

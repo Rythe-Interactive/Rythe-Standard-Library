@@ -1,9 +1,11 @@
 #pragma once
 #include "../geometric/cross.hpp"
 #include "../geometric/dot.hpp"
+#include "addition.hpp"
+
 #include "multiplication.hpp"
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_multiplication;
@@ -51,7 +53,7 @@ namespace rsl::math::detail
 			}
 		}
 
-		template <quat_type AType, scalar_type BType>
+		template <quat_type AType, arithmetic_type BType>
 		[[nodiscard]] constexpr static auto compute(AType&& a, BType&& b) noexcept
 		{
 			value_type result;
@@ -62,4 +64,4 @@ namespace rsl::math::detail
 			return result;
 		}
 	};
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal

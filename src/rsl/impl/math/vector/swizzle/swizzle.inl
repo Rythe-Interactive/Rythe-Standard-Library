@@ -1,21 +1,21 @@
-#include "swizzle_base.hpp"
 #pragma once
+#include "swizzle_base.hpp"
 
 namespace rsl::math
 {
-	template <typename scalar, size_type Size, mode Mode, size_type s0>
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0>
 	constexpr swizzle<scalar, Size, Mode, s0>::swizzle(scalar x) noexcept
 	{
 		data[s0] = x;
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0>
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0>
 	constexpr swizzle<scalar, Size, Mode, s0>::operator scalar() const noexcept
 	{
 		return data[s0];
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0>
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0>
 	constexpr swizzle<scalar, Size, Mode, s0>::operator conv_type() const noexcept
 	{
 		conv_type result;
@@ -23,14 +23,15 @@ namespace rsl::math
 		return result;
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0>
-	constexpr swizzle<scalar, Size, Mode, s0>& swizzle<scalar, Size, Mode, s0>::operator=(const conv_type& other) noexcept
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0>
+	constexpr swizzle<scalar, Size, Mode, s0>& swizzle<scalar, Size, Mode, s0>::operator=(const conv_type& other
+	) noexcept
 	{
 		data[s0] = other[0];
 		return *this;
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0>
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0>
 	constexpr swizzle<scalar, Size, Mode, s0>& swizzle<scalar, Size, Mode, s0>::operator=(scalar value) noexcept
 	{
 		data[s0] = value;
@@ -83,14 +84,14 @@ namespace rsl::math
 		return *this;
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0, size_type s1>
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0, size_type s1>
 	constexpr swizzle<scalar, Size, Mode, s0, s1>::swizzle(scalar x, scalar y) noexcept
 	{
 		data[s0] = x;
 		data[s1] = y;
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0, size_type s1>
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0, size_type s1>
 	constexpr swizzle<scalar, Size, Mode, s0, s1>::operator conv_type() const noexcept
 	{
 		conv_type result;
@@ -99,8 +100,9 @@ namespace rsl::math
 		return result;
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0, size_type s1>
-	constexpr swizzle<scalar, Size, Mode, s0, s1>& swizzle<scalar, Size, Mode, s0, s1>::operator=(const conv_type& other) noexcept
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0, size_type s1>
+	constexpr swizzle<scalar, Size, Mode, s0, s1>& swizzle<scalar, Size, Mode, s0, s1>::operator=(const conv_type& other
+	) noexcept
 	{
 		data[s0] = other[0];
 		data[s1] = other[1];
@@ -137,14 +139,15 @@ namespace rsl::math
 	}
 
 	template <size_type Size, mode Mode, size_type s0, size_type s1>
-	constexpr swizzle<bool, Size, Mode, s0, s1>& swizzle<bool, Size, Mode, s0, s1>::operator=(const conv_type& other) noexcept
+	constexpr swizzle<bool, Size, Mode, s0, s1>& swizzle<bool, Size, Mode, s0, s1>::operator=(const conv_type& other
+	) noexcept
 	{
 		data[s0] = other[0];
 		data[s1] = other[1];
 		return *this;
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2>
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2>
 	constexpr swizzle<scalar, Size, Mode, s0, s1, s2>::swizzle(scalar x, scalar y, scalar z) noexcept
 	{
 		data[s0] = x;
@@ -152,7 +155,7 @@ namespace rsl::math
 		data[s2] = z;
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2>
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2>
 	constexpr swizzle<scalar, Size, Mode, s0, s1, s2>::operator conv_type() const noexcept
 	{
 		conv_type result;
@@ -162,8 +165,9 @@ namespace rsl::math
 		return result;
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2>
-	constexpr swizzle<scalar, Size, Mode, s0, s1, s2>& swizzle<scalar, Size, Mode, s0, s1, s2>::operator=(const conv_type& other) noexcept
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2>
+	constexpr swizzle<scalar, Size, Mode, s0, s1, s2>&
+	swizzle<scalar, Size, Mode, s0, s1, s2>::operator=(const conv_type& other) noexcept
 	{
 		data[s0] = other[0];
 		data[s1] = other[1];
@@ -204,7 +208,8 @@ namespace rsl::math
 	}
 
 	template <size_type Size, mode Mode, size_type s0, size_type s1, size_type s2>
-	constexpr swizzle<bool, Size, Mode, s0, s1, s2>& swizzle<bool, Size, Mode, s0, s1, s2>::operator=(const conv_type& other) noexcept
+	constexpr swizzle<bool, Size, Mode, s0, s1, s2>&
+	swizzle<bool, Size, Mode, s0, s1, s2>::operator=(const conv_type& other) noexcept
 	{
 		data[s0] = other[0];
 		data[s1] = other[1];
@@ -212,7 +217,7 @@ namespace rsl::math
 		return *this;
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
 	constexpr swizzle<scalar, Size, Mode, s0, s1, s2, s3>::swizzle(scalar x, scalar y, scalar z, scalar w) noexcept
 	{
 		data[s0] = x;
@@ -221,7 +226,7 @@ namespace rsl::math
 		data[s3] = w;
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
 	constexpr swizzle<scalar, Size, Mode, s0, s1, s2, s3>::operator conv_type() const noexcept
 	{
 		conv_type result;
@@ -232,8 +237,9 @@ namespace rsl::math
 		return result;
 	}
 
-	template <typename scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
-	constexpr swizzle<scalar, Size, Mode, s0, s1, s2, s3>& swizzle<scalar, Size, Mode, s0, s1, s2, s3>::operator=(const conv_type& other) noexcept
+	template <arithmetic_type scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
+	constexpr swizzle<scalar, Size, Mode, s0, s1, s2, s3>&
+	swizzle<scalar, Size, Mode, s0, s1, s2, s3>::operator=(const conv_type& other) noexcept
 	{
 		data[s0] = other[0];
 		data[s1] = other[1];
@@ -278,7 +284,8 @@ namespace rsl::math
 	}
 
 	template <size_type Size, mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
-	constexpr swizzle<bool, Size, Mode, s0, s1, s2, s3>& swizzle<bool, Size, Mode, s0, s1, s2, s3>::operator=(const conv_type& other) noexcept
+	constexpr swizzle<bool, Size, Mode, s0, s1, s2, s3>&
+	swizzle<bool, Size, Mode, s0, s1, s2, s3>::operator=(const conv_type& other) noexcept
 	{
 		data[s0] = other[0];
 		data[s1] = other[1];

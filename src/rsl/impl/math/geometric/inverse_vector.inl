@@ -1,7 +1,7 @@
 #pragma once
 #include "inverse.hpp"
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_inverse;
@@ -39,4 +39,4 @@ namespace rsl::math::detail
 			return compute_inverse<vec_type>::compute(v);
 		}
 	};
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal

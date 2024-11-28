@@ -25,10 +25,12 @@ namespace rsl
 	using minutes_duration = std::chrono::duration<precision, std::ratio<60>>;
 
 	template <time_duration_rep precision = hours>
-	using hours_duration = std::chrono::duration<precision, std::ratio_multiply<std::ratio<60>, std::chrono::minutes::period>>;
+	using hours_duration =
+		std::chrono::duration<precision, std::ratio_multiply<std::ratio<60>, std::chrono::minutes::period>>;
 
 	template <time_duration_rep precision = days>
-	using days_duration = std::chrono::duration<precision, std::ratio_multiply<std::ratio<24>, std::chrono::hours::period>>;
+	using days_duration =
+		std::chrono::duration<precision, std::ratio_multiply<std::ratio<24>, std::chrono::hours::period>>;
 
 	template <time_duration_rep precision = time32>
 	struct time_span
@@ -100,27 +102,48 @@ namespace rsl
 			return std::chrono::duration_cast<seconds_duration<T>>(duration).count();
 		}
 		template <time_duration_rep T>
-		[[nodiscard]] constexpr T milliseconds() const noexcept(std::is_arithmetic_v<time_type> && std::is_arithmetic_v<T>)
+		[[nodiscard]] constexpr T milliseconds() const
+			noexcept(std::is_arithmetic_v<time_type> && std::is_arithmetic_v<T>)
 		{
 			return std::chrono::duration_cast<milli_seconds_duration<T>>(duration).count();
 		}
 		template <time_duration_rep T>
-		[[nodiscard]] constexpr T microseconds() const noexcept(std::is_arithmetic_v<time_type> && std::is_arithmetic_v<T>)
+		[[nodiscard]] constexpr T microseconds() const
+			noexcept(std::is_arithmetic_v<time_type> && std::is_arithmetic_v<T>)
 		{
 			return std::chrono::duration_cast<micro_seconds_duration<T>>(duration).count();
 		}
 		template <time_duration_rep T>
-		[[nodiscard]] constexpr T nanoseconds() const noexcept(std::is_arithmetic_v<time_type> && std::is_arithmetic_v<T>)
+		[[nodiscard]] constexpr T nanoseconds() const
+			noexcept(std::is_arithmetic_v<time_type> && std::is_arithmetic_v<T>)
 		{
 			return std::chrono::duration_cast<nano_seconds_duration<T>>(duration).count();
 		}
 
-		[[nodiscard]] constexpr time_type hours() const noexcept(std::is_arithmetic_v<time_type>) { return std::chrono::duration_cast<hours_duration<time_type>>(duration).count(); }
-		[[nodiscard]] constexpr time_type minutes() const noexcept(std::is_arithmetic_v<time_type>) { return std::chrono::duration_cast<minutes_duration<time_type>>(duration).count(); }
-		[[nodiscard]] constexpr time_type seconds() const noexcept(std::is_arithmetic_v<time_type>) { return duration.count(); }
-		[[nodiscard]] constexpr time_type milliseconds() const noexcept(std::is_arithmetic_v<time_type>) { return std::chrono::duration_cast<milli_seconds_duration<time_type>>(duration).count(); }
-		[[nodiscard]] constexpr time_type microseconds() const noexcept(std::is_arithmetic_v<time_type>) { return std::chrono::duration_cast<micro_seconds_duration<time_type>>(duration).count(); }
-		[[nodiscard]] constexpr time_type nanoseconds() const noexcept(std::is_arithmetic_v<time_type>) { return std::chrono::duration_cast<nano_seconds_duration<time_type>>(duration).count(); }
+		[[nodiscard]] constexpr time_type hours() const noexcept(std::is_arithmetic_v<time_type>)
+		{
+			return std::chrono::duration_cast<hours_duration<time_type>>(duration).count();
+		}
+		[[nodiscard]] constexpr time_type minutes() const noexcept(std::is_arithmetic_v<time_type>)
+		{
+			return std::chrono::duration_cast<minutes_duration<time_type>>(duration).count();
+		}
+		[[nodiscard]] constexpr time_type seconds() const noexcept(std::is_arithmetic_v<time_type>)
+		{
+			return duration.count();
+		}
+		[[nodiscard]] constexpr time_type milliseconds() const noexcept(std::is_arithmetic_v<time_type>)
+		{
+			return std::chrono::duration_cast<milli_seconds_duration<time_type>>(duration).count();
+		}
+		[[nodiscard]] constexpr time_type microseconds() const noexcept(std::is_arithmetic_v<time_type>)
+		{
+			return std::chrono::duration_cast<micro_seconds_duration<time_type>>(duration).count();
+		}
+		[[nodiscard]] constexpr time_type nanoseconds() const noexcept(std::is_arithmetic_v<time_type>)
+		{
+			return std::chrono::duration_cast<nano_seconds_duration<time_type>>(duration).count();
+		}
 
 		[[nodiscard]] constexpr operator duration_type&() noexcept { return duration; }
 		[[nodiscard]] constexpr operator const duration_type&() const noexcept { return duration; }
@@ -131,52 +154,69 @@ namespace rsl
 			++duration;
 			return *this;
 		}
-		constexpr time_span operator++(int) noexcept(std::is_arithmetic_v<time_type>) /* strengthened */ { return time_span(duration++); }
+		constexpr time_span operator++(int) noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
+		{
+			return time_span(duration++);
+		}
 		constexpr time_span& operator--() noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
 		{
 			--duration;
 			return *this;
 		}
-		constexpr time_span operator--(int) noexcept(std::is_arithmetic_v<time_type>) /* strengthened */ { return time_span(duration--); }
+		constexpr time_span operator--(int) noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
+		{
+			return time_span(duration--);
+		}
 
 		template <time_duration_rep other_time>
-		constexpr time_span& operator+=(const time_span<other_time>& rhs) noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
+		constexpr time_span& operator+=(const time_span<other_time>& rhs)
+			noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
 		{
 			duration += std::chrono::duration_cast<duration_type>(rhs.duration);
 			return *this;
 		}
 
 		template <time_duration_rep other_time>
-		constexpr time_span& operator-=(const time_span<other_time>& rhs) noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
+		constexpr time_span& operator-=(const time_span<other_time>& rhs)
+			noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
 		{
 			duration -= std::chrono::duration_cast<duration_type>(rhs.duration);
 			return *this;
 		}
 
 		template <time_duration_rep other_time>
-		constexpr time_span& operator*=(const time_span<other_time>& rhs) noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
+		constexpr time_span& operator*=(const time_span<other_time>& rhs)
+			noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
 		{
 			duration *= std::chrono::duration_cast<duration_type>(rhs.duration);
 			return *this;
 		}
 
 		template <time_duration_rep other_time>
-		constexpr time_span& operator/=(const time_span<other_time>& rhs) noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
+		constexpr time_span& operator/=(const time_span<other_time>& rhs)
+			noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
 		{
 			duration /= std::chrono::duration_cast<duration_type>(rhs.duration);
 			return *this;
 		}
 
 		template <time_duration_rep other_time>
-		constexpr time_span& operator%=(const time_span<other_time>& rhs) noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
+		constexpr time_span& operator%=(const time_span<other_time>& rhs)
+			noexcept(std::is_arithmetic_v<time_type>) /* strengthened */
 		{
 			duration %= std::chrono::duration_cast<duration_type>(rhs.duration);
 			return *this;
 		}
 
 		[[nodiscard]] static constexpr time_span zero() noexcept { return time_span(0); }
-		[[nodiscard]] static constexpr time_span min() noexcept { return time_span(std::chrono::duration_values<time_type>::min()); }
-		[[nodiscard]] static constexpr time_span max() noexcept { return time_span(std::chrono::duration_values<time_type>::max()); }
+		[[nodiscard]] static constexpr time_span min() noexcept
+		{
+			return time_span(std::chrono::duration_values<time_type>::min());
+		}
+		[[nodiscard]] static constexpr time_span max() noexcept
+		{
+			return time_span(std::chrono::duration_values<time_type>::max());
+		}
 	};
 
 	template <rsl::time_duration_rep precisionLHS, rsl::time_duration_rep precisionRHS>
@@ -220,7 +260,8 @@ template <rsl::time_duration_rep precisionLHS, rsl::time_duration_rep precisionR
 }
 
 template <rsl::time_duration_rep precisionLHS, rsl::time_duration_rep precisionRHS>
-[[nodiscard]] constexpr auto operator<=>(const rsl::time_span<precisionLHS>& lhs, const rsl::time_span<precisionRHS>& rhs)
+[[nodiscard]] constexpr auto
+operator<=>(const rsl::time_span<precisionLHS>& lhs, const rsl::time_span<precisionRHS>& rhs)
 	noexcept(std::is_arithmetic_v<precisionLHS> && std::is_arithmetic_v<precisionRHS>) /* strengthened */
 {
 	return lhs.duration.count() <=> rhs.duration.count();

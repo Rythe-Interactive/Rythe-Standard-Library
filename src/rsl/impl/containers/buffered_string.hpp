@@ -23,7 +23,10 @@ namespace rsl
 		value_type m_buffer[maxSize + 1];
 		size_type m_size;
 
-		constexpr static size_type validate_size(size_type newSize) noexcept { return newSize < maxSize ? newSize : maxSize; }
+		constexpr static size_type validate_size(size_type newSize) noexcept
+		{
+			return newSize < maxSize ? newSize : maxSize;
+		}
 
 	public:
 		constexpr buffered_string() noexcept = default;
@@ -32,7 +35,9 @@ namespace rsl
 			: m_size(validate_size(src.m_size))
 		{
 			for (size_type i = 0; i < m_size; i++)
+			{
 				m_buffer[i] = src.m_buffer[i];
+			}
 
 			m_buffer[m_size] = '\0';
 		}
@@ -42,7 +47,9 @@ namespace rsl
 			: m_size(validate_size(N))
 		{
 			for (size_type i = 0; i < m_size; i++)
+			{
 				m_buffer[i] = str[i];
+			}
 
 			m_buffer[m_size] = '\0';
 		}
@@ -51,7 +58,9 @@ namespace rsl
 			: m_size(validate_size(src.size()))
 		{
 			for (size_type i = 0; i < m_size; i++)
+			{
 				m_buffer[i] = src[i];
+			}
 
 			m_buffer[m_size] = '\0';
 		}
@@ -61,7 +70,9 @@ namespace rsl
 			m_size = validate_size(src.m_size);
 
 			for (size_type i = 0; i < m_size; i++)
+			{
 				m_buffer[i] = src.m_buffer[i];
+			}
 
 			m_buffer[m_size] = '\0';
 
@@ -74,7 +85,9 @@ namespace rsl
 			m_size = validate_size(N);
 
 			for (size_type i = 0; i < m_size; i++)
+			{
 				m_buffer[i] = str[i];
+			}
 
 			m_buffer[m_size] = '\0';
 
@@ -86,7 +99,9 @@ namespace rsl
 			m_size = validate_size(src.size());
 
 			for (size_type i = 0; i < m_size; i++)
+			{
 				m_buffer[i] = src[i];
+			}
 
 			m_buffer[m_size] = '\0';
 
@@ -105,15 +120,9 @@ namespace rsl
 			return m_buffer[i];
 		}
 
-		constexpr reference raw_at(size_type i)
-		{
-			return m_buffer[i];
-		}
+		constexpr reference raw_at(size_type i) { return m_buffer[i]; }
 
-		constexpr const_reference raw_at(size_type i) const
-		{
-			return m_buffer[i];
-		}
+		constexpr const_reference raw_at(size_type i) const { return m_buffer[i]; }
 
 		constexpr reference operator[](size_type i) { return at(i); }
 		constexpr const_reference operator[](size_type i) const { return at(i); }
@@ -130,7 +139,9 @@ namespace rsl
 			if (m_size > oldSize)
 			{
 				for (size_type i = oldSize; i < m_size; i++)
+				{
 					m_buffer[i] = ' ';
+				}
 			}
 
 			m_buffer[m_size] = '\0';

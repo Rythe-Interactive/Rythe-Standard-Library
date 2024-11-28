@@ -37,4 +37,4 @@ namespace rsl::internal::fnv1a
 
 	constexpr id_type prime = select_prime();
 	constexpr id_type offset_basis = select_basis();
-} // namespace internal::fnv1a
+} // namespace rsl::internal::fnv1a

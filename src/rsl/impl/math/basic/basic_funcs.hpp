@@ -13,10 +13,4 @@ namespace rsl::math
 	{
 		return t.data;
 	}
-
-	template <typename Scalar>
-	[[nodiscard]] Scalar radians(Scalar deg)
-	{
-		return (deg * pi<Scalar>()) / static_cast<Scalar>(180);
-	}
 } // namespace rsl::math

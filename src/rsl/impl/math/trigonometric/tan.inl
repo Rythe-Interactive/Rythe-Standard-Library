@@ -15,15 +15,17 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<Type>)
 		{
-			return detail::compute_tan<quaternion<typename Type::scalar>>::compute(forward<T>(value));
+			return internal::compute_tan<quaternion<typename Type::scalar>>::compute(forward<T>(value));
 		}
 		if constexpr (is_matrix_v<Type>)
 		{
-			return detail::compute_tan<matrix<typename Type::scalar, Type::row_count, Type::col_count>>::compute(forward<T>(value));
+			return internal::compute_tan<matrix<typename Type::scalar, Type::row_count, Type::col_count>>::compute(
+				forward<T>(value)
+			);
 		}
 		if constexpr (is_vector_v<Type>)
 		{
-			return detail::compute_tan<vector<typename Type::scalar, Type::size>>::compute(forward<T>(value));
+			return internal::compute_tan<vector<typename Type::scalar, Type::size>>::compute(forward<T>(value));
 		}
 		else
 		{
@@ -39,15 +41,16 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<Type>)
 		{
-			return detail::compute_tan<quaternion<typename Type::scalar>>::compute_inverse(forward<T>(value));
+			return internal::compute_tan<quaternion<typename Type::scalar>>::compute_inverse(forward<T>(value));
 		}
 		if constexpr (is_matrix_v<Type>)
 		{
-			return detail::compute_tan<matrix<typename Type::scalar, Type::row_count, Type::col_count>>::compute_inverse(forward<T>(value));
+			return internal::compute_tan<
+				matrix<typename Type::scalar, Type::row_count, Type::col_count>>::compute_inverse(forward<T>(value));
 		}
 		if constexpr (is_vector_v<Type>)
 		{
-			return detail::compute_tan<vector<typename Type::scalar, Type::size>>::compute_inverse(forward<T>(value));
+			return internal::compute_tan<vector<typename Type::scalar, Type::size>>::compute_inverse(forward<T>(value));
 		}
 		else
 		{
@@ -63,18 +66,18 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<Type>)
 		{
-			return detail::compute_tan<quaternion<typename Type::scalar>>::compute_inverse2(
+			return internal::compute_tan<quaternion<typename Type::scalar>>::compute_inverse2(
 				forward<X>(x), forward<Y>(y)
 			);
 		}
 		if constexpr (is_matrix_v<Type>)
 		{
-			return detail::compute_tan<matrix<typename Type::scalar, Type::row_count, Type::col_count>>::
+			return internal::compute_tan<matrix<typename Type::scalar, Type::row_count, Type::col_count>>::
 				compute_inverse2(forward<X>(x), forward<Y>(y));
 		}
 		if constexpr (is_vector_v<Type>)
 		{
-			return detail::compute_tan<vector<typename Type::scalar, Type::size>>::compute_inverse2(
+			return internal::compute_tan<vector<typename Type::scalar, Type::size>>::compute_inverse2(
 				forward<X>(x), forward<Y>(y)
 			);
 		}

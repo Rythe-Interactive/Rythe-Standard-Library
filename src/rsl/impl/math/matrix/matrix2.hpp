@@ -1,28 +1,23 @@
 #pragma once
-#include "../vector/vector2.hpp"
-#include "column/column_base.hpp"
-#include "matrix_base.hpp"
+#include "predefined.hpp"
 
-RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201)
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201) // anonymous struct
 
 namespace rsl::math
 {
-	template <typename Scalar>
-	struct quaternion;
-
-	template <typename Scalar>
-	struct matrix<Scalar, 2, 2> : matrix_base
+	template <arithmetic_type Scalar, mode Mode>
+	struct matrix<Scalar, 2, 2, Mode>
 	{
 		using scalar = Scalar;
 		static constexpr size_type row_count = 2;
 		static constexpr size_type col_count = 2;
 		static constexpr size_type size = row_count * col_count;
-		using type = matrix<Scalar, 2, 2>;
+		static constexpr mode mode = Mode;
 
-		using row_type = vector<scalar, col_count>;
+		using row_type = vector<scalar, col_count, Mode>;
 
 		template <size_type idx>
-		using col_type = column<scalar, row_count, col_count, idx>;
+		using col_type = column<scalar, row_count, col_count, idx, Mode>;
 
 		union
 		{
@@ -41,64 +36,30 @@ namespace rsl::math
 		static const matrix identity;
 		static const matrix zero;
 
-		constexpr matrix() noexcept
-			: row0(float2::right),
-			  row1(float2::up)
-		{
-		}
+		[[rythe_always_inline]] constexpr matrix() noexcept;
+		[[rythe_always_inline]] constexpr matrix(const matrix&) noexcept = default;
+		[[rythe_always_inline]] explicit constexpr matrix(scalar s) noexcept;
+		[[rythe_always_inline]] explicit constexpr matrix(scalar s, uniform_matrix_signal) noexcept;
+		[[rythe_always_inline]] explicit constexpr matrix(scalar s, identity_matrix_signal) noexcept;
+		[[rythe_always_inline]] explicit constexpr matrix(scalar s00, scalar s01, scalar s10, scalar s11) noexcept;
+		[[rythe_always_inline]] explicit constexpr matrix(row_type r0, row_type r1) noexcept;
 
-		constexpr matrix(const matrix&) noexcept = default;
+		template <arithmetic_type Scal, math::mode M>
+		[[rythe_always_inline]] explicit constexpr matrix(const quaternion<Scal, M>& orientation) noexcept;
 
-		explicit constexpr matrix(scalar s) noexcept
-			: row0(s, static_cast<scalar>(0)),
-			  row1(static_cast<scalar>(0), s)
-		{
-		}
+		template <typename mat_type>
+			requires not_same_as<Scalar, typename mat_type::scalar> || (mat_type::row_count != 2) ||
+					 (mat_type::col_count != 2)
+		[[rythe_always_inline]] constexpr matrix(const mat_type& other) noexcept;
 
-		explicit constexpr matrix(
-			scalar s00, scalar s01,
-			scalar s10, scalar s11
-		) noexcept
-			: row0(s00, s01),
-			  row1(s10, s11)
-		{
-		}
+		[[rythe_always_inline]] constexpr matrix& operator=(const matrix&) noexcept = default;
 
-		explicit constexpr matrix(row_type r0, row_type r1) noexcept
-			: row0(r0),
-			  row1(r1)
-		{
-		}
-
-		template <typename Scal>
-		explicit constexpr matrix(const quaternion<Scal>& orientation) noexcept;
-
-		template <typename Scal, ::std::enable_if_t<!::std::is_same_v<scalar, Scal>, bool> = true>
-		constexpr explicit matrix(const matrix<Scal, row_count, col_count>& other) noexcept;
-
-		template <typename mat_type, ::std::enable_if_t<2 != mat_type::row_count || 2 != mat_type::col_count, bool> = true>
-		constexpr matrix(const mat_type& other) noexcept;
-
-		constexpr matrix& operator=(const matrix&) noexcept = default;
-
-		[[nodiscard]] constexpr row_type& operator[](size_type i) noexcept
-		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < row_count), "matrix subscript out of range");
-			return rows[i];
-		}
-		[[nodiscard]] constexpr const row_type& operator[](size_type i) const noexcept
-		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < row_count), "matrix subscript out of range");
-			return rows[i];
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr row_type& operator[](size_type i) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const row_type& operator[](size_type i) const noexcept;
 	};
 
 	using float2x2 = matrix<float32, 2, 2>;
-	using mat2 = float2x2;
 	using double2x2 = matrix<float64, 2, 2>;
-	using dmat2 = double2x2;
 } // namespace rsl::math
-
-#include "../quaternion/matrix_quat_conv.inl"
 
 RYTHE_MSVC_SUPPRESS_WARNING_POP

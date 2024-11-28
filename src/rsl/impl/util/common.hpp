@@ -264,22 +264,22 @@ namespace rsl
 	{
 	};
 
-    namespace internal
+	namespace internal
 	{
-        template <typename T, bool = is_integral_v<T>>
-	    struct sign_info
-	    {
-		    static constexpr bool isSigned = static_cast<remove_cv_t<T>>(-1) < static_cast<remove_cv_t<T>>(0);
+		template <typename T, bool = is_integral_v<T>>
+		struct sign_info
+		{
+			static constexpr bool isSigned = static_cast<remove_cv_t<T>>(-1) < static_cast<remove_cv_t<T>>(0);
 			static constexpr bool isUnsigned = !isSigned;
-	    };
+		};
 
-	    template <typename T>
+		template <typename T>
 		struct sign_info<T, false>
-	    {
+		{
 			static constexpr bool isSigned = is_floating_point_v<T>;
 			static constexpr bool isUnsigned = false;
-	    };
-	}
+		};
+	} // namespace internal
 
 	template <typename T>
 	inline constexpr bool is_unsigned_v = internal::sign_info<T>::isUnsigned;

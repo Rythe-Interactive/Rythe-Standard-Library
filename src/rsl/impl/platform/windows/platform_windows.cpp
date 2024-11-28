@@ -6,8 +6,8 @@
 	#define VC_EXTRALEAN
 	#define NOMINMAX
 	#include "winplatformdef.h"
-	#include <windef.h>
 	#include <libloaderapi.h>
+	#include <windef.h>
 
 	#define RYTHE_DYNAMIC_LIBRARY_HANDLE_IMPL HMODULE
 	#include "../platform.hpp"

@@ -88,10 +88,7 @@ namespace rsl
 		}
 
 	public:
-		[[nodiscard]] const error_type& getError() const noexcept
-		{
-			return error_context::errors[m_errid].error;
-		}
+		[[nodiscard]] const error_type& getError() const noexcept { return error_context::errors[m_errid].error; }
 
 		[[nodiscard]] warning_view getWarnings() const noexcept
 		{

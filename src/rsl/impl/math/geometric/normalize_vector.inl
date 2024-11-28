@@ -1,7 +1,7 @@
 #pragma once
 #include "normalize.hpp"
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_normalize;
@@ -27,4 +27,4 @@ namespace rsl::math::detail
 			return static_cast<Scalar>(1);
 		}
 	};
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal

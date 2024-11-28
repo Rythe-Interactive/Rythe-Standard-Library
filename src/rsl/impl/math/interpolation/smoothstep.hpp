@@ -13,7 +13,8 @@ namespace rsl::math
 {
 	// smoothstep
 	template <typename TypeMin, typename TypeMax, typename ValueType>
-	[[nodiscard]] [[rythe_always_inline]] constexpr auto smoothstep(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept;
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto
+	smoothstep(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept;
 
 	// smoothstep
 	template <typename ValueType>
@@ -21,7 +22,8 @@ namespace rsl::math
 
 	// smoothstep_derivative
 	template <typename TypeMin, typename TypeMax, typename ValueType>
-	[[nodiscard]] [[rythe_always_inline]] constexpr auto smoothstep_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept;
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto
+	smoothstep_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept;
 
 	// smoothstep_derivative
 	template <typename ValueType>
@@ -29,7 +31,8 @@ namespace rsl::math
 
 	// inverse_smoothstep
 	template <typename TypeMin, typename TypeMax, typename ValueType>
-	[[nodiscard]] [[rythe_always_inline]] auto inverse_smoothstep(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept;
+	[[nodiscard]] [[rythe_always_inline]] auto
+	inverse_smoothstep(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept;
 
 	// inverse_smoothstep
 	template <typename ValueType>
@@ -37,7 +40,8 @@ namespace rsl::math
 
 	// inverse_smoothstep_derivative
 	template <typename TypeMin, typename TypeMax, typename ValueType>
-	[[nodiscard]] [[rythe_always_inline]] auto inverse_smoothstep_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept;
+	[[nodiscard]] [[rythe_always_inline]] auto
+	inverse_smoothstep_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept;
 
 	// inverse_smoothstep_derivative
 	template <typename ValueType>

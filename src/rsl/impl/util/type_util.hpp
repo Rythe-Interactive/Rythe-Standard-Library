@@ -47,7 +47,10 @@ namespace rsl
 			// note that this is an optimization for debug mode codegen; in release mode the BE removes all of this
 			if constexpr (!::std::is_trivially_destructible_v<::std::iter_value_t<NoThrowFwdIt>>)
 			{
-				for (; first != last; ++first) { destroy_in_place(*first); }
+				for (; first != last; ++first)
+				{
+					destroy_in_place(*first);
+				}
 			}
 		}
 	} // namespace internal
@@ -325,7 +328,7 @@ namespace rsl
 				"Second template param needs to be of function type."                                                  \
 			);                                                                                                         \
 		};                                                                                                             \
-																													   \
+                                                                                                                       \
 		template <typename C, typename Ret, typename... Args>                                                          \
 		struct RYTHE_CONCAT(has_, RYTHE_CONCAT(x, _impl))<C, Ret(Args...)>                                             \
 		{                                                                                                              \
@@ -334,14 +337,14 @@ namespace rsl
 			};                                                                                                         \
 		};                                                                                                             \
 	}                                                                                                                  \
-																													   \
+                                                                                                                       \
 	template <typename C, typename F>                                                                                  \
 	constexpr bool RYTHE_CONCAT(has_, RYTHE_CONCAT(x, _v)) =                                                           \
 		RYTHE_CONCAT(internal::has_, RYTHE_CONCAT(x, _impl))<C, F>::value;                                             \
-																													   \
+                                                                                                                       \
 	template <typename C, typename F>                                                                                  \
 	concept RYTHE_CONCAT(has_, x) = RYTHE_CONCAT(has_, RYTHE_CONCAT(x, _v))<C, F>;                                     \
-																													   \
+                                                                                                                       \
 	namespace internal                                                                                                 \
 	{                                                                                                                  \
 		template <typename, typename T>                                                                                \
@@ -352,7 +355,7 @@ namespace rsl
 				"Second template param needs to be of function type."                                                  \
 			);                                                                                                         \
 		};                                                                                                             \
-																													   \
+                                                                                                                       \
 		template <typename C, typename Ret, typename... Args>                                                          \
 		struct RYTHE_CONCAT(has_static_, RYTHE_CONCAT(x, _impl))<C, Ret(Args...)>                                      \
 		{                                                                                                              \
@@ -361,11 +364,11 @@ namespace rsl
 			};                                                                                                         \
 		};                                                                                                             \
 	}                                                                                                                  \
-																													   \
+                                                                                                                       \
 	template <typename C, typename F>                                                                                  \
 	constexpr bool RYTHE_CONCAT(has_static_, RYTHE_CONCAT(x, _v)) =                                                    \
 		RYTHE_CONCAT(internal::has_static_, RYTHE_CONCAT(x, _impl))<C, F>::value;                                      \
-																													   \
+                                                                                                                       \
 	template <typename C, typename F>                                                                                  \
 	concept RYTHE_CONCAT(has_static_, x) = RYTHE_CONCAT(has_static_, RYTHE_CONCAT(x, _v))<C, F>;
 } // namespace rsl

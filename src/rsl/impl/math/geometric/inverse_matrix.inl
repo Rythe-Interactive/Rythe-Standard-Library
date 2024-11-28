@@ -1,7 +1,7 @@
 #pragma once
 #include "inverse.hpp"
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_inverse;
@@ -109,10 +109,15 @@ namespace rsl::math::detail
 				auto inverseDet = static_cast<Scalar>(1) / determinant(m);
 				auto adj = adjoint(m);
 				for (size_type i = 0; i < RowCount; i++)
-					for (size_type j = 0; j < ColCount; j++) result[i][j] = adj[i][j] * inverseDet;
+				{
+					for (size_type j = 0; j < ColCount; j++)
+					{
+						result[i][j] = adj[i][j] * inverseDet;
+					}
+				}
 
 				return result;
 			}
 		}
 	};
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal

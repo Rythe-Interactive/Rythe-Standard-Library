@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../defines.hpp"
 #include "../../util/common.hpp"
 #include "../../util/concepts.hpp"
 #include "../../util/primitives.hpp"

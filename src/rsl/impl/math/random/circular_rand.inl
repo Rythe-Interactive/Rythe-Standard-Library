@@ -6,7 +6,10 @@ namespace rsl::math
 	template <typename Scalar>
 	[[nodiscard]] vector<Scalar, 2> circular_rand(Scalar radius) noexcept
 	{
-		static_assert(::std::is_arithmetic_v<Scalar>, "Input scalar type to circular_rand is neither a scalar nor any other supported type.");
+		static_assert(
+			::std::is_arithmetic_v<Scalar>,
+			"Input scalar type to circular_rand is neither a scalar nor any other supported type."
+		);
 
 		Scalar theta = linear_rand(static_cast<Scalar>(0), tau<Scalar>());
 		return vector<Scalar, 2>(cos(theta), sin(theta)) * radius;

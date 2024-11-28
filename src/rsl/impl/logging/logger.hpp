@@ -11,7 +11,9 @@ namespace rsl
 		class logger_name_formatter : public spdlog::custom_flag_formatter
 		{
 		public:
-			void format(const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest) override
+			void format(
+				const spdlog::details::log_msg& msg, [[maybe_unused]] const std::tm& tm_time, spdlog::memory_buf_t& dest
+			) override
 			{
 				// append to data
 				dest.append(msg.logger_name.begin(), msg.logger_name.end());

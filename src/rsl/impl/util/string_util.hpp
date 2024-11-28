@@ -1,9 +1,9 @@
 #pragma once
+#include <algorithm>
 #include <array>
 #include <cctype>
 #include <locale>
 #include <sstream>
-#include <algorithm>
 
 #include "primitives.hpp"
 
@@ -39,8 +39,7 @@ namespace rsl
 
 	constexpr inline size_type constexpr_strlen(cstring str)
 	{
-		return ((0 == str) ? 0 : (*str == '\0') ? 0
-												: 1 + constexpr_strlen((const char*)(str + 1)));
+		return ((0 == str) ? 0 : (*str == '\0') ? 0 : 1 + constexpr_strlen((const char*)(str + 1)));
 	}
 	inline bool starts_with(const std::string& src, cstring value)
 	{
@@ -51,7 +50,9 @@ namespace rsl
 	{
 		std::string end(value);
 		if (end.size() > src.size())
+		{
 			return false;
+		}
 		return std::equal(end.rbegin(), end.rend(), src.rbegin());
 	}
 
@@ -66,7 +67,8 @@ namespace rsl
 		auto end = source.end();
 		auto itemBegin = item.begin();
 		auto itemEnd = item.end();
-		while ((it = std::search(it, end, itemBegin, itemEnd)) != end) // While there's items to be found, keep replacing them with value.
+		while ((it = std::search(it, end, itemBegin, itemEnd)) != end
+		) // While there's items to be found, keep replacing them with value.
 		{
 			count++;
 			source.erase(it, it + item.size());
@@ -86,8 +88,12 @@ namespace rsl
 		bool operator()(char c) const
 		{
 			for (auto testChar = _chars; *testChar != 0; ++testChar)
+			{
 				if (*testChar == c)
+				{
 					return true;
+				}
+			}
 			return false;
 		}
 		const char* _chars;
@@ -106,7 +112,9 @@ namespace rsl
 	{
 		rc[token] = std::ctype<char>::space;
 		if constexpr (sizeof...(tokens) != 0)
+		{
 			str_tokens_helper<tokens...>(rc);
+		}
 		return true;
 	}
 
@@ -241,7 +249,9 @@ namespace rsl
 
 		// find given word
 		if ((loc = src.find(search, offset)) == std::string::npos)
+		{
 			return false;
+		}
 
 		// erase word
 		src.erase(loc, search.size());
@@ -257,7 +267,9 @@ namespace rsl
 
 		// find given word
 		if ((loc = src.find(search, offset)) == std::string::npos)
+		{
 			return std::string::npos;
+		}
 
 		// erase word
 		src.erase(loc, search.size());
@@ -276,7 +288,10 @@ namespace rsl
 		std::vector<size_t> locationsVector(tokensVector.size());
 
 		// find locations
-		for (char& token : tokensVector) locationsVector.push_back(string.find(token, offset));
+		for (char& token : tokensVector)
+		{
+			locationsVector.push_back(string.find(token, offset));
+		}
 
 		// find smallest element and return
 		return *min_element(begin(locationsVector), end(locationsVector));
@@ -316,7 +331,9 @@ namespace rsl
 	{
 		std::string ret;
 		for (const std::string& str : data)
+		{
 			ret += str;
+		}
 		return ret;
 	}
 
@@ -331,8 +348,7 @@ namespace rsl
 	template <char D = '.'>
 	constexpr size_t count_delimiter(const char* str)
 	{
-		return str[0] == '\0' ? 0 : str[0] == D ? count_delimiter<D>(&str[1]) + 1
-												: count_delimiter<D>(&str[1]);
+		return str[0] == '\0' ? 0 : str[0] == D ? count_delimiter<D>(&str[1]) + 1 : count_delimiter<D>(&str[1]);
 	}
 
 	constexpr size_t cstrptr_length(const char* str)
@@ -350,39 +366,24 @@ namespace rsl
 	// trim from start (in place)
 	static inline void ltrim(std::string& s)
 	{
-		s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch)
-		{
-			return !std::isspace(ch);
-		}));
+		s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) { return !std::isspace(ch); }));
 	}
 
 	template <class Trimmer>
 	static inline void ltrim(std::string& s, Trimmer&& t)
 	{
-		s.erase(std::find_if(s.begin(), s.end(), [&t](int ch)
-		{
-			return !t(ch);
-		}),
-				s.end());
+		s.erase(std::find_if(s.begin(), s.end(), [&t](int ch) { return !t(ch); }), s.end());
 	}
 
 	// trim from end (in place)
 	static inline void rtrim(std::string& s)
 	{
-		s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch)
-		{
-			return !std::isspace(ch);
-		}).base(),
-				s.end());
+		s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) { return !std::isspace(ch); }).base(), s.end());
 	}
 	template <class Trimmer>
 	static inline void rtrim(std::string& s, Trimmer&& t)
 	{
-		s.erase(std::find_if(s.rbegin(), s.rend(), [&t](int ch)
-		{
-			return !t(ch);
-		}).base(),
-				s.end());
+		s.erase(std::find_if(s.rbegin(), s.rend(), [&t](int ch) { return !t(ch); }).base(), s.end());
 	}
 
 

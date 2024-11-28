@@ -146,4 +146,4 @@
 #define rsl_assert_out_of_range_msg(expr, msg) rsl_assert_msg_frequent(expr, msg)
 #define rsl_assert_invalid_object(expr) rsl_assert_msg_frequent(expr, "invalid object")
 #define rsl_assert_alignment(ptr, alignment)                                                                           \
-	rsl_assert_msg_frequent((reinterpret_cast<size_type>(ptr) & ((alignment)-1)) == 0, "wrong alignment")
+	rsl_assert_msg_frequent((reinterpret_cast<size_type>(ptr) & ((alignment) - 1)) == 0, "wrong alignment")

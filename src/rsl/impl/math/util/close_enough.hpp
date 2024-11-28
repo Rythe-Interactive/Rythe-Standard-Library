@@ -16,7 +16,7 @@ namespace rsl::math
 		}
 		else if constexpr (lhsIsInt || rhsIsInt)
 		{
-			using fp_t = floating_type_t<TypeA, TypeB>;
+			using fp_t = select_floating_type_t<TypeA, TypeB>;
 			return abs(static_cast<fp_t>(lhs) - static_cast<fp_t>(rhs)) <= epsilon_v<fp_t>;
 		}
 		else

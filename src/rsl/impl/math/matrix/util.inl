@@ -7,7 +7,7 @@ namespace rsl::math
 	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar rads, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
 	{
 		Scalar const tanHalfFovy = tan(rads * static_cast<Scalar>(0.5));
-        Scalar inverseFrustumDepth = static_cast<Scalar>(1) / (farZ - nearZ);
+		Scalar inverseFrustumDepth = static_cast<Scalar>(1) / (farZ - nearZ);
 
 		matrix<Scalar, 4, 4> result(static_cast<Scalar>(0));
 
@@ -15,7 +15,7 @@ namespace rsl::math
 		result[1][1] = static_cast<Scalar>(1) / (tanHalfFovy);
 		result[2][2] = (farZ + nearZ) * inverseFrustumDepth;
 
-        result[2][3] = static_cast<Scalar>(1);
+		result[2][3] = static_cast<Scalar>(1);
 		result[3][2] = -(static_cast<Scalar>(2) * nearZ * farZ) * inverseFrustumDepth;
 
 		return result;
@@ -56,11 +56,11 @@ namespace rsl::math
 		result.col1 = u;
 		result.col2 = f;
 
-        vector<Scalar, 3> x{ r.x, u.x, f.x };
-        vector<Scalar, 3> y{ r.y, u.y, f.y };
-		vector<Scalar, 3> z{ r.z, u.z, f.z };
+		vector<Scalar, 3> x{r.x, u.x, f.x};
+		vector<Scalar, 3> y{r.y, u.y, f.y};
+		vector<Scalar, 3> z{r.z, u.z, f.z};
 
-        result.col3 = -(x * eye.xxx + y * eye.yyy + z * eye.zzz);
+		result.col3 = -(x * eye.xxx + y * eye.yyy + z * eye.zzz);
 
 		return result;
 	}
@@ -84,7 +84,7 @@ namespace rsl::math
 		return result;
 	}
 
-    // template<typename Scalar>
+	// template<typename Scalar>
 	//[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> matrix, quaternion<Scalar> orientation) noexcept
 	//{
 

@@ -46,10 +46,10 @@ namespace rsl
 #if defined(RYTHE_MSVC)
 			auto first = functionName.find_first_of('<') + 1;
 			auto end = functionName.find_last_of('>');
-            if (auto t = functionName.find_first_of(' ', first) + 1; t < end)
-            {
+			if (auto t = functionName.find_first_of(' ', first) + 1; t < end)
+			{
 				first = t;
-            }
+			}
 
 			typeName = functionName.substr(first, end - first);
 #elif defined(RYTHE_GCC)
@@ -69,38 +69,39 @@ namespace rsl
 		template <typename T>
 		struct compose_type_name
 		{
-			consteval static auto get_value() noexcept {
-                constexpr auto ret = compiler_dependent_type_name<T>();
+			consteval static auto get_value() noexcept
+			{
+				constexpr auto ret = compiler_dependent_type_name<T>();
 				return ret.refit<ret.size() + 1>();
-            }
+			}
 		};
 
 		template <template <typename...> typename T, typename... Args>
 		struct compose_type_name<T<Args...>>
 		{
-            template<typename A, typename... As, size_type N>
-            consteval static auto add_types(constexpr_string<N> original)
-            {
+			template <typename A, typename... As, size_type N>
+			consteval static auto add_types(constexpr_string<N> original)
+			{
 				auto ret = original + compose_type_name<A>::get_value();
 
-                if constexpr (sizeof...(As) != 0)
-                { 
+				if constexpr (sizeof...(As) != 0)
+				{
 					return add_types<As...>(ret + constexpr_string(", "));
 				}
 				else
 				{
 					return ret;
 				}
-            }
+			}
 
-            consteval static auto construct_value() noexcept
-            {
-                auto a = compiler_dependent_templated_type_name<T>();
+			consteval static auto construct_value() noexcept
+			{
+				auto a = compiler_dependent_templated_type_name<T>();
 				auto b = a + constexpr_string("<");
 				auto c = add_types<Args...>(b) + constexpr_string(">");
 
 				return c;
-            }
+			}
 
 			consteval static auto get_value() noexcept
 			{
@@ -174,9 +175,9 @@ namespace rsl
 			template <typename Other>
 			using rebind = typename get_rebind_alias<T, Other>::type;
 
-			[[nodiscard]] static constexpr ptr_type pointer_to(conditional_t<is_void_v<Elem>, char, Elem>& val
-			) noexcept(noexcept(T::pointer_to(val))) /* strengthened */
-			{                                        // Per LWG-3454
+			[[nodiscard]] static constexpr ptr_type pointer_to(conditional_t<is_void_v<Elem>, char, Elem>& val)
+				noexcept(noexcept(T::pointer_to(val))) /* strengthened */
+			{                                          // Per LWG-3454
 				return T::pointer_to(val);
 			}
 		};

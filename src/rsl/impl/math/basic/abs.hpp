@@ -9,7 +9,7 @@
 
 namespace rsl::math
 {
-	namespace detail
+	namespace internal
 	{
 		template <typename T>
 		[[nodiscard]] [[rythe_always_inline]] static auto _abs_impl_(T val)
@@ -21,14 +21,18 @@ namespace rsl::math
 				byte* significantByte = reinterpret_cast<byte*>(&copy);
 
 				if constexpr (endian::native == endian::little)
+				{
 					significantByte += sizeof(value_type) - 1;
+				}
 
 				*significantByte &= static_cast<byte>(0b0111'1111);
 
 				return copy;
 			}
 			else
+			{
 				return val < 0 ? -val : val;
+			}
 		}
 
 		template <typename Scalar, size_type Size>
@@ -47,7 +51,9 @@ namespace rsl::math
 				{
 					value_type result;
 					for (size_type i = 0; i < size; i++)
-						result[i] = detail::_abs_impl_(val[i]);
+					{
+						result[i] = internal::_abs_impl_(val[i]);
+					}
 					return result;
 				}
 			}
@@ -67,11 +73,11 @@ namespace rsl::math
 				}
 				else
 				{
-					return detail::_abs_impl_(val);
+					return internal::_abs_impl_(val);
 				}
 			}
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename T>
 	[[nodiscard]] [[rythe_always_inline]] static auto abs(T val)
@@ -79,7 +85,7 @@ namespace rsl::math
 		using value_type = ::std::remove_cvref_t<T>;
 		if constexpr (is_vector_v<value_type>)
 		{
-			return detail::compute_abs<typename value_type::scalar, value_type::size>::compute(val);
+			return internal::compute_abs<typename value_type::scalar, value_type::size>::compute(val);
 		}
 		else if constexpr (!::std::is_signed_v<value_type>)
 		{
@@ -87,7 +93,7 @@ namespace rsl::math
 		}
 		else
 		{
-			return detail::_abs_impl_(val);
+			return internal::_abs_impl_(val);
 		}
 	}
 } // namespace rsl::math

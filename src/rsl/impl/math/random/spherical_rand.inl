@@ -6,7 +6,10 @@ namespace rsl::math
 	template <typename Scalar>
 	[[nodiscard]] vector<Scalar, 3> spherical_rand(Scalar radius) noexcept
 	{
-		static_assert(::std::is_arithmetic_v<Scalar>, "Input scalar type to spherical_rand is neither a scalar nor any other supported type.");
+		static_assert(
+			::std::is_arithmetic_v<Scalar>,
+			"Input scalar type to spherical_rand is neither a scalar nor any other supported type."
+		);
 
 		Scalar theta = linear_rand(static_cast<Scalar>(0), tau<Scalar>());
 		Scalar z = linear_rand(static_cast<Scalar>(-1), static_cast<Scalar>(1));

@@ -8,20 +8,31 @@
 
 namespace rsl::math
 {
-	// mul
 	template <typename TypeA, typename TypeB>
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto mul(TypeA&& a, TypeB&& b) noexcept;
 
-	// operator *
-	template <typename TypeA, typename TypeB, std::enable_if_t<is_linear_algebraic_construct_v<TypeA> || is_linear_algebraic_construct_v<TypeB>, bool> = true>
+	template <linear_algebraic_construct TypeA, linear_algebraic_construct TypeB>
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto operator*(TypeA&& a, TypeB&& b) noexcept;
 
-	// mul_assign
 	template <typename TypeA, typename TypeB>
+		requires(linear_algebraic_construct<TypeA> && arithmetic_type<TypeB>) ||
+				(linear_algebraic_construct<TypeB> && arithmetic_type<TypeA>)
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto operator*(TypeA&& a, TypeB&& b) noexcept;
+
+	template <linear_algebraic_construct TypeA, linear_algebraic_construct TypeB>
 	[[rythe_always_inline]] constexpr TypeA& mul_assign(TypeA& a, TypeB&& b) noexcept;
 
-	// operator *=
-	template <typename TypeA, typename TypeB, std::enable_if_t<is_linear_algebraic_construct_v<TypeA> || is_linear_algebraic_construct_v<TypeB>, bool> = true>
+	template <typename TypeA, typename TypeB>
+		requires(linear_algebraic_construct<TypeA> && arithmetic_type<TypeB>) ||
+				(linear_algebraic_construct<TypeB> && arithmetic_type<TypeA>)
+	[[rythe_always_inline]] constexpr TypeA& mul_assign(TypeA& a, TypeB&& b) noexcept;
+
+	template <linear_algebraic_construct TypeA, linear_algebraic_construct TypeB>
+	[[rythe_always_inline]] constexpr TypeA& operator*=(TypeA& a, TypeB&& b) noexcept;
+
+	template <typename TypeA, typename TypeB>
+		requires(linear_algebraic_construct<TypeA> && arithmetic_type<TypeB>) ||
+				(linear_algebraic_construct<TypeB> && arithmetic_type<TypeA>)
 	[[rythe_always_inline]] constexpr TypeA& operator*=(TypeA& a, TypeB&& b) noexcept;
 } // namespace rsl::math
 

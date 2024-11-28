@@ -1,28 +1,23 @@
 #pragma once
-#include "../vector/vector4.hpp"
-#include "column/column_base.hpp"
-#include "matrix_base.hpp"
+#include "predefined.hpp"
 
-RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201)
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201) // anonymous struct
 
 namespace rsl::math
 {
-	template <typename Scalar>
-	struct quaternion;
-
-	template <typename Scalar>
-	struct matrix<Scalar, 4, 4> : matrix_base
+	template <arithmetic_type Scalar, mode Mode>
+	struct matrix<Scalar, 4, 4, Mode>
 	{
 		using scalar = Scalar;
 		static constexpr size_type row_count = 4;
 		static constexpr size_type col_count = 4;
 		static constexpr size_type size = row_count * col_count;
-		using type = matrix<Scalar, 4, 4>;
+		static constexpr mode mode = Mode;
 
-		using row_type = vector<scalar, col_count>;
+		using row_type = vector<scalar, col_count, Mode>;
 
 		template <size_type idx>
-		using col_type = column<scalar, row_count, col_count, idx>;
+		using col_type = column<scalar, row_count, col_count, idx, Mode>;
 
 		union
 		{
@@ -43,79 +38,35 @@ namespace rsl::math
 		static const matrix identity;
 		static const matrix zero;
 
-		constexpr matrix() noexcept
-			: row0(float4::right),
-			  row1(float4::up),
-			  row2(float4::forward),
-			  row3(float4::positiveW)
-		{
-		}
+		[[rythe_always_inline]] constexpr matrix() noexcept;
+		[[rythe_always_inline]] constexpr matrix(const matrix&) noexcept = default;
+		[[rythe_always_inline]] explicit constexpr matrix(scalar s) noexcept;
+		[[rythe_always_inline]] explicit constexpr matrix(scalar s, uniform_matrix_signal) noexcept;
+		[[rythe_always_inline]] explicit constexpr matrix(scalar s, identity_matrix_signal) noexcept;
+		[[rythe_always_inline]] explicit constexpr matrix(
+			scalar s00, scalar s01, scalar s02, scalar s03, scalar s10, scalar s11, scalar s12, scalar s13, scalar s20,
+			scalar s21, scalar s22, scalar s23, scalar s30, scalar s31, scalar s32, scalar s33
+		) noexcept;
+		[[rythe_always_inline]] explicit constexpr matrix(row_type r0, row_type r1, row_type r2, row_type r3) noexcept;
 
-		constexpr matrix(const matrix&) noexcept = default;
+		template <arithmetic_type Scal0, math::mode M0, arithmetic_type Scal1, math::mode M1>
+		[[rythe_always_inline]] explicit constexpr matrix(
+			const quaternion<Scal0, M0>& orientation, const vector<Scal1, 3, M1>& position = vector<Scal1, 3, M1>::zero
+		) noexcept;
 
-		explicit constexpr matrix(scalar s) noexcept
-			: row0(s, static_cast<scalar>(0), static_cast<scalar>(0), static_cast<scalar>(0)),
-			  row1(static_cast<scalar>(0), s, static_cast<scalar>(0), static_cast<scalar>(0)),
-			  row2(static_cast<scalar>(0), static_cast<scalar>(0), s, static_cast<scalar>(0)),
-			  row3(static_cast<scalar>(0), static_cast<scalar>(0), static_cast<scalar>(0), s)
-		{
-		}
+		template <typename mat_type>
+			requires not_same_as<Scalar, typename mat_type::scalar> || (mat_type::row_count != 4) ||
+					 (mat_type::col_count != 4)
+		[[rythe_always_inline]] constexpr matrix(const mat_type& other) noexcept;
 
-		explicit constexpr matrix(
-			scalar s00, scalar s01, scalar s02, scalar s03,
-			scalar s10, scalar s11, scalar s12, scalar s13,
-			scalar s20, scalar s21, scalar s22, scalar s23,
-			scalar s30, scalar s31, scalar s32, scalar s33
-		) noexcept
-			: row0(s00, s01, s02, s03),
-			  row1(s10, s11, s12, s13),
-			  row2(s20, s21, s22, s23),
-			  row3(s30, s31, s32, s33)
-		{
-		}
+		[[rythe_always_inline]] constexpr matrix& operator=(const matrix&) noexcept = default;
 
-		explicit constexpr matrix(row_type r0, row_type r1, row_type r2, row_type r3) noexcept
-			: row0(r0),
-			  row1(r1),
-			  row2(r2),
-			  row3(r3)
-		{
-		}
-
-		template <typename Scal>
-		explicit constexpr matrix(const quaternion<Scal>& orientation, const float3& position = float3::zero) noexcept;
-
-		template <typename Scal, ::std::enable_if_t<!::std::is_same_v<scalar, Scal>, bool> = true>
-		constexpr explicit matrix(const matrix<Scal, row_count, col_count>& other) noexcept;
-
-		template <typename mat_type, ::std::enable_if_t<4 != mat_type::row_count || 4 != mat_type::col_count, bool> = true>
-		constexpr matrix(const mat_type& other) noexcept;
-
-		constexpr matrix& operator=(const matrix&) noexcept = default;
-
-		[[nodiscard]] constexpr row_type& operator[](size_type i) noexcept
-		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < row_count), "matrix subscript out of range");
-			return rows[i];
-		}
-		[[nodiscard]] constexpr const row_type& operator[](size_type i) const noexcept
-		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < row_count), "matrix subscript out of range");
-			return rows[i];
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr row_type& operator[](size_type i) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const row_type& operator[](size_type i) const noexcept;
 	};
 
-	template <typename Scalar>
-	const matrix<Scalar, 4, 4> matrix<Scalar, 4, 4>::identity = matrix<Scalar, 4, 4>(1.0f);
-	template <typename Scalar>
-	const matrix<Scalar, 4, 4> matrix<Scalar, 4, 4>::zero = matrix<Scalar, 4, 4>(0.0f);
-
 	using float4x4 = matrix<float32, 4, 4>;
-	using mat4 = float4x4;
 	using double4x4 = matrix<float64, 4, 4>;
-	using dmat4 = double4x4;
 } // namespace rsl::math
-
-#include "../quaternion/matrix_quat_conv.inl"
 
 RYTHE_MSVC_SUPPRESS_WARNING_POP

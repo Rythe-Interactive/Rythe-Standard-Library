@@ -45,7 +45,7 @@ namespace fmt
 
 
 	template <>
-	struct formatter<rsl::math::vec2>
+	struct formatter<rsl::math::float2>
 	{
 		// Presentation format: 'f' - fixed, 'e' - exponential.
 		char presentation = 'f';
@@ -69,14 +69,20 @@ namespace fmt
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
+			{
 				return nullptr;
+			}
 
 			if (it != end && (*it == 'f' || *it == 'e'))
+			{
 				presentation = *it++;
+			}
 
 			// Check if reached the end of the range:
 			if (it != end && *it != '}')
+			{
 				throw format_error("invalid format");
+			}
 
 			// Return an iterator past the end of the parsed range:
 			return it;
@@ -85,19 +91,20 @@ namespace fmt
 		// Formats the point p using the parsed format specification (presentation)
 		// stored in this formatter.
 		template <typename FormatContext>
-		auto format(const rsl::math::vec2& p, FormatContext& ctx)
+		auto format(const rsl::math::float2& p, FormatContext& ctx)
 		{
 			// auto format(const point &p, FormatContext &ctx) -> decltype(ctx.out()) // c++11
 			// ctx.out() is an output iterator to write to.
 			return format_to(
 				ctx.out(),
-				format_string<rsl::math::vec2>(presentation == 'f' ? "({:.1f}, {:.1f})" : "({:.1e}, {:.1e})"), p.x, p.y
+				format_string<rsl::math::float2>(presentation == 'f' ? "({:.1f}, {:.1f})" : "({:.1e}, {:.1e})"), p.x,
+				p.y
 			);
 		}
 	};
 
 	template <>
-	struct formatter<rsl::math::ivec2>
+	struct formatter<rsl::math::int2>
 	{
 
 		constexpr const char* parse(format_parse_context& ctx)
@@ -105,22 +112,26 @@ namespace fmt
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
+			{
 				return nullptr;
+			}
 
 			if (it != end && *it != '}')
+			{
 				throw format_error("invalid format");
+			}
 			return it++;
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::ivec2& p, FormatContext& ctx)
+		auto format(const rsl::math::int2& p, FormatContext& ctx)
 		{
 			return format_to(ctx.out(), "({}, {})", p.x, p.y);
 		}
 	};
 
 	template <>
-	struct formatter<rsl::math::vec3>
+	struct formatter<rsl::math::float3>
 	{
 		char presentation = 'f';
 
@@ -129,23 +140,29 @@ namespace fmt
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
+			{
 				return nullptr;
+			}
 
 			if (it != end && (*it == 'f' || *it == 'e'))
+			{
 				presentation = *it++;
+			}
 
 			if (it != end && *it != '}')
+			{
 				throw format_error("invalid format");
+			}
 
 			return it;
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::vec3& p, FormatContext& ctx)
+		auto format(const rsl::math::float3& p, FormatContext& ctx)
 		{
 			return format_to(
 				ctx.out(),
-				format_string<rsl::math::vec3>(
+				format_string<rsl::math::float3>(
 					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e})"
 				),
 				p.x, p.y, p.z
@@ -154,7 +171,7 @@ namespace fmt
 	};
 
 	template <>
-	struct formatter<rsl::math::ivec3>
+	struct formatter<rsl::math::int3>
 	{
 
 		constexpr const char* parse(format_parse_context& ctx)
@@ -162,22 +179,26 @@ namespace fmt
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
+			{
 				return nullptr;
+			}
 
 			if (it != end && *it != '}')
+			{
 				throw format_error("invalid format");
+			}
 			return it++;
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::ivec3& p, FormatContext& ctx)
+		auto format(const rsl::math::int3& p, FormatContext& ctx)
 		{
 			return format_to(ctx.out(), "({}, {}, {})", p.x, p.y, p.z);
 		}
 	};
 
 	template <>
-	struct formatter<rsl::math::vec4>
+	struct formatter<rsl::math::float4>
 	{
 		char presentation = 'f';
 
@@ -186,23 +207,29 @@ namespace fmt
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
+			{
 				return nullptr;
+			}
 
 			if (it != end && (*it == 'f' || *it == 'e'))
+			{
 				presentation = *it++;
+			}
 
 			if (it != end && *it != '}')
+			{
 				throw format_error("invalid format");
+			}
 
 			return it;
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::vec4& p, FormatContext& ctx)
+		auto format(const rsl::math::float4& p, FormatContext& ctx)
 		{
 			return format_to(
 				ctx.out(),
-				format_string<rsl::math::vec4>(
+				format_string<rsl::math::float4>(
 					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})"
 				),
 				p.x, p.y, p.z, p.w
@@ -211,7 +238,7 @@ namespace fmt
 	};
 
 	template <>
-	struct formatter<rsl::math::mat3> : fmt::formatter<std::string>
+	struct formatter<rsl::math::float3x3> : fmt::formatter<std::string>
 	{
 		char presentation = 'f';
 
@@ -220,23 +247,29 @@ namespace fmt
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
+			{
 				return nullptr;
+			}
 
 			if (it != end && (*it == 'f' || *it == 'e'))
+			{
 				presentation = *it++;
+			}
 
 			if (it != end && *it != '}')
+			{
 				throw format_error("invalid format");
+			}
 
 			return it;
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::mat3& p, FormatContext& ctx) const -> decltype(ctx.out())
+		auto format(const rsl::math::float3x3& p, FormatContext& ctx) const -> decltype(ctx.out())
 		{
 			return format_to(
 				ctx.out(),
-				format_string<rsl::math::mat3>(
+				format_string<rsl::math::float3x3>(
 					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f})\n"
 										  "({:.1f}, {:.1f}, {:.1f})\n"
 										  "({:.1f}, {:.1f}, {:.1f})"
@@ -250,7 +283,7 @@ namespace fmt
 	};
 
 	template <>
-	struct formatter<rsl::math::mat4> : fmt::formatter<std::string>
+	struct formatter<rsl::math::float4x4> : fmt::formatter<std::string>
 	{
 		char presentation = 'f';
 
@@ -259,23 +292,29 @@ namespace fmt
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
+			{
 				return nullptr;
+			}
 
 			if (it != end && (*it == 'f' || *it == 'e'))
+			{
 				presentation = *it++;
+			}
 
 			if (it != end && *it != '}')
+			{
 				throw format_error("invalid format");
+			}
 
 			return it;
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::mat4& p, FormatContext& ctx) const -> decltype(ctx.out())
+		auto format(const rsl::math::float4x4& p, FormatContext& ctx) const -> decltype(ctx.out())
 		{
 			return format_to(
 				ctx.out(),
-				format_string<rsl::math::mat4>(
+				format_string<rsl::math::float4x4>(
 					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
 										  "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
 										  "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
@@ -301,13 +340,19 @@ namespace fmt
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
+			{
 				return nullptr;
+			}
 
 			if (it != end && (*it == 'f' || *it == 'e'))
+			{
 				presentation = *it++;
+			}
 
 			if (it != end && *it != '}')
+			{
 				throw format_error("invalid format");
+			}
 
 			return it;
 		}
@@ -335,13 +380,19 @@ namespace fmt
 			auto it = ctx.begin(), end = ctx.end();
 
 			if (!it)
+			{
 				return nullptr;
+			}
 
 			if (it != end && (*it == 'f' || *it == 'e'))
+			{
 				presentation = *it++;
+			}
 
 			if (it != end && *it != '}')
+			{
 				throw format_error("invalid format");
+			}
 
 			return it;
 		}
@@ -643,7 +694,7 @@ namespace rsl::log
 		println(severity::fatal, format, std::forward<Args>(a)...);
 	}
 
-	namespace detail
+	namespace internal
 	{
 		inline byte _setup_impl()
 		{
@@ -684,12 +735,12 @@ namespace rsl::log
 			undecoratedInfo("== Initializing Logger");
 			return 0;
 		}
-	} // namespace detail
+	} // namespace internal
 
 	/** @brief sets up logging (do not call, invoked by engine) */
 	inline void setup()
 	{
-		[[maybe_unused]] static auto v = detail::_setup_impl();
+		[[maybe_unused]] static auto v = internal::_setup_impl();
 	}
 } // namespace rsl::log
 #undef logger

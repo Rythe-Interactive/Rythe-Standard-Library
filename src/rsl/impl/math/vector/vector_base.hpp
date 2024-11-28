@@ -1,9 +1,6 @@
 #pragma once
-#include <tuple>
-
 #include "../../util/assert.hpp"
-#include "../../util/concepts.hpp"
-#include "../util/storage.hpp"
+#include "predefined.hpp"
 
 namespace rsl::math
 {
@@ -13,7 +10,6 @@ namespace rsl::math
 		using scalar = Scalar;
 		static constexpr size_type size = Size;
 		static constexpr mode mode = Mode;
-		using type = vector<Scalar, Size>;
 		using storage_type = storage_t<Scalar, Size, Mode>;
 
 		storage_type data;

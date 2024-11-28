@@ -12,21 +12,29 @@ namespace rsl::math
 	[[nodiscard]] [[rythe_always_inline]] constexpr Scalar sign(Scalar val) noexcept
 	{
 		if constexpr (::std::is_signed_v<Scalar>)
+		{
 			return static_cast<Scalar>(1);
+		}
 		else
+		{
 			return static_cast<Scalar>((static_cast<Scalar>(0) <= val) - (val < static_cast<Scalar>(0)));
+		}
 	}
 
 	template <typename Scalar>
 	[[nodiscard]] [[rythe_always_inline]] constexpr Scalar signum(Scalar val) noexcept
 	{
 		if constexpr (::std::is_signed_v<Scalar>)
+		{
 			return static_cast<Scalar>(0) < val;
+		}
 		else
+		{
 			return static_cast<Scalar>((static_cast<Scalar>(0) < val) - (val < static_cast<Scalar>(0)));
+		}
 	}
 
-	namespace detail
+	namespace internal
 	{
 		template <typename T>
 		struct compute_signum;
@@ -41,7 +49,9 @@ namespace rsl::math
 			{
 				vec_type result;
 				for (size_type i = 0; i < size; i++)
+				{
 					result[i] = signum(val[i]);
+				}
 				return result;
 			}
 
@@ -49,7 +59,9 @@ namespace rsl::math
 			{
 				vec_type result;
 				for (size_type i = 0; i < size; i++)
+				{
 					result[i] = sign(val[i]);
+				}
 				return result;
 			}
 		};
@@ -70,17 +82,17 @@ namespace rsl::math
 				return sign(val[0]);
 			}
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type> && vec_type::size != 1, bool> = true>
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto sign(const vec_type& val) noexcept
 	{
-		return detail::compute_signum<make_vector_t<vec_type>>::compute_sign(val);
+		return internal::compute_signum<make_vector_t<vec_type>>::compute_sign(val);
 	}
 
 	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type> && vec_type::size != 1, bool> = true>
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto signum(const vec_type& val) noexcept
 	{
-		return detail::compute_signum<make_vector_t<vec_type>>::compute(val);
+		return internal::compute_signum<make_vector_t<vec_type>>::compute(val);
 	}
 } // namespace rsl::math

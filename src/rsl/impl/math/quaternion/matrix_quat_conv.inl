@@ -1,16 +1,14 @@
 #pragma once
 #include <cmath>
 
-#include "../matrix/matrix2.hpp"
-#include "../matrix/matrix3.hpp"
-#include "../matrix/matrix4.hpp"
+#include "../matrix/matrix.hpp"
 #include "quaternion.hpp"
 
 namespace rsl::math
 {
-	template <typename Scalar>
-	template <typename Scal>
-	constexpr matrix<Scalar, 2, 2>::matrix(const quaternion<Scal>& orientation) noexcept
+	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scal, mode M>
+	constexpr matrix<Scalar, 2, 2, Mode>::matrix(const quaternion<Scal, M>& orientation) noexcept
 	{
 		const scalar i2 = static_cast<scalar>(orientation.i * orientation.i);
 		const scalar j2 = static_cast<scalar>(orientation.j * orientation.j);
@@ -25,9 +23,9 @@ namespace rsl::math
 		rows[1][1] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + k2);
 	}
 
-	template <typename Scalar>
-	template <typename Scal>
-	constexpr matrix<Scalar, 3, 3>::matrix(const quaternion<Scal>& orientation) noexcept
+	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scal, mode M>
+	constexpr matrix<Scalar, 3, 3, Mode>::matrix(const quaternion<Scal, M>& orientation) noexcept
 	{
 		const scalar i2 = static_cast<scalar>(orientation.i * orientation.i);
 		const scalar j2 = static_cast<scalar>(orientation.j * orientation.j);
@@ -52,9 +50,11 @@ namespace rsl::math
 		rows[2][2] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + j2);
 	}
 
-	template <typename Scalar>
-	template <typename Scal>
-	constexpr matrix<Scalar, 4, 4>::matrix(const quaternion<Scal>& orientation, const float3& position) noexcept
+	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scal0, math::mode M0, arithmetic_type Scal1, math::mode M1>
+	constexpr matrix<Scalar, 4, 4, Mode>::matrix(
+		const quaternion<Scal0, M0>& orientation, const vector<Scal1, 3, M1>& position
+	) noexcept
 		: row3(position.x, position.y, position.z, static_cast<scalar>(1))
 	{
 		const scalar i2 = static_cast<scalar>(orientation.i * orientation.i);
@@ -80,38 +80,31 @@ namespace rsl::math
 		rows[2][2] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + j2);
 	}
 
-	template <typename Scalar>
-	constexpr quaternion<Scalar>::quaternion(const matrix<scalar, 3, 3>& m) noexcept
+	template <arithmetic_type Scalar, mode Mode>
+	template <mode M>
+	constexpr quaternion<Scalar, Mode>::quaternion(const matrix<scalar, 3, 3, M>& m) noexcept
 	{
 		const scalar& m00 = m[0][0];
 		const scalar& m11 = m[0][0];
 		const scalar& m22 = m[0][0];
 
-		const scalar qwijk[] = {
-			m00 - m11 - m22,
-			m11 - m00 - m22,
-			m22 - m00 - m11,
-			m00 + m11 + m22
-		};
+		const scalar qwijk[] = {m00 - m11 - m22, m11 - m00 - m22, m22 - m00 - m11, m00 + m11 + m22};
 
 		size_type idx = 0;
 		scalar qMax = qwijk[0];
 		for (size_type i = 1; i < 4; i++)
+		{
 			if (qwijk[i] > qMax)
 			{
 				qMax = qwijk[i];
 				idx = i;
 			}
+		}
 
 		qMax = ::std::sqrt(qMax + static_cast<scalar>(1)) * static_cast<scalar>(0.5);
 		scalar mult = static_cast<scalar>(0.25) / qMax;
 
-		scalar qPerms[] = {
-			qMax,
-			(m[1][2] - m[2][1]) * mult,
-			(m[2][0] - m[0][2]) * mult,
-			(m[0][1] - m[1][0]) * mult
-		};
+		scalar qPerms[] = {qMax, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult};
 
 		size_type invIdx = 3 - idx;
 
@@ -121,38 +114,31 @@ namespace rsl::math
 		k = qPerms[invIdx];
 	}
 
-	template <typename Scalar>
-	constexpr quaternion<Scalar>::quaternion(const matrix<scalar, 4, 4>& m) noexcept
+	template <arithmetic_type Scalar, mode Mode>
+	template <mode M>
+	constexpr quaternion<Scalar, Mode>::quaternion(const matrix<scalar, 4, 4, M>& m) noexcept
 	{
 		const scalar& m00 = m[0][0];
 		const scalar& m11 = m[0][0];
 		const scalar& m22 = m[0][0];
 
-		const scalar qwijk[] = {
-			m00 - m11 - m22,
-			m11 - m00 - m22,
-			m22 - m00 - m11,
-			m00 + m11 + m22
-		};
+		const scalar qwijk[] = {m00 - m11 - m22, m11 - m00 - m22, m22 - m00 - m11, m00 + m11 + m22};
 
 		size_type idx = 0;
 		scalar qMax = qwijk[0];
 		for (size_type i = 1; i < 4; i++)
+		{
 			if (qwijk[i] > qMax)
 			{
 				qMax = qwijk[i];
 				idx = i;
 			}
+		}
 
 		qMax = ::std::sqrt(qMax + static_cast<scalar>(1)) * static_cast<scalar>(0.5);
 		scalar mult = static_cast<scalar>(0.25) / qMax;
 
-		scalar qPerms[] = {
-			qMax,
-			(m[1][2] - m[2][1]) * mult,
-			(m[2][0] - m[0][2]) * mult,
-			(m[0][1] - m[1][0]) * mult
-		};
+		scalar qPerms[] = {qMax, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult};
 
 		size_type invIdx = 3 - idx;
 

@@ -85,27 +85,27 @@ namespace rsl
 		}
 
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
-            allocate(size_type size, size_type alignment) noexcept override
-        {
+		allocate(size_type size, size_type alignment) noexcept override
+		{
 			return impl.allocate(size, alignment);
-        }
+		}
 
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
-            reallocate(void* ptr, size_type oldSize, size_type newSize) noexcept override
-        {
+		reallocate(void* ptr, size_type oldSize, size_type newSize) noexcept override
+		{
 			return impl.reallocate(ptr, oldSize, newSize);
-        }
+		}
 
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
-            reallocate(void* ptr, size_type oldSize, size_type newSize, size_type alignment) noexcept override
+		reallocate(void* ptr, size_type oldSize, size_type newSize, size_type alignment) noexcept override
 		{
 			return impl.reallocate(ptr, oldSize, newSize, alignment);
-        }
+		}
 
-        [[rythe_always_inline]] void deallocate(void* ptr, size_type size) noexcept override
+		[[rythe_always_inline]] void deallocate(void* ptr, size_type size) noexcept override
 		{
 			impl.deallocate(ptr, size);
-        }
+		}
 
 		[[rythe_always_inline]] void deallocate(void* ptr, size_type size, size_type alignment) noexcept override
 		{
@@ -113,8 +113,8 @@ namespace rsl
 		}
 	};
 
-    using default_polymorphic_allocator = polymorphic_univeral_allocator_mixin<default_allocator>;
-    using default_pmu_allocator = default_polymorphic_allocator;
+	using default_polymorphic_allocator = polymorphic_univeral_allocator_mixin<default_allocator>;
+	using default_pmu_allocator = default_polymorphic_allocator;
 
 	template <typename T>
 	class default_constructor final
@@ -156,13 +156,12 @@ namespace rsl
 		using value_type = T;
 
 		template <typename... Args>
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T* allocate(
-			size_type count = 1, Args&&... args
-		) noexcept(is_nothrow_invocable_v<Constructor::construct, void*, size_type, Args...>);
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T* allocate(size_type count = 1, Args&&... args)
+			noexcept(is_nothrow_invocable_v<Constructor::construct, void*, size_type, Args...>);
 		template <typename... Args>
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T* allocate(
-			size_type count, size_type alignment, Args&&... args
-		) noexcept(is_nothrow_invocable_v<Constructor::construct, void*, size_type, Args...>);
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T*
+		allocate(size_type count, size_type alignment, Args&&... args)
+			noexcept(is_nothrow_invocable_v<Constructor::construct, void*, size_type, Args...>);
 
 		template <typename... Args>
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T* reallocate(

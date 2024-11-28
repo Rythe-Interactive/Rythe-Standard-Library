@@ -16,7 +16,6 @@
 #include "impl/math/util/util.hpp"
          
 #include "impl/math/constants.hpp"
-#include "impl/math/trigonometry.hpp"
 #include "impl/math/color.hpp"
 #include "impl/math/geometry.hpp"
 

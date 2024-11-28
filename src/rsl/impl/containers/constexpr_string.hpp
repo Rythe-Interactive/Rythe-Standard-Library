@@ -13,7 +13,10 @@ namespace rsl
 		consteval constexpr_string() noexcept = default;
 		consteval constexpr_string(const char (&arr)[N]) noexcept
 		{
-			for (size_type i = 0; i < N; ++i) { buffer[i] = arr[i]; }
+			for (size_type i = 0; i < N; ++i)
+			{
+				buffer[i] = arr[i];
+			}
 		}
 
 		[[nodiscard]] consteval size_type capacity() const noexcept { return N; }
@@ -32,7 +35,7 @@ namespace rsl
 		template <size_type I>
 		[[nodiscard]] consteval constexpr_string<I> refit() const noexcept;
 
-        consteval void copy_from(string_view str) noexcept;
+		consteval void copy_from(string_view str) noexcept;
 	};
 
 	template <size_type A, size_type B>
@@ -40,11 +43,20 @@ namespace rsl
 	{
 		constexpr_string<A + B - 1> retval;
 		// copy up to first nil in lhs:
-		for (size_type i = 0; i < lhs.size(); ++i) { retval[i] = lhs[i]; }
+		for (size_type i = 0; i < lhs.size(); ++i)
+		{
+			retval[i] = lhs[i];
+		}
 		// copy entire rhs buffer, including trailing nils:
-		for (size_type i = 0; i < B; ++i) { retval[lhs.size() + i] = rhs[i]; }
+		for (size_type i = 0; i < B; ++i)
+		{
+			retval[lhs.size() + i] = rhs[i];
+		}
 		// zero out the leftovers, if any:
-		for (size_type i = lhs.size() + B; i < A + B - 1; ++i) { retval[i] = 0; }
+		for (size_type i = lhs.size() + B; i < A + B - 1; ++i)
+		{
+			retval[i] = 0;
+		}
 
 		return retval;
 	}
@@ -64,7 +76,10 @@ namespace rsl
 			}
 		}
 
-		for (j = j + 1; j < N; ++j) { ret[j] = 0; }
+		for (j = j + 1; j < N; ++j)
+		{
+			ret[j] = 0;
+		}
 		return ret;
 	}
 
@@ -75,8 +90,14 @@ namespace rsl
 		constexpr_string<I> ret{};
 
 		constexpr size_type minSize = I < N ? I : N;
-		for (size_type i = 0; i < minSize; i++) { ret[i] = buffer[i]; }
-		for (size_type i = minSize; i < I; i++) { ret[i] = '\0'; }
+		for (size_type i = 0; i < minSize; i++)
+		{
+			ret[i] = buffer[i];
+		}
+		for (size_type i = minSize; i < I; i++)
+		{
+			ret[i] = '\0';
+		}
 		return ret;
 	}
 
@@ -84,7 +105,10 @@ namespace rsl
 	inline consteval size_type constexpr_string<N>::size() const noexcept
 	{
 		size_type s = 0ull;
-		while (s + 1 < N && buffer[s]) { ++s; }
+		while (s + 1 < N && buffer[s])
+		{
+			++s;
+		}
 		return s;
 	}
 
@@ -98,8 +122,14 @@ namespace rsl
 	inline consteval void constexpr_string<N>::copy_from(string_view str) noexcept
 	{
 		size_type minSize = N < str.size() ? N : str.size();
-		for (size_type i = 0; i < minSize; ++i) { buffer[i] = str[i]; }
-		for (size_type i = minSize; i < N; ++i) { buffer[i] = '\0'; }
+		for (size_type i = 0; i < minSize; ++i)
+		{
+			buffer[i] = str[i];
+		}
+		for (size_type i = minSize; i < N; ++i)
+		{
+			buffer[i] = '\0';
+		}
 	}
 
 } // namespace rsl

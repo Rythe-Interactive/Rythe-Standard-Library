@@ -6,7 +6,7 @@
 
 namespace rsl::math
 {
-	namespace detail
+	namespace internal
 	{
 		template <typename Scalar, size_type Size>
 		struct compute_pow
@@ -18,7 +18,9 @@ namespace rsl::math
 			{
 				value_type result;
 				for (size_type i; i < size; i++)
+				{
 					result[i] = ::std::pow(v[i], s[i]);
+				}
 				return result;
 			}
 
@@ -26,7 +28,9 @@ namespace rsl::math
 			{
 				value_type result;
 				for (size_type i; i < size; i++)
+				{
 					result[i] = ::std::pow(v[i], s);
+				}
 				return result;
 			}
 
@@ -34,7 +38,9 @@ namespace rsl::math
 			{
 				value_type result;
 				for (size_type i; i < size; i++)
+				{
 					result[i] = v[i] * v[i];
+				}
 				return result;
 			}
 		};
@@ -45,15 +51,9 @@ namespace rsl::math
 			static constexpr size_type size = 1u;
 			using value_type = vector<Scalar, size>;
 
-			[[rythe_always_inline]] static Scalar compute(Scalar v, Scalar s) noexcept
-			{
-				return ::std::pow(v, s);
-			}
+			[[rythe_always_inline]] static Scalar compute(Scalar v, Scalar s) noexcept { return ::std::pow(v, s); }
 
-			[[rythe_always_inline]] static Scalar compute_squared(Scalar s) noexcept
-			{
-				return s * s;
-			}
+			[[rythe_always_inline]] static Scalar compute_squared(Scalar s) noexcept { return s * s; }
 		};
 
 		template <typename Scalar>
@@ -108,7 +108,9 @@ namespace rsl::math
 
 			[[rythe_always_inline]] static value_type compute(const value_type& v, const value_type& s) noexcept
 			{
-				return value_type{::std::pow(v[0], s[0]), ::std::pow(v[1], s[1]), ::std::pow(v[2], s[2]), ::std::pow(v[3], s[3])};
+				return value_type{
+					::std::pow(v[0], s[0]), ::std::pow(v[1], s[1]), ::std::pow(v[2], s[2]), ::std::pow(v[3], s[3])
+				};
 			}
 
 			[[rythe_always_inline]] static value_type compute(const value_type& v, Scalar s) noexcept
@@ -121,35 +123,37 @@ namespace rsl::math
 				return value_type{v[0] * v[0], v[1] * v[1], v[2] * v[2], v[3] * v[3]};
 			}
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>, bool> = true>
 	[[rythe_always_inline]] static auto pow(const vec_type& v, typename vec_type::scalar s) noexcept
 	{
-		return detail::compute_pow<typename vec_type::scalar, vec_type::size>::compute(v, s);
+		return internal::compute_pow<typename vec_type::scalar, vec_type::size>::compute(v, s);
 	}
 
-	template <typename vec_type0, typename vec_type1, std::enable_if_t<is_vector_v<vec_type0> && is_vector_v<vec_type1>, bool> = true>
+	template <
+		typename vec_type0, typename vec_type1,
+		std::enable_if_t<is_vector_v<vec_type0> && is_vector_v<vec_type1>, bool> = true>
 	[[rythe_always_inline]] static auto pow(const vec_type0& v, const vec_type1& s) noexcept
 	{
-		return detail::compute_pow<typename vec_type0::scalar, vec_type0::size>::compute(v, s);
+		return internal::compute_pow<typename vec_type0::scalar, vec_type0::size>::compute(v, s);
 	}
 
 	template <typename Scalar, ::std::enable_if_t<!is_vector_v<::std::remove_cvref_t<Scalar>>, bool> = true>
 	[[rythe_always_inline]] static auto pow(Scalar v, Scalar s) noexcept
 	{
-		return detail::compute_pow<Scalar, 1u>::compute(v, s);
+		return internal::compute_pow<Scalar, 1u>::compute(v, s);
 	}
 
 	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>, bool> = true>
 	[[rythe_always_inline]] static auto squared(const vec_type& v) noexcept
 	{
-		return detail::compute_pow<typename vec_type::scalar, vec_type::size>::compute_squared(v);
+		return internal::compute_pow<typename vec_type::scalar, vec_type::size>::compute_squared(v);
 	}
 
 	template <typename Scalar, ::std::enable_if_t<!is_vector_v<::std::remove_cvref_t<Scalar>>, bool> = true>
 	[[rythe_always_inline]] static auto squared(Scalar s) noexcept
 	{
-		return detail::compute_pow<Scalar, 1u>::compute_squared(s);
+		return internal::compute_pow<Scalar, 1u>::compute_squared(s);
 	}
 } // namespace rsl::math

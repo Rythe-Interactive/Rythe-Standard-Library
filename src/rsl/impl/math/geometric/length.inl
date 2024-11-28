@@ -9,25 +9,25 @@ namespace rsl::math
 	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>, bool>>
 	[[nodiscard]] auto length(const vec_type& v) noexcept
 	{
-		return detail::compute_length<vec_type>::compute(v);
+		return internal::compute_length<vec_type>::compute(v);
 	}
 
 	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>, bool>>
 	[[nodiscard]] constexpr auto length2(const vec_type& v) noexcept
 	{
-		return detail::compute_length<vec_type>::compute2(v);
+		return internal::compute_length<vec_type>::compute2(v);
 	}
 
 	template <typename quat_type, ::std::enable_if_t<is_quat_v<quat_type>, bool>>
 	[[nodiscard]] auto length(const quat_type& q) noexcept
 	{
-		return detail::compute_length<quat_type>::compute(q);
+		return internal::compute_length<quat_type>::compute(q);
 	}
 
 	template <typename quat_type, ::std::enable_if_t<is_quat_v<quat_type>, bool>>
 	[[nodiscard]] constexpr auto length2(const quat_type& q) noexcept
 	{
-		return detail::compute_length<quat_type>::compute2(q);
+		return internal::compute_length<quat_type>::compute2(q);
 	}
 
 	template <typename mat_type, ::std::enable_if_t<is_matrix_v<mat_type>, bool>>
@@ -41,17 +41,5 @@ namespace rsl::math
 	{
 		auto det = determinant(m);
 		return det * det;
-	}
-
-	template <typename Scalar, size_type Size>
-	[[nodiscard]] Scalar vector<Scalar, Size>::length() const noexcept
-	{
-		return ::rsl::math::length(*this);
-	}
-
-	template <typename Scalar, size_type Size>
-	[[nodiscard]] constexpr Scalar vector<Scalar, Size>::length2() const noexcept
-	{
-		return ::rsl::math::length2(*this);
 	}
 } // namespace rsl::math

@@ -1,8 +1,7 @@
 #pragma once
-#include "../../util/primitives.hpp"
+#include "predefined.hpp"
 
 #include "../util/type_util.hpp"
-#include "matrix_base.hpp"
 
 namespace rsl::math
 {

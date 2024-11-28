@@ -19,31 +19,31 @@ namespace rsl
 	RYTHE_HAS_FUNC(data)
 
 	template <has_begin<any_type()> Container>
-	[[nodiscard]] constexpr auto begin(Container& container)
-		noexcept(noexcept(container.begin())) -> decltype(container.begin())
+	[[nodiscard]] constexpr auto begin(Container& container) noexcept(noexcept(container.begin()))
+		-> decltype(container.begin())
 	{
 		return container.begin();
 	}
 
 	template <typename Container>
 		requires has_begin<const Container, any_type()>
-	[[nodiscard]] constexpr auto begin(const Container& container)
-		noexcept(noexcept(container.begin())) -> decltype(container.begin())
+	[[nodiscard]] constexpr auto begin(const Container& container) noexcept(noexcept(container.begin()))
+		-> decltype(container.begin())
 	{
 		return container.begin();
 	}
 
 	template <has_end<any_type()> Container>
-	[[nodiscard]] constexpr auto end(Container& container)
-		noexcept(noexcept(container.end())) -> decltype(container.end())
+	[[nodiscard]] constexpr auto end(Container& container) noexcept(noexcept(container.end()))
+		-> decltype(container.end())
 	{
 		return container.end();
 	}
 
 	template <typename Container>
 		requires has_end<const Container, any_type()>
-	[[nodiscard]] constexpr auto end(const Container& container)
-		noexcept(noexcept(container.end())) -> decltype(container.end())
+	[[nodiscard]] constexpr auto end(const Container& container) noexcept(noexcept(container.end()))
+		-> decltype(container.end())
 	{
 		return container.end();
 	}
@@ -77,8 +77,8 @@ namespace rsl
 
 	template <typename Container>
 		requires internal::rsl_begin_valid<const Container>
-	[[nodiscard]] constexpr auto cbegin(const Container& container)
-		noexcept(noexcept(::rsl::begin(container))) -> decltype(::rsl::begin(container))
+	[[nodiscard]] constexpr auto cbegin(const Container& container) noexcept(noexcept(::rsl::begin(container)))
+		-> decltype(::rsl::begin(container))
 	{
 		return ::rsl::begin(container);
 	}
@@ -86,16 +86,16 @@ namespace rsl
 	// Fallback.
 	template <typename Container>
 		requires has_cbegin<const Container, any_type()> && internal::rsl_begin_invalid<const Container>
-	[[nodiscard]] constexpr auto cbegin(const Container& container)
-		noexcept(noexcept(container.cbegin())) -> decltype(container.cbegin())
+	[[nodiscard]] constexpr auto cbegin(const Container& container) noexcept(noexcept(container.cbegin()))
+		-> decltype(container.cbegin())
 	{
 		return container.cbegin();
 	}
 
 	template <typename Container>
 		requires internal::rsl_end_valid<const Container>
-	[[nodiscard]] constexpr auto cend(const Container& container)
-		noexcept(noexcept(::rsl::end(container))) -> decltype(::rsl::end(container))
+	[[nodiscard]] constexpr auto cend(const Container& container) noexcept(noexcept(::rsl::end(container)))
+		-> decltype(::rsl::end(container))
 	{
 		return ::rsl::end(container);
 	}
@@ -103,38 +103,38 @@ namespace rsl
 	// Fallback.
 	template <typename Container>
 		requires has_cend<const Container, any_type()> && internal::rsl_end_invalid<const Container>
-	[[nodiscard]] constexpr auto cend(const Container& container)
-		noexcept(noexcept(container.cend())) -> decltype(container.cend())
+	[[nodiscard]] constexpr auto cend(const Container& container) noexcept(noexcept(container.cend()))
+		-> decltype(container.cend())
 	{
 		return container.cend();
 	}
 
 	template <has_rbegin<any_type()> Container>
-	[[nodiscard]] constexpr auto rbegin(Container& container)
-		noexcept(noexcept(container.rbegin())) -> decltype(container.rbegin())
+	[[nodiscard]] constexpr auto rbegin(Container& container) noexcept(noexcept(container.rbegin()))
+		-> decltype(container.rbegin())
 	{
 		return container.rbegin();
 	}
 
 	template <typename Container>
 		requires has_rbegin<const Container, any_type()>
-	[[nodiscard]] constexpr auto rbegin(const Container& container)
-		noexcept(noexcept(container.rbegin())) -> decltype(container.rbegin())
+	[[nodiscard]] constexpr auto rbegin(const Container& container) noexcept(noexcept(container.rbegin()))
+		-> decltype(container.rbegin())
 	{
 		return container.rbegin();
 	}
 
 	template <has_rend<any_type()> Container>
-	[[nodiscard]] constexpr auto rend(Container& container)
-		noexcept(noexcept(container.rend())) -> decltype(container.rend())
+	[[nodiscard]] constexpr auto rend(Container& container) noexcept(noexcept(container.rend()))
+		-> decltype(container.rend())
 	{
 		return container.rend();
 	}
 
 	template <typename Container>
 		requires has_rend<const Container, any_type()>
-	[[nodiscard]] constexpr auto rend(const Container& container)
-		noexcept(noexcept(container.rend())) -> decltype(container.rend())
+	[[nodiscard]] constexpr auto rend(const Container& container) noexcept(noexcept(container.rend()))
+		-> decltype(container.rend())
 	{
 		return container.rend();
 	}
@@ -180,8 +180,8 @@ namespace rsl
 
 	template <typename Container>
 		requires internal::rsl_rbegin_valid<const Container>
-	[[nodiscard]] constexpr auto crbegin(const Container& container)
-		noexcept(noexcept(::rsl::rbegin(container))) -> decltype(::rsl::rbegin(container))
+	[[nodiscard]] constexpr auto crbegin(const Container& container) noexcept(noexcept(::rsl::rbegin(container)))
+		-> decltype(::rsl::rbegin(container))
 	{
 		return ::rsl::rbegin(container);
 	}
@@ -189,16 +189,16 @@ namespace rsl
 	// Fallback.
 	template <typename Container>
 		requires has_crbegin<const Container, any_type()> && internal::rsl_rbegin_invalid<const Container>
-	[[nodiscard]] constexpr auto crbegin(const Container& container)
-		noexcept(noexcept(container.crbegin())) -> decltype(container.crbegin())
+	[[nodiscard]] constexpr auto crbegin(const Container& container) noexcept(noexcept(container.crbegin()))
+		-> decltype(container.crbegin())
 	{
 		return container.crbegin();
 	}
 
 	template <typename Container>
 		requires internal::rsl_rend_valid<const Container>
-	[[nodiscard]] constexpr auto crend(const Container& container)
-		noexcept(noexcept(::rsl::rend(container))) -> decltype(::rsl::rend(container))
+	[[nodiscard]] constexpr auto crend(const Container& container) noexcept(noexcept(::rsl::rend(container)))
+		-> decltype(::rsl::rend(container))
 	{
 		return ::rsl::rend(container);
 	}
@@ -206,16 +206,16 @@ namespace rsl
 	// Fallback.
 	template <typename Container>
 		requires has_crend<const Container, any_type()> && internal::rsl_rend_invalid<const Container>
-	[[nodiscard]] constexpr auto crend(const Container& container)
-		noexcept(noexcept(container.crend())) -> decltype(container.crend())
+	[[nodiscard]] constexpr auto crend(const Container& container) noexcept(noexcept(container.crend()))
+		-> decltype(container.crend())
 	{
 		return container.crend();
 	}
 
 	template <typename Container>
 		requires has_size<const Container, any_type()>
-	[[nodiscard]] constexpr auto size(const Container& container)
-		noexcept(noexcept(container.size())) -> decltype(container.size())
+	[[nodiscard]] constexpr auto size(const Container& container) noexcept(noexcept(container.size()))
+		-> decltype(container.size())
 	{
 		return container.size();
 	}
@@ -228,8 +228,8 @@ namespace rsl
 
 	template <typename Container>
 		requires has_empty<const Container, any_type()>
-	[[nodiscard]] constexpr auto empty(const Container& container)
-		noexcept(noexcept(container.empty())) -> decltype(container.empty())
+	[[nodiscard]] constexpr auto empty(const Container& container) noexcept(noexcept(container.empty()))
+		-> decltype(container.empty())
 	{
 		return container.empty();
 	}
@@ -247,16 +247,16 @@ namespace rsl
 	}
 
 	template <has_data<any_type()> Container>
-	[[nodiscard]] constexpr auto data(Container& container)
-		noexcept(noexcept(container.data())) -> decltype(container.data())
+	[[nodiscard]] constexpr auto data(Container& container) noexcept(noexcept(container.data()))
+		-> decltype(container.data())
 	{
 		return container.data();
 	}
 
 	template <typename Container>
 		requires has_data<const Container, any_type()>
-	[[nodiscard]] constexpr auto data(const Container& container)
-		noexcept(noexcept(container.data())) -> decltype(container.data())
+	[[nodiscard]] constexpr auto data(const Container& container) noexcept(noexcept(container.data()))
+		-> decltype(container.data())
 	{
 		return container.data();
 	}

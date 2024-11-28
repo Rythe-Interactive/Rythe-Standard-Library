@@ -7,7 +7,7 @@
 
 namespace rsl::math
 {
-	namespace detail
+	namespace internal
 	{
 		template <typename Scalar, size_type Size>
 		struct compute_mod
@@ -19,15 +19,20 @@ namespace rsl::math
 			{
 				value_type result;
 				for (size_type i = 0; i < size; i++)
+				{
 					result[i] = ::std::fmod(val[i], m);
+				}
 				return result;
 			}
 
-			[[nodiscard]] [[rythe_always_inline]] static value_type computef(const value_type& val, const value_type& m) noexcept
+			[[nodiscard]] [[rythe_always_inline]] static value_type
+			computef(const value_type& val, const value_type& m) noexcept
 			{
 				value_type result;
 				for (size_type i = 0; i < size; i++)
+				{
 					result[i] = ::std::fmod(val[i], m[i]);
+				}
 				return result;
 			}
 
@@ -35,7 +40,9 @@ namespace rsl::math
 			{
 				value_type result;
 				for (size_type i = 0; i < size; i++)
+				{
 					result[i] = val[i] % m;
+				}
 				return result;
 			}
 
@@ -43,7 +50,9 @@ namespace rsl::math
 			{
 				value_type result;
 				for (size_type i = 0; i < size; i++)
+				{
 					result[i] = val[i] % m[i];
+				}
 				return result;
 			}
 		};
@@ -59,24 +68,26 @@ namespace rsl::math
 				return ::std::fmod(val, m);
 			}
 
-			[[nodiscard]] constexpr static Scalar compute(Scalar val, Scalar m) noexcept
-			{
-				return val % m;
-			}
+			[[nodiscard]] constexpr static Scalar compute(Scalar val, Scalar m) noexcept { return val % m; }
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename T>
 	[[nodiscard]] [[rythe_always_inline]] static auto fmod(const T& val, const T& m)
 	{
 		if constexpr (is_vector_v<T>)
 		{
-			static_assert(::std::is_floating_point_v<typename T::scalar>, "Value must be floating point in order to use fmod, use mod instead.");
-			return detail::compute_mod<typename T::scalar, T::size>::computef(val, m);
+			static_assert(
+				::std::is_floating_point_v<typename T::scalar>,
+				"Value must be floating point in order to use fmod, use mod instead."
+			);
+			return internal::compute_mod<typename T::scalar, T::size>::computef(val, m);
 		}
 		else
 		{
-			static_assert(::std::is_floating_point_v<T>, "Value must be floating point in order to use fmod, use mod instead.");
+			static_assert(
+				::std::is_floating_point_v<T>, "Value must be floating point in order to use fmod, use mod instead."
+			);
 			return ::std::fmod(val, m);
 		}
 	}
@@ -84,8 +95,11 @@ namespace rsl::math
 	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
 	[[nodiscard]] [[rythe_always_inline]] static auto fmod(const vec_type& val, typename vec_type::scalar m)
 	{
-		static_assert(::std::is_floating_point_v<typename vec_type::scalar>, "Value must be floating point in order to use fmod, use mod instead.");
-		return detail::compute_mod<typename vec_type::scalar, vec_type::size>::computef(val, m);
+		static_assert(
+			::std::is_floating_point_v<typename vec_type::scalar>,
+			"Value must be floating point in order to use fmod, use mod instead."
+		);
+		return internal::compute_mod<typename vec_type::scalar, vec_type::size>::computef(val, m);
 	}
 
 	template <typename T>
@@ -94,23 +108,35 @@ namespace rsl::math
 		if constexpr (is_vector_v<T>)
 		{
 			if constexpr (::std::is_floating_point_v<typename T::scalar>)
-				return detail::compute_mod<typename T::scalar, T::size>::computef(val, m);
+			{
+				return internal::compute_mod<typename T::scalar, T::size>::computef(val, m);
+			}
 			else
-				return detail::compute_mod<typename T::scalar, T::size>::compute(val, m);
+			{
+				return internal::compute_mod<typename T::scalar, T::size>::compute(val, m);
+			}
 		}
 		else if constexpr (::std::is_floating_point_v<T>)
+		{
 			return ::std::fmod(val, m);
+		}
 		else
+		{
 			return val % m;
+		}
 	}
 
 	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
 	[[nodiscard]] [[rythe_always_inline]] static auto mod(const vec_type& val, typename vec_type::scalar m)
 	{
 		if constexpr (::std::is_floating_point_v<typename vec_type::scalar>)
-			return detail::compute_mod<typename vec_type::scalar, vec_type::size>::computef(val, m);
+		{
+			return internal::compute_mod<typename vec_type::scalar, vec_type::size>::computef(val, m);
+		}
 		else
-			return detail::compute_mod<typename vec_type::scalar, vec_type::size>::compute(val, m);
+		{
+			return internal::compute_mod<typename vec_type::scalar, vec_type::size>::compute(val, m);
+		}
 	}
 
 	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>

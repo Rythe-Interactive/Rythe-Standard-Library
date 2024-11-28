@@ -19,15 +19,13 @@ namespace rsl::math
 			: float4(other)
 		{
 		}
-		constexpr color(rsl::float32 _r, rsl::float32 _g, rsl::float32 _b)
-			: float4(_r, _g, _b, 1.f)
+		constexpr color(rsl::float32 _r, rsl::float32 _g, rsl::float32 _b, rsl::float32 _a = 1.f)
+			: float4(_r, _g, _b, _a)
 		{
 		}
 
 		using float4::operator=;
 		using float4::operator[];
-		using float4::length;
-		using float4::length2;
 	};
 
 	/**@class dcolor
@@ -42,15 +40,13 @@ namespace rsl::math
 			: double4(other)
 		{
 		}
-		constexpr dcolor(rsl::float64 _r, rsl::float64 _g, rsl::float64 _b)
-			: double4(_r, _g, _b, 1.0)
+		constexpr dcolor(rsl::float64 _r, rsl::float64 _g, rsl::float64 _b, rsl::float64 _a = 1.0)
+			: double4(_r, _g, _b, _a)
 		{
 		}
 
 		using double4::operator=;
 		using double4::operator[];
-		using double4::length;
-		using double4::length2;
 	};
 
 	/**

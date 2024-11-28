@@ -1,7 +1,7 @@
 #pragma once
 #include "multiplication.hpp"
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_multiplication;
@@ -16,18 +16,24 @@ namespace rsl::math::detail
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
+			{
 				if constexpr (is_vector_v<AType> && make_vector_t<AType>::size >= Size)
 				{
 					if constexpr (is_vector_v<BType> && make_vector_t<BType>::size >= Size)
+					{
 						result[i] = a[i] * b[i];
+					}
 					else
+					{
 						result[i] = a[i] * b;
+					}
 				}
 				else
 				{
 					static_assert(is_vector_v<BType> && make_vector_t<BType>::size >= Size);
 					result[i] = a * b[i];
 				}
+			}
 
 			return result;
 		}
@@ -44,16 +50,22 @@ namespace rsl::math::detail
 			if constexpr (is_vector_v<AType>)
 			{
 				if constexpr (is_vector_v<BType>)
+				{
 					return a[0] * b[0];
+				}
 				else
+				{
 					return a[0] * b;
+				}
 			}
 			else if constexpr (is_vector_v<BType>)
 			{
 				return a * b[0];
 			}
 			else
+			{
 				return a * b;
+			}
 		}
 	};
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal

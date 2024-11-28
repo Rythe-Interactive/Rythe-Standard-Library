@@ -34,27 +34,40 @@ namespace rsl
 		template <time_duration_rep T>
 		[[nodiscard]] constexpr minutes_duration<T> m_dur() const noexcept(std::is_arithmetic_v<rep>)
 		{
-			return std::chrono::duration_cast<minutes_duration<T>>(std::chrono::abs(duration) - d_dur<time_large>() - h_dur<time_large>());
+			return std::chrono::duration_cast<minutes_duration<T>>(
+				std::chrono::abs(duration) - d_dur<time_large>() - h_dur<time_large>()
+			);
 		}
 		template <time_duration_rep T>
 		[[nodiscard]] constexpr seconds_duration<T> s_dur() const noexcept(std::is_arithmetic_v<rep>)
 		{
-			return std::chrono::duration_cast<seconds_duration<T>>(std::chrono::abs(duration) - d_dur<time_large>() - h_dur<time_large>() - m_dur<time_large>());
+			return std::chrono::duration_cast<seconds_duration<T>>(
+				std::chrono::abs(duration) - d_dur<time_large>() - h_dur<time_large>() - m_dur<time_large>()
+			);
 		}
 		template <time_duration_rep T>
 		[[nodiscard]] constexpr milli_seconds_duration<T> milli_dur() const noexcept(std::is_arithmetic_v<rep>)
 		{
-			return std::chrono::duration_cast<milli_seconds_duration<T>>(std::chrono::abs(duration) - d_dur<time_large>() - h_dur<time_large>() - m_dur<time_large>() - s_dur<time_large>());
+			return std::chrono::duration_cast<milli_seconds_duration<T>>(
+				std::chrono::abs(duration) - d_dur<time_large>() - h_dur<time_large>() - m_dur<time_large>() -
+				s_dur<time_large>()
+			);
 		}
 		template <time_duration_rep T>
 		[[nodiscard]] constexpr micro_seconds_duration<T> micro_dur() const noexcept(std::is_arithmetic_v<rep>)
 		{
-			return std::chrono::duration_cast<micro_seconds_duration<T>>(std::chrono::abs(duration) - d_dur<time_large>() - h_dur<time_large>() - m_dur<time_large>() - s_dur<time_large>() - milli_dur<time_large>());
+			return std::chrono::duration_cast<micro_seconds_duration<T>>(
+				std::chrono::abs(duration) - d_dur<time_large>() - h_dur<time_large>() - m_dur<time_large>() -
+				s_dur<time_large>() - milli_dur<time_large>()
+			);
 		}
 		template <time_duration_rep T>
 		[[nodiscard]] constexpr nano_seconds_duration<T> nano_dur() const noexcept(std::is_arithmetic_v<rep>)
 		{
-			return std::chrono::duration_cast<nano_seconds_duration<T>>(std::chrono::abs(duration) - d_dur<time_large>() - h_dur<time_large>() - m_dur<time_large>() - s_dur<time_large>() - milli_dur<time_large>() - micro_dur<time_large>());
+			return std::chrono::duration_cast<nano_seconds_duration<T>>(
+				std::chrono::abs(duration) - d_dur<time_large>() - h_dur<time_large>() - m_dur<time_large>() -
+				s_dur<time_large>() - milli_dur<time_large>() - micro_dur<time_large>()
+			);
 		}
 
 	public:
@@ -83,27 +96,39 @@ namespace rsl
 		{
 		}
 
-		[[nodiscard]] constexpr span_type time_since_epoch() const noexcept(std::is_arithmetic_v<rep>) /* strengthened */ { return span_type{duration}; }
+		[[nodiscard]] constexpr span_type time_since_epoch() const
+			noexcept(std::is_arithmetic_v<rep>) /* strengthened */
+		{
+			return span_type{duration};
+		}
 
 		constexpr time_point& operator++() noexcept(std::is_arithmetic_v<rep>) /* strengthened */
 		{
 			++duration;
 			return *this;
 		}
-		constexpr time_point operator++(int) noexcept(std::is_arithmetic_v<rep>) /* strengthened */ { return time_point{duration++}; }
+		constexpr time_point operator++(int) noexcept(std::is_arithmetic_v<rep>) /* strengthened */
+		{
+			return time_point{duration++};
+		}
 		constexpr time_point& operator--() noexcept(std::is_arithmetic_v<rep>) /* strengthened */
 		{
 			--duration;
 			return *this;
 		}
-		constexpr time_point operator--(int) noexcept(std::is_arithmetic_v<rep>) /* strengthened */ { return time_point{duration--}; }
+		constexpr time_point operator--(int) noexcept(std::is_arithmetic_v<rep>) /* strengthened */
+		{
+			return time_point{duration--};
+		}
 
-		constexpr time_point& operator+=(const duration_type& _Dur) noexcept(std::is_arithmetic_v<rep>) /* strengthened */
+		constexpr time_point& operator+=(const duration_type& _Dur)
+			noexcept(std::is_arithmetic_v<rep>) /* strengthened */
 		{
 			duration += _Dur;
 			return *this;
 		}
-		constexpr time_point& operator-=(const duration_type& _Dur) noexcept(std::is_arithmetic_v<rep>) /* strengthened */
+		constexpr time_point& operator-=(const duration_type& _Dur)
+			noexcept(std::is_arithmetic_v<rep>) /* strengthened */
 		{
 			duration -= _Dur;
 			return *this;
@@ -145,26 +170,46 @@ namespace rsl
 			return nano_dur<T>().count();
 		}
 
-		[[nodiscard]] constexpr rsl::hours hours() const noexcept(std::is_arithmetic_v<rep>) { return h_dur<rsl::hours>().count(); }
-		[[nodiscard]] constexpr rsl::minutes minutes() const noexcept(std::is_arithmetic_v<rep>) { return m_dur<rsl::minutes>().count(); }
-		[[nodiscard]] constexpr rsl::seconds seconds() const noexcept(std::is_arithmetic_v<rep>) { return s_dur<rsl::seconds>().count(); }
-		[[nodiscard]] constexpr rsl::milli_seconds milliseconds() const noexcept(std::is_arithmetic_v<rep>) { return milli_dur<rsl::milli_seconds>().count(); }
-		[[nodiscard]] constexpr rsl::micro_seconds microseconds() const noexcept(std::is_arithmetic_v<rep>) { return micro_dur<rsl::micro_seconds>().count(); }
-		[[nodiscard]] constexpr rsl::nano_seconds nanoseconds() const noexcept(std::is_arithmetic_v<rep>) { return nano_dur<rsl::nano_seconds>().count(); }
+		[[nodiscard]] constexpr rsl::hours hours() const noexcept(std::is_arithmetic_v<rep>)
+		{
+			return h_dur<rsl::hours>().count();
+		}
+		[[nodiscard]] constexpr rsl::minutes minutes() const noexcept(std::is_arithmetic_v<rep>)
+		{
+			return m_dur<rsl::minutes>().count();
+		}
+		[[nodiscard]] constexpr rsl::seconds seconds() const noexcept(std::is_arithmetic_v<rep>)
+		{
+			return s_dur<rsl::seconds>().count();
+		}
+		[[nodiscard]] constexpr rsl::milli_seconds milliseconds() const noexcept(std::is_arithmetic_v<rep>)
+		{
+			return milli_dur<rsl::milli_seconds>().count();
+		}
+		[[nodiscard]] constexpr rsl::micro_seconds microseconds() const noexcept(std::is_arithmetic_v<rep>)
+		{
+			return micro_dur<rsl::micro_seconds>().count();
+		}
+		[[nodiscard]] constexpr rsl::nano_seconds nanoseconds() const noexcept(std::is_arithmetic_v<rep>)
+		{
+			return nano_dur<rsl::nano_seconds>().count();
+		}
 	};
 
 	extern const time_point<> genesis;
 } // namespace rsl
 
 template <rsl::time_duration_rep precision, rsl::chrono_clock clock_t, rsl::time_duration_rep precision2>
-[[nodiscard]] constexpr auto operator<=>(const rsl::time_point<precision, clock_t>& lhs, const rsl::time_point<precision2, clock_t>& rhs)
+[[nodiscard]] constexpr auto
+operator<=>(const rsl::time_point<precision, clock_t>& lhs, const rsl::time_point<precision2, clock_t>& rhs)
 	noexcept(std::is_arithmetic_v<typename clock_t::rep>) /* strengthened */
 {
 	return lhs.duration <=> rhs.duration;
 }
 
 template <rsl::time_duration_rep precision, rsl::chrono_clock clock_t, rsl::time_duration_rep precision2>
-[[nodiscard]] constexpr rsl::common_time_span<precision, precision2> operator-(const rsl::time_point<precision, clock_t>& lhs, const rsl::time_point<precision2, clock_t>& rhs)
+[[nodiscard]] constexpr rsl::common_time_span<precision, precision2>
+operator-(const rsl::time_point<precision, clock_t>& lhs, const rsl::time_point<precision2, clock_t>& rhs)
 	noexcept(std::is_arithmetic_v<typename clock_t::rep>) /* strengthened */
 {
 	return rsl::common_time_span<precision, precision2>{lhs.duration - rhs.duration};

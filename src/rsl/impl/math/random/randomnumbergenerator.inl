@@ -15,13 +15,19 @@ namespace rsl::math
 		if constexpr (::std::is_signed_v<Integer>)
 		{
 			using Unsigned = ::std::make_unsigned_t<Integer>;
-			static_assert(sizeof(Unsigned) == sizeof(Integer), "Somehow the size of the unsigned version is not the same as the original integer type?");
+			static_assert(
+				sizeof(Unsigned) == sizeof(Integer),
+				"Somehow the size of the unsigned version is not the same as the original integer type?"
+			);
 
-			Unsigned raw = static_cast<Unsigned>(generate() % static_cast<size_type>(::std::numeric_limits<Unsigned>::max()));
+			Unsigned raw =
+				static_cast<Unsigned>(generate() % static_cast<size_type>(::std::numeric_limits<Unsigned>::max()));
 			return *reinterpret_cast<Integer*>(&raw);
 		}
 		else
+		{
 			return static_cast<Integer>(generate() % static_cast<size_type>(::std::numeric_limits<Integer>::max()));
+		}
 	}
 
 	template <typename Float>

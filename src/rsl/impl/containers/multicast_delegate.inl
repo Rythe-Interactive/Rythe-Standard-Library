@@ -7,8 +7,11 @@
 namespace rsl
 {
 
-	template <typename ReturnType, template <typename, typename> typename ContainerType, template <typename> typename Allocator, typename... ParamTypes>
-	class multicast_delegate<ReturnType(ParamTypes...), ContainerType, Allocator> final : private delegate_base<ReturnType(ParamTypes...)>
+	template <
+		typename ReturnType, template <typename, typename> typename ContainerType,
+		template <typename> typename Allocator, typename... ParamTypes>
+	class multicast_delegate<ReturnType(ParamTypes...), ContainerType, Allocator> final :
+		private delegate_base<ReturnType(ParamTypes...)>
 	{
 		using base = delegate_base<ReturnType(ParamTypes...)>;
 
@@ -148,13 +151,17 @@ namespace rsl
 		}
 
 		template <functor Functor>
-			requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires std::invocable<Functor, ParamTypes...> &&
+					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
 		constexpr multicast_delegate& push_back(const Functor& instance)
 		{
 			return push_back(base::template createElement<Functor>(instance));
 		}
 
-		constexpr multicast_delegate& operator+=(const delegate_type& another) { return push_back(another.m_invocation); }
+		constexpr multicast_delegate& operator+=(const delegate_type& another)
+		{
+			return push_back(another.m_invocation);
+		}
 
 		constexpr multicast_delegate& operator+=(delegate_type&& another) { return push_back(another.m_invocation); }
 
@@ -171,7 +178,8 @@ namespace rsl
 		}
 
 		template <invocable Functor>
-			requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires std::invocable<Functor, ParamTypes...> &&
+					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
 		constexpr multicast_delegate& operator+=(const Functor& instance)
 		{
 			return push_back(base::template createElement<Functor>(instance));
@@ -179,7 +187,10 @@ namespace rsl
 
 		constexpr iterator erase(const_iterator pos) { return m_invocationList.erase(pos); }
 
-		constexpr iterator erase(const_iterator first, const_iterator last) { return m_invocationList.erase(first, last); }
+		constexpr iterator erase(const_iterator first, const_iterator last)
+		{
+			return m_invocationList.erase(first, last);
+		}
 
 		constexpr void pop_back() { erase(std::advance(begin(), size() - 1)); }
 
@@ -204,13 +215,17 @@ namespace rsl
 		}
 
 		template <functor Functor>
-			requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires std::invocable<Functor, ParamTypes...> &&
+					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
 		constexpr multicast_delegate& remove(const Functor& instance)
 		{
 			return remove(base::template createElement<Functor>(instance));
 		}
 
-		constexpr multicast_delegate& operator-=(const delegate_type& another) { return push_back(another.m_invocation); }
+		constexpr multicast_delegate& operator-=(const delegate_type& another)
+		{
+			return push_back(another.m_invocation);
+		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
 		constexpr multicast_delegate& operator-=(T& instance)
@@ -225,7 +240,8 @@ namespace rsl
 		}
 
 		template <invocable Functor>
-			requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires std::invocable<Functor, ParamTypes...> &&
+					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
 		constexpr multicast_delegate& operator-=(const Functor& instance)
 		{
 			return remove(base::template createElement<Functor>(instance));
@@ -254,7 +270,8 @@ namespace rsl
 		}
 
 		template <invocable Functor>
-			requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires std::invocable<Functor, ParamTypes...> &&
+					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
 		constexpr multicast_delegate& operator=(const Functor& instance)
 		{
 			clear();
@@ -278,7 +295,8 @@ namespace rsl
 		}
 
 		template <functor Functor>
-			requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires std::invocable<Functor, ParamTypes...> &&
+					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
 		constexpr multicast_delegate& assign(const Functor& instance)
 		{
 			clear();
@@ -293,7 +311,10 @@ namespace rsl
 			return *this;
 		}
 
-		constexpr multicast_delegate& assign(std::initializer_list<value_type> ilist) { return assign(ilist.begin(), ilist.end()); }
+		constexpr multicast_delegate& assign(std::initializer_list<value_type> ilist)
+		{
+			return assign(ilist.begin(), ilist.end());
+		}
 
 		constexpr auto operator()(ParamTypes... args) const { return invoke(args...); }
 
@@ -302,20 +323,27 @@ namespace rsl
 			if constexpr (std::same_as<ReturnType, void>)
 			{
 				for (auto& m_item : m_invocationList)
+				{
 					(*m_item.m_stub)(m_item.m_object.get(), args...);
+				}
 			}
 			else
 			{
 				invocation_result_t<ReturnType> result;
 				result.reserve(size());
 				for (auto& m_item : m_invocationList)
+				{
 					result.push_back((*m_item.m_stub)(m_item.m_object.get(), args...));
+				}
 
 				return result;
 			}
 		}
 	};
 
-	template <typename ReturnType, template <typename, typename> typename ContainerType = std::vector, template <typename> typename Allocator = std::allocator, typename... ParamTypes>
-	multicast_delegate(const delegate<ReturnType(ParamTypes...)>&) -> multicast_delegate<ReturnType(ParamTypes...), ContainerType, Allocator>;
+	template <
+		typename ReturnType, template <typename, typename> typename ContainerType = std::vector,
+		template <typename> typename Allocator = std::allocator, typename... ParamTypes>
+	multicast_delegate(const delegate<ReturnType(ParamTypes...)>&)
+		-> multicast_delegate<ReturnType(ParamTypes...), ContainerType, Allocator>;
 } // namespace rsl

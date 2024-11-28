@@ -26,13 +26,13 @@ namespace rsl
 	template <typename Type, template <typename...> typename Template>
 	concept specialization_of = is_specialization_v<Type, Template>;
 
-    template<bool value>
+	template <bool value>
 	concept invert = !value;
 
-    template<typename T>
+	template <typename T>
 	concept arithmetic_type = is_arithmetic_v<T>;
 
-    template<typename T>
+	template <typename T>
 	concept unsigned_type = is_unsigned_v<T>;
 
 	template <typename T>

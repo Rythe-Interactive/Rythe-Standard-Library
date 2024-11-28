@@ -11,7 +11,9 @@ namespace rsl
 
 	template <typename FuncSig>
 	class delegate;
-	template <typename FuncSig, template <typename, typename> typename ContainerType = std::vector, template <typename> typename Allocator = std::allocator>
+	template <
+		typename FuncSig, template <typename, typename> typename ContainerType = std::vector,
+		template <typename> typename Allocator = std::allocator>
 	class multicast_delegate;
 
 	template <typename ReturnType, typename... ParamTypes>
@@ -39,14 +41,16 @@ namespace rsl
 		constexpr delegate() = default;
 
 		template <invocable Functor>
-			requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires std::invocable<Functor, ParamTypes...> &&
+					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
 		constexpr delegate(const Functor& instance)
 			: m_invocation(base::template createElement<Functor>(instance))
 		{
 		}
 
 		template <functor Functor>
-			requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires std::invocable<Functor, ParamTypes...> &&
+					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
 		constexpr delegate(const Functor& instance)
 			: m_invocation(base::template createElement<Functor>(instance))
 		{
@@ -71,7 +75,8 @@ namespace rsl
 		}
 
 		template <functor Functor>
-			requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires std::invocable<Functor, ParamTypes...> &&
+					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
 		constexpr static delegate create(const Functor& instance)
 		{
 			return delegate(base::template createElement<Functor>(instance));
@@ -86,8 +91,14 @@ namespace rsl
 		constexpr bool operator==(const delegate&) const = default;
 		constexpr bool operator!=(const delegate&) const = default;
 
-		constexpr bool operator==(const multicast_delegate<ReturnType(ParamTypes...)>& other) const { return other == (*this); }
-		constexpr bool operator!=(const multicast_delegate<ReturnType(ParamTypes...)>& other) const { return other != (*this); }
+		constexpr bool operator==(const multicast_delegate<ReturnType(ParamTypes...)>& other) const
+		{
+			return other == (*this);
+		}
+		constexpr bool operator!=(const multicast_delegate<ReturnType(ParamTypes...)>& other) const
+		{
+			return other != (*this);
+		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
 		constexpr delegate& assign(T& instance)
@@ -113,17 +124,15 @@ namespace rsl
 		constexpr delegate& operator=(const delegate&) = default;
 
 		template <invocable Functor>
-			requires std::invocable<Functor, ParamTypes...> && std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires std::invocable<Functor, ParamTypes...> &&
+					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
 		constexpr delegate& operator=(const Functor& instance)
 		{
 			m_invocation = base::template createElement<Functor>(instance);
 			return *this;
 		}
 
-		constexpr ReturnType operator()(ParamTypes... args) const
-		{
-			return invoke(args...);
-		}
+		constexpr ReturnType operator()(ParamTypes... args) const { return invoke(args...); }
 
 		constexpr ReturnType invoke(ParamTypes... args) const
 		{

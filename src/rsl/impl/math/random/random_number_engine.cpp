@@ -3,7 +3,8 @@
 
 namespace rsl::math
 {
-	thread_local uint64 rythe_default_engine::m_seed = static_cast<uint64>(::std::chrono::high_resolution_clock::now().time_since_epoch().count());
+	thread_local uint64 rythe_default_engine::m_seed =
+		static_cast<uint64>(::std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
 	[[nodiscard]] [[rythe_always_inline]] static constexpr uint64 xor_shift64(uint64 seed) noexcept
 	{
@@ -17,11 +18,14 @@ namespace rsl::math
 	{
 		if constexpr (sizeof(size_type) != sizeof(uint64))
 		{
-			constexpr auto convRate = ::std::numeric_limits<uint64>::max() / static_cast<float_max>(::std::numeric_limits<size_type>::max());
+			constexpr auto convRate =
+				::std::numeric_limits<uint64>::max() / static_cast<float_max>(::std::numeric_limits<size_type>::max());
 			return static_cast<uint64>(seed * convRate);
 		}
 		else
+		{
 			return static_cast<uint64>(seed);
+		}
 	}
 
 
@@ -33,7 +37,9 @@ namespace rsl::math
 	void rythe_default_engine::seed(const std::seed_seq& seq) noexcept
 	{
 		if (seq.size() == 0)
+		{
 			return;
+		}
 
 		std::vector<size_type> seeds(seq.size());
 		seq.generate(seeds.begin(), seeds.end());
@@ -53,7 +59,8 @@ namespace rsl::math
 	void rythe_default_engine::discard(size_type n) noexcept
 	{
 		for (; 0 < n; --n)
-			[[maybe_unused]]
-			auto temp = generate();
+		{
+			[[maybe_unused]] auto temp = generate();
+		}
 	}
 } // namespace rsl::math

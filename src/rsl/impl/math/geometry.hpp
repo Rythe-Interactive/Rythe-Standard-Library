@@ -15,7 +15,9 @@ namespace rsl::math
 	inline float32 pointToLineSegment2D(const float2& point, const float2& lineOrigin, const float2& lineEnd)
 	{
 		if (point == lineOrigin || point == lineEnd)
+		{
 			return 0.0f;
+		}
 		float2 lineDirection = lineEnd - lineOrigin;
 		float2 lineNormal = float2(-lineDirection.y, lineDirection.x);
 
@@ -46,7 +48,9 @@ namespace rsl::math
 	inline float32 pointToLine2D(const float2& point, const float2& lineOrigin, const float2& lineEnd)
 	{
 		if (point == lineOrigin || point == lineEnd)
+		{
 			return 0.0f;
+		}
 		float2 lineDirection = lineEnd - lineOrigin;
 		float2 lineNormal = float2(-lineDirection.y, lineDirection.x);
 
@@ -62,7 +66,9 @@ namespace rsl::math
 	{
 		// Check if the point is equal to the start or end of the line
 		if (point == lineOrigin || point == lineEnd)
+		{
 			return 0.0f;
+		}
 		float3 dir = lineEnd - lineOrigin;
 		float3 toLineOrigin = point - lineOrigin;
 
@@ -98,17 +104,16 @@ namespace rsl::math
 		// Line end
 		float3 end;
 
-		inline float3 direction() const
-		{
-			return end - origin;
-		}
+		inline float3 direction() const { return end - origin; }
 
 		/**@brief Calculates the closest distance between point p and this line
 		 */
 		float32 distanceToPoint(const float3& p) const
 		{
 			if (p == origin || p == end)
+			{
 				return 0.0f;
+			}
 			float3 dir = direction();
 			float3 toLineOrigin = p - origin;
 
@@ -134,7 +139,9 @@ namespace rsl::math
 	inline float32 triangleSurface(const float3& p0, const float3& p1, const float3& p2)
 	{
 		if (p0 == p1 || p0 == p2 || p1 == p2)
+		{
 			return 0.0;
+		}
 		// side lengths
 		float32 a = abs(length(p0 - p1));
 		float32 b = abs(length(p1 - p2));
@@ -150,12 +157,15 @@ namespace rsl::math
 	 * @param triPoint2 - The last triangle point
 	 * @param triNormal - The triangle plane normal
 	 */
-	inline float32 pointToTriangle(const float3& p, const float3& triPoint0, const float3& triPoint1, const float3& triPoint2, const float3& triNormal, bool debug = false)
+	inline float32 pointToTriangle(
+		const float3& p, const float3& triPoint0, const float3& triPoint1, const float3& triPoint2,
+		const float3& triNormal, bool debug = false
+	)
 	{
-		if (p == triPoint0 ||
-			p == triPoint1 ||
-			p == triPoint2)
+		if (p == triPoint0 || p == triPoint1 || p == triPoint2)
+		{
 			return 0.f;
+		}
 
 		// Get the angle between the triangle normal and p to triPoint0
 		float32 cosAngle = dot(triNormal, p - triPoint0) / (distance(p, triPoint0) * length(triNormal));
@@ -164,7 +174,9 @@ namespace rsl::math
 		// From the projectionLength we can determine if the point is above or under the triangle plane
 		float32 positive = 1;
 		if (projectionLength < 0)
+		{
 			positive = -1;
+		}
 		// A vector when added to p gives the projected point
 		float3 towardProjection = (triNormal / length(triNormal)) * -projectionLength;
 		// Q is the projection of p onto the plane
@@ -172,7 +184,8 @@ namespace rsl::math
 
 		// We need to determine if projected p is inside the triangle.
 		// By putting point q (projected point p) on the triangle, three new triangles are created
-		// If point q is in fact inside the triangle, the areas of the three triangles will add up to same area as the original triangle
+		// If point q is in fact inside the triangle, the areas of the three triangles will add up to same area as the
+		// original triangle
 
 		float64 q01Area = triangleSurface(q, triPoint0, triPoint1);
 		float64 q02Area = triangleSurface(q, triPoint0, triPoint2);
@@ -195,12 +208,17 @@ namespace rsl::math
 		if (distance02 < distance12)
 		{
 			if (distance02 < distance01)
+			{
 				shortestDistance = distance02;
+			}
 		}
 		else if (distance12 < distance01)
+		{
 			shortestDistance = distance12;
+		}
 
-		// Return the shortest distance toward one of the sides, either positive or negative, which was determined before
+		// Return the shortest distance toward one of the sides, either positive or negative, which was determined
+		// before
 		return shortestDistance * positive;
 	}
 
@@ -211,7 +229,8 @@ namespace rsl::math
 	 * @param triPoint1 - The second triangle point
 	 * @param triPoint2 - The last triangle point
 	 */
-	inline float32 pointToTriangle(const float3& p, const float3& triPoint0, const float3& triPoint1, const float3& triPoint2)
+	inline float32
+	pointToTriangle(const float3& p, const float3& triPoint0, const float3& triPoint1, const float3& triPoint2)
 	{
 		float3 normal = normalize(cross(triPoint1 - triPoint0, triPoint2 - triPoint0));
 		return pointToTriangle(p, triPoint0, triPoint1, triPoint2, normal);
@@ -225,12 +244,15 @@ namespace rsl::math
 	 * @param triNormal - The normal of the triangle plane
 	 * @return whther the point can be projected onto the triangle
 	 */
-	inline bool pointProjectionOntoTriangle(const float3& p, const float3& triPoint0, const float3& triPoint1, const float3& triPoint2, const float3& triNormal)
+	inline bool pointProjectionOntoTriangle(
+		const float3& p, const float3& triPoint0, const float3& triPoint1, const float3& triPoint2,
+		const float3& triNormal
+	)
 	{
-		if (p == triPoint0 ||
-			p == triPoint1 ||
-			p == triPoint2)
+		if (p == triPoint0 || p == triPoint1 || p == triPoint2)
+		{
 			return true;
+		}
 
 		float32 cosAngle = dot(triNormal, p - triPoint0) / (distance(p, triPoint0) * length(triNormal));
 		float32 projectionLength = length(p - triPoint0) * cosAngle;
@@ -281,16 +303,18 @@ namespace rsl::math
 		 */
 		float32 distanceToPoint(const float3& p) const
 		{
-			if (p == points[0] ||
-				p == points[1] ||
-				p == points[2])
+			if (p == points[0] || p == points[1] || p == points[2])
+			{
 				return 0.f;
+			}
 
 			float32 cosAngle = dot(normal, p - points[0]) / (distance(p, points[0]) * length(normal));
 			float32 projectionLength = length(p - points[0]) * cosAngle;
 			float32 positive = 1;
 			if (projectionLength < 0)
+			{
 				positive = -1;
+			}
 			float3 towardProjection = (normal / length(normal)) * -projectionLength;
 			// Q is the projection of p onto the plane
 			float3 q = p + towardProjection;
@@ -317,10 +341,14 @@ namespace rsl::math
 			if (distance02 < distance12)
 			{
 				if (distance02 < distance01)
+				{
 					shortestDistance = distance02;
+				}
 			}
 			else if (distance12 < distance01)
+			{
 				shortestDistance = distance12;
+			}
 
 			return shortestDistance * positive;
 		}
@@ -381,10 +409,7 @@ namespace rsl::math
 
 		/**@brief Calculates the closest distance between point p and this plane
 		 */
-		float32 distanceToPoint(const float3& p) const
-		{
-			return dot(normal, p - position);
-		}
+		float32 distanceToPoint(const float3& p) const { return dot(normal, p - position); }
 	};
 
 	/**@brief Calculates a matrix for a plane

@@ -1,7 +1,7 @@
 #pragma once
 #include "normalize.hpp"
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_normalize;
@@ -16,4 +16,4 @@ namespace rsl::math::detail
 			return q / length(q);
 		}
 	};
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal

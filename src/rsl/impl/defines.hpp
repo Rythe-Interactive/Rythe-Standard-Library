@@ -102,8 +102,8 @@ namespace rsl
 	defined(__TARGET_ARCH_ARM) || defined(__TARGET_ARCH_THUMB)
 	#if defined(__aarch64__) || defined(_M_ARM64)
 		#define RYTHE_ARCH_ARM64
-    #else
-	    #define RYTHE_ARCH_ARM
+	#else
+		#define RYTHE_ARCH_ARM
 	#endif
 #endif
 

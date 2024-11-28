@@ -31,7 +31,10 @@ namespace rsl
 		value_container m_buffer[maxSize + 1];
 		size_type m_size;
 
-		constexpr static size_type validate_size(size_type newSize) noexcept { return newSize < maxSize ? newSize : maxSize; }
+		constexpr static size_type validate_size(size_type newSize) noexcept
+		{
+			return newSize < maxSize ? newSize : maxSize;
+		}
 
 		constexpr static bool copy_assign_noexcept = std::is_nothrow_copy_assignable_v<value_type>;
 		constexpr static bool copy_construct_noexcept = std::is_nothrow_copy_constructible_v<value_type>;
@@ -41,44 +44,62 @@ namespace rsl
 		template <typename... Args>
 		constexpr static bool construct_noexcept = std::is_nothrow_constructible_v<value_type, Args...>;
 
-		constexpr void copy_assign_from_unsafe_impl(size_type begin, size_type end, const value_type* src) noexcept(copy_assign_noexcept)
+		constexpr void copy_assign_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
+			noexcept(copy_assign_noexcept)
 		{
 			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
+			{
 				to->value = *src;
+			}
 		}
 
-		constexpr void copy_construct_from_unsafe_impl(size_type begin, size_type end, const value_type* src) noexcept(copy_construct_noexcept)
+		constexpr void copy_construct_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
+			noexcept(copy_construct_noexcept)
 		{
 			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
+			{
 				new (&to->value) value_type(*src);
+			}
 		}
 
-		constexpr void move_assign_from_unsafe_impl(size_type begin, size_type end, const value_type* src) noexcept(move_assign_noexcept)
+		constexpr void move_assign_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
+			noexcept(move_assign_noexcept)
 		{
 			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
+			{
 				to->value = std::move(*src);
+			}
 		}
 
-		constexpr void move_construct_from_unsafe_impl(size_type begin, size_type end, const value_type* src) noexcept(move_construct_noexcept)
+		constexpr void move_construct_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
+			noexcept(move_construct_noexcept)
 		{
 			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
+			{
 				new (&to->value) value_type(std::move(*src));
+			}
 		}
 
 		template <typename... Args>
-		constexpr void emplace_unsafe_impl(size_type begin, size_type end, Args&&... args) noexcept(construct_noexcept<Args...>)
+		constexpr void emplace_unsafe_impl(size_type begin, size_type end, Args&&... args)
+			noexcept(construct_noexcept<Args...>)
 		{
 			for (auto* to = m_buffer + begin; to != m_buffer + end; to++)
+			{
 				new (&to->value) value_type(std::forward<Args>(args)...);
+			}
 		}
 
 		constexpr void reset_unsafe_impl(size_type begin, size_type end) noexcept
 		{
 			for (size_type i = begin; i < end; i++)
+			{
 				m_buffer[i].value.~value_type();
+			}
 		}
 
-		constexpr void copy_assign_impl(const value_type* src, size_type srcSize) noexcept(copy_assign_noexcept && copy_construct_noexcept)
+		constexpr void copy_assign_impl(const value_type* src, size_type srcSize)
+			noexcept(copy_assign_noexcept && copy_construct_noexcept)
 		{
 			if (m_size >= srcSize)
 			{
@@ -130,14 +151,16 @@ namespace rsl
 			copy_construct_from_unsafe_impl(0, m_size, src.data());
 		}
 
-		constexpr buffered_list& operator=(const buffered_list& src) noexcept(copy_assign_noexcept && copy_construct_noexcept)
+		constexpr buffered_list& operator=(const buffered_list& src)
+			noexcept(copy_assign_noexcept && copy_construct_noexcept)
 		{
 			copy_assign_impl(src.m_buffer, src.m_size);
 			return *this;
 		}
 
 		template <size_type N>
-		constexpr buffered_list& operator=(const value_type (&arr)[N]) noexcept(copy_assign_noexcept && copy_construct_noexcept)
+		constexpr buffered_list& operator=(const value_type (&arr)[N])
+			noexcept(copy_assign_noexcept && copy_construct_noexcept)
 		{
 			copy_assign_impl(arr, N);
 			return *this;
@@ -156,9 +179,13 @@ namespace rsl
 			m_size = validate_size(newSize);
 
 			if (m_size >= oldSize)
+			{
 				emplace_unsafe_impl(oldSize, m_size, std::forward<Args>(args)...);
+			}
 			else
+			{
 				reset_unsafe_impl(m_size, oldSize);
+			}
 		}
 
 		constexpr void push_back(const value_type& value) noexcept(move_construct_noexcept && !RYTHE_VALIDATE_ON)
@@ -196,15 +223,9 @@ namespace rsl
 			return m_buffer[i].value;
 		}
 
-		constexpr reference raw_at(size_type i) noexcept
-		{
-			return m_buffer[i].value;
-		}
+		constexpr reference raw_at(size_type i) noexcept { return m_buffer[i].value; }
 
-		constexpr const_reference raw_at(size_type i) const noexcept
-		{
-			return m_buffer[i].value;
-		}
+		constexpr const_reference raw_at(size_type i) const noexcept { return m_buffer[i].value; }
 
 		constexpr reference operator[](size_type i) { return at(i); }
 		constexpr const_reference operator[](size_type i) const { return at(i); }
@@ -231,8 +252,14 @@ namespace rsl
 		constexpr const_iterator cend() const noexcept { return &m_buffer[m_size].value; }
 
 		constexpr reverse_iterator rend() noexcept { return reverse_iterator(&m_buffer[m_size].value); }
-		constexpr const_reverse_iterator rend() const noexcept { return const_reverse_iterator(&m_buffer[m_size].value); }
-		constexpr const_reverse_iterator crend() const noexcept { return const_reverse_iterator(&m_buffer[m_size].value); }
+		constexpr const_reverse_iterator rend() const noexcept
+		{
+			return const_reverse_iterator(&m_buffer[m_size].value);
+		}
+		constexpr const_reverse_iterator crend() const noexcept
+		{
+			return const_reverse_iterator(&m_buffer[m_size].value);
+		}
 
 		constexpr reverse_iterator rbegin() noexcept { return reverse_iterator(&m_buffer->value); }
 		constexpr const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(&m_buffer->value); }

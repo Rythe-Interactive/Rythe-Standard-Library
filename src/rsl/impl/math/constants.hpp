@@ -1,10 +1,10 @@
 #pragma once
-#include "../util/primitives.hpp"
 #include "../util/concepts.hpp"
+#include "../util/primitives.hpp"
 
 namespace rsl::math
 {
-	namespace detail
+	namespace internal
 	{
 
 		// note that this is in fact way more digits than even float_max can usually handle
@@ -24,12 +24,12 @@ namespace rsl::math
 		// I have honestly no idea what you would use this for,
 		// but it is a neat constant so have fun with it anyways
 		constexpr static float_max vp_feigenbaum = 4.66920160910299067185320382046620161725818557747576863274l;
-	} // namespace detail
+	} // namespace internal
 
 	template <arithmetic_type T = float32>
 	constexpr T euler()
 	{
-		return static_cast<T>(detail::very_precise_e);
+		return static_cast<T>(internal::very_precise_e);
 	}
 
 	template <arithmetic_type T = float32>
@@ -41,19 +41,19 @@ namespace rsl::math
 	template <arithmetic_type T = float32>
 	constexpr T log2e()
 	{
-		return static_cast<T>(detail::very_precise_log2e);
+		return static_cast<T>(internal::very_precise_log2e);
 	}
 
 	template <arithmetic_type T = float32>
 	constexpr T log10e()
 	{
-		return static_cast<T>(detail::very_precise_log10e);
+		return static_cast<T>(internal::very_precise_log10e);
 	}
 
 	template <arithmetic_type T = float32>
 	constexpr T pi()
 	{
-		return static_cast<T>(detail::very_precise_pi);
+		return static_cast<T>(internal::very_precise_pi);
 	}
 
 	template <arithmetic_type T = float32>
@@ -71,7 +71,7 @@ namespace rsl::math
 	template <arithmetic_type T = float32>
 	constexpr T tau()
 	{
-		return static_cast<T>(detail::very_precise_tau);
+		return static_cast<T>(internal::very_precise_tau);
 	}
 
 	template <arithmetic_type T = float32>
@@ -89,7 +89,7 @@ namespace rsl::math
 	template <arithmetic_type T = float32>
 	constexpr T sqrt2()
 	{
-		return static_cast<T>(detail::very_precise_sqrt2);
+		return static_cast<T>(internal::very_precise_sqrt2);
 	}
 
 	template <arithmetic_type T = float32>
@@ -101,7 +101,7 @@ namespace rsl::math
 	template <arithmetic_type T = float32>
 	constexpr T sqrt3()
 	{
-		return static_cast<T>(detail::very_precise_sqrt3);
+		return static_cast<T>(internal::very_precise_sqrt3);
 	}
 
 	template <arithmetic_type T = float32>
@@ -113,19 +113,19 @@ namespace rsl::math
 	template <arithmetic_type T = float32>
 	constexpr T egamma()
 	{
-		return static_cast<T>(detail::very_precise_egamma);
+		return static_cast<T>(internal::very_precise_egamma);
 	}
 
 	template <arithmetic_type T = float32>
 	constexpr T phi()
 	{
-		return static_cast<T>(detail::very_precise_phi);
+		return static_cast<T>(internal::very_precise_phi);
 	}
 
 	template <arithmetic_type T = float32>
 	constexpr T feigenbaum()
 	{
-		return static_cast<T>(detail::vp_feigenbaum);
+		return static_cast<T>(internal::vp_feigenbaum);
 	}
 
 	template <arithmetic_type T>

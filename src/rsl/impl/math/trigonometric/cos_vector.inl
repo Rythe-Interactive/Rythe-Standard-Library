@@ -1,7 +1,7 @@
 #pragma once
 #include "../interpolation/map.hpp"
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_cos;
@@ -16,7 +16,9 @@ namespace rsl::math::detail
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
+			{
 				result[i] = ::std::cos(value[i]);
+			}
 
 			return result;
 		}
@@ -26,7 +28,9 @@ namespace rsl::math::detail
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
+			{
 				result[i] = ::std::acos(value[i]);
+			}
 
 			return result;
 		}
@@ -49,4 +53,4 @@ namespace rsl::math::detail
 			return ::std::acos(value[0]);
 		}
 	};
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal

@@ -1,7 +1,7 @@
 #pragma once
 #include "map.hpp"
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_smoothstep;
@@ -16,7 +16,11 @@ namespace rsl::math::detail
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
-				result[i] = _smoothstep_impl_(saturate(map01(_extract_item_(value, i), _extract_item_(edgeMin, i), _extract_item_(edgeMax, i))));
+			{
+				result[i] = _smoothstep_impl_(
+					saturate(map01(_extract_item_(value, i), _extract_item_(edgeMin, i), _extract_item_(edgeMax, i)))
+				);
+			}
 
 			return result;
 		}
@@ -26,17 +30,24 @@ namespace rsl::math::detail
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
+			{
 				result[i] = _smoothstep_impl_(value[i]);
+			}
 
 			return result;
 		}
 
 		template <typename TypeMin, typename TypeMax, typename ValueType>
-		[[nodiscard]] constexpr static auto compute_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
+		[[nodiscard]] constexpr static auto
+		compute_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
-				result[i] = _smoothstep_derivative_impl_(saturate(map01(_extract_item_(value, i), _extract_item_(edgeMin, i), _extract_item_(edgeMax, i))));
+			{
+				result[i] = _smoothstep_derivative_impl_(
+					saturate(map01(_extract_item_(value, i), _extract_item_(edgeMin, i), _extract_item_(edgeMax, i)))
+				);
+			}
 
 			return result;
 		}
@@ -46,7 +57,9 @@ namespace rsl::math::detail
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
+			{
 				result[i] = _smoothstep_derivative_impl_(value[i]);
+			}
 
 			return result;
 		}
@@ -56,7 +69,11 @@ namespace rsl::math::detail
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
-				result[i] = _inverse_smoothstep_impl_(saturate(map01(_extract_item_(value, i), _extract_item_(edgeMin, i), _extract_item_(edgeMax, i))));
+			{
+				result[i] = _inverse_smoothstep_impl_(
+					saturate(map01(_extract_item_(value, i), _extract_item_(edgeMin, i), _extract_item_(edgeMax, i)))
+				);
+			}
 
 			return result;
 		}
@@ -66,17 +83,24 @@ namespace rsl::math::detail
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
+			{
 				result[i] = _inverse_smoothstep_impl_(value[i]);
+			}
 
 			return result;
 		}
 
 		template <typename TypeMin, typename TypeMax, typename ValueType>
-		[[nodiscard]] static auto compute_inverse_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
+		[[nodiscard]] static auto
+		compute_inverse_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
-				result[i] = _inverse_smoothstep_derivative_impl_(saturate(map01(_extract_item_(value, i), _extract_item_(edgeMin, i), _extract_item_(edgeMax, i))));
+			{
+				result[i] = _inverse_smoothstep_derivative_impl_(
+					saturate(map01(_extract_item_(value, i), _extract_item_(edgeMin, i), _extract_item_(edgeMax, i)))
+				);
+			}
 
 			return result;
 		}
@@ -86,7 +110,9 @@ namespace rsl::math::detail
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
+			{
 				result[i] = _inverse_smoothstep_derivative_impl_(value[i]);
+			}
 
 			return result;
 		}
@@ -100,7 +126,9 @@ namespace rsl::math::detail
 		template <typename TypeMin, typename TypeMax, typename ValueType>
 		[[nodiscard]] constexpr static Scalar compute(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 		{
-			return _smoothstep_impl_(saturate(map01(_extract_item_(value, 0), _extract_item_(edgeMin, 0), _extract_item_(edgeMax, 0))));
+			return _smoothstep_impl_(
+				saturate(map01(_extract_item_(value, 0), _extract_item_(edgeMin, 0), _extract_item_(edgeMax, 0)))
+			);
 		}
 
 		template <typename ValueType>
@@ -110,9 +138,12 @@ namespace rsl::math::detail
 		}
 
 		template <typename TypeMin, typename TypeMax, typename ValueType>
-		[[nodiscard]] constexpr static Scalar compute_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
+		[[nodiscard]] constexpr static Scalar
+		compute_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 		{
-			return _smoothstep_derivative_impl_(saturate(map01(_extract_item_(value, 0), _extract_item_(edgeMin, 0), _extract_item_(edgeMax, 0))));
+			return _smoothstep_derivative_impl_(
+				saturate(map01(_extract_item_(value, 0), _extract_item_(edgeMin, 0), _extract_item_(edgeMax, 0)))
+			);
 		}
 
 		template <typename ValueType>
@@ -124,7 +155,9 @@ namespace rsl::math::detail
 		template <typename TypeMin, typename TypeMax, typename ValueType>
 		[[nodiscard]] static Scalar compute_inverse(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 		{
-			return _inverse_smoothstep_impl_(saturate(map01(_extract_item_(value, 0), _extract_item_(edgeMin, 0), _extract_item_(edgeMax, 0))));
+			return _inverse_smoothstep_impl_(
+				saturate(map01(_extract_item_(value, 0), _extract_item_(edgeMin, 0), _extract_item_(edgeMax, 0)))
+			);
 		}
 
 		template <typename ValueType>
@@ -134,9 +167,12 @@ namespace rsl::math::detail
 		}
 
 		template <typename TypeMin, typename TypeMax, typename ValueType>
-		[[nodiscard]] static Scalar compute_inverse_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
+		[[nodiscard]] static Scalar
+		compute_inverse_derivative(TypeMin&& edgeMin, TypeMax&& edgeMax, ValueType&& value) noexcept
 		{
-			return _inverse_smoothstep_derivative_impl_(saturate(map01(_extract_item_(value, 0), _extract_item_(edgeMin, 0), _extract_item_(edgeMax, 0))));
+			return _inverse_smoothstep_derivative_impl_(
+				saturate(map01(_extract_item_(value, 0), _extract_item_(edgeMin, 0), _extract_item_(edgeMax, 0)))
+			);
 		}
 
 		template <typename ValueType>
@@ -145,4 +181,4 @@ namespace rsl::math::detail
 			return _inverse_smoothstep_derivative_impl_(value[0]);
 		}
 	};
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal

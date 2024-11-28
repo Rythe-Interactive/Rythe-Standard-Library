@@ -1,7 +1,7 @@
 #pragma once
 #include "lerp.hpp"
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_lerp;
@@ -15,9 +15,17 @@ namespace rsl::math::detail
 		[[nodiscard]] constexpr static auto compute(AType&& a, BType&& b, InterpType&& t) noexcept
 		{
 			if constexpr (is_vector_v<InterpType>)
-				return compute_vector(::std::forward<AType>(a), ::std::forward<BType>(b), ::std::forward<InterpType>(t));
+			{
+				return compute_vector(
+					::std::forward<AType>(a), ::std::forward<BType>(b), ::std::forward<InterpType>(t)
+				);
+			}
 			else
-				return compute_scalar(::std::forward<AType>(a), ::std::forward<BType>(b), ::std::forward<InterpType>(t));
+			{
+				return compute_scalar(
+					::std::forward<AType>(a), ::std::forward<BType>(b), ::std::forward<InterpType>(t)
+				);
+			}
 		}
 
 	private:
@@ -31,18 +39,24 @@ namespace rsl::math::detail
 				if constexpr (is_vector_v<AType> && make_vector_t<AType>::size >= Size)
 				{
 					if constexpr (is_vector_v<BType> && make_vector_t<BType>::size >= Size)
-						result[i] = detail::_lerp_impl_(a[i], b[i], t[j]);
+					{
+						result[i] = internal::_lerp_impl_(a[i], b[i], t[j]);
+					}
 					else
-						result[i] = detail::_lerp_impl_(a[i], b, t[j]);
+					{
+						result[i] = internal::_lerp_impl_(a[i], b, t[j]);
+					}
 				}
 				else
 				{
 					static_assert(is_vector_v<BType> && make_vector_t<BType>::size >= Size);
-					result[i] = detail::_lerp_impl_(a, b[i], t[j]);
+					result[i] = internal::_lerp_impl_(a, b[i], t[j]);
 				}
 
 				if (j < ::std::remove_cvref_t<InterpType>::size - 1)
+				{
 					j++;
+				}
 			}
 
 			return result;
@@ -53,18 +67,24 @@ namespace rsl::math::detail
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
+			{
 				if constexpr (is_vector_v<AType> && make_vector_t<AType>::size >= Size)
 				{
 					if constexpr (is_vector_v<BType> && make_vector_t<BType>::size >= Size)
-						result[i] = detail::_lerp_impl_(a[i], b[i], ::std::forward<InterpType>(t));
+					{
+						result[i] = internal::_lerp_impl_(a[i], b[i], ::std::forward<InterpType>(t));
+					}
 					else
-						result[i] = detail::_lerp_impl_(a[i], b, ::std::forward<InterpType>(t));
+					{
+						result[i] = internal::_lerp_impl_(a[i], b, ::std::forward<InterpType>(t));
+					}
 				}
 				else
 				{
 					static_assert(is_vector_v<BType> && make_vector_t<BType>::size >= Size);
-					result[i] = detail::_lerp_impl_(a, b[i], ::std::forward<InterpType>(t));
+					result[i] = internal::_lerp_impl_(a, b[i], ::std::forward<InterpType>(t));
 				}
+			}
 
 			return result;
 		}
@@ -79,9 +99,17 @@ namespace rsl::math::detail
 		[[nodiscard]] constexpr static Scalar compute(AType&& a, BType&& b, InterpType&& t) noexcept
 		{
 			if constexpr (is_vector_v<InterpType>)
-				return compute_vector(::std::forward<AType>(a), ::std::forward<BType>(b), ::std::forward<InterpType>(t));
+			{
+				return compute_vector(
+					::std::forward<AType>(a), ::std::forward<BType>(b), ::std::forward<InterpType>(t)
+				);
+			}
 			else
-				return compute_scalar(::std::forward<AType>(a), ::std::forward<BType>(b), ::std::forward<InterpType>(t));
+			{
+				return compute_scalar(
+					::std::forward<AType>(a), ::std::forward<BType>(b), ::std::forward<InterpType>(t)
+				);
+			}
 		}
 
 	private:
@@ -91,14 +119,18 @@ namespace rsl::math::detail
 			if constexpr (is_vector_v<AType>)
 			{
 				if constexpr (is_vector_v<BType>)
-					return detail::_lerp_impl_(a[0], b[0], t[0]);
+				{
+					return internal::_lerp_impl_(a[0], b[0], t[0]);
+				}
 				else
-					return detail::_lerp_impl_(a[0], b, t[0]);
+				{
+					return internal::_lerp_impl_(a[0], b, t[0]);
+				}
 			}
 			else
 			{
 				static_assert(is_vector_v<BType>);
-				return detail::_lerp_impl_(a, b[0], t[0]);
+				return internal::_lerp_impl_(a, b[0], t[0]);
 			}
 		}
 
@@ -108,15 +140,19 @@ namespace rsl::math::detail
 			if constexpr (is_vector_v<AType>)
 			{
 				if constexpr (is_vector_v<BType>)
-					return detail::_lerp_impl_(a[0], b[0], ::std::forward<InterpType>(t));
+				{
+					return internal::_lerp_impl_(a[0], b[0], ::std::forward<InterpType>(t));
+				}
 				else
-					return detail::_lerp_impl_(a[0], b, ::std::forward<InterpType>(t));
+				{
+					return internal::_lerp_impl_(a[0], b, ::std::forward<InterpType>(t));
+				}
 			}
 			else
 			{
 				static_assert(is_vector_v<BType>);
-				return detail::_lerp_impl_(a, b[0], ::std::forward<InterpType>(t));
+				return internal::_lerp_impl_(a, b[0], ::std::forward<InterpType>(t));
 			}
 		}
 	};
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal

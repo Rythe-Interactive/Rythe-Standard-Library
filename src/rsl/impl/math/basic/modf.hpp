@@ -7,7 +7,7 @@
 
 namespace rsl::math
 {
-	namespace detail
+	namespace internal
 	{
 		template <typename Scalar, size_type Size>
 		struct compute_modf
@@ -19,7 +19,9 @@ namespace rsl::math
 			{
 				value_type result;
 				for (size_type i = 0; i < size; i++)
+				{
 					result[i] = ::std::modf(val[i], &integer[i]);
+				}
 				return result;
 			}
 		};
@@ -34,24 +36,33 @@ namespace rsl::math
 			[[rythe_always_inline]] static value_type compute(Scalar val, RET& integer) noexcept
 			{
 				if constexpr (is_vector_v<RET>)
+				{
 					return ::std::modf(val, &integer[0]);
+				}
 				else
+				{
 					return ::std::modf(val, &integer);
+				}
 			}
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename T, typename RET>
 	[[rythe_always_inline]] static auto modf(const T& val, RET& integer)
 	{
 		if constexpr (is_vector_v<T>)
 		{
-			static_assert(::std::is_floating_point_v<typename T::scalar>, "Value must be floating point in order to use modf. (Did you mean fmod?)");
-			return detail::compute_modf<typename T::scalar, T::size>::compute(val, integer);
+			static_assert(
+				::std::is_floating_point_v<typename T::scalar>,
+				"Value must be floating point in order to use modf. (Did you mean fmod?)"
+			);
+			return internal::compute_modf<typename T::scalar, T::size>::compute(val, integer);
 		}
 		else
 		{
-			static_assert(::std::is_floating_point_v<T>, "Value must be floating point in order to use modf. (Did you mean fmod?)");
+			static_assert(
+				::std::is_floating_point_v<T>, "Value must be floating point in order to use modf. (Did you mean fmod?)"
+			);
 			return ::std::modf(val, &integer);
 		}
 	}

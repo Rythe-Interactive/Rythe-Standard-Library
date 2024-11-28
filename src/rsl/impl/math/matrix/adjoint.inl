@@ -3,7 +3,7 @@
 
 namespace rsl::math
 {
-	namespace detail
+	namespace internal
 	{
 		template <typename T>
 		struct compute_adjoint;
@@ -21,21 +21,23 @@ namespace rsl::math
 
 				mat_type result;
 				for (size_type i = 0; i < RowCount; i++)
+				{
 					for (size_type j = 0; j < ColCount; j++)
 					{
 						auto subMat = extract_sub_mat(v, i, j);
 						Scalar s = static_cast<Scalar>(((i + j) % 2) ? -1 : 1);
 						result[j][i] = static_cast<Scalar>(s * determinant(subMat));
 					}
+				}
 
 				return result;
 			}
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename mat_type, ::std::enable_if_t<is_matrix_v<mat_type>, bool>>
 	[[nodiscard]] constexpr auto adjoint(const mat_type& mat) noexcept
 	{
-		return detail::compute_adjoint<mat_type>::compute(mat);
+		return internal::compute_adjoint<mat_type>::compute(mat);
 	}
 } // namespace rsl::math

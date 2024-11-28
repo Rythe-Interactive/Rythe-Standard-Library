@@ -8,15 +8,13 @@
 
 namespace rsl::math
 {
-	struct quaternion_base;
-
-	template <typename Scalar>
+	template <arithmetic_type Scalar, mode Mode>
 	struct quaternion;
 
-	template <typename Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, mode Mode>
+	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, mode Mode>
 	struct column;
 
-	namespace detail
+	namespace internal
 	{
 		template <typename T>
 		struct _is_vector_impl : false_type
@@ -37,10 +35,10 @@ namespace rsl::math
 		struct _is_vector_impl<column<Scalar, RowCount, ColCount, ColIdx, Mode>> : true_type
 		{
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename T>
-	struct is_vector : detail::_is_vector_impl<remove_cvr_t<T>>
+	struct is_vector : internal::_is_vector_impl<remove_cvr_t<T>>
 	{
 	};
 
@@ -50,7 +48,7 @@ namespace rsl::math
 	template <typename T>
 	concept vector_type = is_vector_v<T>;
 
-	namespace detail
+	namespace internal
 	{
 		template <typename T>
 		[[nodiscard]] constexpr auto _extract_item_(T&& v, size_type i)
@@ -101,12 +99,12 @@ namespace rsl::math
 				return T{};
 			}
 		}
-	} // namespace detail
+	} // namespace internal
 
 	template <typename T>
 	struct make_vector
 	{
-		using type = remove_cvr_t<decltype(detail::_make_vector_impl<remove_cvr_t<T>>())>;
+		using type = remove_cvr_t<decltype(internal::_make_vector_impl<remove_cvr_t<T>>())>;
 	};
 
 	template <typename T>
@@ -143,27 +141,27 @@ namespace rsl::math
 	template <typename T>
 	struct decay_vector
 	{
-		using type = remove_cvr_t<decltype(detail::_decay_vector_impl<remove_cvr_t<T>>())>;
+		using type = remove_cvr_t<decltype(internal::_decay_vector_impl<remove_cvr_t<T>>())>;
 	};
 
 	template <typename T>
 	using decay_vector_t = typename decay_vector<T>::type;
 
-	namespace detail
+	namespace internal
 	{
 		template <typename T>
-		struct _is_matrix_impl : is_base_of<matrix_base, T>
+		struct _is_matrix_impl : false_type
 		{
 		};
 
-		template <typename Scalar, size_type RowCount, size_type ColCount>
-		struct _is_matrix_impl<matrix<Scalar, RowCount, ColCount>> : true_type
+		template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, mode Mode>
+		struct _is_matrix_impl<matrix<Scalar, RowCount, ColCount, Mode>> : true_type
 		{
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename T>
-	struct is_matrix : detail::_is_matrix_impl<remove_cvr_t<T>>
+	struct is_matrix : internal::_is_matrix_impl<remove_cvr_t<T>>
 	{
 	};
 
@@ -173,7 +171,7 @@ namespace rsl::math
 	template <typename T>
 	concept matrix_type = is_matrix_v<T>;
 
-	namespace detail
+	namespace internal
 	{
 		template <typename T>
 		auto _make_matrix_impl()
@@ -191,32 +189,32 @@ namespace rsl::math
 				static_assert(always_false_v<T>, "Type cannot be made into a quaternion.");
 			}
 		}
-	} // namespace detail
+	} // namespace internal
 
 	template <typename T>
 	struct make_matrix
 	{
-		using type = remove_cvr_t<decltype(detail::_make_matrix_impl<remove_cvr_t<T>>())>;
+		using type = remove_cvr_t<decltype(internal::_make_matrix_impl<remove_cvr_t<T>>())>;
 	};
 
 	template <typename T>
 	using make_matrix_t = typename make_matrix<T>::type;
 
-	namespace detail
+	namespace internal
 	{
 		template <typename T>
-		struct _is_quat_impl : is_base_of<quaternion_base, T>
+		struct _is_quat_impl : false_type
 		{
 		};
 
-		template <typename Scalar>
-		struct _is_quat_impl<quaternion<Scalar>> : true_type
+		template <arithmetic_type Scalar, mode Mode>
+		struct _is_quat_impl<quaternion<Scalar, Mode>> : true_type
 		{
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename T>
-	struct is_quat : detail::_is_quat_impl<remove_cvr_t<T>>
+	struct is_quat : internal::_is_quat_impl<remove_cvr_t<T>>
 	{
 	};
 
@@ -226,30 +224,30 @@ namespace rsl::math
 	template <typename T>
 	concept quat_type = is_quat_v<T>;
 
-	namespace detail
+	namespace internal
 	{
 		template <typename T>
 		auto _make_quat_impl()
 		{
 			if constexpr (is_quat_v<T>)
 			{
-				return quaternion<typename T::scalar>{};
+				return quaternion<typename T::scalar, T::mode>{};
 			}
 			else if constexpr (is_arithmetic_v<T>)
 			{
-				return quaternion<T>{};
+				return quaternion<T, mode::defaultp>{};
 			}
 			else
 			{
 				static_assert(always_false_v<T>, "Type cannot be made into a quaternion.");
 			}
 		}
-	} // namespace detail
+	} // namespace internal
 
 	template <typename T>
 	struct make_quat
 	{
-		using type = remove_cvr_t<decltype(detail::_make_quat_impl<remove_cvr_t<T>>())>;
+		using type = remove_cvr_t<decltype(internal::_make_quat_impl<remove_cvr_t<T>>())>;
 	};
 
 	template <typename T>
@@ -267,60 +265,61 @@ namespace rsl::math
 	template <typename T>
 	concept linear_algebraic_construct = is_linear_algebraic_construct_v<T>;
 
-	namespace detail
+	namespace internal
 	{
-		template <typename T, size_type v>
+		template <arithmetic_type T, size_type v>
 		struct _uniform_value_impl_;
 
-		template <typename Scalar, size_type Size, mode Mode, size_type v>
+		template <arithmetic_type Scalar, size_type Size, mode Mode, size_type v>
 		struct _uniform_value_impl_<vector<Scalar, Size, Mode>, v>
 		{
 			constexpr static auto value = vector<Scalar, Size, Mode>(static_cast<Scalar>(v));
 		};
 
-		template <typename Scalar, size_type Size, mode Mode, size_type... args, size_type v>
+		template <arithmetic_type Scalar, size_type Size, mode Mode, size_type... args, size_type v>
 		struct _uniform_value_impl_<swizzle<Scalar, Size, Mode, args...>, v>
 		{
 			constexpr static auto value = vector<Scalar, Size, Mode>(static_cast<Scalar>(v));
 		};
 
-		template <typename Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, mode Mode, size_type v>
+		template <
+			arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, mode Mode, size_type v>
 		struct _uniform_value_impl_<column<Scalar, RowCount, ColCount, ColIdx, Mode>, v>
 		{
 			constexpr static auto value = vector<Scalar, RowCount, Mode>(static_cast<Scalar>(v));
 		};
 
-		template <typename Scalar, size_type v>
-		struct _uniform_value_impl_<quaternion<Scalar>, v>
+		template <arithmetic_type Scalar, mode Mode, size_type v>
+		struct _uniform_value_impl_<quaternion<Scalar, Mode>, v>
 		{
-			constexpr static auto value = quaternion<Scalar>(
+			constexpr static auto value = quaternion<Scalar, Mode>(
 				static_cast<Scalar>(v), static_cast<Scalar>(v), static_cast<Scalar>(v), static_cast<Scalar>(v)
 			);
 		};
 
-		template <typename Scalar, size_type RowCount, size_type ColCount, size_type v>
-		struct _uniform_value_impl_<matrix<Scalar, RowCount, ColCount>, v>
+		template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, mode Mode, size_type v>
+		struct _uniform_value_impl_<matrix<Scalar, RowCount, ColCount, Mode>, v>
 		{
 			constexpr static auto value =
 				matrix<Scalar, RowCount, ColCount>(static_cast<Scalar>(v), uniform_matrix_signal{});
 		};
-	} // namespace detail
+	} // namespace internal
 
-	template <typename T, size_type v>
-	struct uniform_value : detail::_uniform_value_impl_<remove_cvr_t<T>, v>
+	template <arithmetic_type T, size_type v>
+	struct uniform_value : internal::_uniform_value_impl_<remove_cvr_t<T>, v>
 	{
 	};
 
-	template <typename T>
+	template <arithmetic_type T>
 	constexpr auto zero = uniform_value<T, 0>::value;
 
-	template <typename T>
+	template <arithmetic_type T>
 	constexpr auto one = uniform_value<T, 1>::value;
 
-	template <typename T, size_type v>
+	template <arithmetic_type T, size_type v>
 	constexpr auto uniform_value_v = uniform_value<T, v>::value;
 
-	namespace detail
+	namespace internal
 	{
 		template <typename FPType>
 		struct _epsilon_fp_impl
@@ -338,17 +337,17 @@ namespace rsl::math
 			conditional_t<is_floating_point_v<FPType>, _epsilon_fp_impl<FPType>, _epsilon_int_impl<FPType>>
 		{
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename FPType>
-	struct epsilon : detail::_epsilon_impl<remove_cvr_t<FPType>>
+	struct epsilon : internal::_epsilon_impl<remove_cvr_t<FPType>>
 	{
 	};
 
 	template <typename FPType>
 	constexpr auto epsilon_v = epsilon<FPType>::value;
 
-	namespace detail
+	namespace internal
 	{
 		template <size_type size>
 		constexpr auto _int_least_impl()
@@ -404,10 +403,10 @@ namespace rsl::math
 				return epsilon_v<B>;
 			}
 		}
-	} // namespace detail
+	} // namespace internal
 
 	template <size_type size>
-	using int_least = decltype(detail::_int_least_impl<size>());
+	using int_least = decltype(internal::_int_least_impl<size>());
 
 	template <size_type size>
 	using uint_least = std::make_unsigned_t<int_least<size>>;
@@ -415,7 +414,7 @@ namespace rsl::math
 	template <typename TypeA, typename TypeB>
 	struct highest_epsilon
 	{
-		constexpr static auto value = detail::_highest_epsilon_impl<TypeA, TypeB>();
+		constexpr static auto value = internal::_highest_epsilon_impl<TypeA, TypeB>();
 	};
 
 	template <typename TypeA, typename TypeB>
@@ -424,7 +423,7 @@ namespace rsl::math
 	template <typename TypeA, typename TypeB>
 	struct lowest_epsilon
 	{
-		constexpr static auto value = detail::_lowest_epsilon_impl<TypeA, TypeB>();
+		constexpr static auto value = internal::_lowest_epsilon_impl<TypeA, TypeB>();
 	};
 
 	template <typename TypeA, typename TypeB>
@@ -536,7 +535,7 @@ namespace rsl::math
 	template <typename A, typename B>
 	using smallest_t = typename smallest<A, B>::type;
 
-	namespace detail
+	namespace internal
 	{
 		template <typename A, typename B>
 		struct _elevated_int_impl :
@@ -550,13 +549,13 @@ namespace rsl::math
 		struct _elevated_impl :
 			conditional<
 				is_floating_point_v<A> || is_floating_point_v<B>, highest_precision_t<A, B>,
-				typename detail::_elevated_int_impl<A, B>::type>
+				typename internal::_elevated_int_impl<A, B>::type>
 		{
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename A, typename B>
-	struct elevated : detail::_elevated_impl<remove_cvr_t<A>, remove_cvr_t<B>>
+	struct elevated : internal::_elevated_impl<remove_cvr_t<A>, remove_cvr_t<B>>
 	{
 	};
 

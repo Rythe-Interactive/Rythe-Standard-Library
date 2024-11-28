@@ -1,7 +1,7 @@
 #pragma once
 #include "length.hpp"
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_length;
@@ -24,4 +24,4 @@ namespace rsl::math::detail
 			return dot(v, v);
 		}
 	};
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal

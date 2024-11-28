@@ -3,7 +3,7 @@
 
 namespace rsl::math
 {
-	namespace detail
+	namespace internal
 	{
 		template <typename Target, round_mode Mode, typename T>
 		[[nodiscard]] [[rythe_always_inline]] constexpr Target _round_impl_(T val) noexcept
@@ -17,18 +17,31 @@ namespace rsl::math
 			{
 				value_type pretrunc = static_cast<value_type>(0);
 				if constexpr (Mode == round_mode::floor)
+				{
 					pretrunc = val - static_cast<value_type>(val < static_cast<value_type>(0));
+				}
 				else if constexpr (Mode == round_mode::round)
+				{
 					pretrunc = val + (sign(val) * static_cast<value_type>(0.5));
+				}
 				else if constexpr (Mode == round_mode::ceil)
+				{
 					pretrunc = val + (sign(val) * static_cast<value_type>(1.0 - epsilon_v<value_type>));
+				}
 				else if constexpr (Mode == round_mode::trunc)
+				{
 					pretrunc = val;
+				}
 
 				if constexpr (::std::is_signed_v<Target>)
+				{
 					return static_cast<Target>(static_cast<int_max>(pretrunc));
+				}
 				else
-					return pretrunc < static_cast<value_type>(0) ? static_cast<Target>(0) : static_cast<Target>(static_cast<uint_max>(pretrunc));
+				{
+					return pretrunc < static_cast<value_type>(0) ? static_cast<Target>(0)
+																 : static_cast<Target>(static_cast<uint_max>(pretrunc));
+				}
 			}
 		}
 
@@ -46,7 +59,9 @@ namespace rsl::math
 			{
 				vector<Target, size> result;
 				for (size_type i = 0; i < size; i++)
+				{
 					result[i] = _round_impl_<Target, Mode>(val[i]);
+				}
 				return result;
 			}
 		};
@@ -70,14 +85,15 @@ namespace rsl::math
 			using value_type = ::std::remove_cvref_t<T>;
 			if constexpr (is_vector_v<value_type>)
 			{
-				return detail::compute_round<make_vector_t<value_type>, Mode>::template compute<typename value_type::scalar>(val);
+				return internal::compute_round<make_vector_t<value_type>, Mode>::template compute<
+					typename value_type::scalar>(val);
 			}
 			else
 			{
-				return detail::_round_impl_<value_type, Mode>(val);
+				return internal::_round_impl_<value_type, Mode>(val);
 			}
 		}
-	} // namespace detail
+	} // namespace internal
 
 	template <typename Target, round_mode Mode, typename T>
 	[[nodiscard]] constexpr auto adv_round(T&& val) noexcept
@@ -85,18 +101,18 @@ namespace rsl::math
 		using value_type = ::std::remove_cvref_t<T>;
 		if constexpr (is_vector_v<value_type>)
 		{
-			return detail::compute_round<make_vector_t<value_type>, Mode>::template compute<Target>(val);
+			return internal::compute_round<make_vector_t<value_type>, Mode>::template compute<Target>(val);
 		}
 		else
 		{
-			return detail::_round_impl_<Target, Mode>(val);
+			return internal::_round_impl_<Target, Mode>(val);
 		}
 	}
 
 	template <typename T>
 	[[nodiscard]] constexpr auto round(T&& val) noexcept
 	{
-		return detail::_auto_adv_round_<round_mode::round>(val);
+		return internal::_auto_adv_round_<round_mode::round>(val);
 	}
 
 	template <typename Integer, typename T>
@@ -114,7 +130,7 @@ namespace rsl::math
 	template <typename T>
 	[[nodiscard]] constexpr auto ceil(T&& val) noexcept
 	{
-		return detail::_auto_adv_round_<round_mode::ceil>(val);
+		return internal::_auto_adv_round_<round_mode::ceil>(val);
 	}
 
 	template <typename Integer, typename T>
@@ -132,7 +148,7 @@ namespace rsl::math
 	template <typename T>
 	[[nodiscard]] constexpr auto floor(T&& val) noexcept
 	{
-		return detail::_auto_adv_round_<round_mode::floor>(val);
+		return internal::_auto_adv_round_<round_mode::floor>(val);
 	}
 
 	template <typename Integer, typename T>
@@ -150,7 +166,7 @@ namespace rsl::math
 	template <typename T>
 	[[nodiscard]] constexpr auto trunc(T&& val) noexcept
 	{
-		return detail::_auto_adv_round_<round_mode::trunc>(val);
+		return internal::_auto_adv_round_<round_mode::trunc>(val);
 	}
 
 	template <typename Integer, typename T>

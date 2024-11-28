@@ -6,11 +6,11 @@ namespace rsl
 {
 	namespace enum_flags
 	{
-        template<enum_type Enum>
-        [[rythe_always_inline]] constexpr Enum make_zero()
-        {
+		template <enum_type Enum>
+		[[rythe_always_inline]] constexpr Enum make_zero()
+		{
 			return static_cast<Enum>(0);
-        }
+		}
 
 		template <enum_type Enum, same_as<Enum>... T>
 		[[rythe_always_inline]] constexpr Enum combine_flags(Enum first, Enum second, T... rest);
@@ -90,5 +90,5 @@ namespace rsl
 
 			return value;
 		}
-	}
-}
+	} // namespace enum_flags
+} // namespace rsl

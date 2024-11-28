@@ -147,7 +147,10 @@ namespace rsl
 	template <>
 	struct hash<hashed_string>
 	{
-		[[rythe_always_inline]] constexpr id_type operator()(const hashed_string& val) const noexcept { return val.value; }
+		[[rythe_always_inline]] constexpr id_type operator()(const hashed_string& val) const noexcept
+		{
+			return val.value;
+		}
 	};
 
 	template <>

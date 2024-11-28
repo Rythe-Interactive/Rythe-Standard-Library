@@ -2,7 +2,8 @@
 
 namespace rsl::math
 {
-	std::unique_ptr<random_number_engine_base> RandomNumberGenerator::engine = ::std::make_unique<rythe_default_engine>();
+	std::unique_ptr<random_number_engine_base> RandomNumberGenerator::engine =
+		::std::make_unique<rythe_default_engine>();
 
 	void RandomNumberGenerator::setRNGEngine(std::unique_ptr<random_number_engine_base>&& newEngine) noexcept
 	{
@@ -28,7 +29,9 @@ namespace rsl::math
 	{
 #if defined(LEGION_VALIDATE)
 		if (!engine)
+		{
 			return 0; // should report an error with improved error system down the line.
+		}
 #endif
 		return engine->generate();
 	}

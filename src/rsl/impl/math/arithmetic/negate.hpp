@@ -5,7 +5,7 @@
 
 namespace rsl::math
 {
-	namespace detail
+	namespace internal
 	{
 		template <typename Scalar, size_type Size>
 		struct compute_negate
@@ -17,7 +17,9 @@ namespace rsl::math
 			{
 				value_type result;
 				for (size_type i = 0; i < size; i++)
+				{
 					result[i] = -a[i];
+				}
 				return result;
 			}
 		};
@@ -28,28 +30,25 @@ namespace rsl::math
 			static constexpr size_type size = 1u;
 			using value_type = vector<Scalar, size>;
 
-			[[nodiscard]] constexpr static Scalar compute(Scalar a) noexcept
-			{
-				return -a;
-			}
+			[[nodiscard]] constexpr static Scalar compute(Scalar a) noexcept { return -a; }
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
 	[[nodiscard]] constexpr auto negate(const vec_type& a) noexcept
 	{
-		return detail::compute_negate<typename vec_type::scalar, vec_type::size>::compute(a);
+		return internal::compute_negate<typename vec_type::scalar, vec_type::size>::compute(a);
 	}
 
 	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
 	[[nodiscard]] constexpr auto operator-(const vec_type& a)
 	{
-		return detail::compute_negate<typename vec_type::scalar, vec_type::size>::compute(a);
+		return internal::compute_negate<typename vec_type::scalar, vec_type::size>::compute(a);
 	}
 
 	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
 	constexpr vec_type& negate_assign(vec_type& a) noexcept
 	{
-		return a = detail::compute_negate<typename vec_type::scalar, vec_type::size>::compute(a);
+		return a = internal::compute_negate<typename vec_type::scalar, vec_type::size>::compute(a);
 	}
 } // namespace rsl::math

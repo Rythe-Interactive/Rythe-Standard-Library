@@ -8,11 +8,15 @@ namespace rsl::math
 {
 #pragma region Vector
 	// div vec/vec
-	template <typename vec_type0, typename vec_type1, std::enable_if_t<is_vector_v<vec_type0> && is_vector_v<vec_type1>, bool> = true>
+	template <
+		typename vec_type0, typename vec_type1,
+		std::enable_if_t<is_vector_v<vec_type0> && is_vector_v<vec_type1>, bool> = true>
 	[[nodiscard]] constexpr auto div(const vec_type0& a, const vec_type1& b) noexcept;
 
 	// operator /  vec/vec
-	template <typename vec_type0, typename vec_type1, std::enable_if_t<is_vector_v<vec_type0> && is_vector_v<vec_type1>, bool> = true>
+	template <
+		typename vec_type0, typename vec_type1,
+		std::enable_if_t<is_vector_v<vec_type0> && is_vector_v<vec_type1>, bool> = true>
 	[[nodiscard]] constexpr auto operator/(const vec_type0& a, const vec_type1& b) noexcept;
 
 	// div vec/scal
@@ -25,11 +29,15 @@ namespace rsl::math
 
 
 	// div_assign vec/vec
-	template <typename vec_type0, typename vec_type1, std::enable_if_t<is_vector_v<vec_type0> && is_vector_v<vec_type1>, bool> = true>
+	template <
+		typename vec_type0, typename vec_type1,
+		std::enable_if_t<is_vector_v<vec_type0> && is_vector_v<vec_type1>, bool> = true>
 	constexpr vec_type0& div_assign(vec_type0& a, const vec_type1& b) noexcept;
 
 	// operator /=  vec/vec
-	template <typename vec_type0, typename vec_type1, std::enable_if_t<is_vector_v<vec_type0> && is_vector_v<vec_type1>, bool> = true>
+	template <
+		typename vec_type0, typename vec_type1,
+		std::enable_if_t<is_vector_v<vec_type0> && is_vector_v<vec_type1>, bool> = true>
 	constexpr vec_type0& operator/=(vec_type0& a, const vec_type1& b) noexcept;
 
 	// div_assign vec/scal
@@ -43,11 +51,15 @@ namespace rsl::math
 
 #pragma region Quaternion
 	// div quat/quat
-	template <typename quat_type0, typename quat_type1, std::enable_if_t<is_quat_v<quat_type0> && is_quat_v<quat_type1>, bool> = true>
+	template <
+		typename quat_type0, typename quat_type1,
+		std::enable_if_t<is_quat_v<quat_type0> && is_quat_v<quat_type1>, bool> = true>
 	[[nodiscard]] constexpr auto div(const quat_type0& a, const quat_type1& b) noexcept;
 
 	// operator /  quat/quat
-	template <typename quat_type0, typename quat_type1, std::enable_if_t<is_quat_v<quat_type0> && is_quat_v<quat_type1>, bool> = true>
+	template <
+		typename quat_type0, typename quat_type1,
+		std::enable_if_t<is_quat_v<quat_type0> && is_quat_v<quat_type1>, bool> = true>
 	[[nodiscard]] constexpr auto operator/(const quat_type0& a, const quat_type1& b) noexcept;
 
 	// div quat/scal
@@ -60,11 +72,15 @@ namespace rsl::math
 
 
 	// div_assign quat/quat
-	template <typename quat_type0, typename quat_type1, std::enable_if_t<is_quat_v<quat_type0> && is_quat_v<quat_type1>, bool> = true>
+	template <
+		typename quat_type0, typename quat_type1,
+		std::enable_if_t<is_quat_v<quat_type0> && is_quat_v<quat_type1>, bool> = true>
 	constexpr quat_type0& div_assign(quat_type0& a, const quat_type1& b) noexcept;
 
 	// operator /=  quat/quat
-	template <typename quat_type0, typename quat_type1, std::enable_if_t<is_quat_v<quat_type0> && is_quat_v<quat_type1>, bool> = true>
+	template <
+		typename quat_type0, typename quat_type1,
+		std::enable_if_t<is_quat_v<quat_type0> && is_quat_v<quat_type1>, bool> = true>
 	constexpr quat_type0& operator/=(quat_type0& a, const quat_type1& b) noexcept;
 
 	// div_assign quat/scal

@@ -22,15 +22,9 @@ namespace rsl
 		{
 		}
 
-		[[nodiscard]] auto& begin() const
-		{
-			return range.first;
-		}
+		[[nodiscard]] auto& begin() const { return range.first; }
 
-		[[nodiscard]] auto& end() const
-		{
-			return range.second;
-		}
+		[[nodiscard]] auto& end() const { return range.second; }
 		std::pair<T, T> range;
 	};
 
@@ -49,13 +43,17 @@ namespace rsl
 		while (diff-- > 0)
 		{
 			if (iter == end)
+			{
 				return false;
+			}
 			++iter;
 		}
 		return true;
 	}
 
-	template <class KeysIterator, class ValuesIterator, class Category = std::bidirectional_iterator_tag, class Diff = rsl::diff_type>
+	template <
+		class KeysIterator, class ValuesIterator, class Category = std::bidirectional_iterator_tag,
+		class Diff = rsl::diff_type>
 	class key_value_pair_iterator
 	{
 	public:
@@ -75,40 +73,16 @@ namespace rsl
 		{
 		}
 
-		pair_type operator*()
-		{
-			return {std::ref(key()), std::ref(value())};
-		}
-		const_pair_type operator*() const
-		{
-			return {std::cref(key()), std::cref(value())};
-		}
+		pair_type operator*() { return {std::ref(key()), std::ref(value())}; }
+		const_pair_type operator*() const { return {std::cref(key()), std::cref(value())}; }
 
-		pair_type operator->()
-		{
-			return {std::ref(key()), std::ref(value())};
-		}
-		const_pair_type operator->() const
-		{
-			return {std::cref(key()), std::cref(value())};
-		}
+		pair_type operator->() { return {std::ref(key()), std::ref(value())}; }
+		const_pair_type operator->() const { return {std::cref(key()), std::cref(value())}; }
 
-		auto& key()
-		{
-			return *m_key;
-		}
-		const auto& key() const
-		{
-			return *m_key;
-		}
-		auto& value()
-		{
-			return *m_value;
-		}
-		const auto& value() const
-		{
-			return *m_value;
-		}
+		auto& key() { return *m_key; }
+		const auto& key() const { return *m_key; }
+		auto& value() { return *m_value; }
+		const auto& value() const { return *m_value; }
 
 		friend auto operator==(const key_value_pair_iterator& rhs, const key_value_pair_iterator& lhs)
 		{
@@ -126,10 +100,7 @@ namespace rsl
 			return *this;
 		}
 
-		auto operator++(int) noexcept
-		{
-			return key_value_pair_iterator(++m_key, ++m_value);
-		}
+		auto operator++(int) noexcept { return key_value_pair_iterator(++m_key, ++m_value); }
 
 		auto& operator--() noexcept
 		{
@@ -138,10 +109,7 @@ namespace rsl
 			return *this;
 		}
 
-		auto operator--(int) noexcept
-		{
-			return key_value_pair_iterator(--m_key, --m_value);
-		}
+		auto operator--(int) noexcept { return key_value_pair_iterator(--m_key, --m_value); }
 
 	private:
 		keys_proxy_type m_key;
@@ -158,31 +126,13 @@ namespace rsl
 		{
 		}
 
-		auto& operator*()
-		{
-			return key();
-		}
-		const auto& operator*() const
-		{
-			return key();
-		}
+		auto& operator*() { return key(); }
+		const auto& operator*() const { return key(); }
 
-		auto& operator->()
-		{
-			return key();
-		}
-		const auto& operator->() const
-		{
-			return key();
-		}
-		auto& key()
-		{
-			return m_self->first;
-		}
-		const auto& key() const
-		{
-			return m_self->first;
-		}
+		auto& operator->() { return key(); }
+		const auto& operator->() const { return key(); }
+		auto& key() { return m_self->first; }
+		const auto& key() const { return m_self->first; }
 		friend auto operator==(const key_only_iterator& rhs, const key_only_iterator& lhs)
 		{
 			return rhs.m_self == lhs.m_self;
@@ -192,14 +142,8 @@ namespace rsl
 			return rhs.m_self != lhs.m_self;
 		}
 
-		auto operator++()
-		{
-			return key_only_iterator(m_self++);
-		}
-		auto operator++() const
-		{
-			return key_only_iterator(m_self++);
-		}
+		auto operator++() { return key_only_iterator(m_self++); }
+		auto operator++() const { return key_only_iterator(m_self++); }
 
 	private:
 		self_proxy_type m_self;
@@ -215,39 +159,15 @@ namespace rsl
 		{
 		}
 
-		auto& operator*()
-		{
-			return value();
-		}
-		const auto& operator*() const
-		{
-			return value();
-		}
+		auto& operator*() { return value(); }
+		const auto& operator*() const { return value(); }
 
-		auto& operator->()
-		{
-			return value();
-		}
-		const auto& operator->() const
-		{
-			return value();
-		}
-		auto& value()
-		{
-			return m_self->second;
-		}
-		const auto& value() const
-		{
-			return m_self->second;
-		}
-		auto operator++()
-		{
-			return value_only_iterator(m_self++);
-		}
-		auto operator++() const
-		{
-			return value_only_iterator(m_self++);
-		}
+		auto& operator->() { return value(); }
+		const auto& operator->() const { return value(); }
+		auto& value() { return m_self->second; }
+		const auto& value() const { return m_self->second; }
+		auto operator++() { return value_only_iterator(m_self++); }
+		auto operator++() const { return value_only_iterator(m_self++); }
 		friend auto operator==(const value_only_iterator& rhs, const value_only_iterator& lhs)
 		{
 			return rhs.m_self == lhs.m_self;
@@ -269,14 +189,8 @@ namespace rsl
 			: m_container(cont)
 		{
 		}
-		[[nodiscard]] auto begin() const
-		{
-			return key_only_iterator<PairIteratorContainer>(m_container.begin());
-		}
-		[[nodiscard]] auto end() const
-		{
-			return key_only_iterator<PairIteratorContainer>(m_container.end());
-		}
+		[[nodiscard]] auto begin() const { return key_only_iterator<PairIteratorContainer>(m_container.begin()); }
+		[[nodiscard]] auto end() const { return key_only_iterator<PairIteratorContainer>(m_container.end()); }
 
 	private:
 		PairIteratorContainer& m_container;
@@ -296,14 +210,8 @@ namespace rsl
 		{
 		}
 
-		[[nodiscard]] auto begin() const
-		{
-			return value_only_iterator<PairIteratorContainer>(m_container.begin());
-		}
-		[[nodiscard]] auto end() const
-		{
-			return value_only_iterator<PairIteratorContainer>(m_container.end());
-		}
+		[[nodiscard]] auto begin() const { return value_only_iterator<PairIteratorContainer>(m_container.begin()); }
+		[[nodiscard]] auto end() const { return value_only_iterator<PairIteratorContainer>(m_container.end()); }
 
 	private:
 		PairIteratorContainer& m_container;

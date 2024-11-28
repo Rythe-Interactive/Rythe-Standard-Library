@@ -1,7 +1,7 @@
 #pragma once
 #include "inverse.hpp"
 
-namespace rsl::math::detail
+namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_inverse;
@@ -17,4 +17,4 @@ namespace rsl::math::detail
 			return quat_type(q.w, -q.vec);
 		}
 	};
-} // namespace rsl::math::detail
+} // namespace rsl::math::internal

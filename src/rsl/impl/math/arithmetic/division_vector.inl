@@ -5,7 +5,7 @@
 
 namespace rsl::math
 {
-	namespace detail
+	namespace internal
 	{
 		template <typename T>
 		struct compute_division;
@@ -20,7 +20,9 @@ namespace rsl::math
 			{
 				value_type result;
 				for (size_type i = 0; i < size; i++)
+				{
 					result[i] = a[i] / b[i];
+				}
 				return result;
 			}
 
@@ -29,7 +31,9 @@ namespace rsl::math
 				value_type result;
 				Scalar inv = static_cast<Scalar>(1) / b;
 				for (size_type i = 0; i < size; i++)
+				{
 					result[i] = a[i] * inv;
+				}
 				return result;
 			}
 		};
@@ -40,10 +44,7 @@ namespace rsl::math
 			static constexpr size_type size = 1u;
 			using value_type = vector<Scalar, size>;
 
-			[[nodiscard]] constexpr static Scalar compute(Scalar a, Scalar b) noexcept
-			{
-				return a[0] / b;
-			}
+			[[nodiscard]] constexpr static Scalar compute(Scalar a, Scalar b) noexcept { return a[0] / b; }
 		};
-	} // namespace detail
+	} // namespace internal
 } // namespace rsl::math

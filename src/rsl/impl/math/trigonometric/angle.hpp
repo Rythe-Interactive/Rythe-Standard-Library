@@ -37,20 +37,20 @@ namespace rsl::math
 		return value;
 	}
 
-    template<typename precision>
+	template <typename precision>
 	struct degrees
 	{
 		using scalar = precision;
 
 		scalar value;
 
-		[[rythe_always_inline]] constexpr operator radians<precision>() const noexcept { return { deg2rad(value) }; }
+		[[rythe_always_inline]] constexpr operator radians<precision>() const noexcept { return {deg2rad(value)}; }
 	};
 
 	template <typename precision>
 	constexpr angle<precision>::operator rsl::math::degrees<precision>() const noexcept
 	{
-		return { rad2deg(value) };
+		return {rad2deg(value)};
 	}
 
 	using angle32 = angle<float32>;

@@ -4,7 +4,7 @@
 
 namespace rsl::math
 {
-	namespace detail
+	namespace internal
 	{
 		template <typename Scalar, size_type Size>
 		struct compute_all
@@ -15,16 +15,20 @@ namespace rsl::math
 			[[nodiscard]] constexpr static bool compute(const value_type& value) noexcept
 			{
 				for (size_type i = 0; i < size; i++)
+				{
 					if (!value[i])
+					{
 						return false;
+					}
+				}
 				return true;
 			}
 		};
-	} // namespace detail
+	} // namespace internal
 
 	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
 	[[nodiscard]] constexpr bool all(const vec_type& value) noexcept
 	{
-		return detail::compute_all<typename vec_type::scalar, vec_type::size>::compute(value);
+		return internal::compute_all<typename vec_type::scalar, vec_type::size>::compute(value);
 	}
 } // namespace rsl::math
