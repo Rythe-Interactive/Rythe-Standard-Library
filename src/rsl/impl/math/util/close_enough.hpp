@@ -5,7 +5,7 @@
 namespace rsl::math
 {
 	template <typename TypeA, typename TypeB>
-	constexpr bool close_enough(TypeA lhs, TypeB rhs)
+	[[nodiscard]] [[rythe_always_inline]] constexpr bool close_enough(TypeA lhs, TypeB rhs)
 	{
 		constexpr bool lhsIsInt = std::is_integral_v<TypeA>;
 		constexpr bool rhsIsInt = std::is_integral_v<TypeB>;

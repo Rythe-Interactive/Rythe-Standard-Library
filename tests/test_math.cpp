@@ -117,8 +117,11 @@ TEST_CASE("vectors", "[math]")
 		REQUIRE(vec0.yyyy == vec0.gggg);
 		REQUIRE(vec0.yyyy == vec0.tttt);
 
+		REQUIRE(any(vec0 != CONST0));
+
 		constexpr float2 vec1(CONST2);
 
+		REQUIRE(vec1 != CONST0);
 		REQUIRE(vec0.x != vec1.x);
 		REQUIRE(vec0.y != vec1.y);
 		REQUIRE(vec0 != vec1);
@@ -127,5 +130,38 @@ TEST_CASE("vectors", "[math]")
 
 		REQUIRE(vec2.x == (CONST0 + CONST2));
 		REQUIRE(vec2.y == (CONST1 + CONST2));
+
+		//{
+		//	constexpr float1 result = vec0 + vec1;
+		//	REQUIRE(result.x == (CONST0 + CONST1));
+		//}
+		//{
+		//	constexpr float1 result = vec0 - vec1;
+		//	REQUIRE(result.x == (CONST0 - CONST1));
+		//}
+		//{
+		//	constexpr float1 result = vec0 * vec1;
+		//	REQUIRE(result.x == (CONST0 * CONST1));
+		//}
+		//{
+		//	constexpr float1 result = vec0 / vec1;
+		//	REQUIRE(result.x == (CONST0 / CONST1));
+		//}
+		//{
+		//	constexpr float1 result = -vec0;
+		//	REQUIRE(result.x == (-CONST0));
+		//}
+		//{
+		//	constexpr bool1 result = vec0 > vec1;
+		//	REQUIRE(!result);
+		//}
+		//{
+		//	constexpr bool1 result = vec0 < vec1;
+		//	REQUIRE(result);
+		//}
+		//{
+		//	constexpr bool1 result = !bool1(false);
+		//	REQUIRE(result);
+		//}
 	}
 }

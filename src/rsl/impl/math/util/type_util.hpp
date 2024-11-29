@@ -91,7 +91,7 @@ namespace rsl::math
 				}
 				else
 				{
-					return vector<typename T::scalar, T::size, T::mode>{};
+					return T{};
 				}
 			}
 			else
@@ -538,18 +538,27 @@ namespace rsl::math
 	namespace internal
 	{
 		template <typename A, typename B>
-		struct _elevated_int_impl :
-			conditional<
-				::std::is_signed_v<A> || ::std::is_signed_v<B>, make_signed_t<largest_t<A, B>>,
-				make_unsigned_t<largest_t<A, B>>>
+		struct _elevated_impl;
+
+		template <arithmetic_type A, arithmetic_type B>
+			requires floating_point_type<A> || floating_point_type<B>
+		struct _elevated_impl<A, B> : highest_precision<A, B>
 		{
 		};
 
-		template <typename A, typename B>
-		struct _elevated_impl :
-			conditional<
-				is_floating_point_v<A> || is_floating_point_v<B>, highest_precision_t<A, B>,
-				typename internal::_elevated_int_impl<A, B>::type>
+		template <vector_type A, vector_type B>
+		struct _elevated_impl<A, B>
+		{
+			using type = vector<
+				typename _elevated_impl<typename A::scalar, typename B::scalar>::type,
+				(A::size < B::size ? A::size : B::size), (A::mode < B::mode ? A::mode : B::mode)>;
+		};
+
+		template <integral_type A, integral_type B>
+		struct _elevated_impl<A, B> :
+			conditional_t<
+				::std::is_signed_v<A> || ::std::is_signed_v<B>, make_signed<largest_t<A, B>>,
+				make_unsigned<largest_t<A, B>>>
 		{
 		};
 	} // namespace internal

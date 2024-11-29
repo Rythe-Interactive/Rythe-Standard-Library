@@ -6,15 +6,13 @@ namespace rsl::math
 {
 	namespace internal
 	{
-		template <typename Scalar, size_type Size>
+		template <vector_type vec_type>
+			requires same_as<bool, typename vec_type::scalar>
 		struct compute_any
 		{
-			static constexpr size_type size = Size;
-			using value_type = vector<Scalar, size>;
-
-			[[nodiscard]] constexpr static bool compute(const value_type& value) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr static bool compute(vec_type&& value) noexcept
 			{
-				for (size_type i = 0; i < size; i++)
+				for (size_type i = 0; i < vec_type::size; i++)
 				{
 					if (value[i])
 					{
@@ -26,9 +24,10 @@ namespace rsl::math
 		};
 	} // namespace internal
 
-	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
-	[[nodiscard]] constexpr bool any(const vec_type& value) noexcept
+	template <vector_type vec_type>
+		requires same_as<bool, typename vec_type::scalar>
+	[[nodiscard]] [[rythe_always_inline]] constexpr bool any(vec_type&& value) noexcept
 	{
-		return internal::compute_any<typename vec_type::scalar, vec_type::size>::compute(value);
+		return internal::compute_any<remove_cvr_t<vec_type>>::compute(std::forward<vec_type>(value));
 	}
 } // namespace rsl::math

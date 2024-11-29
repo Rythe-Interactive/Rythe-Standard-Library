@@ -30,6 +30,12 @@ namespace rsl
 	concept invert = !value;
 
 	template <typename T>
+	concept integral_type = is_integral_v<T>;
+
+	template <typename T>
+	concept floating_point_type = is_floating_point_v<T>;
+
+	template <typename T>
 	concept arithmetic_type = is_arithmetic_v<T>;
 
 	template <typename T>
