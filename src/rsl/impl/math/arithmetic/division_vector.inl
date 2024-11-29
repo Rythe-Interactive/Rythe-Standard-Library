@@ -44,7 +44,7 @@ namespace rsl::math
 			static constexpr size_type size = 1u;
 			using value_type = vector<Scalar, size>;
 
-			[[nodiscard]] constexpr static Scalar compute(Scalar a, Scalar b) noexcept { return a[0] / b; }
+			[[nodiscard]] constexpr static Scalar compute(Scalar a, Scalar b) noexcept { return a / b; }
 		};
 	} // namespace internal
 } // namespace rsl::math

@@ -82,7 +82,7 @@ namespace rsl::math
 
 		union
 		{
-			scalar data[4];
+			storage_type data;
 
 #include "swizzle/swizzle4.inl"
 		};
@@ -130,21 +130,24 @@ namespace rsl::math
 
 		[[rythe_always_inline]] constexpr void set_mask(bitfield8 mask) noexcept
 		{
-			x = (mask & 1) != 0;
-			y = (mask & 2) != 0;
-			z = (mask & 4) != 0;
-			w = (mask & 8) != 0;
+			data[0] = (mask & 1) != 0;
+			data[1] = (mask & 2) != 0;
+			data[2] = (mask & 4) != 0;
+			data[3] = (mask & 8) != 0;
 		}
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr bitfield8 mask() const noexcept
 		{
 			return static_cast<bitfield8>(
-				static_cast<uint32>(x) | static_cast<uint32>(y) << 1u | static_cast<uint32>(z) << 2u |
-				static_cast<uint32>(w) << 3u
+				static_cast<uint32>(data[0]) | static_cast<uint32>(data[1]) << 1u | static_cast<uint32>(data[2]) << 2u |
+				static_cast<uint32>(data[3]) << 3u
 			);
 		}
 
-		[[rythe_always_inline]] constexpr operator bool() const noexcept { return x && y && z && w; }
+		[[rythe_always_inline]] constexpr operator bool() const noexcept
+		{
+			return data[0] && data[1] && data[2] && data[3];
+		}
 
 		[[rythe_always_inline]] constexpr vector& operator=(const vector&) noexcept = default;
 

@@ -110,7 +110,7 @@ namespace rsl
 	template <char token, char... tokens>
 	bool str_tokens_helper(std::ctype<char>::mask* rc)
 	{
-		rc[token] = std::ctype<char>::space;
+		rc[size_type(token)] = std::ctype<char>::space;
 		if constexpr (sizeof...(tokens) != 0)
 		{
 			str_tokens_helper<tokens...>(rc);
@@ -206,11 +206,11 @@ namespace rsl
 		std::ostringstream os;
 		auto b = begin(elements), e = end(elements);
 
-		char promoter[2] = {delim};
+		char promoter[1] = {delim};
 
 		if (b != e)
 		{
-			std::copy(b, prev(e), std::ostream_iterator<Value>(os, delim));
+			std::copy(b, prev(e), std::ostream_iterator<Value>(os, promoter));
 			b = prev(e);
 		}
 		if (b != e)
@@ -226,11 +226,9 @@ namespace rsl
 		std::ostringstream os;
 		auto b = begin(elements), e = end(elements);
 
-		char promoter[2] = {delim};
-
 		if (b != e)
 		{
-			std::copy(b, prev(e), std::ostream_iterator<Value>(os, promoter));
+			std::copy(b, prev(e), std::ostream_iterator<Value>(os, &delim));
 			b = prev(e);
 		}
 		if (b != e)

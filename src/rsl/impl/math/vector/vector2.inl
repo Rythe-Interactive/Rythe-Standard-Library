@@ -17,15 +17,17 @@ namespace rsl::math
 {
 	template <arithmetic_type Scalar, mode Mode>
 	constexpr vector<Scalar, 2, Mode>::vector(scalar _x, scalar _y) noexcept
-		: x(_x),
-		  y(_y)
+		: data{
+			  {_x, _y}
+    }
 	{
 	}
 
 	template <mode Mode>
 	constexpr vector<bool, 2, Mode>::vector(scalar _x, scalar _y) noexcept
-		: x(_x),
-		  y(_y)
+		: data{
+			  {_x, _y}
+    }
 	{
 	}
 } // namespace rsl::math

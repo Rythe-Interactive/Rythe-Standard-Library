@@ -33,7 +33,7 @@ namespace rsl::math
 		static const vector zero;
 
 		[[rythe_always_inline]] constexpr vector& operator=(const vector&) noexcept = default;
-		[[nodiscard]] [[rythe_always_inline]] constexpr operator scalar() const noexcept { return x; }
+		[[nodiscard]] [[rythe_always_inline]] constexpr operator scalar() const noexcept { return data[0]; }
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept;
@@ -65,14 +65,14 @@ namespace rsl::math
 		static const vector one;
 		static const vector zero;
 
-		[[rythe_always_inline]] constexpr void set_mask(bitfield8 mask) noexcept { x = (mask & 1) != 0; }
+		[[rythe_always_inline]] constexpr void set_mask(bitfield8 mask) noexcept { data[0] = (mask & 1) != 0; }
 		[[nodiscard]] [[rythe_always_inline]] constexpr bitfield8 mask() const noexcept
 		{
-			return static_cast<bitfield8>(x);
+			return static_cast<bitfield8>(data[0]);
 		}
 
 		[[rythe_always_inline]] constexpr vector& operator=(const vector&) noexcept = default;
-		[[nodiscard]] [[rythe_always_inline]] constexpr operator bool() const noexcept { return x; }
+		[[nodiscard]] [[rythe_always_inline]] constexpr operator bool() const noexcept { return data[0]; }
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept;

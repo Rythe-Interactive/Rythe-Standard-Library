@@ -124,16 +124,12 @@ namespace rsl::math
 	template <vector_type vec_type>
 	[[rythe_always_inline]] constexpr vec_type& add_assign(vec_type& a, typename vec_type::scalar b) noexcept
 	{
-		return a = internal::compute_addition<typename vec_type::scalar, vec_type::size, vec_type::mode>::compute(
-				   a, b
-			   );
+		return a = internal::compute_addition<typename vec_type::scalar, vec_type::size, vec_type::mode>::compute(a, b);
 	}
 
 	template <vector_type vec_type>
 	[[rythe_always_inline]] constexpr vec_type& operator+=(vec_type& a, typename vec_type::scalar b) noexcept
 	{
-		return a = internal::compute_addition<typename vec_type::scalar, vec_type::size, vec_type::mode>::compute(
-				   a, b
-			   );
+		return a = internal::compute_addition<typename vec_type::scalar, vec_type::size, vec_type::mode>::compute(a, b);
 	}
 } // namespace rsl::math

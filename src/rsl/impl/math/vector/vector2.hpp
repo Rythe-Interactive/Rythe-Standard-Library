@@ -69,16 +69,16 @@ namespace rsl::math
 
 		[[rythe_always_inline]] constexpr void set_mask(bitfield8 mask) noexcept
 		{
-			x = (mask & 1) != 0;
-			y = (mask & 2) != 0;
+			data[0] = (mask & 1) != 0;
+			data[1] = (mask & 2) != 0;
 		}
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr bitfield8 mask() const noexcept
 		{
-			return static_cast<bitfield8>(static_cast<uint32>(x) | static_cast<uint32>(y) << 1u);
+			return static_cast<bitfield8>(static_cast<uint32>(data[0]) | static_cast<uint32>(data[1]) << 1u);
 		}
 
-		[[rythe_always_inline]] constexpr operator bool() const noexcept { return x && y; }
+		[[rythe_always_inline]] constexpr operator bool() const noexcept { return data[0] && data[1]; }
 
 		[[rythe_always_inline]] constexpr vector& operator=(const vector&) noexcept = default;
 

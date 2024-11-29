@@ -60,10 +60,9 @@ namespace rsl::math
 
 	template <arithmetic_type Scalar, mode Mode>
 	constexpr vector<Scalar, 4, Mode>::vector(scalar _x, scalar _y, scalar _z, scalar _w) noexcept
-		: x(_x),
-		  y(_y),
-		  z(_z),
-		  w(_w)
+		: data{
+			  {_x, _y, _z, _w}
+    }
 	{
 	}
 
@@ -112,10 +111,9 @@ namespace rsl::math
 
 	template <math::mode Mode>
 	constexpr vector<bool, 4, Mode>::vector(scalar _x, scalar _y, scalar _z, scalar _w) noexcept
-		: x(_x),
-		  y(_y),
-		  z(_z),
-		  w(_w)
+		: data{
+			  {_x, _y, _z, _w}
+    }
 	{
 	}
 } // namespace rsl::math

@@ -20,6 +20,7 @@ namespace rsl::math
 		vector<ScalarSpecialization, SizeSpecialization, Mode>::zero(ScalarSpecialization(0));
 
 	VectorTemplate constexpr vector<ScalarSpecialization, SizeSpecialization, Mode>::vector() noexcept
+		: data()
 	{
 		for (size_type i = 0; i < size; i++)
 		{
@@ -28,6 +29,7 @@ namespace rsl::math
 	}
 
 	VectorTemplate constexpr vector<ScalarSpecialization, SizeSpecialization, Mode>::vector(scalar s) noexcept
+		: data()
 	{
 		for (size_type i = 0; i < size; i++)
 		{
@@ -38,6 +40,7 @@ namespace rsl::math
 	VectorTemplate template <typename vec_type>
 		requires not_same_as<ScalarSpecialization, typename vec_type::scalar> || (vec_type::size != SizeSpecialization)
 	constexpr vector<ScalarSpecialization, SizeSpecialization, Mode>::vector(const vec_type& other) noexcept
+		: data()
 	{
 		if constexpr (size > vec_type::size)
 		{

@@ -1,27 +1,23 @@
-#include "spherical_rand.hpp"
 #pragma once
+#include "spherical_rand.hpp"
 
 namespace rsl::math
 {
-	template <typename Scalar>
-	[[nodiscard]] vector<Scalar, 3> spherical_rand(Scalar radius) noexcept
+	template <arithmetic_type Scalar, mode Mode>
+	vector<Scalar, 3, Mode> spherical_rand(Scalar radius) noexcept
 	{
-		static_assert(
-			::std::is_arithmetic_v<Scalar>,
-			"Input scalar type to spherical_rand is neither a scalar nor any other supported type."
-		);
-
 		Scalar theta = linear_rand(static_cast<Scalar>(0), tau<Scalar>());
 		Scalar z = linear_rand(static_cast<Scalar>(-1), static_cast<Scalar>(1));
 		Scalar phi = acos(z);
 		Scalar x = sin(phi) * cos(theta);
 		Scalar y = sin(phi) * sin(theta);
 
-		return vector<3, Scalar>(x, y, z) * radius;
+		return vector<Scalar, 3, Mode>(x, y, z) * radius;
 	}
 
-	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type> && vec_type::size == 3, bool>>
-	[[nodiscard]] auto spherical_rand(const vec_type& radii) noexcept
+	template <vector_type vec_type>
+		requires(vec_type::size == 3)
+	vec_type spherical_rand(const vec_type& radii) noexcept
 	{
 		using Scalar = typename vec_type::scalar;
 
@@ -31,6 +27,6 @@ namespace rsl::math
 		Scalar x = sin(phi) * cos(theta);
 		Scalar y = sin(phi) * sin(theta);
 
-		return vector<Scalar, 3>(x, y, z) * radii;
+		return vec_type(x, y, z) * radii;
 	}
 } // namespace rsl::math
