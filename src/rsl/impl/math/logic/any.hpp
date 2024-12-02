@@ -10,7 +10,7 @@ namespace rsl::math
 			requires same_as<bool, typename vec_type::scalar>
 		struct compute_any
 		{
-			[[nodiscard]] [[rythe_always_inline]] constexpr static bool compute(vec_type&& value) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr static bool compute(const vec_type& value) noexcept
 			{
 				for (size_type i = 0; i < vec_type::size; i++)
 				{
@@ -26,8 +26,8 @@ namespace rsl::math
 
 	template <vector_type vec_type>
 		requires same_as<bool, typename vec_type::scalar>
-	[[nodiscard]] [[rythe_always_inline]] constexpr bool any(vec_type&& value) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr bool any(const vec_type& value) noexcept
 	{
-		return internal::compute_any<remove_cvr_t<vec_type>>::compute(std::forward<vec_type>(value));
+		return internal::compute_any<vec_type>::compute(value);
 	}
 } // namespace rsl::math

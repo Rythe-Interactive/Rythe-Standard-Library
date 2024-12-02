@@ -46,22 +46,19 @@ namespace rsl::math
 		};
 	} // namespace internal
 
-	template <
-		vector_type vec_type0, vector_type vec_type1>
+	template <vector_type vec_type0, vector_type vec_type1>
 	[[nodiscard]] constexpr auto equals(const vec_type0& a, const vec_type1& b) noexcept
 	{
 		return internal::compute_equality<elevated_t<vec_type0, vec_type1>>::compute(a, b);
 	}
 
-	template <
-		vector_type vec_type0, vector_type vec_type1>
+	template <vector_type vec_type0, vector_type vec_type1>
 	[[nodiscard]] constexpr auto operator==(const vec_type0& a, const vec_type1& b) noexcept
 	{
 		return internal::compute_equality<elevated_t<vec_type0, vec_type1>>::compute(a, b);
 	}
 
-	template <
-		vector_type vec_type0, vector_type vec_type1>
+	template <vector_type vec_type0, vector_type vec_type1>
 	[[nodiscard]] constexpr auto operator!=(const vec_type0& a, const vec_type1& b) noexcept
 	{
 		return !internal::compute_equality<elevated_t<vec_type0, vec_type1>>::compute(a, b);

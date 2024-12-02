@@ -30,19 +30,19 @@ namespace rsl
 	concept invert = !value;
 
 	template <typename T>
-	concept integral_type = is_integral_v<T>;
+	concept integral_type = is_integral_v<remove_cvr_t<T>>;
 
 	template <typename T>
-	concept floating_point_type = is_floating_point_v<T>;
+	concept floating_point_type = is_floating_point_v<remove_cvr_t<T>>;
 
 	template <typename T>
-	concept arithmetic_type = is_arithmetic_v<T>;
+	concept arithmetic_type = is_arithmetic_v<remove_cvr_t<T>>;
 
 	template <typename T>
-	concept unsigned_type = is_unsigned_v<T>;
+	concept unsigned_type = is_unsigned_v<remove_cvr_t<T>>;
 
 	template <typename T>
-	concept signed_type = is_signed_v<T>;
+	concept signed_type = is_signed_v<remove_cvr_t<T>>;
 
 	template <typename T1, typename T2>
 	concept same_as = is_same_v<T1, T2>;
