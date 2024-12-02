@@ -136,7 +136,7 @@ TEST_CASE("vectors", "[math]")
 		REQUIRE(vec0.y != vec1.y);
 		REQUIRE(vec0 != vec1);
 
-        constexpr float2 vec2(CONST0, CONST4);
+		constexpr float2 vec2(CONST0, CONST4);
 
 		{
 
@@ -711,4 +711,66 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(!result.w);
 		}
 	}
+
+    SECTION("vector length") {}
+    SECTION("vector cross") {}
+    SECTION("vector distance") {}
+    SECTION("vector dot") {}
+    SECTION("vector normalize") {}
+    SECTION("vector inverse") {}
+}
+
+TEST_CASE("matrices", "[math]")
+{
+	SECTION("matrix1x1") {}
+	SECTION("matrix2x2") {}
+	SECTION("matrix3x3") {}
+	SECTION("matrix4x4") {}
+	SECTION("matrix decompose") {}
+	SECTION("matrix determinant") {}
+	SECTION("matrix adjoint") {}
+	SECTION("matrix inverse") {}
+}
+
+TEST_CASE("quaternions", "[math]")
+{
+	SECTION("quaternion") {}
+	SECTION("quaternion matrix conversion") {}
+	SECTION("quaternion length") {}
+	SECTION("quaternion inverse") {}
+}
+
+TEST_CASE("generic functions", "[math]")
+{
+	SECTION("abs") {}
+	SECTION("min") {}
+	SECTION("max") {}
+	SECTION("clamp") {}
+	SECTION("saturate") {}
+	SECTION("fmod") {}
+	SECTION("modf") {}
+	SECTION("round") {}
+	SECTION("sign") {}
+	SECTION("sqrt") {}
+	SECTION("pow") {}
+	SECTION("inverse sqrt") {}
+}
+
+TEST_CASE("interpolation", "[math]")
+{
+	SECTION("lerp") {}
+	SECTION("map") {}
+	SECTION("quintic") {}
+	SECTION("smoothstep") {}
+}
+
+TEST_CASE("random & noise", "[math]")
+{
+	SECTION("random number engine") {}
+	SECTION("rand") {}
+	SECTION("linear rand") {}
+	SECTION("circular rand") {}
+	SECTION("spherical rand") {}
+	SECTION("perlin") {}
+	SECTION("value") {}
 }
