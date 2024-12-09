@@ -19,8 +19,8 @@ struct ::std::hash<::rsl::math::vector<Scalar, Size>>
     constexpr static ::std::hash<Scalar> hasher{};
     inline rythe_always_inline::std::size_t operator()(const ::rsl::math::vector<Scalar, Size>& vec) const noexcept
     {
-        size_type seed = hasher(vec[0]);
-        for (size_type i = 1; i < Size; i++)
+        rsl::size_type seed = hasher(vec[0]);
+        for (rsl::size_type i = 1; i < Size; i++)
             seed = ::rsl::combine_hash(seed, hasher(vec[i]));
         return seed;
     }

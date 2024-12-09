@@ -12,16 +12,15 @@ namespace rsl::math
     template<typename Scalar>
     struct matrix<Scalar, 4, 4> : matrix_base
     {
-        using scalar = Scalar;
         static constexpr size_type row_count = 4;
         static constexpr size_type col_count = 4;
         static constexpr size_type size = row_count * col_count;
         using type = matrix<Scalar, 4, 4>;
 
-        using row_type = vector<scalar, col_count>;
+        using row_type = vector<Scalar, col_count>;
 
         template<size_type idx>
-        using col_type = column<scalar, row_count, col_count, idx>;
+        using col_type = column<Scalar, row_count, col_count, idx>;
 
         union
         {
@@ -32,7 +31,7 @@ namespace rsl::math
                 row_type row0, row1, row2, row3;
             };
 
-            scalar data[size];
+            Scalar data[size];
             col_type<0> col0;
             col_type<1> col1;
             col_type<2> col2;
@@ -51,18 +50,18 @@ namespace rsl::math
 
         constexpr matrix(const matrix&) noexcept = default;
 
-        explicit constexpr matrix(scalar s) noexcept :
-            row0(s, static_cast<scalar>(0), static_cast<scalar>(0), static_cast<scalar>(0)),
-            row1(static_cast<scalar>(0), s, static_cast<scalar>(0), static_cast<scalar>(0)),
-            row2(static_cast<scalar>(0), static_cast<scalar>(0), s, static_cast<scalar>(0)),
-            row3(static_cast<scalar>(0), static_cast<scalar>(0), static_cast<scalar>(0), s)
+        explicit constexpr matrix(Scalar s) noexcept :
+            row0(s, static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(0)),
+            row1(static_cast<Scalar>(0), s, static_cast<Scalar>(0), static_cast<Scalar>(0)),
+            row2(static_cast<Scalar>(0), static_cast<Scalar>(0), s, static_cast<Scalar>(0)),
+            row3(static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(0), s)
         {}
 
         explicit constexpr matrix(
-            scalar s00, scalar s01, scalar s02, scalar s03,
-            scalar s10, scalar s11, scalar s12, scalar s13,
-            scalar s20, scalar s21, scalar s22, scalar s23,
-            scalar s30, scalar s31, scalar s32, scalar s33) noexcept :
+            Scalar s00, Scalar s01, Scalar s02, Scalar s03,
+            Scalar s10, Scalar s11, Scalar s12, Scalar s13,
+            Scalar s20, Scalar s21, Scalar s22, Scalar s23,
+            Scalar s30, Scalar s31, Scalar s32, Scalar s33) noexcept :
             row0(s00, s01, s02, s03),
             row1(s10, s11, s12, s13),
             row2(s20, s21, s22, s23),
@@ -74,7 +73,7 @@ namespace rsl::math
         template<typename Scal>
         explicit constexpr matrix(const quaternion<Scal>& orientation, const float3& position = float3::zero) noexcept;
 
-        template<typename Scal, ::std::enable_if_t<!::std::is_same_v<scalar, Scal>, bool> = true>
+        template<typename Scal, ::std::enable_if_t<!::std::is_same_v<Scalar, Scal>, bool> = true>
         constexpr explicit matrix(const matrix<Scal, row_count, col_count>& other) noexcept;
 
         template<typename mat_type, ::std::enable_if_t<4 != mat_type::row_count || 4 != mat_type::col_count, bool> = true>

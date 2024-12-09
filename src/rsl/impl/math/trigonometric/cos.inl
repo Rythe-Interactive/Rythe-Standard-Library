@@ -1,9 +1,9 @@
 #include "cos.hpp"
 #pragma once
-
+#include "../vector/vector.hpp"
+#include "../matrix/matrix.hpp"
+#include "../quaternion/quaternion_base.hpp"
 #include "cos_vector.inl"
-//#include "cos_matrix.inl"
-//#include "cos_quaternion.inl"
 
 namespace rsl::math
 {

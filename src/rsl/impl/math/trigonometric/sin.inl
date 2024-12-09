@@ -1,9 +1,10 @@
 #include "sin.hpp"
 #pragma once
 
+#include "../vector/vector.hpp"
+#include "../matrix/matrix.hpp"
+#include "../quaternion/quaternion_base.hpp"
 #include "sin_vector.inl"
-//#include "sin_matrix.inl"
-//#include "sin_quaternion.inl"
 
 namespace rsl::math
 {

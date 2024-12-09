@@ -244,6 +244,7 @@ namespace rsl::math
 	matrix<Scalar, 3, 3> compose(const vector<Scalar, 3>& scale, const quaternion<Scalar>& orientation) noexcept
 	{
 		matrix<Scalar, 3, 3> rotMat = toMat3(orientation);
+		matrix<Scalar, 3, 3> result;
 		result[0] = vec4(rotMat[0] * scale[0], 0);
 		result[1] = vec4(rotMat[1] * scale[1], 0);
 		result[2] = vec4(rotMat[2] * scale[2], 0);

@@ -4,6 +4,7 @@
 #include <concepts>
 
 #include "../defines.hpp"
+#include "meta.hpp"
 #include "primitives.hpp"
 #include "string_util.hpp"
 
@@ -240,7 +241,7 @@ namespace rsl {
             }
 
             std::string result;
-            for (auto i = 1; i < vec.size(); i++)
+            for (rsl::size_type i = 1; i < vec.size(); i++)
             {
                 if (ends_with(vec[i], "struct"))
                     result += vec[i].substr(0, vec[i].size() - 6);
@@ -415,7 +416,7 @@ namespace rsl {
         if (name[size - 1] == '\0')
             size--;
 
-        for (int i = 0; i < size; i++)
+        for (rsl::size_type i = 0; i < size; i++)
         {
             hash = hash ^ static_cast<const byte>(name[i]);
             hash *= prime;
@@ -505,7 +506,7 @@ namespace rsl {
 
             uint64 arrSize = std::distance(first, last) * sizeof(typename decltype(first)::value_type);
 
-            for (int i = 0; i < sizeof(uint64); i++)
+            for (rsl::size_type i = 0; i < sizeof(uint64); i++)
                 data.push_back(reinterpret_cast<const byte*>(&arrSize)[i]);
 
             for (auto it = first; it != last; ++it)

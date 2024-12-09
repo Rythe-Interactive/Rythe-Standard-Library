@@ -23,7 +23,7 @@ namespace rsl::math::noise
             for (size_type i = 0; i < size; i++)
                 hash[index] ^= value[i];
 
-            xor_impl<index + 1>(hash, others);
+            xor_impl<index + 1>(hash, others...);
         }
 
         template<typename scalar, size_type size, typename int_scalar = int_least<sizeof(scalar)>, typename... ints>

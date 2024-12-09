@@ -11,7 +11,7 @@ namespace rsl::math
     template<typename Scalar>
     struct alignas(sizeof(Scalar) * 4) aligned_vector3;
 
-    struct quaternion_base;
+    struct quaternion_base {};
 
     template<typename Scalar>
     struct quaternion;

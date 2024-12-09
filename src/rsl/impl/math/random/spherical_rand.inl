@@ -14,7 +14,7 @@ namespace rsl::math
         Scalar x = sin(phi) * cos(theta);
         Scalar y = sin(phi) * sin(theta);
 
-        return vector<3, Scalar>(x, y, z) * radius;
+        return vector<Scalar, 3>(x, y, z) * radius;
     }
 
     template<typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>&& vec_type::size == 3, bool>>

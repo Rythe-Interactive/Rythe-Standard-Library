@@ -29,7 +29,7 @@ namespace rsl::math
     template<typename Scalar>
     [[nodiscard]] rythe_always_inline quaternion<Scalar> quaternion<Scalar>::angle_axis(Scalar angle, const vec_type& vec) noexcept
     {
-        auto halfAngle = angle * static_cast<scalar>(0.5);
+        auto halfAngle = angle * static_cast<Scalar>(0.5);
         return quaternion<Scalar>(::std::cos(halfAngle), ::std::sin(halfAngle) * vec);
     }
 
@@ -40,14 +40,14 @@ namespace rsl::math
         vec_type const right(normalize(cross(_up, forward)));
         vec_type const up(cross(forward, right));
 
-        const scalar qwijk[] = {
+        const Scalar qwijk[] = {
             right.x - up.y - forward.z,
             up.y - right.x - forward.z,
             forward.z - right.x - up.y,
             right.x + up.y + forward.z };
 
         size_type idx = 0;
-        scalar qMax = qwijk[0];
+        Scalar qMax = qwijk[0];
         for (size_type i = 1; i < 4; i++)
             if (qwijk[i] > qMax)
             {
@@ -55,10 +55,10 @@ namespace rsl::math
                 idx = i;
             }
 
-        qMax = ::std::sqrt(qMax + static_cast<scalar>(1)) * static_cast<scalar>(0.5);
-        scalar mult = static_cast<scalar>(0.25) / qMax;
+        qMax = ::std::sqrt(qMax + static_cast<Scalar>(1)) * static_cast<Scalar>(0.5);
+        Scalar mult = static_cast<Scalar>(0.25) / qMax;
 
-        scalar qPerms[] = {
+        Scalar qPerms[] = {
             qMax,
             (forward.y - up.z) * mult,
             (right.z - forward.x) * mult,

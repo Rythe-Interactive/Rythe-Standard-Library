@@ -3,6 +3,7 @@
 #include <locale>
 #include <cctype>
 #include <sstream>
+#include <algorithm>
 
 #include "primitives.hpp"
 

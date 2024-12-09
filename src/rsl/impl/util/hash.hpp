@@ -15,6 +15,9 @@ namespace rsl
     template<typename T>
     constexpr static id_type hash(const T& val);
 
+    template<typename T>
+    constexpr static size_type typeHash();
+
     struct name_hash
     {
         id_type value = invalid_id;

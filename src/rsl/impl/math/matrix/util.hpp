@@ -8,6 +8,7 @@
 #include "../geometric/geometric.hpp"
 #include "../trigonometric/trigonometric.hpp"
 #include "../util/close_enough.hpp"
+#include "../exponential/sqrt.hpp"
 
 namespace rsl::math
 {

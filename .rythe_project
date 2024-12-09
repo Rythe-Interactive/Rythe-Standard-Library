@@ -1,7 +1,7 @@
 local project = {
     alias = "rsl",
     namespace = "rsl",
-    additional_types = { "test" },
+    warnings_as_errors = false,
     dependencies = {
         "public third_party/spdlog:header-only"
     },
