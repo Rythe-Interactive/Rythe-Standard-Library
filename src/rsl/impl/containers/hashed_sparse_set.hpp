@@ -339,7 +339,7 @@ namespace rsl
 		template <typename... Arguments>
 		std::pair<iterator, bool> emplace(Arguments&&... arguments)
 		{
-			return insert(std::forward<value_type>(value_type(arguments...)));
+			return insert(std::forward<value_type>(value_type{& arguments... }));
 		}
 #pragma endregion
 

@@ -8,23 +8,24 @@
 #include "../util/assert.hpp"
 #include "../util/concepts.hpp"
 #include "../util/primitives.hpp"
+#include "../util/type_util.hpp"
 
 namespace rsl
 {
 #if !defined(RSL_ERR_MESSAGE_MAX_LENGTH)
-	#define RSL_ERR_MESSAGE_MAX_LENGTH 512
+#define RSL_ERR_MESSAGE_MAX_LENGTH 512
 #endif
 
 #if !defined(RSL_WARN_MAX_COUNT)
-	#define RSL_WARN_MAX_COUNT 16
+#define RSL_WARN_MAX_COUNT 16
 #endif
 
 #if !defined(RSL_ERR_UNDERLYING)
-	#define RSL_ERR_UNDERLYING int64
+#define RSL_ERR_UNDERLYING int64
 #endif
 
 #if !defined(RSL_ERR_ID_UNDERLYING)
-	#define RSL_ERR_ID_UNDERLYING uint8
+#define RSL_ERR_ID_UNDERLYING uint8
 #endif
 
 #if defined(RSL_ERR_MAX_COUNT)
@@ -32,25 +33,25 @@ namespace rsl
 #endif
 
 #if !defined(RSL_HANDLE_ERROR_WARNING)
-	#define RSL_HANDLE_ERROR_WARNING(condition, message) rsl_soft_assert_msg_consistent(condition, message)
+#define RSL_HANDLE_ERROR_WARNING(condition, message) rsl_soft_assert_msg_consistent(condition, message)
 #endif
 
 #if !defined(RSL_HANDLE_ERROR_ERROR)
-	#define RSL_HANDLE_ERROR_ERROR(condition, message) rsl_hard_assert_msg(condition, message)
+#define RSL_HANDLE_ERROR_ERROR(condition, message) rsl_hard_assert_msg(condition, message)
 #endif
 
 #if !defined(RSL_HANDLE_ERROR_FATAL)
-	#define RSL_HANDLE_ERROR_FATAL(condition, message) rsl_hard_assert_msg(condition, message)
+#define RSL_HANDLE_ERROR_FATAL(condition, message) rsl_hard_assert_msg(condition, message)
 #endif
 
-	using errid = RSL_ERR_ID_UNDERLYING;
+		using errid = RSL_ERR_ID_UNDERLYING;
 
 #define RSL_ERR_MAX_COUNT std::numeric_limits<errid>::max()
 
 	constexpr errid invalid_err_id = RSL_ERR_MAX_COUNT;
 
 	using errc = RSL_ERR_UNDERLYING;
-    constexpr errc no_error_code = 0;
+	constexpr errc no_error_code = 0;
 
 	template <typename ERRC>
 	concept error_code = std::is_enum_v<ERRC> && rsl::is_same_v<std::underlying_type_t<ERRC>, errc>;
@@ -78,7 +79,7 @@ namespace rsl
 	};
 
 	constexpr static error_type success =
-		error_type{.code = no_error_code, .message = {}, .severity = static_cast<error_severity>(-1), .errorBlockStart = 0};
+		error_type{ .code = no_error_code, .message = {}, .severity = static_cast<error_severity>(-1), .errorBlockStart = 0 };
 
 	using error_list = buffered_list<error_type, RSL_ERR_MAX_COUNT>;
 	using error_view = typename error_list::view_type;
@@ -129,7 +130,7 @@ namespace rsl
 			}
 
 			errid blockStart = error_context::errors[m_errid].errorBlockStart;
-			return error_view{&error_context::errors[blockStart], static_cast<size_type>((m_errid - blockStart) + 1)};
+			return error_view{ &error_context::errors[blockStart], static_cast<size_type>((m_errid - blockStart) + 1) };
 		}
 
 		[[rythe_always_inline]] void resolve() noexcept
@@ -154,9 +155,9 @@ namespace rsl
 			{
 				switch (error.severity)
 				{
-					case error_severity::warning: RSL_HANDLE_ERROR_WARNING(error == success, error.message); break;
-					case error_severity::error: RSL_HANDLE_ERROR_ERROR(error == success, error.message); break;
-					case error_severity::fatal: RSL_HANDLE_ERROR_FATAL(error == success, error.message); break;
+				case error_severity::warning: RSL_HANDLE_ERROR_WARNING(error == success, error.message); break;
+				case error_severity::error: RSL_HANDLE_ERROR_ERROR(error == success, error.message); break;
+				case error_severity::fatal: RSL_HANDLE_ERROR_FATAL(error == success, error.message); break;
 				}
 			}
 
@@ -194,7 +195,7 @@ namespace rsl
 	public:
 		[[rythe_always_inline]] result(error_signal) noexcept
 			: result_base(error_signal{}),
-			  m_dummy(0)
+			m_dummy(0)
 		{
 		}
 
@@ -202,7 +203,7 @@ namespace rsl
 			requires(rsl::constructible_from<T, Args...>)
 		[[rythe_always_inline]] constexpr result(Args&&... args) noexcept(rsl::is_nothrow_constructible_v<T, Args...>)
 			: result_base(),
-			  m_value(rsl::forward<Args>(args)...)
+			m_value(rsl::forward<Args>(args)...)
 		{
 		}
 
@@ -263,13 +264,13 @@ namespace rsl
 				.message = message,
 				.severity = severity,
 				.errorBlockStart = errorBlockStart,
-			});
+				});
 		}
 	} // namespace internal
 
 	template <error_code ErrorType>
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto
-	make_error(ErrorType errorType, std::string_view message, error_severity severity = error_severity::error) noexcept
+		make_error(ErrorType errorType, std::string_view message, error_severity severity = error_severity::error) noexcept
 	{
 		internal::append_error(error_context::errors.size(), errorType, message, severity);
 		return error_signal{};
@@ -277,14 +278,14 @@ namespace rsl
 
 	template <error_code ErrorType>
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto
-	make_warning(ErrorType errorType, std::string_view message) noexcept
+		make_warning(ErrorType errorType, std::string_view message) noexcept
 	{
 		return make_error(errorType, message, error_severity::warning);
 	}
 
 	template <error_code ErrorType>
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto
-	make_fatal(ErrorType errorType, std::string_view message) noexcept
+		make_fatal(ErrorType errorType, std::string_view message) noexcept
 	{
 		return make_error(errorType, message, error_severity::fatal);
 	}
@@ -311,14 +312,14 @@ namespace rsl
 
 	template <typename T, error_code ErrorType>
 	[[rythe_always_inline]] constexpr void
-	append_warning(result<T>& result, ErrorType errorType, std::string_view message) noexcept
+		append_warning(result<T>& result, ErrorType errorType, std::string_view message) noexcept
 	{
 		append_error(result, errorType, message, error_severity::warning);
 	}
 
 	template <typename T, error_code ErrorType>
 	[[rythe_always_inline]] constexpr void
-	append_fatal(result<T>& result, ErrorType errorType, std::string_view message) noexcept
+		append_fatal(result<T>& result, ErrorType errorType, std::string_view message) noexcept
 	{
 		append_error(result, errorType, message, error_severity::fatal);
 	}

@@ -67,6 +67,8 @@ namespace rsl::math
 
 	using float4x4 = matrix<float32, 4, 4>;
 	using double4x4 = matrix<float64, 4, 4>;
+	using mat4 = float4x4;
+	using dmat4 = double4x4;
 } // namespace rsl::math
 
 RYTHE_MSVC_SUPPRESS_WARNING_POP

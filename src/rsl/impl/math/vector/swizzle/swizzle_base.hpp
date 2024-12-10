@@ -1,5 +1,6 @@
 #pragma once
 #include "../../../defines.hpp"
+#include "../../../util/assert.hpp"
 #include "../predefined.hpp"
 
 namespace rsl::math

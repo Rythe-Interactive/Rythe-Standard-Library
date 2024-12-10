@@ -62,7 +62,9 @@ namespace rsl::math
 	};
 
 	using float3x3 = matrix<float32, 3, 3>;
+	using mat3 = float3x3;
 	using double3x3 = matrix<float64, 3, 3>;
+	using dmat3 = double3x3;
 } // namespace rsl::math
 
 RYTHE_MSVC_SUPPRESS_WARNING_POP

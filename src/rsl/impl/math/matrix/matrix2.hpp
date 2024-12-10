@@ -60,6 +60,8 @@ namespace rsl::math
 
 	using float2x2 = matrix<float32, 2, 2>;
 	using double2x2 = matrix<float64, 2, 2>;
+	using mat2 = float2x2;
+	using dmat2 = double2x2;
 } // namespace rsl::math
 
 RYTHE_MSVC_SUPPRESS_WARNING_POP

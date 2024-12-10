@@ -72,7 +72,7 @@ namespace rsl
 			consteval static auto get_value() noexcept
 			{
 				constexpr auto ret = compiler_dependent_type_name<T>();
-				return ret.refit<ret.size() + 1>();
+				return ret.template refit<ret.size() + 1>();
 			}
 		};
 
@@ -106,7 +106,7 @@ namespace rsl
 			consteval static auto get_value() noexcept
 			{
 				constexpr auto ret = construct_value();
-				return ret.refit<ret.size() + 1>();
+				return ret.template refit<ret.size() + 1>();
 			}
 		};
 

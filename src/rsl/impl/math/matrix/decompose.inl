@@ -6,13 +6,13 @@ namespace rsl::math
 	template <typename Scalar>
 	[[nodiscard]] vector<Scalar, 3> scale(const matrix<Scalar, 4, 4>& mat) noexcept
 	{
-		return {length(mat[0].xyz), length(mat[1].xyz), length(mat[2].xyz)};
+		return { length(mat[0].xyz), length(mat[1].xyz), length(mat[2].xyz) };
 	}
 
 	template <typename Scalar>
 	[[nodiscard]] vector<Scalar, 3> scale(const matrix<Scalar, 3, 3>& mat) noexcept
 	{
-		return {length(mat[0].xyz), length(mat[1].xyz), length(mat[2].xyz)};
+		return { length(mat[0].xyz), length(mat[1].xyz), length(mat[2].xyz) };
 	}
 
 	template <typename Scalar>
@@ -39,7 +39,7 @@ namespace rsl::math
 		}
 		else
 		{
-			static constexpr size_type nextIdx[3] = {1, 2, 0};
+			static constexpr size_type nextIdx[3] = { 1, 2, 0 };
 			size_type i = 0;
 
 			if (orientationMat[1].y > orientationMat[0].x)
@@ -92,7 +92,7 @@ namespace rsl::math
 		}
 		else
 		{
-			static constexpr size_type nextIdx[3] = {1, 2, 0};
+			static constexpr size_type nextIdx[3] = { 1, 2, 0 };
 			size_type i = 0;
 
 			if (orientationMat[1].y > orientationMat[0].x)
@@ -171,7 +171,7 @@ namespace rsl::math
 			}
 			else
 			{
-				static constexpr size_type nextIdx[3] = {1, 2, 0};
+				static constexpr size_type nextIdx[3] = { 1, 2, 0 };
 				size_type i = 0;
 
 				if (orientationMat[1].y > orientationMat[0].x)
@@ -242,7 +242,7 @@ namespace rsl::math
 		}
 		else
 		{
-			static constexpr size_type nextIdx[3] = {1, 2, 0};
+			static constexpr size_type nextIdx[3] = { 1, 2, 0 };
 			size_type i = 0;
 
 			if (orientationMat[1].y > orientationMat[0].x)
@@ -274,7 +274,7 @@ namespace rsl::math
 		const vector<Scalar, 3>& scale, const quaternion<Scalar>& orientation, const vector<Scalar, 3>& translation
 	) noexcept
 	{
-		matrix<Scalar, 4, 4> result(orientation);
+		matrix<Scalar, 4, 4> result = { matrix<Scalar,3,3>(orientation) };
 		result[3].xyz = translation;
 		result[0].xyz *= scale[0];
 		result[1].xyz *= scale[1];

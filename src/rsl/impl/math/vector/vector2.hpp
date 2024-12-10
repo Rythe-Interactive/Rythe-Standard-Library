@@ -87,10 +87,15 @@ namespace rsl::math
 	};
 
 	using float2 = vector<float32, 2>;
+	using vec2 = float2;
 	using double2 = vector<float64, 2>;
+	using dvec2 = double2;
 	using int2 = vector<int, 2>;
+	using ivec2 = int2;
 	using uint2 = vector<uint, 2>;
+	using uvec2 = uint2;
 	using bool2 = vector<bool, 2>;
+	using bvec2 = bool2;
 } // namespace rsl::math
 
 RYTHE_MSVC_SUPPRESS_WARNING_POP

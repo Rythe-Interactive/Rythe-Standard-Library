@@ -102,7 +102,7 @@ namespace rsl::math
 			{
 				for (size_type j = 0; j < min_col; j++)
 				{
-					rows[i][j] = static_cast<scalar>(other.mx[i][j]);
+					rows[i][j] = static_cast<scalar>(other.rows[i][j]);
 				}
 			}
 		}

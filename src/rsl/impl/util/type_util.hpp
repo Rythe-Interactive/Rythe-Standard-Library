@@ -7,6 +7,7 @@
 
 #include "../defines.hpp"
 #include "string_util.hpp"
+#include "concepts.hpp"
 
 namespace rsl
 {
@@ -56,10 +57,10 @@ namespace rsl
 	} // namespace internal
 
 	template <typename T, size_type Size>
-	[[nodiscard]] constexpr T* begin(T (&arr)[Size]) noexcept;
+	[[nodiscard]] constexpr T* begin(T(&arr)[Size]) noexcept;
 
 	template <typename T, size_type Size>
-	[[nodiscard]] constexpr T* end(T (&arr)[Size]) noexcept;
+	[[nodiscard]] constexpr T* end(T(&arr)[Size]) noexcept;
 
 	template <typename T>
 	constexpr void destroy_at(T* const location) noexcept
@@ -101,7 +102,7 @@ namespace rsl
 	template <typename T, typename... Args>
 	struct is_brace_constructible
 	{
-		static constexpr bool value = requires(Args&&... args) { T{::rsl::forward<Args>(args)...}; };
+		static constexpr bool value = requires(Args&&... args) { T{ ::rsl::forward<Args>(args)... }; };
 	};
 
 	template <typename T, typename... Args>
@@ -216,18 +217,18 @@ namespace rsl
 
 	template <typename Derived, typename Base>
 	concept derived_from =
-		::rsl::is_base_of_v<Base, Derived> && ::rsl::is_convertible_v<const volatile Derived*, const volatile Base*>;
+		::rsl::is_base_of_v<Base, Derived>&& ::rsl::is_convertible_v<const volatile Derived*, const volatile Base*>;
 
 	template <typename From, typename To>
-	concept convertible_to = ::rsl::is_convertible_v<From, To> && requires { static_cast<To>(::rsl::declval<From>()); };
+	concept convertible_to = ::rsl::is_convertible_v<From, To>&& requires { static_cast<To>(::rsl::declval<From>()); };
 
 	template <typename LHS, typename RHS>
 	concept assignable_from =
 		::rsl::is_lvalue_reference_v<LHS> &&
 		::std::common_reference_with<const ::rsl::remove_reference_t<LHS>&, const ::rsl::remove_reference_t<RHS>&> &&
 		requires(LHS lhs, RHS&& rhs) {
-			{ lhs = static_cast<RHS&&>(rhs) } -> same_as<LHS>;
-		};
+			{ lhs = static_cast<RHS&&>(rhs) } -> ::rsl::same_as<LHS>;
+	};
 
 	template <class _Ty>
 	concept destructible = __is_nothrow_destructible(_Ty);
@@ -242,13 +243,13 @@ namespace rsl
 	};
 
 	template <class _Ty>
-	concept move_constructible = constructible_from<_Ty, _Ty> && convertible_to<_Ty, _Ty>;
+	concept move_constructible = constructible_from<_Ty, _Ty>&& convertible_to<_Ty, _Ty>;
 
 	template <class _Ty>
-	concept swappable = requires(_Ty& __x, _Ty& __y) { _RANGES swap(__x, __y); };
+	concept swappable = requires(_Ty & __x, _Ty & __y) { _RANGES swap(__x, __y); };
 
 	template <class _Ty1, class _Ty2>
-	concept swappable_with = _STD common_reference_with<_Ty1, _Ty2> && requires(_Ty1&& __t, _Ty2&& __u) {
+	concept swappable_with = _STD common_reference_with<_Ty1, _Ty2>&& requires(_Ty1&& __t, _Ty2&& __u) {
 		_RANGES swap(static_cast<_Ty1&&>(__t), static_cast<_Ty1&&>(__t));
 		_RANGES swap(static_cast<_Ty2&&>(__u), static_cast<_Ty2&&>(__u));
 		_RANGES swap(static_cast<_Ty1&&>(__t), static_cast<_Ty2&&>(__u));
@@ -257,38 +258,38 @@ namespace rsl
 
 	template <class _Ty>
 	concept copy_constructible =
-		move_constructible<_Ty> && constructible_from<_Ty, _Ty&> && convertible_to<_Ty&, _Ty> &&
-		constructible_from<_Ty, const _Ty&> && convertible_to<const _Ty&, _Ty> && constructible_from<_Ty, const _Ty> &&
+		move_constructible<_Ty> && constructible_from<_Ty, _Ty&>&& convertible_to<_Ty&, _Ty>&&
+		constructible_from<_Ty, const _Ty&>&& convertible_to<const _Ty&, _Ty>&& constructible_from<_Ty, const _Ty>&&
 		convertible_to<const _Ty, _Ty>;
 
 	template <class _Ty>
 	concept _Boolean_testable_impl = convertible_to<_Ty, bool>;
 
 	template <class _Ty>
-	concept _Boolean_testable = _Boolean_testable_impl<_Ty> && requires(_Ty&& __t) {
+	concept _Boolean_testable = _Boolean_testable_impl<_Ty> && requires(_Ty && __t) {
 		{ !static_cast<_Ty&&>(__t) } -> _Boolean_testable_impl;
 	};
 
 	template <class _Ty1, class _Ty2>
 	concept _Half_equality_comparable =
-		requires(const remove_reference_t<_Ty1>& __x, const remove_reference_t<_Ty2>& __y) {
+		requires(const remove_reference_t<_Ty1>&__x, const remove_reference_t<_Ty2>&__y) {
 			{ __x == __y } -> _Boolean_testable;
 			{ __x != __y } -> _Boolean_testable;
-		};
+	};
 
 	template <class _Ty1, class _Ty2>
 	concept _Weakly_equality_comparable_with =
-		_Half_equality_comparable<_Ty1, _Ty2> && _Half_equality_comparable<_Ty2, _Ty1>;
+		_Half_equality_comparable<_Ty1, _Ty2>&& _Half_equality_comparable<_Ty2, _Ty1>;
 
 	template <class _Ty>
 	concept equality_comparable = _Half_equality_comparable<_Ty, _Ty>;
 
 	template <class _Ty>
-	concept movable = is_object_v<_Ty> && move_constructible<_Ty> && assignable_from<_Ty&, _Ty> && swappable<_Ty>;
+	concept movable = is_object_v<_Ty> && move_constructible<_Ty> && assignable_from<_Ty&, _Ty>&& swappable<_Ty>;
 
 	template <class _Ty>
-	concept copyable = copy_constructible<_Ty> && movable<_Ty> && assignable_from<_Ty&, _Ty&> &&
-					   assignable_from<_Ty&, const _Ty&> && assignable_from<_Ty&, const _Ty>;
+	concept copyable = copy_constructible<_Ty> && movable<_Ty> && assignable_from<_Ty&, _Ty&>&&
+		assignable_from<_Ty&, const _Ty&>&& assignable_from<_Ty&, const _Ty>;
 
 	template <class _Ty>
 	concept semiregular = copyable<_Ty> && default_initializable<_Ty>;
@@ -297,7 +298,7 @@ namespace rsl
 	concept regular = semiregular<_Ty> && equality_comparable<_Ty>;
 
 	template <class _FTy, class... _ArgTys>
-	concept invocable = requires(_FTy&& _Fn, _ArgTys&&... _Args) {
+	concept invocable = requires(_FTy && _Fn, _ArgTys&&... _Args) {
 		_STD invoke(static_cast<_FTy&&>(_Fn), static_cast<_ArgTys&&>(_Args)...);
 	};
 
@@ -305,11 +306,11 @@ namespace rsl
 	concept regular_invocable = invocable<_FTy, _ArgTys...>;
 
 	template <class _FTy, class... _ArgTys>
-	concept predicate = regular_invocable<_FTy, _ArgTys...> && _Boolean_testable<invoke_result_t<_FTy, _ArgTys...>>;
+	concept predicate = regular_invocable<_FTy, _ArgTys...>&& _Boolean_testable<invoke_result_t<_FTy, _ArgTys...>>;
 
 	template <class _FTy, class _Ty1, class _Ty2>
-	concept relation = predicate<_FTy, _Ty1, _Ty1> && predicate<_FTy, _Ty2, _Ty2> && predicate<_FTy, _Ty1, _Ty2> &&
-					   predicate<_FTy, _Ty2, _Ty1>;
+	concept relation = predicate<_FTy, _Ty1, _Ty1>&& predicate<_FTy, _Ty2, _Ty2>&& predicate<_FTy, _Ty1, _Ty2>&&
+		predicate<_FTy, _Ty2, _Ty1>;
 
 	template <class _FTy, class _Ty1, class _Ty2>
 	concept equivalence_relation = relation<_FTy, _Ty1, _Ty2>;
@@ -324,7 +325,7 @@ namespace rsl
 		struct RYTHE_CONCAT(has_, RYTHE_CONCAT(x, _impl))                                                              \
 		{                                                                                                              \
 			static_assert(                                                                                             \
-				::rsl::integral_constant<bool_t<T>, false>::value,                                                     \
+				::rsl::integral_constant<::rsl::bool_t<T>, false>::value,                                                     \
 				"Second template param needs to be of function type."                                                  \
 			);                                                                                                         \
 		};                                                                                                             \
@@ -351,7 +352,7 @@ namespace rsl
 		struct RYTHE_CONCAT(has_static_, RYTHE_CONCAT(x, _impl))                                                       \
 		{                                                                                                              \
 			static_assert(                                                                                             \
-				::rsl::integral_constant<bool_t<T>, false>::value,                                                     \
+				::rsl::integral_constant<::rsl::bool_t<T>, false>::value,                                                     \
 				"Second template param needs to be of function type."                                                  \
 			);                                                                                                         \
 		};                                                                                                             \

@@ -6,6 +6,8 @@
 
 namespace rsl::math
 {
+#undef min
+#undef max
 	template <typename A, typename B>
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto min(A&& a, B&& b);
 

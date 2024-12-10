@@ -3,6 +3,8 @@
 #include <type_traits>
 
 #include "../defines.hpp"
+#include "type_util.hpp"
+
 
 namespace rsl
 {
