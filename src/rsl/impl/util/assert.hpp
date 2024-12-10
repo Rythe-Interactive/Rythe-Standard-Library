@@ -29,14 +29,31 @@
 		[[maybe_unused]] const char* m = static_cast<const char*>(msg);                                                \
 	}
 
+namespace rsl::asserts
+{
+	namespace internal
+	{
+		void default_assert_handler(
+			std::string_view expression, std::string_view file, size_type line, std::string_view message, bool soft
+		);
+	}
+
+	using assert_handler_function = void (*)(
+		std::string_view expression, std::string_view file, size_type line, std::string_view message, bool soft
+	);
+
+	extern assert_handler_function assert_handler;
+} // namespace rsl::asserts
+
 #define __rsl_assert_impl(expr, file, line, msg, soft)                                                                 \
 	{                                                                                                                  \
-		std::cerr << "Assertion failed:\t" << msg                                                                      \
-				  << "\nExpected:\t\t" expr "\nSource:\t\t\t" file ", line " RYTHE_STRINGIFY(line) "\n";               \
-		__debugbreak();                                                                                                \
-		if constexpr (!soft)                                                                                           \
+		if (rsl::asserts::assert_handler)                                                                              \
 		{                                                                                                              \
-			std::abort();                                                                                              \
+			rsl::asserts::assert_handler(expr, file, line, msg, soft);                                                 \
+		}                                                                                                              \
+		else                                                                                                           \
+		{                                                                                                              \
+			rsl::asserts::internal::default_assert_handler(expr, file, line, msg, soft);                               \
 		}                                                                                                              \
 	}
 

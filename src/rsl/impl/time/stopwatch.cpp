@@ -1,6 +1,6 @@
 #include "stopwatch.hpp"
 
-namespace rsl
+namespace rsl::time
 {
-	const timer main_clock;
+	const timer32 main_clock;
 }

@@ -264,14 +264,18 @@ namespace rsl
 
 #pragma region /////////////////////////////////////// Attributes ///////////////////////////////////////
 
-#if defined(RYTHE_GCC)
-	#define rythe_always_inline gnu::always_inline
-#elif defined(RYTHE_CLANG)
-	#define rythe_always_inline clang::always_inline
-#elif defined(RYTHE_MSVC)
-	#define rythe_always_inline msvc::forceinline
-#else
+#if defined(RYTHE_DISABLE_ALWAYS_INLINE)
 	#define rythe_always_inline
+#else
+	#if defined(RYTHE_GCC)
+		#define rythe_always_inline gnu::always_inline
+	#elif defined(RYTHE_CLANG)
+		#define rythe_always_inline clang::always_inline
+	#elif defined(RYTHE_MSVC)
+		#define rythe_always_inline msvc::forceinline
+	#else
+		#define rythe_always_inline
+	#endif
 #endif
 
 #if defined(RYTHE_GCC)

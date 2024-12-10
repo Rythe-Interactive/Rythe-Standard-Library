@@ -2,6 +2,14 @@
 
 namespace rsl
 {
-	thread_local buffered_list<error_info, RSL_ERR_MAX_COUNT> error_context::errors;
-	thread_local errid error_context::currentError;
+	thread_local error_list error_context::errors;
+	thread_local errid error_context::currentError = invalid_err_id;
+
+	namespace internal
+	{
+		errid& get_errid(result_base& r) noexcept
+		{
+			return r.m_errid;
+		}
+	} // namespace internal
 } // namespace rsl

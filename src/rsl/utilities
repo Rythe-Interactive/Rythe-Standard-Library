@@ -3,3 +3,4 @@
 #include "impl/util/utilities.hpp"
 #include "impl/util/enum_flags.hpp"
 #include "impl/util/assert.hpp"
+#include "impl/util/error_handling.hpp"

@@ -997,7 +997,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	[[nodiscard]] constexpr T* addressof(T& val) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr T* addressof(T& val) noexcept
 	{
 		return ::std::addressof(val); // Compiler magic behind the scenes.
 	}
@@ -1006,26 +1006,26 @@ namespace rsl
 	const T* addressof(const T&&) = delete;
 
 	template <typename T>
-	[[nodiscard]] constexpr T&& forward(remove_reference_t<T>& val) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr T&& forward(remove_reference_t<T>& val) noexcept
 	{
 		return static_cast<T&&>(val);
 	}
 
 	template <typename T>
-	[[nodiscard]] constexpr T&& forward(remove_reference_t<T>&& val) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr T&& forward(remove_reference_t<T>&& val) noexcept
 	{
 		static_assert(!is_lvalue_reference_v<T>, "bad forward call");
 		return static_cast<T&&>(val);
 	}
 
 	template <typename T>
-	[[nodiscard]] constexpr remove_reference_t<T>&& move(T&& val) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr remove_reference_t<T>&& move(T&& val) noexcept
 	{
 		return static_cast<remove_reference_t<T>&&>(val);
 	}
 
 	template <typename T>
-	[[nodiscard]] constexpr conditional_t<
+	[[nodiscard]] [[rythe_always_inline]] constexpr conditional_t<
 		!::std::is_nothrow_move_constructible_v<T> && ::std::is_copy_constructible_v<T>, const T&, T&&>
 	move_if_noexcept(T& val) noexcept
 	{
@@ -1092,7 +1092,7 @@ namespace rsl
 
 		using value_type = T;
 
-		[[nodiscard]] static constexpr size_type size() noexcept { return sizeof...(Vals); }
+		[[nodiscard]] consteval size_type size() noexcept { return sizeof...(Vals); }
 	};
 
 	template <typename T, T Size>
@@ -1261,7 +1261,7 @@ namespace rsl
 	namespace internal
 	{
 		template <typename Func, size_type... paramCounts>
-		constexpr bool test_invocable_impl([[maybe_unused]] integer_sequence<size_type, paramCounts...> int_seq)
+		consteval bool test_invocable_impl([[maybe_unused]] integer_sequence<size_type, paramCounts...> int_seq)
 		{
 			return ((make_sequence_t<is_invocable, any_type, paramCounts, Func>::value) || ...);
 		}

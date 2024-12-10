@@ -1,7 +1,7 @@
 #include "time_point.hpp"
 #include "stopwatch.hpp"
 
-namespace rsl
+namespace rsl::time
 {
-	const time_point<> genesis = main_clock.start_point();
+	const point32 genesis = main_clock.start_point();
 }

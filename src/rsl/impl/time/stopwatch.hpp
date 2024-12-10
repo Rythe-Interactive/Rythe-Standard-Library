@@ -7,15 +7,15 @@
 #include "time_point.hpp"
 
 
-namespace rsl
+namespace rsl::time
 {
-	template <time_duration_rep precision = time32, chrono_clock clock_t = std::chrono::high_resolution_clock>
+	template <duration_rep precision = time32, chrono_clock clock_t = std::chrono::high_resolution_clock>
 	struct stopwatch
 	{
 	public:
 		using time_type = precision;
-		using span_type = time_span<time_type>;
-		using time_point_type = time_point<precision, clock_t>;
+		using span_type = time::span<time_type>;
+		using time_point_type = time::point<precision, clock_t>;
 		using clock_type = clock_t;
 
 	private:
@@ -56,7 +56,8 @@ namespace rsl
 		}
 	};
 
-	using timer = stopwatch<>;
+	using timer32 = stopwatch<time32>;
+	using timer64 = stopwatch<time64>;
 
-	extern const timer main_clock;
+	extern const timer32 main_clock;
 } // namespace rsl

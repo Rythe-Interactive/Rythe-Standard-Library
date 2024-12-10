@@ -9,7 +9,7 @@ namespace rsl
 	)
 	{
 		// get seconds since engine start
-		const auto timeSinceGenesis = main_clock.current_point() - genesis;
+		const auto timeSinceGenesis = time::main_clock.current_point() - time::genesis;
 		const auto seconds = timeSinceGenesis.seconds();
 
 		// convert to "--s.ms---"
