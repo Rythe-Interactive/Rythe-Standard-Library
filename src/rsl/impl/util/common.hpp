@@ -1078,15 +1078,16 @@ namespace rsl
 	using concat_sequence_t = typename concat_sequence<Sequences...>::type;
 
 	template <type_sequence_c Sequence, typename T>
+	constexpr bool type_sequence_contains_v = Sequence::template contains<T>;
+
+	template <type_sequence_c Sequence, typename T>
 	struct type_sequence_contains;
 
 	template <typename... Types, typename T>
-	struct type_sequence_contains<type_sequence<Types...>, T> : bool_constant<type_sequence<Types...>::contains<T>>
+	struct type_sequence_contains<type_sequence<Types...>, T> :
+		bool_constant<type_sequence_contains_v<type_sequence<Types...>, T>>
 	{
 	};
-
-	template <type_sequence_c Sequence, typename T>
-	constexpr bool type_sequence_contains_v = type_sequence_contains<Sequence, T>::value;
 
 	template <typename T, T... Vals>
 	struct integer_sequence

@@ -97,12 +97,12 @@ namespace rsl
 	void disable_assert_on_error() noexcept;
 	bool assert_on_error_enabled() noexcept;
 
-    struct scoped_assert_on_error final
-    {
+	struct scoped_assert_on_error final
+	{
 		bool wasEnabled;
 		scoped_assert_on_error(bool enabled = true);
 		~scoped_assert_on_error();
-    };
+	};
 
 	void set_error_handler(error_handler* errorHandler) noexcept;
 	error_handler* get_error_handler() noexcept;
@@ -353,4 +353,17 @@ namespace rsl
 	}
 
 	inline static result<void> okay = result<void>();
+
+	struct unspecified_error
+	{
+		enum struct unspecified_error_code : errc
+		{
+			unspecified = -1,
+		};
+
+        template<typename T>
+		operator result<T>() { return make_error(unspecified_error_code::unspecified, "Unspecified error"); }
+	};
+
+	inline static unspecified_error error = unspecified_error{};
 } // namespace rsl

@@ -2,6 +2,7 @@
 #include "../../logging/spdlog_include.hpp"
 
 #include "../buffered_string.hpp"
+#include "../constexpr_string.hpp"
 
 namespace fmt
 {
@@ -17,6 +18,23 @@ namespace fmt
 		auto format(const rsl::buffered_string<maxSize, CharType>& str, FormatContext& ctx)
 		{
 			return format_to(ctx.out(), format_string<typename rsl::buffered_string<maxSize, CharType>::view_type>("{}"), str.view());
+		}
+	};
+
+	template <rsl::size_type N>
+	struct formatter<rsl::constexpr_string<N>>
+	{
+		constexpr const char* parse(format_parse_context& ctx)
+		{
+			return formatter<rsl::cstring>{}.parse(ctx);
+		}
+
+		template <typename FormatContext>
+		auto format(const rsl::constexpr_string<N>& str, FormatContext& ctx)
+		{
+			return format_to(
+				ctx.out(), format_string<rsl::cstring>("{}"), str.buffer
+			);
 		}
 	};
 } // namespace fmt
