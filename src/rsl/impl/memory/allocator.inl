@@ -76,7 +76,7 @@ namespace rsl
 	template <typename T>
 	template <typename... Args>
 	inline T* default_constructor<T>::construct(void* ptr, size_type count, Args&&... args)
-		noexcept(is_nothrow_constructible_v<T, Args...>)
+		noexcept(noexcept_constructable<Args...>)
 	{
 		if constexpr (is_trivially_default_constructible_v<T> && sizeof...(Args) == 0)
 		{
@@ -101,8 +101,7 @@ namespace rsl
 	}
 
 	template <typename T>
-	inline T* default_constructor<T>::move(void* dst, T* src, size_type count)
-		noexcept(is_nothrow_move_constructible_v<T>)
+	inline T* default_constructor<T>::move(void* dst, T* src, size_type count) noexcept(noexcept_moveable)
 	{
 		if constexpr (is_trivially_copy_constructible_v<T>)
 		{
@@ -137,18 +136,18 @@ namespace rsl
 	template <typename T, universal_allocator_type UniversalAlloc, constructor_type Constructor>
 	template <typename... Args>
 	inline T* allocator<T, UniversalAlloc, Constructor>::allocate(size_type count, Args&&... args)
-		noexcept(is_nothrow_invocable_v<Constructor::construct, void*, size_type, Args...>)
+		noexcept(Constructor::template noexcept_constructable<Args...>)
 	{
-		void* mem = UniversalAlloc::allocate(count * sizeof(T));
+		T* mem = static_cast<T*>(UniversalAlloc::allocate(count * sizeof(T)));
 		return Constructor::construct(mem, count, std::forward<Args>(args)...);
 	}
 
 	template <typename T, universal_allocator_type UniversalAlloc, constructor_type Constructor>
 	template <typename... Args>
 	inline T* allocator<T, UniversalAlloc, Constructor>::allocate(size_type count, size_type alignment, Args&&... args)
-		noexcept(is_nothrow_invocable_v<Constructor::construct, void*, size_type, Args...>)
+		noexcept(Constructor::template noexcept_constructable<Args...>)
 	{
-		void* mem = UniversalAlloc::allocate(count * sizeof(T), alignment);
+		T* mem = static_cast<T*>(UniversalAlloc::allocate(count * sizeof(T), alignment));
 		return Constructor::construct(mem, count, std::forward<Args>(args)...);
 	}
 
@@ -156,26 +155,26 @@ namespace rsl
 	template <typename... Args>
 	inline T* allocator<T, UniversalAlloc, Constructor>::reallocate(
 		T* ptr, size_type oldCount, size_type newCount, Args&&... args
-	) noexcept(is_nothrow_invocable_v<Constructor::construct, void*, size_type, Args...> && is_nothrow_invocable_v<Constructor::move, void*, T*, size_type>)
+	) noexcept(Constructor::template noexcept_constructable<Args...> && Constructor::noexcept_moveable)
 	{
 		if constexpr (std::is_trivially_copyable_v<T>)
 		{
-			void* mem = UniversalAlloc::reallocate(ptr, oldCount * sizeof(T), newCount * sizeof(T));
+			T* mem = static_cast<T*>(UniversalAlloc::reallocate(ptr, oldCount * sizeof(T), newCount * sizeof(T)));
 
 			if (newCount > oldCount)
 			{
 				Constructor::construct(mem + oldCount, oldCount - newCount, std::forward<Args>(args)...);
 			}
 
-			return static_cast<T>(mem);
+			return mem;
 		}
 		else
 		{
-			void* mem = nullptr;
+			T* mem = nullptr;
 
 			if (newCount != 0)
 			{
-				mem = UniversalAlloc::allocate(newCount * sizeof(T));
+				mem = static_cast<T*>(UniversalAlloc::allocate(newCount * sizeof(T)));
 				if (mem)
 				{
 					Constructor::move(mem, ptr, oldCount);
@@ -197,26 +196,26 @@ namespace rsl
 	template <typename... Args>
 	inline T* allocator<T, UniversalAlloc, Constructor>::reallocate(
 		T* ptr, size_type oldCount, size_type newCount, size_type alignment, Args&&... args
-	) noexcept(is_nothrow_invocable_v<Constructor::construct, void*, size_type, Args...> && is_nothrow_invocable_v<Constructor::move, void*, T*, size_type>)
+	) noexcept(Constructor::template noexcept_constructable<Args...> && Constructor::noexcept_moveable)
 	{
 		if constexpr (std::is_trivially_copyable_v<T>)
 		{
-			void* mem = UniversalAlloc::reallocate(ptr, oldCount * sizeof(T), newCount * sizeof(T), alignment);
+			T* mem = static_cast<T*>(UniversalAlloc::reallocate(ptr, oldCount * sizeof(T), newCount * sizeof(T), alignment));
 
 			if (newCount > oldCount)
 			{
 				Constructor::construct(mem + oldCount, oldCount - newCount, std::forward<Args>(args)...);
 			}
 
-			return static_cast<T>(mem);
+			return mem;
 		}
 		else
 		{
-			void* mem = nullptr;
+			T* mem = nullptr;
 
 			if (newCount != 0)
 			{
-				mem = UniversalAlloc::allocate(newCount * sizeof(T), alignment);
+				mem = static_cast<T*>(UniversalAlloc::allocate(newCount * sizeof(T), alignment));
 				if (mem)
 				{
 					Constructor::move(mem, ptr, oldCount);
@@ -232,6 +231,18 @@ namespace rsl
 
 			return mem;
 		}
+	}
+
+	template <typename T, universal_allocator_type UniversalAlloc, constructor_type Constructor>
+	inline UniversalAlloc& allocator<T, UniversalAlloc, Constructor>::as_universal() noexcept
+	{
+		return *this;
+	}
+
+	template <typename T, universal_allocator_type UniversalAlloc, constructor_type Constructor>
+	inline const UniversalAlloc& allocator<T, UniversalAlloc, Constructor>::as_universal() const noexcept
+	{
+		return *this;
 	}
 
 	template <typename T, universal_allocator_type UniversalAlloc, constructor_type Constructor>

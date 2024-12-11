@@ -167,7 +167,7 @@ namespace rsl
 
 			auto& error = error_context::errors[error_context::currentError];
 			error_context::errors.pop_back((error_context::currentError - error.errorBlockStart) + 1);
-			error_context::currentError = error_context::errors.size() - 1;
+			error_context::currentError = static_cast<errid>(error_context::errors.size() - 1);
 			m_errid = invalid_err_id;
 		}
 
@@ -279,7 +279,7 @@ namespace rsl
 				"Max error count overflow, consider changing RSL_ERR_ID_UNDERLYING to a larger type."
 			);
 
-			error_context::currentError = error_context::errors.size();
+			error_context::currentError = static_cast<errid>(error_context::errors.size());
 			error_context::errors.emplace_back(error_type{
 				.code = static_cast<errc>(errorType),
 				.message = message,
@@ -293,7 +293,7 @@ namespace rsl
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto
 	make_error(ErrorType errorType, std::string_view message, error_severity severity = error_severity::error) noexcept
 	{
-		internal::append_error(error_context::errors.size(), errorType, message, severity);
+		internal::append_error(static_cast<errid>(error_context::errors.size()), errorType, message, severity);
 		return error_signal{};
 	}
 

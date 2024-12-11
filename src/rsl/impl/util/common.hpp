@@ -2,6 +2,7 @@
 #include <ratio>
 #include <type_traits>
 
+#include "../defines.hpp"
 #include "primitives.hpp"
 
 namespace rsl

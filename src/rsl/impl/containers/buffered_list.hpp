@@ -9,8 +9,9 @@
 namespace rsl
 {
 	template <typename ValueType, size_type maxSize>
-	struct buffered_list
+	class buffered_list
 	{
+	public:
 		using value_type = ValueType;
 		using reference = value_type&;
 		using const_reference = const value_type&;

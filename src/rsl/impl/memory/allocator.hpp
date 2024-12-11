@@ -29,7 +29,7 @@ namespace rsl
 	template <typename T>
 	concept universal_allocator_type = allocator_type<T> && same_as<typename T::value_type, void>;
 
-	class heap_allocator final
+	class heap_allocator
 	{
 	public:
 		using value_type = void;
@@ -117,7 +117,7 @@ namespace rsl
 	using default_pmu_allocator = default_polymorphic_allocator;
 
 	template <typename T>
-	class default_constructor final
+	class default_constructor
 	{
 	public:
 		using value_type = T;
@@ -125,10 +125,14 @@ namespace rsl
 		template <typename Other>
 		using retarget = default_constructor<Other>;
 
-		template <typename... Args>
-		T* construct(void* ptr, size_type count, Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>);
+        template<typename... Args>
+		constexpr static bool noexcept_constructable = is_nothrow_constructible_v<T, Args...>;
+		constexpr static bool noexcept_moveable = is_nothrow_move_constructible_v<T>;
 
-		T* move(void* dst, T* src, size_type count) noexcept(is_nothrow_move_constructible_v<T>);
+		template <typename... Args>
+		T* construct(void* ptr, size_type count, Args&&... args) noexcept(noexcept_constructable<Args...>);
+
+		T* move(void* dst, T* src, size_type count) noexcept(noexcept_moveable);
 
 		void destroy(T* ptr, size_type count) noexcept;
 	};
@@ -137,7 +141,7 @@ namespace rsl
 	concept constructor_type = requires(T ctor, void* mem, typename T::value_type* ptr, size_type n) {
 		{ ctor.construct(mem, n) } -> convertible_to<typename T::value_type*>;
 		{ ctor.move(mem, ptr, n) } -> convertible_to<typename T::value_type*>;
-		{ ctor.destroy(ptr, n) };
+		{ ctor.destroy(ptr, n) } noexcept;
 	};
 
 	template <typename T>
@@ -150,28 +154,55 @@ namespace rsl
 	template <
 		typename T, universal_allocator_type UniversalAlloc = default_allocator,
 		constructor_type Constructor = default_constructor<T>>
-	class allocator final : private UniversalAlloc, private Constructor
+	class allocator final : public UniversalAlloc, private Constructor
 	{
 	public:
 		using value_type = T;
+		using universal_type = UniversalAlloc;
+
+		allocator() = default;
+		allocator(const UniversalAlloc& uAlloc, const Constructor& construct = {})
+			: UniversalAlloc(uAlloc),
+			  Constructor(construct)
+		{
+		}
+		allocator(UniversalAlloc&& uAlloc, const Constructor& construct = {})
+			: UniversalAlloc(move(uAlloc)),
+			  Constructor(construct)
+		{
+		}
+		allocator(const UniversalAlloc& uAlloc, Constructor&& construct)
+			: UniversalAlloc(uAlloc),
+			  Constructor(move(construct))
+		{
+		}
+		allocator(UniversalAlloc&& uAlloc, Constructor&& construct)
+			: UniversalAlloc(move(uAlloc)),
+			  Constructor(move(construct))
+		{
+		}
+
+        universal_type& as_universal() noexcept;
+        const universal_type& as_universal() const noexcept;
 
 		template <typename... Args>
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T* allocate(size_type count = 1, Args&&... args)
-			noexcept(is_nothrow_invocable_v<Constructor::construct, void*, size_type, Args...>);
+			noexcept(Constructor::template noexcept_constructable<Args...>);
+
 		template <typename... Args>
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T*
 		allocate(size_type count, size_type alignment, Args&&... args)
-			noexcept(is_nothrow_invocable_v<Constructor::construct, void*, size_type, Args...>);
+			noexcept(Constructor::template noexcept_constructable<Args...>);
 
 		template <typename... Args>
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T* reallocate(
-			T* ptr, size_type oldCount, size_type newCount, Args&&... args
-		) noexcept(is_nothrow_invocable_v<Constructor::construct, void*, size_type, Args...> && is_nothrow_invocable_v<Constructor::move, void*, T*, size_type>);
+			T* ptr, size_type oldCount, size_type newCount, Args&&... args)
+			noexcept(Constructor::template noexcept_constructable<Args...> && Constructor::noexcept_moveable);
 
 		template <typename... Args>
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T* reallocate(
-			T* ptr, size_type oldCount, size_type newCount, size_type alignment, Args&&... args
-		) noexcept(is_nothrow_invocable_v<Constructor::construct, void*, size_type, Args...> && is_nothrow_invocable_v<Constructor::move, void*, T*, size_type>);
+			T* ptr, size_type oldCount, size_type newCount, size_type alignment, Args&&... args)
+			noexcept(Constructor::template noexcept_constructable<Args...> && Constructor::noexcept_moveable);
 
 		[[rythe_always_inline]] void deallocate(T* ptr, size_type count = 1) noexcept;
 		[[rythe_always_inline]] void deallocate(T* ptr, size_type count, size_type alignment) noexcept;
@@ -179,6 +210,47 @@ namespace rsl
 		template <typename Other>
 		using retarget = allocator<Other, UniversalAlloc, typename Constructor::template retarget<Other>>;
 	};
+
+	template <specialization_of<allocator> Alloc>
+	struct stl_allocator_compatible_wrapper
+	{
+		Alloc alloc;
+        using value_type = Alloc::value_type;
+
+        template<typename Other>
+        struct rebind
+        {
+            using other = stl_allocator_compatible_wrapper<typename Alloc::template retarget<Other>>;
+        };
+
+        constexpr stl_allocator_compatible_wrapper() noexcept {}
+
+		constexpr stl_allocator_compatible_wrapper(const stl_allocator_compatible_wrapper&) noexcept = default;
+		constexpr stl_allocator_compatible_wrapper(const Alloc& other) noexcept
+			: alloc(other)
+            {}
+		template <class _Other>
+		constexpr stl_allocator_compatible_wrapper(
+			const stl_allocator_compatible_wrapper<typename Alloc::template retarget<_Other>>& other
+		) noexcept
+			: alloc(other.alloc)
+		{
+		}
+
+		constexpr ~stl_allocator_compatible_wrapper() = default;
+		constexpr stl_allocator_compatible_wrapper& operator=(const stl_allocator_compatible_wrapper&) = default;
+
+		constexpr void deallocate(value_type* const ptr, const size_t count)
+        {
+			alloc.as_universal().deallocate(ptr, count * sizeof(value_type));
+		}
+
+		[[nodiscard]] [[rythe_allocating]] constexpr value_type* allocate(const size_t count)
+		{
+			return static_cast<value_type*>(alloc.as_universal().allocate(count * sizeof(value_type)));
+		}
+	};
+
 } // namespace rsl
 
 #include "allocator.inl"

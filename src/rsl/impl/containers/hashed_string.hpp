@@ -66,8 +66,9 @@ namespace rsl
 	} // namespace hashed_string_literals
 
 	template <typename Alloc>
-	struct basic_hashed_string
+	class basic_hashed_string
 	{
+	public:
 		using string_type = std::basic_string<char, std::char_traits<char>, Alloc>;
 
 		u64 value = 0;
