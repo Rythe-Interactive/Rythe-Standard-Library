@@ -1,9 +1,7 @@
 #pragma once
 
-#include <cstdlib>
-#include <iostream>
-
 #include "../defines.hpp"
+#include "primitives.hpp"
 
 #define rsl_mock_assert(expr)                                                                                          \
 	if constexpr (false)                                                                                               \

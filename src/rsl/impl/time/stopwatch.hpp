@@ -60,4 +60,4 @@ namespace rsl::time
 	using timer64 = stopwatch<time64>;
 
 	extern const timer32 main_clock;
-} // namespace rsl
+} // namespace rsl::time

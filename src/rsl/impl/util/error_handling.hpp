@@ -31,18 +31,6 @@ namespace rsl
 	RYTHE_COMPILER_ERROR("RSL_ERR_MAX_COUNT cannot be user defined, use RSL_ERR_ID_UNDERLYING instead")
 #endif
 
-#if !defined(RSL_HANDLE_ERROR_WARNING)
-	#define RSL_HANDLE_ERROR_WARNING(condition, message) rsl_soft_assert_msg_consistent(condition, message)
-#endif
-
-#if !defined(RSL_HANDLE_ERROR_ERROR)
-	#define RSL_HANDLE_ERROR_ERROR(condition, message) rsl_hard_assert_msg(condition, message)
-#endif
-
-#if !defined(RSL_HANDLE_ERROR_FATAL)
-	#define RSL_HANDLE_ERROR_FATAL(condition, message) rsl_hard_assert_msg(condition, message)
-#endif
-
 	using errid = RSL_ERR_ID_UNDERLYING;
 
 #define RSL_ERR_MAX_COUNT std::numeric_limits<errid>::max()
@@ -50,7 +38,7 @@ namespace rsl
 	constexpr errid invalid_err_id = RSL_ERR_MAX_COUNT;
 
 	using errc = RSL_ERR_UNDERLYING;
-    constexpr errc no_error_code = 0;
+	constexpr errc no_error_code = 0;
 
 	template <typename ERRC>
 	concept error_code = std::is_enum_v<ERRC> && rsl::is_same_v<std::underlying_type_t<ERRC>, errc>;
@@ -77,16 +65,53 @@ namespace rsl
 		}
 	};
 
-	constexpr static error_type success =
-		error_type{.code = no_error_code, .message = {}, .severity = static_cast<error_severity>(-1), .errorBlockStart = 0};
+	constexpr static error_type success = error_type{
+		.code = no_error_code, .message = {}, .severity = static_cast<error_severity>(-1), .errorBlockStart = 0
+	};
 
 	using error_list = buffered_list<error_type, RSL_ERR_MAX_COUNT>;
 	using error_view = typename error_list::view_type;
+
+	struct error_handler
+	{
+		virtual void handle_assert(
+			std::string_view expression, std::string_view file, size_type line, std::string_view message, bool soft
+		)
+		{
+			rsl::asserts::internal::default_assert_handler(expression, file, line, message, soft);
+		}
+
+		virtual void handle_error(const error_type& error, bool assertError);
+	};
 
 	struct error_context
 	{
 		thread_local static error_list errors;
 		thread_local static errid currentError;
+		thread_local static error_handler* errorHandlerOverride;
+		thread_local static bool assertOnError;
+		static error_handler defaultErrorHandler;
+	};
+
+	void enable_assert_on_error(bool enabled = true) noexcept;
+	void disable_assert_on_error() noexcept;
+	bool assert_on_error_enabled() noexcept;
+
+    struct scoped_assert_on_error final
+    {
+		bool wasEnabled;
+		scoped_assert_on_error(bool enabled = true);
+		~scoped_assert_on_error();
+    };
+
+	void set_error_handler(error_handler* errorHandler) noexcept;
+	error_handler* get_error_handler() noexcept;
+
+	struct scoped_error_handler final
+	{
+		error_handler* previousErrorHandler;
+		scoped_error_handler(error_handler* errorHandler);
+		~scoped_error_handler();
 	};
 
 	struct error_signal
@@ -150,14 +175,11 @@ namespace rsl
 
 		errc report_errors() noexcept
 		{
+			error_handler* errorHandler = get_error_handler();
+
 			for (auto& error : get_errors())
 			{
-				switch (error.severity)
-				{
-					case error_severity::warning: RSL_HANDLE_ERROR_WARNING(error == success, error.message); break;
-					case error_severity::error: RSL_HANDLE_ERROR_ERROR(error == success, error.message); break;
-					case error_severity::fatal: RSL_HANDLE_ERROR_FATAL(error == success, error.message); break;
-				}
+				errorHandler->handle_error(error, assert_on_error_enabled());
 			}
 
 			errc errorCode = no_error_code;

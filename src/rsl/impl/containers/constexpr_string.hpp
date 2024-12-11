@@ -21,6 +21,7 @@ namespace rsl
 
 		[[nodiscard]] consteval size_type capacity() const noexcept { return N; }
 		[[nodiscard]] consteval size_type size() const noexcept;
+		[[nodiscard]] consteval bool empty() const noexcept { return size() == 0; }
 
 		constexpr char& operator[](size_type i) noexcept { return buffer[i]; }
 		constexpr const char& operator[](size_type i) const noexcept { return buffer[i]; }
@@ -30,10 +31,22 @@ namespace rsl
 
 		template <typename F>
 		[[nodiscard]] consteval constexpr_string<N> filter_if(F f) const noexcept;
+		template <size_type... Vals>
+		[[nodiscard]] consteval constexpr_string<N> filter_range(index_sequence<Vals...>) const noexcept;
+		[[nodiscard]] consteval constexpr_string<N> filter_range(size_type start, size_type end) const noexcept;
+		template <size_type OtherN>
+		[[nodiscard]] consteval constexpr_string<N> filter(const constexpr_string<OtherN>& str) const noexcept;
 		[[nodiscard]] consteval constexpr_string<N> filter(char x) const noexcept;
+
+		template <size_type N0, size_type N1>
+		[[nodiscard]] consteval constexpr_string<N>
+		replace(const constexpr_string<N0>& filter, const constexpr_string<N1>& replacement) const noexcept;
 
 		template <size_type I>
 		[[nodiscard]] consteval constexpr_string<I> refit() const noexcept;
+
+		template <size_type OtherN>
+		[[nodiscard]] consteval size_type find(const constexpr_string<OtherN>& str) const noexcept;
 
 		consteval void copy_from(string_view str) noexcept;
 	};
@@ -69,18 +82,131 @@ namespace rsl
 		size_type j = 0;
 		for (size_type i = 0; i < N; ++i)
 		{
-			ret[j] = buffer[i];
-			if (f(buffer[i]))
+			if (f(i))
 			{
+				ret[j] = buffer[i];
 				++j;
 			}
 		}
 
-		for (j = j + 1; j < N; ++j)
+		for (; j < N; ++j)
 		{
 			ret[j] = 0;
 		}
 		return ret;
+	}
+
+	template <size_type N>
+	template <size_type... Vals>
+	inline consteval constexpr_string<N> constexpr_string<N>::filter_range(index_sequence<Vals...>) const noexcept
+	{
+		constexpr_string<N> ret{};
+		size_type j = 0;
+		for (size_type i = 0; i < N; ++i)
+		{
+			if (index_sequence<Vals...>::template contains<i>)
+			{
+				ret[j] = buffer[i];
+				++j;
+			}
+		}
+
+		for (; j < N; ++j)
+		{
+			ret[j] = 0;
+		}
+		return ret;
+	}
+
+	template <size_type N>
+	inline consteval constexpr_string<N>
+	constexpr_string<N>::filter_range(size_type start, size_type end) const noexcept
+	{
+		return filter_if([&](size_type i) { return i < start || i > end; });
+	}
+
+	template <size_type N>
+	template <size_type OtherN>
+	inline consteval constexpr_string<N> constexpr_string<N>::filter(const constexpr_string<OtherN>& str) const noexcept
+	{
+		size_type start = find(str);
+		if (start == npos)
+        {
+			return *this;
+        }
+
+		constexpr_string<N> result = filter_range(start, start + str.size());
+        if (result.find(str) == npos)
+        {
+			return result;
+        }
+        else
+        {
+			return result.filter(str);
+        }
+	}
+
+	template <size_type N>
+	inline consteval constexpr_string<N> constexpr_string<N>::filter(char x) const noexcept
+	{
+		return filter_if([&](size_type i) { return x != buffer[i]; });
+	}
+
+	template <size_type N>
+	template <size_type N0, size_type N1>
+	inline consteval constexpr_string<N> constexpr_string<N>::replace(
+		const constexpr_string<N0>& filter, const constexpr_string<N1>& replacement
+	) const noexcept
+	{
+		size_type start = find(filter);
+		if (start == npos)
+		{
+			return *this;
+		}
+
+		size_type end = start + filter.size();
+
+		constexpr_string<N> ret{};
+		size_type j = 0;
+		for (size_type i = 0; i < N; ++i)
+		{
+			if (i == start)
+			{
+				for (size_type k = 0; k < replacement.size(); k++)
+				{
+					ret[j] = replacement[k];
+					j++;
+
+					if (j == N - 1)
+					{
+						break;
+					}
+				}
+				i = end;
+			}
+
+			if (j == N - 1)
+			{
+				break;
+			}
+
+			ret[j] = buffer[i];
+			j++;
+		}
+
+		for (; j < N; ++j)
+		{
+			ret[j] = 0;
+		}
+
+		if (ret.find(filter) == npos)
+		{
+			return ret;
+		}
+		else
+		{
+			return ret.replace(filter, replacement);
+		}
 	}
 
 	template <size_type N>
@@ -102,6 +228,41 @@ namespace rsl
 	}
 
 	template <size_type N>
+	template <size_type OtherN>
+	inline consteval size_type constexpr_string<N>::find(const constexpr_string<OtherN>& str) const noexcept
+	{
+        if (str.size() > size())
+        {
+			return npos;
+        }
+
+        if (str.empty())
+        {
+			return 0;
+        }
+
+        size_type j = 0;
+		for (size_type i = 0; i < N; ++i)
+		{
+            if (buffer[i] == str[j])
+            {
+				j++;
+            }
+            else
+            {
+				j = 0;
+            }
+
+            if (j == str.size())
+            {
+				return (i - str.size()) + 1;
+            }
+		}
+
+        return npos;
+	}
+
+	template <size_type N>
 	inline consteval size_type constexpr_string<N>::size() const noexcept
 	{
 		size_type s = 0ull;
@@ -110,12 +271,6 @@ namespace rsl
 			++s;
 		}
 		return s;
-	}
-
-	template <size_type N>
-	inline consteval constexpr_string<N> constexpr_string<N>::filter(char x) const noexcept
-	{
-		return filter_if([x](char y) { return x != y; });
 	}
 
 	template <size_type N>

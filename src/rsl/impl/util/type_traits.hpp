@@ -12,8 +12,8 @@ namespace rsl
 		consteval auto compiler_dependent_type_name() noexcept
 		{
 			string_view functionName = __RYTHE_FULL_FUNC__;
-			string_view typeName;
 
+			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
 #if defined(RYTHE_MSVC)
 			auto first = functionName.find_first_of('<') + 1;
 			auto end = functionName.find_last_of('>');
@@ -22,18 +22,23 @@ namespace rsl
 				first = t;
 			}
 
-			typeName = functionName.substr(first, end - first);
+			ret.copy_from(functionName.substr(first, end - first));
 #elif defined(RYTHE_GCC)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			typeName = functionName.substr(first, functionName.find_last_of(';') - first);
+			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
 #elif defined(RYTHE_CLANG)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			typeName = functionName.substr(first, functionName.find_last_of(']') - first);
+			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
+			constexpr_string refFilter = " &";
+			constexpr_string refReplace = "&";
+			ret = ret.replace(refFilter, refReplace);
+			constexpr_string ptrFilter = " *";
+			constexpr_string ptrReplace = "*";
+			ret = ret.replace(ptrFilter, ptrReplace);
 #else
-			typeName = functionName;
+			ret.copy_from(functionName);
 #endif
-			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
-			ret.copy_from(typeName);
+
 			return ret;
 		}
 
@@ -41,8 +46,8 @@ namespace rsl
 		consteval auto compiler_dependent_templated_type_name() noexcept
 		{
 			string_view functionName = __RYTHE_FULL_FUNC__;
-			string_view typeName;
 
+			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
 #if defined(RYTHE_MSVC)
 			auto first = functionName.find_first_of('<') + 1;
 			auto end = functionName.find_last_of('>');
@@ -51,18 +56,19 @@ namespace rsl
 				first = t;
 			}
 
-			typeName = functionName.substr(first, end - first);
+			ret.copy_from(functionName.substr(first, end - first));
 #elif defined(RYTHE_GCC)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			typeName = functionName.substr(first, functionName.find_last_of(';') - first);
+			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
+			constexpr_string cxxfilter = "__cxx11::";
+			ret = ret.filter(cxxfilter);
 #elif defined(RYTHE_CLANG)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			typeName = functionName.substr(first, functionName.find_last_of(']') - first);
+			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
 #else
-			typeName = functionName;
+			ret.copy_from(functionName);
 #endif
-			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
-			ret.copy_from(typeName);
+
 			return ret;
 		}
 
@@ -72,7 +78,7 @@ namespace rsl
 			consteval static auto get_value() noexcept
 			{
 				constexpr auto ret = compiler_dependent_type_name<T>();
-				return ret.refit<ret.size() + 1>();
+				return ret.template refit<ret.size() + 1>();
 			}
 		};
 
@@ -106,7 +112,7 @@ namespace rsl
 			consteval static auto get_value() noexcept
 			{
 				constexpr auto ret = construct_value();
-				return ret.refit<ret.size() + 1>();
+				return ret.template refit<ret.size() + 1>();
 			}
 		};
 
