@@ -121,7 +121,7 @@ namespace rsl
 
 		pmu_allocator* allocatorPtr;
 
-        constexpr polymorphic_universal_allocator_ptr_wrapper() noexcept = default;
+		constexpr polymorphic_universal_allocator_ptr_wrapper() noexcept = default;
 		constexpr polymorphic_universal_allocator_ptr_wrapper(pmu_allocator* ptr) noexcept
 			: allocatorPtr(ptr)
 		{
@@ -141,7 +141,7 @@ namespace rsl
 		[[rythe_always_inline]] void deallocate(void* ptr, size_type size, size_type alignment) noexcept;
 	};
 
-    using pmu_alloc_ptr_wrapper = polymorphic_universal_allocator_ptr_wrapper;
+	using pmu_alloc_ptr_wrapper = polymorphic_universal_allocator_ptr_wrapper;
 
 	using default_polymorphic_allocator = polymorphic_universal_allocator_mixin<default_allocator>;
 	using default_pmu_allocator = default_polymorphic_allocator;
@@ -282,12 +282,65 @@ namespace rsl
 		}
 	};
 
+	template <allocator_type Alloc>
+	struct stl_deleter_compatible_wrapper
+	{
+		Alloc alloc;
+		using value_type = Alloc::value_type;
+
+		constexpr void operator()(value_type* ptr) const noexcept { alloc.deallocate(ptr); }
+	};
+
+    template<typename T>
+    using stl_pmu_alloc = stl_allocator_compatible_wrapper<allocator<T, pmu_alloc_ptr_wrapper>>;
+
+    template<typename T>
+    using stl_pmu_deleter = stl_deleter_compatible_wrapper<allocator<T, pmu_alloc_ptr_wrapper>>;
+
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr stl_pmu_deleter<T> make_stl_pmu_deleter(pmu_allocator* alloc) noexcept
+	{
+		return stl_pmu_deleter<T>{allocator<T, pmu_alloc_ptr_wrapper>{pmu_alloc_ptr_wrapper{alloc}}};
+	}
+
 	struct allocator_context
 	{
 		static default_pmu_allocator defaultGlobalAllocator;
 		static pmu_allocator* globalAllocator;
 		static thread_local pmu_allocator* threadSpecificAllocator;
 	};
+
+	template <typename T, typename... Args>
+	[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T*
+	allocate(pmu_allocator& alloc, size_type count = 1, Args&&... args)
+		noexcept(default_constructor<T>::template noexcept_constructable<Args...>);
+
+	template <typename T, typename... Args>
+	[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T*
+	allocate(pmu_allocator& alloc, size_type count, size_type alignment, Args&&... args)
+		noexcept(default_constructor<T>::template noexcept_constructable<Args...>);
+
+	template <typename T, typename... Args>
+	[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T*
+	reallocate(pmu_allocator& alloc, T* ptr, size_type oldCount, size_type newCount, Args&&... args) noexcept(
+		default_constructor<T>::template noexcept_constructable<Args...> && default_constructor<T>::noexcept_moveable
+	);
+
+	template <typename T, typename... Args>
+	[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T* reallocate(
+		pmu_allocator& alloc, T* ptr, size_type oldCount, size_type newCount, size_type alignment, Args&&... args
+	)
+		noexcept(
+			default_constructor<T>::template noexcept_constructable<Args...> &&
+			default_constructor<T>::noexcept_moveable
+		);
+
+	template <typename T>
+	[[rythe_always_inline]] void deallocate(pmu_allocator& alloc, T* ptr, size_type count = 1) noexcept;
+
+	template <typename T>
+	[[rythe_always_inline]] void
+	deallocate(pmu_allocator& alloc, T* ptr, size_type count, size_type alignment) noexcept;
 } // namespace rsl
 
 #include "allocator.inl"
