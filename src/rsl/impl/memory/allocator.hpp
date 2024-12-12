@@ -2,6 +2,7 @@
 
 #include "../util/assert.hpp"
 #include "../util/common.hpp"
+#include "../util/concepts.hpp"
 #include "../util/type_util.hpp"
 
 namespace rsl
@@ -53,7 +54,7 @@ namespace rsl
 	using default_allocator = RSL_DEFAULT_ALLOCATOR_OVERRIDE;
 #endif
 
-	class polymorphic_univeral_allocator
+	class polymorphic_universal_allocator
 	{
 	public:
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] virtual void* allocate(size_type size) noexcept = 0;
@@ -69,10 +70,10 @@ namespace rsl
 		[[rythe_always_inline]] virtual void deallocate(void* ptr, size_type size, size_type alignment) noexcept = 0;
 	};
 
-	using pmu_allocator = polymorphic_univeral_allocator;
+	using pmu_allocator = polymorphic_universal_allocator;
 
 	template <rsl::universal_allocator_type Alloc = default_allocator>
-	class polymorphic_univeral_allocator_mixin final : public polymorphic_univeral_allocator
+	class polymorphic_universal_allocator_mixin final : public polymorphic_universal_allocator
 	{
 	public:
 		using value_type = void;
@@ -113,7 +114,36 @@ namespace rsl
 		}
 	};
 
-	using default_polymorphic_allocator = polymorphic_univeral_allocator_mixin<default_allocator>;
+	class polymorphic_universal_allocator_ptr_wrapper
+	{
+	public:
+		using value_type = void;
+
+		pmu_allocator* allocatorPtr;
+
+        constexpr polymorphic_universal_allocator_ptr_wrapper() noexcept = default;
+		constexpr polymorphic_universal_allocator_ptr_wrapper(pmu_allocator* ptr) noexcept
+			: allocatorPtr(ptr)
+		{
+		}
+
+
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void* allocate(size_type size) noexcept;
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
+		allocate(size_type size, size_type alignment) noexcept;
+
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
+		reallocate(void* ptr, size_type oldSize, size_type newSize) noexcept;
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
+		reallocate(void* ptr, size_type oldSize, size_type newSize, size_type alignment) noexcept;
+
+		[[rythe_always_inline]] void deallocate(void* ptr, size_type size) noexcept;
+		[[rythe_always_inline]] void deallocate(void* ptr, size_type size, size_type alignment) noexcept;
+	};
+
+    using pmu_alloc_ptr_wrapper = polymorphic_universal_allocator_ptr_wrapper;
+
+	using default_polymorphic_allocator = polymorphic_universal_allocator_mixin<default_allocator>;
 	using default_pmu_allocator = default_polymorphic_allocator;
 
 	template <typename T>
@@ -125,7 +155,7 @@ namespace rsl
 		template <typename Other>
 		using retarget = default_constructor<Other>;
 
-        template<typename... Args>
+		template <typename... Args>
 		constexpr static bool noexcept_constructable = is_nothrow_constructible_v<T, Args...>;
 		constexpr static bool noexcept_moveable = is_nothrow_move_constructible_v<T>;
 
@@ -182,8 +212,8 @@ namespace rsl
 		{
 		}
 
-        universal_type& as_universal() noexcept;
-        const universal_type& as_universal() const noexcept;
+		universal_type& as_universal() noexcept;
+		const universal_type& as_universal() const noexcept;
 
 		template <typename... Args>
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T* allocate(size_type count = 1, Args&&... args)
@@ -195,40 +225,41 @@ namespace rsl
 			noexcept(Constructor::template noexcept_constructable<Args...>);
 
 		template <typename... Args>
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T* reallocate(
-			T* ptr, size_type oldCount, size_type newCount, Args&&... args)
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T*
+		reallocate(T* ptr, size_type oldCount, size_type newCount, Args&&... args)
 			noexcept(Constructor::template noexcept_constructable<Args...> && Constructor::noexcept_moveable);
 
 		template <typename... Args>
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T* reallocate(
-			T* ptr, size_type oldCount, size_type newCount, size_type alignment, Args&&... args)
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] T*
+		reallocate(T* ptr, size_type oldCount, size_type newCount, size_type alignment, Args&&... args)
 			noexcept(Constructor::template noexcept_constructable<Args...> && Constructor::noexcept_moveable);
 
 		[[rythe_always_inline]] void deallocate(T* ptr, size_type count = 1) noexcept;
 		[[rythe_always_inline]] void deallocate(T* ptr, size_type count, size_type alignment) noexcept;
 
 		template <typename Other>
-		using retarget = allocator<Other, UniversalAlloc, typename Constructor::template retarget<Other>>;
+		using retarget = allocator<Other, UniversalAlloc, Constructor>;
 	};
 
-	template <specialization_of<allocator> Alloc>
+	template <allocator_type Alloc>
 	struct stl_allocator_compatible_wrapper
 	{
 		Alloc alloc;
-        using value_type = Alloc::value_type;
+		using value_type = Alloc::value_type;
 
-        template<typename Other>
-        struct rebind
-        {
-            using other = stl_allocator_compatible_wrapper<typename Alloc::template retarget<Other>>;
-        };
+		template <typename Other>
+		struct rebind
+		{
+			using other = stl_allocator_compatible_wrapper<typename Alloc::template retarget<Other>>;
+		};
 
-        constexpr stl_allocator_compatible_wrapper() noexcept {}
+		constexpr stl_allocator_compatible_wrapper() noexcept {}
 
 		constexpr stl_allocator_compatible_wrapper(const stl_allocator_compatible_wrapper&) noexcept = default;
 		constexpr stl_allocator_compatible_wrapper(const Alloc& other) noexcept
 			: alloc(other)
-            {}
+		{
+		}
 		template <class _Other>
 		constexpr stl_allocator_compatible_wrapper(
 			const stl_allocator_compatible_wrapper<typename Alloc::template retarget<_Other>>& other
@@ -241,7 +272,7 @@ namespace rsl
 		constexpr stl_allocator_compatible_wrapper& operator=(const stl_allocator_compatible_wrapper&) = default;
 
 		constexpr void deallocate(value_type* const ptr, const size_t count)
-        {
+		{
 			alloc.as_universal().deallocate(ptr, count * sizeof(value_type));
 		}
 
@@ -251,6 +282,12 @@ namespace rsl
 		}
 	};
 
+	struct allocator_context
+	{
+		static default_pmu_allocator defaultGlobalAllocator;
+		static pmu_allocator* globalAllocator;
+		static thread_local pmu_allocator* threadSpecificAllocator;
+	};
 } // namespace rsl
 
 #include "allocator.inl"

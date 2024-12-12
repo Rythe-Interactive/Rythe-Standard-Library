@@ -229,93 +229,36 @@ namespace rsl
 			{ lhs = static_cast<RHS&&>(rhs) } -> same_as<LHS>;
 		};
 
-	template <class _Ty>
-	concept destructible = __is_nothrow_destructible(_Ty);
+	template <typename T>
+	concept destructible = ::std::destructible<T>; // Compiler magic behind the scenes.
 
-	template <class _Ty, class... _ArgTys>
-	concept constructible_from = destructible<_Ty> && __is_constructible(_Ty, _ArgTys...);
+	template <typename T, typename... Args>
+	concept constructible_from = ::std::constructible_from<T, Args...>; // Compiler magic behind the scenes.
 
-	template <class _Ty>
-	concept default_initializable = constructible_from<_Ty> && requires {
-		_Ty{};
-		::new (static_cast<void*>(nullptr)) _Ty; // is-default-initializable<_Ty>
+	template <typename T>
+	concept default_initializable = constructible_from<T> && requires {
+		T{};
+		::new (static_cast<void*>(nullptr)) T; // is-default-initializable<T>
 	};
 
-	template <class _Ty>
-	concept move_constructible = constructible_from<_Ty, _Ty> && convertible_to<_Ty, _Ty>;
+	template <typename T>
+	concept move_constructible = constructible_from<T, T> && convertible_to<T, T>;
 
-	template <class _Ty>
-	concept swappable = requires(_Ty& __x, _Ty& __y) { _RANGES swap(__x, __y); };
+	template <typename T>
+	concept copy_constructible = move_constructible<T> && constructible_from<T, T&> && convertible_to<T&, T> &&
+								 constructible_from<T, const T&> && convertible_to<const T&, T> &&
+								 constructible_from<T, const T> && convertible_to<const T, T>;
 
-	template <class _Ty1, class _Ty2>
-	concept swappable_with = _STD common_reference_with<_Ty1, _Ty2> && requires(_Ty1&& __t, _Ty2&& __u) {
-		_RANGES swap(static_cast<_Ty1&&>(__t), static_cast<_Ty1&&>(__t));
-		_RANGES swap(static_cast<_Ty2&&>(__u), static_cast<_Ty2&&>(__u));
-		_RANGES swap(static_cast<_Ty1&&>(__t), static_cast<_Ty2&&>(__u));
-		_RANGES swap(static_cast<_Ty2&&>(__u), static_cast<_Ty1&&>(__t));
+	template <typename T>
+	concept movable = is_object_v<T> && move_constructible<T> && assignable_from<T&, T> && ::std::swappable<T>;
+
+	template <typename T>
+	concept copyable = copy_constructible<T> && movable<T> && assignable_from<T&, T&> &&
+					   assignable_from<T&, const T&> && assignable_from<T&, const T>;
+
+	template <typename Func, typename... Args>
+	concept invocable = requires(Func&& func, Args&&... args) { _STD invoke(static_cast<Func&&>(func), static_cast<Args&&>(args)...);
 	};
-
-	template <class _Ty>
-	concept copy_constructible =
-		move_constructible<_Ty> && constructible_from<_Ty, _Ty&> && convertible_to<_Ty&, _Ty> &&
-		constructible_from<_Ty, const _Ty&> && convertible_to<const _Ty&, _Ty> && constructible_from<_Ty, const _Ty> &&
-		convertible_to<const _Ty, _Ty>;
-
-	template <class _Ty>
-	concept _Boolean_testable_impl = convertible_to<_Ty, bool>;
-
-	template <class _Ty>
-	concept _Boolean_testable = _Boolean_testable_impl<_Ty> && requires(_Ty&& __t) {
-		{ !static_cast<_Ty&&>(__t) } -> _Boolean_testable_impl;
-	};
-
-	template <class _Ty1, class _Ty2>
-	concept _Half_equality_comparable =
-		requires(const remove_reference_t<_Ty1>& __x, const remove_reference_t<_Ty2>& __y) {
-			{ __x == __y } -> _Boolean_testable;
-			{ __x != __y } -> _Boolean_testable;
-		};
-
-	template <class _Ty1, class _Ty2>
-	concept _Weakly_equality_comparable_with =
-		_Half_equality_comparable<_Ty1, _Ty2> && _Half_equality_comparable<_Ty2, _Ty1>;
-
-	template <class _Ty>
-	concept equality_comparable = _Half_equality_comparable<_Ty, _Ty>;
-
-	template <class _Ty>
-	concept movable = is_object_v<_Ty> && move_constructible<_Ty> && assignable_from<_Ty&, _Ty> && swappable<_Ty>;
-
-	template <class _Ty>
-	concept copyable = copy_constructible<_Ty> && movable<_Ty> && assignable_from<_Ty&, _Ty&> &&
-					   assignable_from<_Ty&, const _Ty&> && assignable_from<_Ty&, const _Ty>;
-
-	template <class _Ty>
-	concept semiregular = copyable<_Ty> && default_initializable<_Ty>;
-
-	template <class _Ty>
-	concept regular = semiregular<_Ty> && equality_comparable<_Ty>;
-
-	template <class _FTy, class... _ArgTys>
-	concept invocable = requires(_FTy&& _Fn, _ArgTys&&... _Args) {
-		_STD invoke(static_cast<_FTy&&>(_Fn), static_cast<_ArgTys&&>(_Args)...);
-	};
-
-	template <class _FTy, class... _ArgTys>
-	concept regular_invocable = invocable<_FTy, _ArgTys...>;
-
-	template <class _FTy, class... _ArgTys>
-	concept predicate = regular_invocable<_FTy, _ArgTys...> && _Boolean_testable<invoke_result_t<_FTy, _ArgTys...>>;
-
-	template <class _FTy, class _Ty1, class _Ty2>
-	concept relation = predicate<_FTy, _Ty1, _Ty1> && predicate<_FTy, _Ty2, _Ty2> && predicate<_FTy, _Ty1, _Ty2> &&
-					   predicate<_FTy, _Ty2, _Ty1>;
-
-	template <class _FTy, class _Ty1, class _Ty2>
-	concept equivalence_relation = relation<_FTy, _Ty1, _Ty2>;
-
-	template <class _FTy, class _Ty1, class _Ty2>
-	concept strict_weak_order = relation<_FTy, _Ty1, _Ty2>;
 
 #define RYTHE_HAS_FUNC(x)                                                                                              \
 	namespace internal                                                                                                 \

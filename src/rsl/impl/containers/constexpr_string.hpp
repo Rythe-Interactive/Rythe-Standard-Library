@@ -287,4 +287,13 @@ namespace rsl
 		}
 	}
 
+    template<typename T>
+	constexpr bool is_constexpr_string = false;
+
+    template<size_type N>
+	constexpr bool is_constexpr_string<constexpr_string<N>> = true;
+
+	template <typename T>
+	concept constexpr_string_type = is_constexpr_string<T>;
+
 } // namespace rsl

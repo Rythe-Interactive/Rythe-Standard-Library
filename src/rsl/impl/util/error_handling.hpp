@@ -214,6 +214,8 @@ namespace rsl
 		};
 
 	public:
+        using result_type = remove_cvr_t<T>;
+
 		[[rythe_always_inline]] result(error_signal) noexcept
 			: result_base(error_signal{}),
 			  m_dummy(0)
@@ -240,13 +242,13 @@ namespace rsl
 			return true;
 		}
 
-		[[nodiscard]] [[rythe_always_inline]] T& value() noexcept
+		[[nodiscard]] [[rythe_always_inline]] result_type& value() noexcept
 		{
 			rsl_hard_assert_msg(is_okay(), "Tried to get value of result with unresolved error.");
 			return m_value;
 		}
 
-		[[nodiscard]] [[rythe_always_inline]] const T& value() const noexcept
+		[[nodiscard]] [[rythe_always_inline]] const result_type& value() const noexcept
 		{
 			rsl_hard_assert_msg(is_okay(), "Tried to get value of result with unresolved error.");
 			return m_value;

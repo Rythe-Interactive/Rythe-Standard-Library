@@ -49,4 +49,10 @@ namespace rsl
 
 	template <typename T1, typename T2>
 	concept not_same_as = !is_same_v<T1, T2>;
+
+	template <typename T>
+	concept nothrow_copy_constructible = is_nothrow_copy_constructible_v<T>;
+
+	template <typename T>
+	concept nothrow_move_constructible = is_nothrow_move_constructible_v<T>;
 } // namespace rsl

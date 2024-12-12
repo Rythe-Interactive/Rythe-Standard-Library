@@ -469,7 +469,6 @@ namespace rsl
 	template <typename T, typename... Args>
 	struct is_constructible : bool_constant<is_constructible_v<T, Args...>>
 	{
-		// determine whether T can be direct-initialized with Args...
 	};
 
 	template <typename T>
@@ -485,7 +484,15 @@ namespace rsl
 	template <typename T, typename... Args>
 	struct is_nothrow_constructible : bool_constant<is_nothrow_constructible_v<T, Args...>>
 	{
-		// determine whether T can be direct-initialized with Args... in a noexcept way
+	};
+
+	template <typename T>
+	inline constexpr bool is_nothrow_copy_constructible_v =
+		::std::is_nothrow_copy_constructible_v<T>; // Uses compiler magic behind the scenes.
+
+	template <typename T>
+	struct is_nothrow_copy_constructible : bool_constant<is_nothrow_copy_constructible_v<T>>
+	{
 	};
 
 	template <typename T>
@@ -495,7 +502,6 @@ namespace rsl
 	template <typename T>
 	struct is_nothrow_move_constructible : bool_constant<is_nothrow_move_constructible_v<T>>
 	{
-		// determine whether T can be direct-initialized with Args... in a noexcept way
 	};
 
 	template <typename T>
@@ -505,7 +511,6 @@ namespace rsl
 	template <typename T>
 	struct is_trivially_default_constructible : bool_constant<is_trivially_default_constructible_v<T>>
 	{
-		// determine whether T can be direct-initialized with Args... in a noexcept way
 	};
 
 	template <typename T>
@@ -515,7 +520,6 @@ namespace rsl
 	template <typename T>
 	struct is_trivially_destructible : bool_constant<is_trivially_destructible_v<T>>
 	{
-		// determine whether T can be direct-initialized with Args... in a noexcept way
 	};
 
 	template <typename T>
@@ -525,7 +529,6 @@ namespace rsl
 	template <typename T>
 	struct is_trivially_copy_constructible : bool_constant<is_trivially_copy_constructible_v<T>>
 	{
-		// determine whether T can be direct-initialized with Args... in a noexcept way
 	};
 
 	template <typename>
@@ -1032,6 +1035,15 @@ namespace rsl
 	{
 		return ::rsl::move(val);
 	}
+
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr add_const_t<T>& as_const(T& val) noexcept
+	{
+		return val;
+	}
+
+	template <typename T>
+	void as_const(const T&&) = delete;
 
 	template <template <typename...> typename T, typename U, size_type I, typename... Args>
 	struct make_sequence : make_sequence<T, U, I - 1, Args..., U>

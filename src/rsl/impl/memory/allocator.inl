@@ -60,6 +60,40 @@ namespace rsl
 		::operator delete(ptr, size, std::align_val_t{alignment});
 	}
 
+	inline void* polymorphic_universal_allocator_ptr_wrapper::allocate(size_type size) noexcept
+	{
+		return allocatorPtr->allocate(size);
+	}
+
+	inline void* polymorphic_universal_allocator_ptr_wrapper::allocate(size_type size, size_type alignment) noexcept
+	{
+		return allocatorPtr->allocate(size, alignment);
+	}
+
+	inline void*
+	polymorphic_universal_allocator_ptr_wrapper::reallocate(void* ptr, size_type oldSize, size_type newSize) noexcept
+	{
+		return allocatorPtr->reallocate(ptr, oldSize, newSize);
+	}
+
+	inline void* polymorphic_universal_allocator_ptr_wrapper::reallocate(
+		void* ptr, size_type oldSize, size_type newSize, size_type alignment
+	) noexcept
+	{
+		return allocatorPtr->reallocate(ptr, oldSize, newSize, alignment);
+	}
+
+	inline void polymorphic_universal_allocator_ptr_wrapper::deallocate(void* ptr, size_type size) noexcept
+	{
+		allocatorPtr->deallocate(ptr, size);
+	}
+
+	inline void
+	polymorphic_universal_allocator_ptr_wrapper::deallocate(void* ptr, size_type size, size_type alignment) noexcept
+	{
+		allocatorPtr->deallocate(ptr, size, alignment);
+	}
+
 	namespace internal
 	{
 		template <typename T, typename = void>
@@ -200,7 +234,8 @@ namespace rsl
 	{
 		if constexpr (std::is_trivially_copyable_v<T>)
 		{
-			T* mem = static_cast<T*>(UniversalAlloc::reallocate(ptr, oldCount * sizeof(T), newCount * sizeof(T), alignment));
+			T* mem =
+				static_cast<T*>(UniversalAlloc::reallocate(ptr, oldCount * sizeof(T), newCount * sizeof(T), alignment));
 
 			if (newCount > oldCount)
 			{

@@ -7,18 +7,36 @@
 
 namespace rsl
 {
-	template <typename Alloc = allocator<id_type>,
-		template <typename...> typename MapType = std::unordered_map, typename Comparer = map_traits<MapType>::default_comparer<id_type>>
+	template <
+		universal_allocator_type Alloc = default_allocator,
+		template <typename> typename Constructor = default_constructor,
+		template <typename...> typename MapType = std::unordered_map,
+		typename Comparer = typename map_traits<MapType>::template default_comparer<id_type>>
 	class basic_type_map
 	{
 	private:
 		struct entry_item;
 
+        using underlying_map_value_type = typename map_traits<MapType>::template value_type<id_type, entry_item>;
+        using underlying_map_allocator = typename map_traits<MapType>::template allocator_type<
+			id_type, entry_item, Alloc, Constructor<underlying_map_value_type>>;
+
 	public:
-		using univeral_alloc = Alloc::universal_type;
-        template<typename T>
-        using alloc_type = typename Alloc::template retarget<T>;
-		using underlying_map = typename map_traits<MapType>::template customized_type<id_type, entry_item, Comparer, Alloc>;
+		using univeral_alloc = Alloc;
+		template <typename T>
+		using alloc_type = allocator<T, univeral_alloc, Constructor<T>>;
+		using underlying_map = typename map_traits<MapType>::template customized_type<
+			id_type, entry_item, Comparer, Alloc, Constructor<underlying_map_value_type>>;
+
+		constexpr basic_type_map() = default;
+
+		explicit constexpr basic_type_map(const univeral_alloc& alloc)
+			noexcept(is_nothrow_copy_constructible_v<univeral_alloc>)
+			requires nothrow_copy_constructible<univeral_alloc>
+			: m_allocator(alloc),
+			  m_storage(underlying_map_allocator(m_allocator))
+		{
+		}
 
 		template <typename T>
 		bool has() const
@@ -42,7 +60,7 @@ namespace rsl
 		template <typename T>
 		T* try_get()
 		{
-			return const_cast<T*>(as_const(*this).template try_get<T>());
+			return const_cast<T*>(rsl::as_const(*this).template try_get<T>());
 		}
 
 		template <typename T>
@@ -56,9 +74,7 @@ namespace rsl
 		template <typename T>
 		T& get()
 		{
-			auto* ptr = try_get<T>();
-			rsl_assert_invalid_object(ptr);
-			return *ptr;
+			return const_cast<T&>(rsl::as_const(*this).template get<T>());
 		}
 
 		template <typename T, typename... Args>
@@ -127,4 +143,6 @@ namespace rsl
 	};
 
 	using type_map = basic_type_map<>;
+
+    using pmu_alloc_type_map = basic_type_map<pmu_alloc_ptr_wrapper>;
 } // namespace rsl
