@@ -151,8 +151,7 @@ namespace rsl
 		}
 
 		template <functor Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires invocable<Functor, ReturnType(ParamTypes...)>
 		constexpr multicast_delegate& push_back(const Functor& instance)
 		{
 			return push_back(base::template createElement<Functor>(instance));
@@ -177,9 +176,7 @@ namespace rsl
 			return push_back(base::template createElement<T, TMethod>(instance));
 		}
 
-		template <invocable Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+		template <invocable<ReturnType(ParamTypes...)> Functor>
 		constexpr multicast_delegate& operator+=(const Functor& instance)
 		{
 			return push_back(base::template createElement<Functor>(instance));
@@ -215,8 +212,7 @@ namespace rsl
 		}
 
 		template <functor Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires invocable<Functor, ReturnType(ParamTypes...)>
 		constexpr multicast_delegate& remove(const Functor& instance)
 		{
 			return remove(base::template createElement<Functor>(instance));
@@ -239,9 +235,7 @@ namespace rsl
 			return push_back(base::template createElement<T, TMethod>(instance));
 		}
 
-		template <invocable Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+		template <invocable<ReturnType(ParamTypes...)> Functor>
 		constexpr multicast_delegate& operator-=(const Functor& instance)
 		{
 			return remove(base::template createElement<Functor>(instance));
@@ -269,9 +263,7 @@ namespace rsl
 			return push_back(base::template createElement<T, TMethod>(instance));
 		}
 
-		template <invocable Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+		template <invocable<ReturnType(ParamTypes...)> Functor>
 		constexpr multicast_delegate& operator=(const Functor& instance)
 		{
 			clear();
@@ -295,8 +287,7 @@ namespace rsl
 		}
 
 		template <functor Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires invocable<Functor, ReturnType(ParamTypes...)>
 		constexpr multicast_delegate& assign(const Functor& instance)
 		{
 			clear();

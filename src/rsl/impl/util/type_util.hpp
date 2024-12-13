@@ -256,9 +256,34 @@ namespace rsl
 	concept copyable = copy_constructible<T> && movable<T> && assignable_from<T&, T&> &&
 					   assignable_from<T&, const T&> && assignable_from<T&, const T>;
 
-	template <typename Func, typename... Args>
-	concept invocable = requires(Func&& func, Args&&... args) { _STD invoke(static_cast<Func&&>(func), static_cast<Args&&>(args)...);
-	};
+	namespace internal
+	{
+		template <typename T>
+		struct func_traits
+		{
+			static_assert(
+				::rsl::integral_constant<bool_t<T>, false>::value, "Template param needs to be of function type."
+			);
+		};
+
+		template <typename Ret, typename... Args>
+		struct func_traits<Ret(Args...)>
+		{
+			using return_type = Ret;
+			using parameter_list = type_sequence<Args...>;
+
+			template <typename Func>
+			auto test_func(Func&&) -> decltype(std::invoke(rsl::declval<Func>(), rsl::declval<Args>()...));
+
+			template <typename Func>
+			constexpr static bool is_compatible_with = requires(Func&& func, Args&&... args) {
+				{ std::invoke(forward<Func>(func), forward<Args>(args)...) } -> convertible_to<Ret>;
+			};
+		};
+	} // namespace internal
+
+	template <typename Func, typename FuncType>
+	concept invocable = internal::func_traits<FuncType>::template is_compatible_with<Func>;
 
 #define RYTHE_HAS_FUNC(x)                                                                                              \
 	namespace internal                                                                                                 \

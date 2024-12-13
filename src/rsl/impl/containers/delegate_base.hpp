@@ -95,25 +95,22 @@ namespace rsl
 			return force_cast<size_type>(func);
 		}
 
-		template <invocable Func>
-			requires std::invocable<Func, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Func, ParamTypes...>, ReturnType> && (!functor<Func>)
+		template <invocable<ReturnType(ParamTypes...)> Func>
+			requires(!functor<Func>)
 		static ReturnType function_ptr_stub(void* obj, ParamTypes... args)
 		{
 			return (reinterpret_cast<Func>(obj))(std::forward<ParamTypes>(args)...);
 		}
 
-		template <invocable Func>
-			requires std::invocable<Func, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Func, ParamTypes...>, ReturnType> && (!functor<Func>)
+		template <invocable<ReturnType(ParamTypes...)> Func>
+			requires(!functor<Func>)
 		[[rythe_always_inline]] static id_type function_ptr_id(Func obj)
 		{
 			return force_cast<size_type>(obj);
 		}
 
 		template <functor Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires invocable<Functor, ReturnType(ParamTypes...)>
 		static ReturnType functor_stub(void* obj, ParamTypes... args)
 		{
 			Functor* p = static_cast<Functor*>(obj);
@@ -121,8 +118,7 @@ namespace rsl
 		}
 
 		template <functor Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires invocable<Functor, ReturnType(ParamTypes...)>
 		[[rythe_always_inline]] static id_type functor_id(const Functor& obj)
 		{
 			return combine_hash(force_cast<size_type>(&obj), force_cast<size_type>(&Functor::operator()));
@@ -149,9 +145,7 @@ namespace rsl
 			return invocation_element(nullptr, function_stub<TMethod>, function_id<TMethod>());
 		}
 
-		template <invocable Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+		template <invocable<ReturnType(ParamTypes...)> Functor>
 		[[rythe_always_inline]] static invocation_element createElement(const Functor& instance)
 		{
 			if constexpr (!is_functor_v<Functor>)

@@ -214,7 +214,7 @@ namespace rsl
 		};
 
 	public:
-        using result_type = remove_cvr_t<T>;
+		using result_type = remove_cvr_t<T>;
 
 		[[rythe_always_inline]] result(error_signal) noexcept
 			: result_base(error_signal{}),
@@ -363,8 +363,11 @@ namespace rsl
 			unspecified = -1,
 		};
 
-        template<typename T>
-		operator result<T>() { return make_error(unspecified_error_code::unspecified, "Unspecified error"); }
+		template <typename T>
+		operator result<T>()
+		{
+			return make_error(unspecified_error_code::unspecified, "Unspecified error");
+		}
 	};
 
 	inline static unspecified_error error = unspecified_error{};

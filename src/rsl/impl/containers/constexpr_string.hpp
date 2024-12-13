@@ -131,19 +131,19 @@ namespace rsl
 	{
 		size_type start = find(str);
 		if (start == npos)
-        {
+		{
 			return *this;
-        }
+		}
 
 		constexpr_string<N> result = filter_range(start, start + str.size());
-        if (result.find(str) == npos)
-        {
+		if (result.find(str) == npos)
+		{
 			return result;
-        }
-        else
-        {
+		}
+		else
+		{
 			return result.filter(str);
-        }
+		}
 	}
 
 	template <size_type N>
@@ -231,35 +231,35 @@ namespace rsl
 	template <size_type OtherN>
 	inline consteval size_type constexpr_string<N>::find(const constexpr_string<OtherN>& str) const noexcept
 	{
-        if (str.size() > size())
-        {
-			return npos;
-        }
-
-        if (str.empty())
-        {
-			return 0;
-        }
-
-        size_type j = 0;
-		for (size_type i = 0; i < N; ++i)
+		if (str.size() > size())
 		{
-            if (buffer[i] == str[j])
-            {
-				j++;
-            }
-            else
-            {
-				j = 0;
-            }
-
-            if (j == str.size())
-            {
-				return (i - str.size()) + 1;
-            }
+			return npos;
 		}
 
-        return npos;
+		if (str.empty())
+		{
+			return 0;
+		}
+
+		size_type j = 0;
+		for (size_type i = 0; i < N; ++i)
+		{
+			if (buffer[i] == str[j])
+			{
+				j++;
+			}
+			else
+			{
+				j = 0;
+			}
+
+			if (j == str.size())
+			{
+				return (i - str.size()) + 1;
+			}
+		}
+
+		return npos;
 	}
 
 	template <size_type N>
@@ -287,10 +287,10 @@ namespace rsl
 		}
 	}
 
-    template<typename T>
+	template <typename T>
 	constexpr bool is_constexpr_string = false;
 
-    template<size_type N>
+	template <size_type N>
 	constexpr bool is_constexpr_string<constexpr_string<N>> = true;
 
 	template <typename T>

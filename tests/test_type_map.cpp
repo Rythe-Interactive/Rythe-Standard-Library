@@ -1,0 +1,179 @@
+#include <catch2/catch_test_macros.hpp>
+
+#include <rsl/heap_allocator>
+
+namespace
+{
+	class test_heap_allocator : private rsl::heap_allocator
+	{
+	public:
+		using value_type = void;
+		rsl::id_type id = 1012234;
+
+		using rsl::heap_allocator::heap_allocator;
+		explicit constexpr test_heap_allocator(rsl::id_type _id) noexcept
+			: id(_id)
+		{
+		}
+
+		using rsl::heap_allocator::allocate;
+		using rsl::heap_allocator::deallocate;
+		using rsl::heap_allocator::reallocate;
+	};
+} // namespace
+
+#define RYTHE_VALIDATE
+#define RSL_DEFAULT_ALLOCATOR_OVERRIDE test_heap_allocator
+
+#include <rsl/type_map>
+
+namespace
+{
+	constexpr int CONST1 = 123456;
+	constexpr int CONST2 = 234567;
+	constexpr int CONST3 = 345678;
+	constexpr int CONST4 = 456789;
+	constexpr int CONST5 = 567891;
+	constexpr int CONST6 = 678912;
+
+	struct test1
+	{
+		int value = CONST1;
+		test1() = default;
+		test1(int i)
+			: value(i)
+		{
+		}
+	};
+	struct test2
+	{
+		int value = CONST2;
+		test2() = default;
+		test2(int i)
+			: value(i)
+		{
+		}
+	};
+	struct test3
+	{
+		int value = CONST3;
+		test3() = default;
+		test3(int i)
+			: value(i)
+		{
+		}
+	};
+	struct test4
+	{
+		int value = CONST4;
+		test4() = default;
+		test4(int i)
+			: value(i)
+		{
+		}
+	};
+} // namespace
+
+TEST_CASE("type_map", "[containers]")
+{
+	using namespace rsl;
+
+	SECTION("construction")
+	{
+		{
+			rsl::type_map map{};
+			REQUIRE(map.get_allocator().id == 1012234);
+		}
+		{
+			test_heap_allocator alloc{1234};
+			rsl::basic_type_map<test_heap_allocator> map{alloc};
+			REQUIRE(map.get_allocator().id == 1234);
+		}
+		{
+			default_pmu_allocator alloc;
+			rsl::basic_type_map<pmu_alloc_ptr_wrapper> map{&alloc};
+			REQUIRE(map.get_allocator().allocatorPtr == &alloc);
+		}
+	}
+
+	SECTION("emplace")
+	{
+		rsl::type_map map{};
+
+		{
+			auto [result, emplaced] = map.try_emplace<test1>();
+			REQUIRE(result.value == CONST1);
+			REQUIRE(emplaced);
+		}
+
+		REQUIRE(map.has<test1>());
+		REQUIRE(!map.has<test2>());
+		REQUIRE(!map.has<test3>());
+		REQUIRE(!map.has<test4>());
+
+		{
+			auto [result, emplaced] = map.try_emplace<test1>();
+			REQUIRE(result.value == CONST1);
+			REQUIRE(!emplaced);
+		}
+
+		REQUIRE(map.has<test1>());
+		REQUIRE(!map.has<test2>());
+		REQUIRE(!map.has<test3>());
+		REQUIRE(!map.has<test4>());
+
+		{
+			auto [result, emplaced] = map.try_emplace<test2>(CONST6);
+			REQUIRE(result.value == CONST6);
+			REQUIRE(emplaced);
+		}
+
+		REQUIRE(map.has<test1>());
+		REQUIRE(map.has<test2>());
+		REQUIRE(!map.has<test3>());
+		REQUIRE(!map.has<test4>());
+
+		{
+			auto [result, emplaced] = map.try_emplace<test2>(CONST5);
+			REQUIRE(result.value == CONST6);
+			REQUIRE(!emplaced);
+		}
+
+		REQUIRE(map.has<test1>());
+		REQUIRE(map.has<test2>());
+		REQUIRE(!map.has<test3>());
+		REQUIRE(!map.has<test4>());
+
+		{
+			test3& result = map.emplace<test3>();
+			REQUIRE(result.value == CONST3);
+		}
+
+		REQUIRE(map.has<test1>());
+		REQUIRE(map.has<test2>());
+		REQUIRE(map.has<test3>());
+		REQUIRE(!map.has<test4>());
+
+		{
+			test4& result = map.emplace<test4>(CONST5);
+			REQUIRE(result.value == CONST5);
+		}
+
+		REQUIRE(map.has<test1>());
+		REQUIRE(map.has<test2>());
+		REQUIRE(map.has<test3>());
+		REQUIRE(map.has<test4>());
+
+		map.clear();
+
+		REQUIRE(!map.has<test1>());
+		REQUIRE(!map.has<test2>());
+		REQUIRE(!map.has<test3>());
+		REQUIRE(!map.has<test4>());
+	}
+
+	SECTION("get") {}
+	SECTION("erase") {}
+	SECTION("get_or_emplace") {}
+	SECTION("emplace_or_replace") {}
+}

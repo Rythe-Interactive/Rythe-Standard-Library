@@ -86,31 +86,33 @@ namespace rsl
 		enable_assert_on_error(wasEnabled);
 	}
 
-    namespace
-    {
+	namespace
+	{
 		void error_handler_based_assert_handler(
 			std::string_view expression, std::string_view file, size_type line, std::string_view message, bool soft
 		)
-        {
+		{
 			get_error_handler()->handle_assert(expression, file, line, message, soft);
-        }
-    }
+		}
+	} // namespace
 
 	void set_error_handler(error_handler* errorHandler) noexcept
-    {
+	{
 		asserts::assert_handler = &error_handler_based_assert_handler;
 		error_context::errorHandlerOverride = errorHandler;
-    }
+	}
 
 	error_handler* get_error_handler() noexcept
 	{
-		return error_context::errorHandlerOverride ? error_context::errorHandlerOverride : &error_context::defaultErrorHandler;
+		return error_context::errorHandlerOverride ? error_context::errorHandlerOverride
+												   : &error_context::defaultErrorHandler;
 	}
 
-    scoped_error_handler::scoped_error_handler(error_handler* errorHandler) : previousErrorHandler(get_error_handler())
+	scoped_error_handler::scoped_error_handler(error_handler* errorHandler)
+		: previousErrorHandler(get_error_handler())
 	{
 		set_error_handler(errorHandler);
-    }
+	}
 
 	scoped_error_handler::~scoped_error_handler()
 	{

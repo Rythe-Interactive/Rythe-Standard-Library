@@ -1,9 +1,7 @@
 #pragma once
-#include <algorithm>
-#include <cstddef>
-#include <functional>
 #include <vector>
 
+#include "../util/concepts.hpp"
 #include "delegate_base.hpp"
 
 namespace rsl
@@ -40,17 +38,14 @@ namespace rsl
 	public:
 		constexpr delegate() = default;
 
-		template <invocable Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+		template <invocable<ReturnType(ParamTypes...)> Functor>
 		constexpr delegate(const Functor& instance)
 			: m_invocation(base::template createElement<Functor>(instance))
 		{
 		}
 
 		template <functor Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires rsl::invocable<Functor, ReturnType(ParamTypes...)>
 		constexpr delegate(const Functor& instance)
 			: m_invocation(base::template createElement<Functor>(instance))
 		{
@@ -75,8 +70,7 @@ namespace rsl
 		}
 
 		template <functor Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+			requires rsl::invocable<Functor, ReturnType(ParamTypes...)>
 		constexpr static delegate create(const Functor& instance)
 		{
 			return delegate(base::template createElement<Functor>(instance));
@@ -85,8 +79,8 @@ namespace rsl
 		constexpr bool empty() const { return m_invocation.stub == nullptr; }
 		constexpr void clear() { m_invocation = invocation_element(); }
 
-		constexpr bool operator==(std::nullptr_t) const { return empty(); }
-		constexpr bool operator!=(std::nullptr_t) const { return !empty(); }
+		constexpr bool operator==(rsl::nullptr_type) const { return empty(); }
+		constexpr bool operator!=(rsl::nullptr_type) const { return !empty(); }
 
 		constexpr bool operator==(const delegate&) const = default;
 		constexpr bool operator!=(const delegate&) const = default;
@@ -123,9 +117,7 @@ namespace rsl
 
 		constexpr delegate& operator=(const delegate&) = default;
 
-		template <invocable Functor>
-			requires std::invocable<Functor, ParamTypes...> &&
-					 std::same_as<std::invoke_result_t<Functor, ParamTypes...>, ReturnType>
+		template <invocable<ReturnType(ParamTypes...)> Functor>
 		constexpr delegate& operator=(const Functor& instance)
 		{
 			m_invocation = base::template createElement<Functor>(instance);

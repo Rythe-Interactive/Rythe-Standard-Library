@@ -1065,7 +1065,7 @@ namespace rsl
 		using tuple_type = ::std::tuple<Types...>; // TODO: Make our own tuple type.
 		constexpr static size_type size = sizeof...(Types);
 
-        template<typename T>
+		template <typename T>
 		constexpr static bool contains = disjunction<is_same<T, Types>...>::value;
 	};
 
@@ -1108,10 +1108,10 @@ namespace rsl
 		static_assert(is_integral_v<T>, "integer_sequence<T, I...> requires T to be an integral type.");
 
 		using value_type = T;
-        
+
 		constexpr static size_type size = sizeof...(Vals);
 
-        template <T Val>
+		template <T Val>
 		constexpr static bool contains = ((Val == Vals) || ...);
 	};
 

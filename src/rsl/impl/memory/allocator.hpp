@@ -5,6 +5,8 @@
 #include "../util/concepts.hpp"
 #include "../util/type_util.hpp"
 
+#include "heap_allocator.hpp"
+
 namespace rsl
 {
 	template <typename T>
@@ -29,24 +31,6 @@ namespace rsl
 
 	template <typename T>
 	concept universal_allocator_type = allocator_type<T> && same_as<typename T::value_type, void>;
-
-	class heap_allocator
-	{
-	public:
-		using value_type = void;
-
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void* allocate(size_type size) noexcept;
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
-		allocate(size_type size, size_type alignment) noexcept;
-
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
-		reallocate(void* ptr, size_type oldSize, size_type newSize) noexcept;
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
-		reallocate(void* ptr, size_type oldSize, size_type newSize, size_type alignment) noexcept;
-
-		[[rythe_always_inline]] void deallocate(void* ptr, size_type size) noexcept;
-		[[rythe_always_inline]] void deallocate(void* ptr, size_type size, size_type alignment) noexcept;
-	};
 
 #if !defined(RSL_DEFAULT_ALLOCATOR_OVERRIDE)
 	using default_allocator = heap_allocator;
@@ -291,14 +275,15 @@ namespace rsl
 		constexpr void operator()(value_type* ptr) const noexcept { alloc.deallocate(ptr); }
 	};
 
-    template<typename T>
-    using stl_pmu_alloc = stl_allocator_compatible_wrapper<allocator<T, pmu_alloc_ptr_wrapper>>;
-
-    template<typename T>
-    using stl_pmu_deleter = stl_deleter_compatible_wrapper<allocator<T, pmu_alloc_ptr_wrapper>>;
+	template <typename T>
+	using stl_pmu_alloc = stl_allocator_compatible_wrapper<allocator<T, pmu_alloc_ptr_wrapper>>;
 
 	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] constexpr stl_pmu_deleter<T> make_stl_pmu_deleter(pmu_allocator* alloc) noexcept
+	using stl_pmu_deleter = stl_deleter_compatible_wrapper<allocator<T, pmu_alloc_ptr_wrapper>>;
+
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr stl_pmu_deleter<T> make_stl_pmu_deleter(pmu_allocator* alloc
+	) noexcept
 	{
 		return stl_pmu_deleter<T>{allocator<T, pmu_alloc_ptr_wrapper>{pmu_alloc_ptr_wrapper{alloc}}};
 	}

@@ -4,9 +4,9 @@
 #include "../../util/assert.hpp"
 
 #include "../color.hpp"
+#include "../matrix/matrix.hpp"
 #include "../quaternion/quaternion.hpp"
 #include "../vector/vector.hpp"
-#include "../matrix/matrix.hpp"
 
 namespace rsl::log::internal
 {

@@ -15,7 +15,7 @@ namespace rsl
 
 			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
 #if defined(RYTHE_MSVC)
-			auto first = functionName.find_first_of('<') + 1;
+			auto first = functionName.find_first_of('<', functionName.find("compiler_dependent_type_name")) + 1;
 			auto end = functionName.find_last_of('>');
 			if (auto t = functionName.find_first_of(' ', first) + 1; t < end)
 			{
@@ -25,10 +25,17 @@ namespace rsl
 			ret.copy_from(functionName.substr(first, end - first));
 #elif defined(RYTHE_GCC)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
+			auto end = functionName.find_last_of(';');
+			if (end == std::string_view::npos)
+			{
+				end = functionName.find_last_of(']');
+			}
+
+			ret.copy_from(functionName.substr(first, end - first));
 #elif defined(RYTHE_CLANG)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
 			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
+
 			constexpr_string refFilter = " &";
 			constexpr_string refReplace = "&";
 			ret = ret.replace(refFilter, refReplace);
