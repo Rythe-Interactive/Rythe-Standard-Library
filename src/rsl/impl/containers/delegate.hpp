@@ -6,7 +6,6 @@
 
 namespace rsl
 {
-
 	template <typename FuncSig>
 	class delegate;
 	template <
@@ -40,40 +39,40 @@ namespace rsl
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
 		constexpr delegate(const Functor& instance)
-			: m_invocation(base::template createElement<Functor>(instance))
+			: m_invocation(base::template create_element<Functor>(instance))
 		{
 		}
 
 		template <functor Functor>
 			requires rsl::invocable<Functor, ReturnType(ParamTypes...)>
 		constexpr delegate(const Functor& instance)
-			: m_invocation(base::template createElement<Functor>(instance))
+			: m_invocation(base::template create_element<Functor>(instance))
 		{
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
 		constexpr static delegate create(T& instance)
 		{
-			return delegate(base::template createElement<T, TMethod>(instance));
+			return delegate(base::template create_element<T, TMethod>(instance));
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		constexpr static delegate create(const T& instance)
 		{
-			return delegate(base::template createElement<T, TMethod>(instance));
+			return delegate(base::template create_element<T, TMethod>(instance));
 		}
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
 		constexpr static delegate create()
 		{
-			return delegate(base::template createElement<TMethod>());
+			return delegate(base::template create_element<TMethod>());
 		}
 
 		template <functor Functor>
 			requires rsl::invocable<Functor, ReturnType(ParamTypes...)>
 		constexpr static delegate create(const Functor& instance)
 		{
-			return delegate(base::template createElement<Functor>(instance));
+			return delegate(base::template create_element<Functor>(instance));
 		}
 
 		constexpr bool empty() const { return m_invocation.stub == nullptr; }
@@ -97,21 +96,21 @@ namespace rsl
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
 		constexpr delegate& assign(T& instance)
 		{
-			m_invocation = base::template createElement<T, TMethod>(instance);
+			m_invocation = base::template create_element<T, TMethod>(instance);
 			return *this;
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		constexpr delegate& assign(const T& instance)
 		{
-			m_invocation = base::template createElement<T, TMethod>(instance);
+			m_invocation = base::template create_element<T, TMethod>(instance);
 			return *this;
 		}
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
 		constexpr delegate& assign()
 		{
-			m_invocation = base::template createElement<TMethod>();
+			m_invocation = base::template create_element<TMethod>();
 			return *this;
 		}
 
@@ -120,7 +119,7 @@ namespace rsl
 		template <invocable<ReturnType(ParamTypes...)> Functor>
 		constexpr delegate& operator=(const Functor& instance)
 		{
-			m_invocation = base::template createElement<Functor>(instance);
+			m_invocation = base::template create_element<Functor>(instance);
 			return *this;
 		}
 
@@ -128,7 +127,7 @@ namespace rsl
 
 		constexpr ReturnType invoke(ParamTypes... args) const
 		{
-			return (*m_invocation.m_stub)(m_invocation.m_object.get(), args...);
+			return (*m_invocation.stub)(m_invocation.object.get(), args...);
 		}
 	};
 } // namespace rsl

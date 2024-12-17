@@ -1,12 +1,22 @@
 #pragma once
 #include <ratio>
 #include <type_traits>
+#include <bit>
 
 #include "../defines.hpp"
 #include "primitives.hpp"
 
 namespace rsl
 {
+	consteval void* constexpr_memcpy(void* dst, const void* src, size_type count) noexcept
+    {
+        for (size_type i = 0; i < count; i++)
+        {
+			std::bit_cast<byte*>(dst)[i] = *std::bit_cast<const byte*>(src);
+        }
+		return dst;
+    }
+
 	template <typename T, T Val>
 	struct integral_constant
 	{
@@ -190,6 +200,20 @@ namespace rsl
 
 	template <typename T>
 	using remove_reference_t = typename remove_reference<T>::type;
+
+	template <typename T>
+	struct remove_const
+	{
+		using type = T;
+	};
+
+	template <typename T>
+	struct remove_const<const T>
+	{
+		using type = T;
+	};
+	template <typename T>
+	using remove_const_t = typename remove_const<T>::type;
 
 	template <typename T>
 	struct remove_cv
@@ -1099,6 +1123,17 @@ namespace rsl
 	template <typename... Types, typename T>
 	struct type_sequence_contains<type_sequence<Types...>, T> :
 		bool_constant<type_sequence_contains_v<type_sequence<Types...>, T>>
+	{
+	};
+
+	template <type_sequence_c SequenceA, type_sequence_c SequenceB>
+	struct type_sequence_conjunction;
+
+	template <typename... TypesA, typename... TypesB>
+	struct type_sequence_conjunction<type_sequence<TypesA...>, type_sequence<TypesB...>> :
+		conjunction<
+			conjunction<type_sequence_contains<type_sequence<TypesA...>, TypesB>...>,
+			conjunction<type_sequence_contains<type_sequence<TypesB...>, TypesA>...>>
 	{
 	};
 

@@ -51,10 +51,23 @@ namespace rsl
 			return *this;
 		}
 
-		constexpr multicast_delegate& remove(const value_type& e)
+		constexpr multicast_delegate& remove(id_type id)
 		{
-			m_invocationList.erase(std::remove(begin(), end(), e), end());
+			m_invocationList.erase(std::remove(begin(), end(), id), end());
 			return *this;
+		}
+
+		constexpr bool contains(id_type id) const noexcept
+		{
+			for (auto& element : m_invocationList)
+			{
+				if (element.id == id)
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		template <typename T>
@@ -135,26 +148,26 @@ namespace rsl
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
 		constexpr multicast_delegate& push_back(T& instance)
 		{
-			return push_back(base::template createElement<T, TMethod>(instance));
+			return push_back(base::template create_element<T, TMethod>(instance));
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		constexpr multicast_delegate& push_back(const T& instance)
 		{
-			return push_back(base::template createElement<T, TMethod>(instance));
+			return push_back(base::template create_element<T, TMethod>(instance));
 		}
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
 		constexpr multicast_delegate& push_back()
 		{
-			return push_back(base::template createElement<TMethod>());
+			return push_back(base::template create_element<TMethod>());
 		}
 
 		template <functor Functor>
 			requires invocable<Functor, ReturnType(ParamTypes...)>
 		constexpr multicast_delegate& push_back(const Functor& instance)
 		{
-			return push_back(base::template createElement<Functor>(instance));
+			return push_back(base::template create_element<Functor>(instance));
 		}
 
 		constexpr multicast_delegate& operator+=(const delegate_type& another)
@@ -167,19 +180,19 @@ namespace rsl
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
 		constexpr multicast_delegate& operator+=(T& instance)
 		{
-			return push_back(base::template createElement<T, TMethod>(instance));
+			return push_back(base::template create_element<T, TMethod>(instance));
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		constexpr multicast_delegate& operator+=(const T& instance)
 		{
-			return push_back(base::template createElement<T, TMethod>(instance));
+			return push_back(base::template create_element<T, TMethod>(instance));
 		}
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
 		constexpr multicast_delegate& operator+=(const Functor& instance)
 		{
-			return push_back(base::template createElement<Functor>(instance));
+			return push_back(base::template create_element<Functor>(instance));
 		}
 
 		constexpr iterator erase(const_iterator pos) { return m_invocationList.erase(pos); }
@@ -189,56 +202,83 @@ namespace rsl
 			return m_invocationList.erase(first, last);
 		}
 
-		constexpr void pop_back() { erase(std::advance(begin(), size() - 1)); }
+		constexpr void pop_back() { erase(--end()); }
 
-		constexpr multicast_delegate& remove(const delegate_type& del) { return remove(del.m_invocation); }
+		constexpr multicast_delegate& remove(const delegate_type& del) { return remove(del.m_invocation.id); }
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
 		constexpr multicast_delegate& remove(T& instance)
 		{
-			return remove(base::template createElement<T, TMethod>(instance));
+			return remove(base::template create_id<T, TMethod>(instance));
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		constexpr multicast_delegate& remove(const T& instance)
 		{
-			return remove(base::template createElement<T, TMethod>(instance));
+			return remove(base::template create_id<T, TMethod>(instance));
 		}
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
 		constexpr multicast_delegate& remove()
 		{
-			return remove(base::template createElement<TMethod>());
+			return remove(base::template create_id<TMethod>());
 		}
 
 		template <functor Functor>
 			requires invocable<Functor, ReturnType(ParamTypes...)>
 		constexpr multicast_delegate& remove(const Functor& instance)
 		{
-			return remove(base::template createElement<Functor>(instance));
+			return remove(base::template create_id<Functor>(instance));
+		}
+
+		constexpr bool contains(const delegate_type& del) const noexcept { return contains(del.m_invocation.id); }
+
+		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
+		constexpr bool contains(T& instance) const noexcept
+		{
+			return contains(base::template create_id<T, TMethod>(instance));
+		}
+
+		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
+		constexpr bool contains(const T& instance) const noexcept
+		{
+			return contains(base::template create_id<T, TMethod>(instance));
+		}
+
+		template <ReturnType (*TMethod)(ParamTypes...)>
+		constexpr bool contains() const noexcept
+		{
+			return contains(base::template create_id<TMethod>());
+		}
+
+		template <functor Functor>
+			requires invocable<Functor, ReturnType(ParamTypes...)>
+		constexpr bool contains(const Functor& instance) const noexcept
+		{
+			return contains(base::template create_id<Functor>(instance));
 		}
 
 		constexpr multicast_delegate& operator-=(const delegate_type& another)
 		{
-			return push_back(another.m_invocation);
+			return remove(another.m_invocation.id);
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
 		constexpr multicast_delegate& operator-=(T& instance)
 		{
-			return push_back(base::template createElement<T, TMethod>(instance));
+			return remove(base::template create_id<T, TMethod>(instance));
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		constexpr multicast_delegate& operator-=(const T& instance)
 		{
-			return push_back(base::template createElement<T, TMethod>(instance));
+			return remove(base::template create_id<T, TMethod>(instance));
 		}
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
 		constexpr multicast_delegate& operator-=(const Functor& instance)
 		{
-			return remove(base::template createElement<Functor>(instance));
+			return remove(base::template create_id<Functor>(instance));
 		}
 
 		constexpr multicast_delegate& operator=(const multicast_delegate&) = default;
@@ -253,21 +293,21 @@ namespace rsl
 		constexpr multicast_delegate& operator=(T& instance)
 		{
 			clear();
-			return push_back(base::template createElement<T, TMethod>(instance));
+			return push_back(base::template create_element<T, TMethod>(instance));
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		constexpr multicast_delegate& operator=(const T& instance)
 		{
 			clear();
-			return push_back(base::template createElement<T, TMethod>(instance));
+			return push_back(base::template create_element<T, TMethod>(instance));
 		}
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
 		constexpr multicast_delegate& operator=(const Functor& instance)
 		{
 			clear();
-			return push_back(base::template createElement<Functor>(instance));
+			return push_back(base::template create_element<Functor>(instance));
 		}
 
 		constexpr multicast_delegate& assign(const delegate_type& del) { return push_back(del.m_invocation); }
@@ -276,14 +316,14 @@ namespace rsl
 		constexpr multicast_delegate& assign(T& instance)
 		{
 			clear();
-			return push_back(base::template createElement<T, TMethod>(instance));
+			return push_back(base::template create_element<T, TMethod>(instance));
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		constexpr multicast_delegate& assign(const T& instance)
 		{
 			clear();
-			return push_back(base::template createElement<T, TMethod>(instance));
+			return push_back(base::template create_element<T, TMethod>(instance));
 		}
 
 		template <functor Functor>
@@ -291,7 +331,7 @@ namespace rsl
 		constexpr multicast_delegate& assign(const Functor& instance)
 		{
 			clear();
-			return push_back(base::template createElement<Functor>(instance));
+			return push_back(base::template create_element<Functor>(instance));
 		}
 
 		template <typename InputIt>
@@ -315,7 +355,7 @@ namespace rsl
 			{
 				for (auto& m_item : m_invocationList)
 				{
-					(*m_item.m_stub)(m_item.m_object.get(), args...);
+					(*m_item.stub)(m_item.object.get(), args...);
 				}
 			}
 			else
@@ -324,7 +364,7 @@ namespace rsl
 				result.reserve(size());
 				for (auto& m_item : m_invocationList)
 				{
-					result.push_back((*m_item.m_stub)(m_item.m_object.get(), args...));
+					result.push_back((*m_item.stub)(m_item.object.get(), args...));
 				}
 
 				return result;

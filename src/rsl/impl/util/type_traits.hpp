@@ -8,6 +8,44 @@ namespace rsl
 {
 	namespace internal
 	{
+		template <size_type I>
+		consteval constexpr_string<I> post_process_compiler_dependent_type_name(constexpr_string<I> name) noexcept
+		{
+			constexpr_string ret = name;
+
+			constexpr_string cxxfilter = "__cxx11::";
+			ret = ret.filter(cxxfilter);
+			constexpr_string classFilter = "class ";
+			constexpr_string classReplace = "";
+			ret = ret.replace(classFilter, classReplace);
+			constexpr_string structFilter = "struct ";
+			constexpr_string structReplace = "";
+			ret = ret.replace(structFilter, structReplace);
+			constexpr_string cdeclFilter = "(__cdecl ";
+			constexpr_string cdeclReplace = " (";
+			ret = ret.replace(cdeclFilter, cdeclReplace);
+			constexpr_string funcPtrFilter = "* )";
+			constexpr_string funcPtrReplace = "*)";
+			ret = ret.replace(funcPtrFilter, funcPtrReplace);
+			constexpr_string voidParamFilter = "(void)";
+			constexpr_string voidParamReplace = "()";
+			ret = ret.replace(voidParamFilter, voidParamReplace);
+			constexpr_string refFilter = " &";
+			constexpr_string refReplace = "&";
+			ret = ret.replace(refFilter, refReplace);
+			constexpr_string ptrFilter = " *";
+			constexpr_string ptrReplace = "*";
+			ret = ret.replace(ptrFilter, ptrReplace);
+			constexpr_string commaFilter = ",";
+			constexpr_string commaReplace = ", ";
+			ret = ret.replace(commaFilter, commaReplace, 0, true);
+			constexpr_string comma2Filter = ",  ";
+			constexpr_string comma2Replace = ", ";
+			ret = ret.replace(comma2Filter, comma2Replace);
+
+			return ret;
+		}
+
 		template <typename T>
 		consteval auto compiler_dependent_type_name() noexcept
 		{
@@ -17,10 +55,6 @@ namespace rsl
 #if defined(RYTHE_MSVC)
 			auto first = functionName.find_first_of('<', functionName.find("compiler_dependent_type_name")) + 1;
 			auto end = functionName.find_last_of('>');
-			if (auto t = functionName.find_first_of(' ', first) + 1; t < end)
-			{
-				first = t;
-			}
 
 			ret.copy_from(functionName.substr(first, end - first));
 #elif defined(RYTHE_GCC)
@@ -35,13 +69,6 @@ namespace rsl
 #elif defined(RYTHE_CLANG)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
 			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
-
-			constexpr_string refFilter = " &";
-			constexpr_string refReplace = "&";
-			ret = ret.replace(refFilter, refReplace);
-			constexpr_string ptrFilter = " *";
-			constexpr_string ptrReplace = "*";
-			ret = ret.replace(ptrFilter, ptrReplace);
 #else
 			ret.copy_from(functionName);
 #endif
@@ -56,19 +83,14 @@ namespace rsl
 
 			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
 #if defined(RYTHE_MSVC)
-			auto first = functionName.find_first_of('<') + 1;
+			auto first =
+				functionName.find_first_of('<', functionName.find("compiler_dependent_templated_type_name")) + 1;
 			auto end = functionName.find_last_of('>');
-			if (auto t = functionName.find_first_of(' ', first) + 1; t < end)
-			{
-				first = t;
-			}
 
 			ret.copy_from(functionName.substr(first, end - first));
 #elif defined(RYTHE_GCC)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
 			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
-			constexpr_string cxxfilter = "__cxx11::";
-			ret = ret.filter(cxxfilter);
 #elif defined(RYTHE_CLANG)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
 			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
@@ -84,7 +106,7 @@ namespace rsl
 		{
 			consteval static auto get_value() noexcept
 			{
-				constexpr auto ret = compiler_dependent_type_name<T>();
+				constexpr auto ret = post_process_compiler_dependent_type_name(compiler_dependent_type_name<T>());
 				return ret.template refit<ret.size() + 1>();
 			}
 		};
@@ -118,7 +140,7 @@ namespace rsl
 
 			consteval static auto get_value() noexcept
 			{
-				constexpr auto ret = construct_value();
+				constexpr auto ret = post_process_compiler_dependent_type_name(construct_value());
 				return ret.template refit<ret.size() + 1>();
 			}
 		};

@@ -39,14 +39,22 @@ namespace rsl
 		[[nodiscard]] consteval constexpr_string<N> filter(char x) const noexcept;
 
 		template <size_type N0, size_type N1>
-		[[nodiscard]] consteval constexpr_string<N>
-		replace(const constexpr_string<N0>& filter, const constexpr_string<N1>& replacement) const noexcept;
+		[[nodiscard]] consteval constexpr_string<N> replace(
+			const constexpr_string<N0>& filter, const constexpr_string<N1>& replacement, size_type offset = 0,
+			bool linear = false
+		) const noexcept;
+
+		template <size_type N0, size_type N1>
+		[[nodiscard]] consteval constexpr_string<N> replace_first(
+			const constexpr_string<N0>& filter, const constexpr_string<N1>& replacement, size_type offset = 0
+		) const noexcept;
 
 		template <size_type I>
 		[[nodiscard]] consteval constexpr_string<I> refit() const noexcept;
 
 		template <size_type OtherN>
-		[[nodiscard]] consteval size_type find(const constexpr_string<OtherN>& str) const noexcept;
+		[[nodiscard]] consteval size_type
+		find(const constexpr_string<OtherN>& str, size_type offset = 0) const noexcept;
 
 		consteval void copy_from(string_view str) noexcept;
 	};
@@ -154,11 +162,11 @@ namespace rsl
 
 	template <size_type N>
 	template <size_type N0, size_type N1>
-	inline consteval constexpr_string<N> constexpr_string<N>::replace(
-		const constexpr_string<N0>& filter, const constexpr_string<N1>& replacement
+	inline consteval constexpr_string<N> constexpr_string<N>::replace_first(
+		const constexpr_string<N0>& filter, const constexpr_string<N1>& replacement, size_type offset
 	) const noexcept
 	{
-		size_type start = find(filter);
+		size_type start = find(filter, offset);
 		if (start == npos)
 		{
 			return *this;
@@ -196,17 +204,37 @@ namespace rsl
 
 		for (; j < N; ++j)
 		{
-			ret[j] = 0;
+			ret[j] = '\0';
 		}
 
-		if (ret.find(filter) == npos)
+		return ret;
+	}
+
+	template <size_type N>
+	template <size_type N0, size_type N1>
+	inline consteval constexpr_string<N> constexpr_string<N>::replace(
+		const constexpr_string<N0>& filter, const constexpr_string<N1>& replacement, size_type offset, bool linear
+	) const noexcept
+	{
+		constexpr_string<N> ret = replace_first(filter, replacement, offset);
+		if (linear)
 		{
-			return ret;
+			size_type i = find(filter, offset);
+			while (i != npos)
+			{
+				i = ret.find(filter, i + replacement.size());
+				ret = ret.replace_first(filter, replacement, i);
+			}
 		}
 		else
 		{
-			return ret.replace(filter, replacement);
+			while (ret.find(filter, offset) != npos)
+			{
+				ret = ret.replace_first(filter, replacement, offset);
+			}
 		}
+
+		return ret;
 	}
 
 	template <size_type N>
@@ -229,7 +257,8 @@ namespace rsl
 
 	template <size_type N>
 	template <size_type OtherN>
-	inline consteval size_type constexpr_string<N>::find(const constexpr_string<OtherN>& str) const noexcept
+	inline consteval size_type
+	constexpr_string<N>::find(const constexpr_string<OtherN>& str, size_type offset) const noexcept
 	{
 		if (str.size() > size())
 		{
@@ -242,7 +271,7 @@ namespace rsl
 		}
 
 		size_type j = 0;
-		for (size_type i = 0; i < N; ++i)
+		for (size_type i = offset; i < N; ++i)
 		{
 			if (buffer[i] == str[j])
 			{
