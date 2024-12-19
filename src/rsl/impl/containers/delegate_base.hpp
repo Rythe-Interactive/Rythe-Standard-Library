@@ -58,14 +58,14 @@ namespace rsl
 		static ReturnType method_stub(void* obj, ParamTypes... args)
 		{
 			T* p = force_cast<T*>(obj);
-			return (p->*method)(std::forward<ParamTypes>(args)...);
+			return (p->*method)(forward<ParamTypes>(args)...);
 		}
 
 		template <typename T, ReturnType (T::*method)(ParamTypes...) const>
 		static ReturnType const_method_stub(void* obj, ParamTypes... args)
 		{
 			const T* p = force_cast<const T*>(obj);
-			return (p->*method)(std::forward<ParamTypes>(args)...);
+			return (p->*method)(forward<ParamTypes>(args)...);
 		}
 
 		template <typename T, ReturnType (T::*method)(ParamTypes...)>
@@ -83,7 +83,7 @@ namespace rsl
 		template <ReturnType (*func)(ParamTypes...)>
 		static ReturnType function_stub(void* obj, ParamTypes... args)
 		{
-			return (func)(std::forward<ParamTypes>(args)...);
+			return (func)(forward<ParamTypes>(args)...);
 		}
 
 		template <ReturnType (*func)(ParamTypes...)>
@@ -96,7 +96,7 @@ namespace rsl
 			requires(!functor<Func>)
 		static ReturnType function_ptr_stub(void* obj, ParamTypes... args)
 		{
-			return (*std::bit_cast<Func*>(&obj))(std::forward<ParamTypes>(args)...);
+			return (*bit_cast<Func*>(&obj))(forward<ParamTypes>(args)...);
 		}
 
 		template <invocable<ReturnType(ParamTypes...)> Func>
@@ -111,7 +111,7 @@ namespace rsl
 		static ReturnType functor_stub(void* obj, ParamTypes... args)
 		{
 			Functor* p = force_cast<Functor*>(obj);
-			return (p->operator())(std::forward<ParamTypes>(args)...);
+			return (p->operator())(forward<ParamTypes>(args)...);
 		}
 
 		template <functor Functor>
@@ -131,8 +131,7 @@ namespace rsl
 		[[rythe_always_inline]] static invocation_element create_element(const T& instance)
 		{
 			return invocation_element(
-				force_cast<void*>(&instance), const_method_stub<T, TMethod>,
-				method_id<T, TMethod>(instance)
+				force_cast<void*>(&instance), const_method_stub<T, TMethod>, method_id<T, TMethod>(instance)
 			);
 		}
 
@@ -148,10 +147,10 @@ namespace rsl
 			if constexpr (!is_functor_v<Functor>)
 			{
 				return invocation_element(
-					*std::bit_cast<void**>(&instance), function_ptr_stub<Functor>, function_ptr_id<Functor>(instance)
+					*bit_cast<void**>(&instance), function_ptr_stub<Functor>, function_ptr_id<Functor>(instance)
 				);
 			}
-			else if constexpr (std::is_empty_v<Functor>)
+			else if constexpr (is_empty_v<Functor>)
 			{
 				return invocation_element(
 					force_cast<void*>(&instance), functor_stub<Functor>, functor_id<Functor>(instance)
@@ -195,7 +194,7 @@ namespace rsl
 			{
 				return function_ptr_id<Functor>(instance);
 			}
-			else if constexpr (std::is_empty_v<Functor>)
+			else if constexpr (is_empty_v<Functor>)
 			{
 				return functor_id<Functor>(instance);
 			}

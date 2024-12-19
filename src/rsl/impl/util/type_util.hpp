@@ -10,69 +10,11 @@
 
 namespace rsl
 {
-	// I'm choosing to go with the constraint option instead of SFINAE, the Microsoft STL has choosen different.
-	// See https://github.com/microsoft/STL/issues/2620 and https://github.com/microsoft/STL/pull/2624 for further
-	// context. Theoretically the constraint should be superior cross compilers, but bugs inside MSVC has in the past
-	// prevented it from working propperly in all edge cases. I don't care about these edge cases nor do I care about
-	// past versions of MSVC.
-	template <typename T, typename... Args>
-		requires requires(void* ptr, Args&&... args) { ::new (ptr) T(static_cast<Args&&>(args)...); }
-	constexpr T* construct_at(T* const location, Args&&... args)
-		noexcept(noexcept(::new(static_cast<void*>(location)) T(::rsl::forward<Args>(args)...)))
-	{
-		return ::new (static_cast<void*>(location)) T(::rsl::forward<Args>(args)...);
-	}
-
-	namespace internal
-	{
-		template <class NoThrowFwdIt, class NoThrowSentinel>
-		constexpr void destroy_range(NoThrowFwdIt first, const NoThrowSentinel last) noexcept;
-
-		template <class T>
-		constexpr void destroy_in_place(T& val) noexcept
-		{
-			if constexpr (is_array_v<T>)
-			{
-				destroy_range(val, val + extent_v<T>);
-			}
-			else
-			{
-				val.~T();
-			}
-		}
-
-		template <class NoThrowFwdIt, class NoThrowSentinel>
-		constexpr void destroy_range(NoThrowFwdIt first, const NoThrowSentinel last) noexcept
-		{
-			// note that this is an optimization for debug mode codegen; in release mode the BE removes all of this
-			if constexpr (!::std::is_trivially_destructible_v<::std::iter_value_t<NoThrowFwdIt>>)
-			{
-				for (; first != last; ++first)
-				{
-					destroy_in_place(*first);
-				}
-			}
-		}
-	} // namespace internal
-
 	template <typename T, size_type Size>
 	[[nodiscard]] constexpr T* begin(T (&arr)[Size]) noexcept;
 
 	template <typename T, size_type Size>
 	[[nodiscard]] constexpr T* end(T (&arr)[Size]) noexcept;
-
-	template <typename T>
-	constexpr void destroy_at(T* const location) noexcept
-	{
-		if constexpr (is_array_v<T>)
-		{
-			internal::destroy_range(::rsl::begin(*location), ::rsl::end(*location));
-		}
-		else
-		{
-			location->~T();
-		}
-	}
 
 	template <template <typename> typename Compare, typename T, T A, T B>
 	struct do_compare

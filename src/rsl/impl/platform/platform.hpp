@@ -3,6 +3,7 @@
 #include <bit>
 
 #include "../defines.hpp"
+#include "../util/common.hpp"
 #include "../util/primitives.hpp"
 
 #if RYTHE_PLATFORM_WINDOWS
@@ -35,7 +36,7 @@ namespace rsl
 		template <typename T>
 		T get_symbol(cstring symbolName) const
 		{
-			return std::bit_cast<T>(platform::get_symbol(*this, symbolName));
+			return bit_cast<T>(platform::get_symbol(*this, symbolName));
 		}
 
 		operator bool() const { return m_handle; }

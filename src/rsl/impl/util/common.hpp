@@ -1,22 +1,13 @@
 #pragma once
+#include <bit>
 #include <ratio>
 #include <type_traits>
-#include <bit>
 
 #include "../defines.hpp"
 #include "primitives.hpp"
 
 namespace rsl
 {
-	consteval void* constexpr_memcpy(void* dst, const void* src, size_type count) noexcept
-    {
-        for (size_type i = 0; i < count; i++)
-        {
-			std::bit_cast<byte*>(dst)[i] = *std::bit_cast<const byte*>(src);
-        }
-		return dst;
-    }
-
 	template <typename T, T Val>
 	struct integral_constant
 	{
@@ -468,6 +459,34 @@ namespace rsl
 	template <typename T>
 	using add_rval_ref_t = typename add_rval_ref<T>::type;
 
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr T* addressof(T& val) noexcept
+	{
+		return ::std::addressof(val); // Compiler magic behind the scenes.
+	}
+
+	template <typename T>
+	const T* addressof(const T&&) = delete;
+
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr T&& forward(remove_reference_t<T>& val) noexcept
+	{
+		return static_cast<T&&>(val);
+	}
+
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr T&& forward(remove_reference_t<T>&& val) noexcept
+	{
+		static_assert(!is_lvalue_reference_v<T>, "bad forward call");
+		return static_cast<T&&>(val);
+	}
+
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr remove_reference_t<T>&& move(T&& val) noexcept
+	{
+		return static_cast<remove_reference_t<T>&&>(val);
+	}
+
 	// Only function types and reference types can't be const qualified.
 	template <typename T>
 	inline constexpr bool is_function_v = !is_const_v<const T> && !is_reference_v<T>;
@@ -487,8 +506,9 @@ namespace rsl
 	};
 
 	template <typename T, typename... Args>
-	inline constexpr bool is_constructible_v =
-		::std::is_constructible_v<T, Args...>; // Uses compiler magic behind the scenes.
+	inline constexpr bool is_constructible_v = requires(Args... args) {
+		{ T(args...) };
+	};
 
 	template <typename T, typename... Args>
 	struct is_constructible : bool_constant<is_constructible_v<T, Args...>>
@@ -501,9 +521,13 @@ namespace rsl
 	{
 	};
 
+	template <typename T>
+	inline constexpr bool is_copy_constructible_v = is_copy_constructible<T>::value;
+
 	template <typename T, typename... Args>
-	inline constexpr bool is_nothrow_constructible_v =
-		::std::is_nothrow_constructible_v<T, Args...>; // Uses compiler magic behind the scenes.
+	inline constexpr bool is_nothrow_constructible_v = requires(Args... args) {
+		{ T(args...) } noexcept;
+	};
 
 	template <typename T, typename... Args>
 	struct is_nothrow_constructible : bool_constant<is_nothrow_constructible_v<T, Args...>>
@@ -511,8 +535,9 @@ namespace rsl
 	};
 
 	template <typename T>
-	inline constexpr bool is_nothrow_copy_constructible_v =
-		::std::is_nothrow_copy_constructible_v<T>; // Uses compiler magic behind the scenes.
+	inline constexpr bool is_nothrow_copy_constructible_v = requires(const T& src) {
+		{ T(src) } noexcept;
+	};
 
 	template <typename T>
 	struct is_nothrow_copy_constructible : bool_constant<is_nothrow_copy_constructible_v<T>>
@@ -520,11 +545,42 @@ namespace rsl
 	};
 
 	template <typename T>
-	inline constexpr bool is_nothrow_move_constructible_v =
-		::std::is_nothrow_move_constructible_v<T>; // Uses compiler magic behind the scenes.
+	inline constexpr bool is_nothrow_move_constructible_v = requires(T&& src) {
+		{ T(move(src)) } noexcept;
+	};
 
 	template <typename T>
 	struct is_nothrow_move_constructible : bool_constant<is_nothrow_move_constructible_v<T>>
+	{
+	};
+
+	template <typename To, typename From>
+	constexpr bool is_nothrow_assignable_v = requires(add_lval_ref<To> to, add_lval_ref<From> from) {
+		{ to = from } noexcept;
+	};
+
+	template <typename To, typename From>
+	struct is_nothrow_assignable : bool_constant<is_nothrow_assignable_v<To, From>>
+	{
+	};
+
+	template <typename T>
+	constexpr bool is_nothrow_copy_assignable_v = requires(const T& src) {
+		{ T(src) } noexcept;
+	};
+
+	template <typename T>
+	struct is_nothrow_copy_assignable : bool_constant<is_nothrow_copy_assignable_v<T>>
+	{
+	};
+
+	template <typename T>
+	constexpr bool is_nothrow_move_assignable_v = requires(add_lval_ref<T> dst, T&& src) {
+		{ dst = move(src) } noexcept;
+	};
+
+	template <typename T>
+	struct is_nothrow_move_assignable : bool_constant<is_nothrow_move_assignable_v<T>>
 	{
 	};
 
@@ -554,6 +610,39 @@ namespace rsl
 	struct is_trivially_copy_constructible : bool_constant<is_trivially_copy_constructible_v<T>>
 	{
 	};
+
+	template <typename T>
+	constexpr bool is_trivial_v = ::std::is_trivial_v<T>; // Uses compiler magic behind the scenes.
+
+	template <typename T>
+	struct is_trivial : bool_constant<is_trivial_v<T>>
+	{
+	};
+
+	template <typename T>
+	constexpr bool is_trivially_copyable_v =
+		::std::is_trivially_copyable_v<T>; // Uses compiler magic behind the scenes.
+
+	template <typename T>
+	struct is_trivially_copyable : bool_constant<is_trivially_copyable_v<T>>
+	{
+	};
+
+	template <typename To, typename From>
+		requires(sizeof(To) == sizeof(From)) && is_trivially_copyable_v<To> && is_trivially_copyable_v<From>
+	[[nodiscard]] constexpr To bit_cast(const From& value) noexcept
+	{
+		return ::std::bit_cast<To>(value);
+	}
+
+	consteval void* constexpr_memcpy(void* dst, const void* src, size_type count) noexcept
+	{
+		for (size_type i = 0; i < count; i++)
+		{
+			bit_cast<byte*>(dst)[i] = *bit_cast<const byte*>(src);
+		}
+		return dst;
+	}
 
 	template <typename>
 	inline constexpr bool is_array_v = false;
@@ -1025,36 +1114,8 @@ namespace rsl
 	};
 
 	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] constexpr T* addressof(T& val) noexcept
-	{
-		return ::std::addressof(val); // Compiler magic behind the scenes.
-	}
-
-	template <typename T>
-	const T* addressof(const T&&) = delete;
-
-	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] constexpr T&& forward(remove_reference_t<T>& val) noexcept
-	{
-		return static_cast<T&&>(val);
-	}
-
-	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] constexpr T&& forward(remove_reference_t<T>&& val) noexcept
-	{
-		static_assert(!is_lvalue_reference_v<T>, "bad forward call");
-		return static_cast<T&&>(val);
-	}
-
-	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] constexpr remove_reference_t<T>&& move(T&& val) noexcept
-	{
-		return static_cast<remove_reference_t<T>&&>(val);
-	}
-
-	template <typename T>
 	[[nodiscard]] [[rythe_always_inline]] constexpr conditional_t<
-		!::std::is_nothrow_move_constructible_v<T> && ::std::is_copy_constructible_v<T>, const T&, T&&>
+		!is_nothrow_move_constructible_v<T> && is_copy_constructible_v<T>, const T&, T&&>
 	move_if_noexcept(T& val) noexcept
 	{
 		return ::rsl::move(val);

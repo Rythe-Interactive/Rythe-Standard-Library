@@ -95,8 +95,8 @@ namespace
 	{
 		delegate_type2 del2;
 
-        REQUIRE(del2.empty());
-        REQUIRE(del2 == nullptr);
+		REQUIRE(del2.empty());
+		REQUIRE(del2 == nullptr);
 
 		counter = 0;
 
@@ -134,7 +134,7 @@ namespace
 
 		REQUIRE(counter == 1);
 
-        del.clear();
+		del.clear();
 		REQUIRE(del.empty());
 		REQUIRE(del == nullptr);
 
@@ -236,7 +236,7 @@ TEST_CASE("multicast_delegate", "[delegates]")
 			del2 += &funcParam;
 		}
 
-        REQUIRE(del2.size() == 1);
+		REQUIRE(del2.size() == 1);
 
 		{
 			del2 += &funcParam2;
@@ -261,7 +261,7 @@ TEST_CASE("multicast_delegate", "[delegates]")
 			REQUIRE(v == 38);
 		}
 
-        del2.remove(funcParam);
+		del2.remove(funcParam);
 		REQUIRE(!del2.empty());
 		REQUIRE(del2 != nullptr);
 		REQUIRE(del2.size() == 1);
@@ -331,7 +331,7 @@ TEST_CASE("multicast_delegate", "[delegates]")
 			REQUIRE(!del.contains(lambda));
 		}
 
-        del.clear();
+		del.clear();
 
 		REQUIRE(del.empty());
 		REQUIRE(del == nullptr);
@@ -384,7 +384,7 @@ TEST_CASE("multicast_delegate", "[delegates]")
 			del();
 			REQUIRE(counter == 9280);
 
-            del.pop_back();
+			del.pop_back();
 
 			REQUIRE(!del.empty());
 			REQUIRE(del != nullptr);
@@ -392,7 +392,7 @@ TEST_CASE("multicast_delegate", "[delegates]")
 			REQUIRE(del.contains<Object, &Object::memberFunc>(obj));
 			REQUIRE(!del.contains<Object, &Object::memberFunc2>(obj));
 
-            del.pop_back();
+			del.pop_back();
 
 			REQUIRE(del.empty());
 			REQUIRE(del == nullptr);

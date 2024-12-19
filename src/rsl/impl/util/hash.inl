@@ -1,7 +1,7 @@
 #include "hash.hpp"
 #pragma once
 
-#include <bit>
+#include "common.hpp"
 
 namespace rsl
 {
@@ -52,7 +52,7 @@ namespace rsl
 	template <typename T>
 	constexpr id_type hash_value(const T& val) noexcept
 	{
-		return hash_bytes(internal::fnv1a::offset_basis, std::span(std::bit_cast<const byte*>(&val), sizeof(T)));
+		return hash_bytes(internal::fnv1a::offset_basis, std::span(bit_cast<const byte*>(&val), sizeof(T)));
 	}
 
 } // namespace rsl
