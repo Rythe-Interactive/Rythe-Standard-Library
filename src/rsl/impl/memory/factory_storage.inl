@@ -17,9 +17,19 @@ namespace rsl
 	{
 	}
 
-	template <typename T>
-	inline constexpr factory_storage<default_factory<T>>::factory_storage(const default_factory<T>& factory) noexcept
-		: value(factory)
+	template <factory_type Factory>
+	template <factory_type Other>
+	inline constexpr factory_storage<Factory>::factory_storage(const factory_storage<Other>& other)
+		noexcept(is_nothrow_constructible_v<Factory, const Other&>)
+		: value(other.value)
+	{
+	}
+
+	template <factory_type Factory>
+	template <factory_type Other>
+	inline constexpr factory_storage<Factory>::factory_storage(factory_storage<Other>&& other)
+		noexcept(is_nothrow_constructible_v<Factory, Other&&>)
+		: value(std::move(other.value))
 	{
 	}
 } // namespace rsl

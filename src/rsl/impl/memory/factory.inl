@@ -21,7 +21,7 @@ namespace rsl
 	inline T* default_factory<T>::construct(void* ptr, size_type count, Args&&... args)
 		noexcept(is_nothrow_constructible_v<T, Args...>)
 	{
-		if constexpr (is_trivially_default_constructible_v<T> && sizeof...(Args) == 0)
+		if constexpr ((is_trivially_default_constructible_v<T>) && sizeof...(Args) == 0)
 		{
 			if constexpr (internal::memset_zero<T>::value)
 			{

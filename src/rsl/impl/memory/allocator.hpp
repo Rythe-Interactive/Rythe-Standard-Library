@@ -60,38 +60,17 @@ namespace rsl
 
 		Alloc impl;
 
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void* allocate(size_type size) noexcept override
-		{
-			return impl.allocate(size);
-		}
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void* allocate(size_type size) noexcept override;
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
+		allocate(size_type size, size_type alignment) noexcept override;
 
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
-		allocate(size_type size, size_type alignment) noexcept override
-		{
-			return impl.allocate(size, alignment);
-		}
-
+		reallocate(void* ptr, size_type oldSize, size_type newSize) noexcept override;
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
-		reallocate(void* ptr, size_type oldSize, size_type newSize) noexcept override
-		{
-			return impl.reallocate(ptr, oldSize, newSize);
-		}
+		reallocate(void* ptr, size_type oldSize, size_type newSize, size_type alignment) noexcept override;
 
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
-		reallocate(void* ptr, size_type oldSize, size_type newSize, size_type alignment) noexcept override
-		{
-			return impl.reallocate(ptr, oldSize, newSize, alignment);
-		}
-
-		[[rythe_always_inline]] void deallocate(void* ptr, size_type size) noexcept override
-		{
-			impl.deallocate(ptr, size);
-		}
-
-		[[rythe_always_inline]] void deallocate(void* ptr, size_type size, size_type alignment) noexcept override
-		{
-			impl.deallocate(ptr, size, alignment);
-		}
+		[[rythe_always_inline]] void deallocate(void* ptr, size_type size) noexcept override;
+		[[rythe_always_inline]] void deallocate(void* ptr, size_type size, size_type alignment) noexcept override;
 	};
 
 	using default_polymorphic_allocator = polymorphic_allocator_mixin<default_allocator>;
@@ -111,17 +90,17 @@ namespace rsl
 		}
 
 
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void* allocate(size_type size) noexcept;
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] constexpr void* allocate(size_type size) noexcept;
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] constexpr void*
 		allocate(size_type size, size_type alignment) noexcept;
 
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] constexpr void*
 		reallocate(void* ptr, size_type oldSize, size_type newSize) noexcept;
-		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] void*
+		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] constexpr void*
 		reallocate(void* ptr, size_type oldSize, size_type newSize, size_type alignment) noexcept;
 
-		[[rythe_always_inline]] void deallocate(void* ptr, size_type size) noexcept;
-		[[rythe_always_inline]] void deallocate(void* ptr, size_type size, size_type alignment) noexcept;
+		[[rythe_always_inline]] constexpr void deallocate(void* ptr, size_type size) noexcept;
+		[[rythe_always_inline]] constexpr void deallocate(void* ptr, size_type size, size_type alignment) noexcept;
 	};
 
 	using pmu_alloc_ptr_wrapper = polymorphic_allocator_ptr_wrapper;

@@ -41,6 +41,13 @@ namespace rsl
 		template <typename Other>
 		using retarget = default_factory<Other>;
 
+        constexpr default_factory() noexcept = default;
+        
+		template <typename Other>
+		constexpr default_factory(default_factory<Other>) noexcept
+		{
+		}
+
 		template <typename... Args>
 		T* construct(void* ptr, size_type count, Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>);
 		T* move(void* dst, T* src, size_type count) noexcept(is_nothrow_move_constructible_v<T>);

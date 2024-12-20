@@ -3,17 +3,17 @@
 
 namespace rsl
 {
-	inline void* heap_allocator::allocate(size_type size) noexcept
+	inline constexpr void* heap_allocator::allocate(size_type size) noexcept
 	{
 		return ::operator new(size, std::nothrow);
 	}
 
-	inline void* heap_allocator::allocate(size_type size, size_type alignment) noexcept
+	inline constexpr void* heap_allocator::allocate(size_type size, size_type alignment) noexcept
 	{
 		return ::operator new(size, std::align_val_t{alignment}, std::nothrow);
 	}
 
-	inline void* heap_allocator::reallocate(void* ptr, size_type oldSize, size_type newSize) noexcept
+	inline constexpr void* heap_allocator::reallocate(void* ptr, size_type oldSize, size_type newSize) noexcept
 	{
 		void* mem = nullptr;
 
@@ -31,7 +31,7 @@ namespace rsl
 		return mem;
 	}
 
-	inline void*
+	inline constexpr void*
 	heap_allocator::reallocate(void* ptr, size_type oldSize, size_type newSize, size_type alignment) noexcept
 	{
 		void* mem = nullptr;
@@ -50,12 +50,12 @@ namespace rsl
 		return mem;
 	}
 
-	inline void heap_allocator::deallocate(void* ptr, size_type size) noexcept
+	inline constexpr void heap_allocator::deallocate(void* ptr, size_type size) noexcept
 	{
 		::operator delete(ptr, size);
 	}
 
-	inline void heap_allocator::deallocate(void* ptr, size_type size, size_type alignment) noexcept
+	inline constexpr void heap_allocator::deallocate(void* ptr, size_type size, size_type alignment) noexcept
 	{
 		::operator delete(ptr, size, std::align_val_t{alignment});
 	}

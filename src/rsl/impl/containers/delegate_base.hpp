@@ -8,6 +8,8 @@
 #include "../util/hash.hpp"
 #include "../util/utilities.hpp"
 
+#include "../memory/managed_resource.hpp"
+
 namespace rsl
 {
 
@@ -28,7 +30,7 @@ namespace rsl
 			using param_types = type_sequence<ParamTypes...>;
 			constexpr invocation_element() = default;
 			constexpr invocation_element(void* object, stub_type stub, id_type id, deleter_type deleter = nullptr)
-				: object(object, deleter ? deleter : defaultDeleter),
+				: object(deleter ? deleter : defaultDeleter, object),
 				  ownsData(deleter != nullptr),
 				  stub(stub),
 				  id(id)
@@ -48,7 +50,7 @@ namespace rsl
 			constexpr bool operator==(const invocation_element& other) const noexcept { return id == other.id; }
 			constexpr bool operator!=(const invocation_element& other) const noexcept { return id != other.id; }
 
-			std::shared_ptr<void> object = nullptr;
+			managed_resource<void*> object = nullptr;
 			bool ownsData = false;
 			stub_type stub = nullptr;
 			id_type id = invalid_id;
@@ -81,7 +83,7 @@ namespace rsl
 		}
 
 		template <ReturnType (*func)(ParamTypes...)>
-		static ReturnType function_stub(void* obj, ParamTypes... args)
+		static ReturnType function_stub(void*, ParamTypes... args)
 		{
 			return (func)(forward<ParamTypes>(args)...);
 		}

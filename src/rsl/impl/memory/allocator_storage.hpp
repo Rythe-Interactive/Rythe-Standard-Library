@@ -1,5 +1,5 @@
 #pragma once
-#include "memory.hpp"
+#include "allocator.hpp"
 
 namespace rsl
 {
@@ -24,9 +24,9 @@ namespace rsl
 	template <>
 	struct allocator_storage<polymorphic_allocator> final
 	{
-		[[rythe_always_inline]] allocator_storage() noexcept;
-		[[rythe_always_inline]] constexpr allocator_storage(const allocator_storage&) noexcept = default;
-		[[rythe_always_inline]] constexpr allocator_storage& operator=(const allocator_storage&) noexcept = default;
+		allocator_storage() noexcept;
+		[[rythe_always_inline]] constexpr allocator_storage(const allocator_storage& other) noexcept;
+		[[rythe_always_inline]] constexpr allocator_storage& operator=(const allocator_storage& other) noexcept;
 
 		[[rythe_always_inline]] constexpr allocator_storage(polymorphic_allocator& alloc) noexcept;
 
@@ -35,7 +35,7 @@ namespace rsl
 		[[rythe_always_inline]] constexpr polymorphic_allocator* operator->() noexcept { return value; }
 		[[rythe_always_inline]] constexpr const polymorphic_allocator* operator->() const noexcept { return value; }
 
-		polymorphic_allocator* value;
+		mutable polymorphic_allocator* value;
 	};
 } // namespace rsl
 

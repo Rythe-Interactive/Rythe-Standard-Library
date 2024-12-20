@@ -17,9 +17,16 @@ namespace rsl
 	{
 	}
 
-	inline constexpr allocator_storage<polymorphic_allocator>::allocator_storage() noexcept
-		: value(allocator_context::threadSpecificAllocator)
+	inline constexpr allocator_storage<polymorphic_allocator>::allocator_storage(const allocator_storage& other) noexcept
+		: value(other.value)
+    {
+    }
+
+	inline constexpr allocator_storage<polymorphic_allocator>&
+	allocator_storage<polymorphic_allocator>::operator=(const allocator_storage& other) noexcept
 	{
+		value = other.value;
+		return *this;
 	}
 
 	inline constexpr allocator_storage<polymorphic_allocator>::allocator_storage(polymorphic_allocator& alloc) noexcept

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "allocator.hpp"
-#include "factory.hpp"
+#include "typed_allocator.hpp"
 
 namespace rsl
 {

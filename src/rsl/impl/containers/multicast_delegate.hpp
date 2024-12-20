@@ -355,7 +355,7 @@ namespace rsl
 			{
 				for (auto& m_item : m_invocationList)
 				{
-					(*m_item.stub)(m_item.object.get(), args...);
+					(*m_item.stub)(*m_item.object, args...);
 				}
 			}
 			else
@@ -364,7 +364,7 @@ namespace rsl
 				result.reserve(size());
 				for (auto& m_item : m_invocationList)
 				{
-					result.push_back((*m_item.stub)(m_item.object.get(), args...));
+					result.push_back((*m_item.stub)(*m_item.object, args...));
 				}
 
 				return result;

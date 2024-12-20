@@ -8,8 +8,8 @@
 namespace rsl
 {
 	template <
-		universal_allocator_type Alloc = default_allocator,
-		template <typename> typename Constructor = default_constructor,
+		allocator_type Alloc = default_allocator,
+		factory_type Factory = default_factory<void>,
 		template <typename...> typename MapType = std::unordered_map,
 		typename Comparer = typename map_traits<MapType>::template default_comparer<id_type>>
 	class basic_type_map
@@ -18,22 +18,24 @@ namespace rsl
 		struct entry_item;
 
 		using underlying_map_value_type = typename map_traits<MapType>::template value_type<id_type, entry_item>;
-		using underlying_map_allocator = typename map_traits<MapType>::template allocator_type<
-			id_type, entry_item, Alloc, Constructor<underlying_map_value_type>>;
+		using underlying_map_allocator = typename map_traits<MapType>::template alloc_type<
+			id_type, entry_item, Alloc, typename Factory::template retarget<underlying_map_value_type>>;
 
 	public:
-		using universal_alloc = Alloc;
+		using allocator_storage_type = allocator_storage<Alloc>;
+		using allocator_t = Alloc;
+		using factory_storage_type = factory_storage<Factory>;
+		using factory_t = Factory;
 		template <typename T>
-		using alloc_type = allocator<T, universal_alloc, Constructor<T>>;
+		using alloc_type = typed_allocator<T, Alloc, typename Factory::template retarget<T>>;
 		using underlying_map = typename map_traits<MapType>::template customized_type<
-			id_type, entry_item, Comparer, Alloc, Constructor<underlying_map_value_type>>;
+			id_type, entry_item, Comparer, Alloc, typename Factory::template retarget<underlying_map_value_type>>;
 
 		constexpr basic_type_map() = default;
 
-		explicit constexpr basic_type_map(const universal_alloc& alloc)
-			noexcept(is_nothrow_copy_constructible_v<universal_alloc>)
-			requires nothrow_copy_constructible<universal_alloc>
-			: m_allocator(alloc),
+		explicit constexpr basic_type_map(const allocator_storage_type& allocStorage)
+			noexcept(is_nothrow_copy_constructible_v<allocator_storage_type>)
+			: m_allocator(allocStorage),
 			  m_storage(underlying_map_allocator(m_allocator))
 		{
 		}
@@ -126,8 +128,11 @@ namespace rsl
 
 		[[rythe_always_inline]] constexpr void clear() noexcept { m_storage.clear(); }
 
-		[[rythe_always_inline]] constexpr universal_alloc& get_allocator() noexcept { return m_allocator; }
-		[[rythe_always_inline]] constexpr const universal_alloc& get_allocator() const noexcept { return m_allocator; }
+		[[rythe_always_inline]] constexpr allocator_t& get_allocator() noexcept { return m_allocator.get_allocator(); }
+		[[rythe_always_inline]] constexpr const allocator_t& get_allocator() const noexcept
+		{
+			return m_allocator.get_allocator();
+		}
 
 	private:
 		template <typename T>
@@ -192,7 +197,7 @@ namespace rsl
 			}
 		};
 
-		universal_alloc m_allocator;
+		alloc_type<underlying_map_value_type> m_allocator;
 		underlying_map m_storage;
 	};
 

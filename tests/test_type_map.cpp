@@ -91,8 +91,9 @@ TEST_CASE("type_map", "[containers]")
 		}
 		{
 			default_pmu_allocator alloc;
-			rsl::basic_type_map<pmu_alloc_ptr_wrapper> map{&alloc};
-			REQUIRE(map.get_allocator().allocatorPtr == &alloc);
+			allocator_storage<polymorphic_allocator> store(alloc);
+			rsl::basic_type_map<polymorphic_allocator> map{store};
+			REQUIRE((&(map.get_allocator())) == &alloc);
 		}
 	}
 

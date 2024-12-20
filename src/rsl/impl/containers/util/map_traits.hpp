@@ -1,5 +1,5 @@
 #pragma once
-#include "../../memory/allocator.hpp"
+#include "../../memory/stl_compatibility.hpp"
 #include "../../util/hash.hpp"
 #include <map>
 #include <unordered_map>
@@ -19,22 +19,20 @@ namespace rsl
 		using default_comparer = std::equal_to<Key>;
 
 		template <typename Key, typename Value>
-		using default_allocator = stl_allocator_compatible_wrapper<allocator<value_type<Key, Value>>>;
+		using default_allocator = stl_allocator_compatible_wrapper<typed_allocator<value_type<Key, Value>>>;
 
-		template <typename Key, typename Value, universal_allocator_type Alloc, constructor_type Constructor>
-			requires same_as<value_type<Key, Value>, typename Constructor::value_type>
-		using allocator_type = stl_allocator_compatible_wrapper<allocator<value_type<Key, Value>, Alloc, Constructor>>;
+		template <typename Key, typename Value, allocator_type Alloc, factory_type Factory>
+			requires same_as<value_type<Key, Value>, typename Factory::value_type>
+		using alloc_type = stl_allocator_compatible_wrapper<typed_allocator<value_type<Key, Value>, Alloc, Factory>>;
 
 		template <typename Key, typename Value>
 		using default_type =
 			std::unordered_map<Key, Value, hash<Key>, default_comparer<Key>, default_allocator<Key, Value>>;
 
-		template <
-			typename Key, typename Value, typename Compare, universal_allocator_type Alloc,
-			constructor_type Constructor>
-			requires same_as<value_type<Key, Value>, typename Constructor::value_type>
+		template <typename Key, typename Value, typename Compare, allocator_type Alloc, factory_type Factory>
+			requires same_as<value_type<Key, Value>, typename Factory::value_type>
 		using customized_type =
-			std::unordered_map<Key, Value, hash<Key>, Compare, allocator_type<Key, Value, Alloc, Constructor>>;
+			std::unordered_map<Key, Value, hash<Key>, Compare, alloc_type<Key, Value, Alloc, Factory>>;
 	};
 
 	template <>
@@ -47,19 +45,17 @@ namespace rsl
 		using default_comparer = std::less<Key>;
 
 		template <typename Key, typename Value>
-		using default_allocator = stl_allocator_compatible_wrapper<allocator<std::pair<const Key, Value>>>;
+		using default_allocator = stl_allocator_compatible_wrapper<typed_allocator<std::pair<const Key, Value>>>;
 
-		template <typename Key, typename Value, universal_allocator_type Alloc, constructor_type Constructor>
-			requires same_as<value_type<Key, Value>, typename Constructor::value_type>
-		using allocator_type = stl_allocator_compatible_wrapper<allocator<value_type<Key, Value>, Alloc, Constructor>>;
+		template <typename Key, typename Value, allocator_type Alloc, factory_type Factory>
+			requires same_as<value_type<Key, Value>, typename Factory::value_type>
+		using alloc_type = stl_allocator_compatible_wrapper<typed_allocator<value_type<Key, Value>, Alloc, Factory>>;
 
 		template <typename Key, typename Value>
 		using default_type = std::map<Key, Value, default_comparer<Key>, default_allocator<Key, Value>>;
 
-		template <
-			typename Key, typename Value, typename Compare, universal_allocator_type Alloc,
-			constructor_type Constructor>
-			requires same_as<value_type<Key, Value>, typename Constructor::value_type>
-		using customized_type = std::map<Key, Value, Compare, allocator_type<Key, Value, Alloc, Constructor>>;
+		template <typename Key, typename Value, typename Compare, allocator_type Alloc, factory_type Factory>
+			requires same_as<value_type<Key, Value>, typename Factory::value_type>
+		using customized_type = std::map<Key, Value, Compare, alloc_type<Key, Value, Alloc, Factory>>;
 	};
 } // namespace rsl

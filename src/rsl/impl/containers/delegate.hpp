@@ -127,7 +127,7 @@ namespace rsl
 
 		constexpr ReturnType invoke(ParamTypes... args) const
 		{
-			return (*m_invocation.stub)(m_invocation.object.get(), args...);
+			return (*m_invocation.stub)(*m_invocation.object, args...);
 		}
 	};
 } // namespace rsl
