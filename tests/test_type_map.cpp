@@ -1,3 +1,4 @@
+#define RYTHE_VALIDATE
 
 #include <rsl/heap_allocator>
 
@@ -21,7 +22,6 @@ namespace
 	};
 } // namespace
 
-#define RYTHE_VALIDATE
 #define RSL_DEFAULT_ALLOCATOR_OVERRIDE test_heap_allocator
 
 #include <rsl/type_map>

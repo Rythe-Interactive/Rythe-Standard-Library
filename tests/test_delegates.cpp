@@ -1,14 +1,10 @@
-#include <catch2/catch_test_macros.hpp>
-
 #define RYTHE_VALIDATE
 
 #include <rsl/containers>
 #include <rsl/delegate>
 #include <rsl/primitives>
 
-#include <any>
-#include <chrono>
-#include <iostream>
+#include <catch2/catch_test_macros.hpp>
 
 namespace
 {
