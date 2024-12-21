@@ -16,7 +16,7 @@ namespace rsl
 		  m_value(forward<Args>(args)...)
 	{
 		using alloc_type = typename mem_rsc::typed_alloc_type::template retarget<internal::managed_payload<T, Deleter>>;
-		alloc_type alloc{this->m_alloc};
+		alloc_type alloc{mem_rsc::m_alloc};
 		auto* ptr = alloc.allocate();
 		ptr->deleter = deleter;
 		ref_counter::arm(ptr);
@@ -27,7 +27,7 @@ namespace rsl
 	{
 		if (ref_counter::is_armed() && ref_counter::free())
 		{
-			this->m_ptr->destroy(&m_value);
+			mem_rsc::m_ptr->destroy(&m_value);
 		}
 	}
 } // namespace rsl

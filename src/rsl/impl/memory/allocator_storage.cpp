@@ -8,4 +8,4 @@ namespace rsl
 		: value(allocator_context::threadSpecificAllocator)
 	{
 	}
-}
+} // namespace rsl

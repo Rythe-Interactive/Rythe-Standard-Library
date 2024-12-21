@@ -15,14 +15,14 @@ namespace rsl
 		using allocator_t = Alloc;
 		using factory_storage_type = factory_storage<Factory>;
 		using factory_t = Factory;
-        
+
 		template <typename Other>
 		using retarget = typed_allocator<Other, Alloc, typename Factory::template retarget<Other>>;
 
 		typed_allocator() = default;
 		typed_allocator(const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage = {});
 
-        template<not_same_as<T> Other>
+		template <not_same_as<T> Other>
 		typed_allocator(const retarget<Other>& other);
 
 		[[rythe_always_inline]] constexpr void set_allocator(const allocator_storage_type& allocStorage)
@@ -62,9 +62,9 @@ namespace rsl
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] constexpr T*
 		reallocate_aligned(T* ptr, size_type oldCount, size_type newCount, size_type alignment, Args&&... args)
 			noexcept(
-			factory_traits<Factory>::template noexcept_constructable<Args...> &&
-			factory_traits<Factory>::noexcept_moveable
-		);
+				factory_traits<Factory>::template noexcept_constructable<Args...> &&
+				factory_traits<Factory>::noexcept_moveable
+			);
 
 		[[rythe_always_inline]] constexpr void deallocate(T* ptr, size_type count = 1) noexcept;
 		[[rythe_always_inline]] constexpr void

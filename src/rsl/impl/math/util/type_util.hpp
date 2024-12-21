@@ -1,6 +1,6 @@
 #pragma once
-#include <type_traits>
 
+#include "../../util/common.hpp"
 #include "../../util/type_util.hpp"
 #include "../matrix/matrix_base.hpp"
 #include "../vector/swizzle/swizzle_base.hpp"

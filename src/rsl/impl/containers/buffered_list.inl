@@ -1,9 +1,9 @@
 #pragma once
 
 #include <span>
-#include <type_traits>
 
 #include "../util/assert.hpp"
+#include "../util/common.hpp"
 #include "../util/primitives.hpp"
 
 namespace rsl

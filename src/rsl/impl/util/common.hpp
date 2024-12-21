@@ -1,13 +1,21 @@
 #pragma once
+#include "../defines.hpp"
+
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(5046)
 #include <bit>
 #include <ratio>
 #include <type_traits>
+RYTHE_MSVC_SUPPRESS_WARNING_POP
 
-#include "../defines.hpp"
 #include "primitives.hpp"
 
 namespace rsl
 {
+	[[nodiscard]] constexpr bool is_constant_evaluated() noexcept
+	{
+		return std::is_constant_evaluated();
+	}
+
 	template <typename T, T Val>
 	struct integral_constant
 	{
@@ -635,13 +643,21 @@ namespace rsl
 		return ::std::bit_cast<To>(value);
 	}
 
-	consteval void* constexpr_memcpy(void* dst, const void* src, size_type count) noexcept
+	constexpr void* constexpr_memcpy(void* dst, const void* src, size_type count) noexcept
 	{
-		for (size_type i = 0; i < count; i++)
+		if constexpr (is_constant_evaluated())
 		{
-			bit_cast<byte*>(dst)[i] = *bit_cast<const byte*>(src);
+			for (size_type i = 0; i < count; i++)
+			{
+				bit_cast<byte*>(dst)[i] = *bit_cast<const byte*>(src);
+			}
+
+			return dst;
 		}
-		return dst;
+		else
+		{
+			return memcpy(dst, src, count);
+		}
 	}
 
 	template <typename>

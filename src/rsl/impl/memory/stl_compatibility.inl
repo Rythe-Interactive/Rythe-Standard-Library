@@ -11,10 +11,11 @@ namespace rsl
 	}
 
 	template <specialization_of<typed_allocator> Alloc>
-	template <not_same_as<typename Alloc::value_type> Other>
+	template <specialization_of<typed_allocator> Other>
 	constexpr stl_allocator_compatible_wrapper<Alloc>::stl_allocator_compatible_wrapper(
-		const stl_allocator_compatible_wrapper<typename Alloc::template retarget<Other>>& other
+		const stl_allocator_compatible_wrapper<Other>& other
 	) noexcept
+		requires is_constructible_v<Alloc, const Other&>
 		: alloc(other.alloc)
 	{
 	}

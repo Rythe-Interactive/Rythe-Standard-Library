@@ -8,8 +8,7 @@
 namespace rsl
 {
 	template <
-		allocator_type Alloc = default_allocator,
-		factory_type Factory = default_factory<void>,
+		allocator_type Alloc = default_allocator, factory_type Factory = default_factory<void>,
 		template <typename...> typename MapType = std::unordered_map,
 		typename Comparer = typename map_traits<MapType>::template default_comparer<id_type>>
 	class basic_type_map

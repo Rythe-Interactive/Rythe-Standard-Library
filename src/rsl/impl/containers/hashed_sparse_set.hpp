@@ -1,10 +1,10 @@
 #pragma once
 #include <algorithm>
 #include <stdexcept>
-#include <type_traits>
 #include <unordered_map>
 #include <vector>
 
+#include "../util/common.hpp"
 #include "../util/primitives.hpp"
 #include "iterators.hpp"
 

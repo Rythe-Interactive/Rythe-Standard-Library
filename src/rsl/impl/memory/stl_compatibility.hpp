@@ -21,10 +21,9 @@ namespace rsl
 		constexpr stl_allocator_compatible_wrapper(const stl_allocator_compatible_wrapper&) noexcept = default;
 		constexpr stl_allocator_compatible_wrapper(const Alloc& other) noexcept;
 
-		template <not_same_as<value_type> Other>
-		constexpr stl_allocator_compatible_wrapper(
-			const stl_allocator_compatible_wrapper<typename Alloc::template retarget<Other>>& other
-		) noexcept;
+		template <specialization_of<typed_allocator> Other>
+		constexpr stl_allocator_compatible_wrapper(const stl_allocator_compatible_wrapper<Other>& other) noexcept
+			requires is_constructible_v<Alloc, const Other&>;
 
 		constexpr ~stl_allocator_compatible_wrapper() = default;
 		constexpr stl_allocator_compatible_wrapper& operator=(const stl_allocator_compatible_wrapper&) = default;

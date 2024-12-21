@@ -1,4 +1,3 @@
-#include <catch2/catch_test_macros.hpp>
 
 #include <rsl/heap_allocator>
 
@@ -26,6 +25,8 @@ namespace
 #define RSL_DEFAULT_ALLOCATOR_OVERRIDE test_heap_allocator
 
 #include <rsl/type_map>
+
+#include <catch2/catch_test_macros.hpp>
 
 namespace
 {

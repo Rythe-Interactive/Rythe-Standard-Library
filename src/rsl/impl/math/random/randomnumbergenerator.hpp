@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
-#include <type_traits>
 
+#include "../../util/common.hpp"
 #include "../../util/primitives.hpp"
 
 #include "random_number_engine.hpp"

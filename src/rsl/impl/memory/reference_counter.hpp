@@ -28,19 +28,21 @@ namespace rsl
 		size_type m_count = 0;
 	};
 
-    template<typename T>
+	template <typename T>
 	struct reference_counted_payload final : public manual_reference_counter
-    {
+	{
 		T value;
-    };
+	};
 
-    struct arm_signal_type
+	struct arm_signal_type
 	{
 	};
 
-    constexpr arm_signal_type arm_signal;
+	constexpr arm_signal_type arm_signal;
 
-	template <reference_counted Counter = manual_reference_counter, allocator_type Alloc = default_allocator, factory_type Factory = default_factory<Counter>>
+	template <
+		reference_counted Counter = manual_reference_counter, allocator_type Alloc = default_allocator,
+		factory_type Factory = default_factory<Counter>>
 	class basic_reference_counter : public memory_resource_base<Counter, Alloc, Factory, false>
 	{
 	protected:
@@ -55,12 +57,13 @@ namespace rsl
 		[[rythe_always_inline]] constexpr basic_reference_counter(arm_signal_type) noexcept;
 		[[rythe_always_inline]] constexpr basic_reference_counter(const basic_reference_counter& other) noexcept;
 		[[rythe_always_inline]] constexpr basic_reference_counter(basic_reference_counter&& other) noexcept;
-		[[rythe_always_inline]] constexpr basic_reference_counter& operator=(const basic_reference_counter& other) noexcept;
+		[[rythe_always_inline]] constexpr basic_reference_counter& operator=(const basic_reference_counter& other
+		) noexcept;
 		[[rythe_always_inline]] constexpr basic_reference_counter& operator=(basic_reference_counter&& other) noexcept;
 		[[rythe_always_inline]] constexpr ~basic_reference_counter() noexcept;
 
-        [[rythe_always_inline]] constexpr void arm() noexcept;
-        [[rythe_always_inline]] constexpr void disarm() noexcept;
+		[[rythe_always_inline]] constexpr void arm() noexcept;
+		[[rythe_always_inline]] constexpr void disarm() noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool is_armed() const noexcept;
 
 		[[rythe_always_inline]] constexpr size_type borrow() noexcept;
@@ -71,11 +74,11 @@ namespace rsl
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool occupied() const noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool free() const noexcept;
 
-        protected:
+	protected:
 		[[rythe_always_inline]] constexpr void arm(Counter* ptr) noexcept;
 	};
 
-    using reference_counter = basic_reference_counter<>;
+	using reference_counter = basic_reference_counter<>;
 } // namespace rsl
 
 #include "reference_counter.inl"

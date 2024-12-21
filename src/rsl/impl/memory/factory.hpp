@@ -41,8 +41,8 @@ namespace rsl
 		template <typename Other>
 		using retarget = default_factory<Other>;
 
-        constexpr default_factory() noexcept = default;
-        
+		constexpr default_factory() noexcept = default;
+
 		template <typename Other>
 		constexpr default_factory(default_factory<Other>) noexcept
 		{
