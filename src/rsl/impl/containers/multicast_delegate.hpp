@@ -23,8 +23,8 @@ namespace rsl
 		using value_type = typename base::invocation_element;
 		using allocator_type = Allocator<value_type>;
 		using invocation_container = ContainerType<value_type, allocator_type>;
-		using size_type = rsl::size_type;
-		using difference_type = rsl::diff_type;
+		using size_type = size_type;
+		using difference_type = diff_type;
 		using reference = value_type&;
 		using const_reference = const value_type&;
 		using pointer = typename std::allocator_traits<allocator_type>::pointer;

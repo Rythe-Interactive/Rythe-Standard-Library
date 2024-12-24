@@ -4,7 +4,7 @@
 #define RowCountSpecialization 3
 #define ColCountSpecialization 3
 #define ScalarSpecialization Scalar
-#define MatrixTemplate template <rsl::arithmetic_type Scalar, rsl::math::mode Mode>
+#define MatrixTemplate template <arithmetic_type Scalar, mode Mode>
 
 #include "matrix_shared.inl"
 

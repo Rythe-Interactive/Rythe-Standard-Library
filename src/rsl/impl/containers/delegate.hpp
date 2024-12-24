@@ -44,7 +44,7 @@ namespace rsl
 		}
 
 		template <functor Functor>
-			requires rsl::invocable<Functor, ReturnType(ParamTypes...)>
+			requires invocable<Functor, ReturnType(ParamTypes...)>
 		constexpr delegate(const Functor& instance)
 			: m_invocation(base::template create_element<Functor>(instance))
 		{
@@ -69,7 +69,7 @@ namespace rsl
 		}
 
 		template <functor Functor>
-			requires rsl::invocable<Functor, ReturnType(ParamTypes...)>
+			requires invocable<Functor, ReturnType(ParamTypes...)>
 		constexpr static delegate create(const Functor& instance)
 		{
 			return delegate(base::template create_element<Functor>(instance));
@@ -78,8 +78,8 @@ namespace rsl
 		constexpr bool empty() const { return m_invocation.stub == nullptr; }
 		constexpr void clear() { m_invocation = invocation_element(); }
 
-		constexpr bool operator==(rsl::nullptr_type) const { return empty(); }
-		constexpr bool operator!=(rsl::nullptr_type) const { return !empty(); }
+		constexpr bool operator==(nullptr_type) const { return empty(); }
+		constexpr bool operator!=(nullptr_type) const { return !empty(); }
 
 		constexpr bool operator==(const delegate&) const = default;
 		constexpr bool operator!=(const delegate&) const = default;

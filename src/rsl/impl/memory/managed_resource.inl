@@ -3,31 +3,29 @@
 
 namespace rsl
 {
-	template <typename T, allocator_type Alloc, factory_type Factory>
+	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
 	inline constexpr managed_resource<T, Alloc, Factory>::managed_resource(nullptr_type) noexcept
 		: ref_counter()
 	{
 	}
 
-	template <typename T, allocator_type Alloc, factory_type Factory>
+	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
 	template <typename Deleter, typename... Args>
 	inline constexpr managed_resource<T, Alloc, Factory>::managed_resource(Deleter deleter, Args&&... args) noexcept
 		: ref_counter(),
 		  m_value(forward<Args>(args)...)
 	{
-		using alloc_type = typename mem_rsc::typed_alloc_type::template retarget<internal::managed_payload<T, Deleter>>;
-		alloc_type alloc{mem_rsc::m_alloc};
-		auto* ptr = alloc.allocate();
-		ptr->deleter = deleter;
-		ref_counter::arm(ptr);
+		ref_counter::set_factory(Factory(construct_type_signal<internal::managed_payload<T, Deleter>>));
+		ref_counter::arm();
+		bit_cast<internal::managed_payload<T, Deleter>*>(ref_counter::get_ptr())->deleter = deleter;
 	}
 
-	template <typename T, allocator_type Alloc, factory_type Factory>
+	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
 	inline constexpr managed_resource<T, Alloc, Factory>::~managed_resource() noexcept
 	{
 		if (ref_counter::is_armed() && ref_counter::free())
 		{
-			mem_rsc::m_ptr->destroy(&m_value);
+			ref_counter::get_ptr()->destroy(&m_value);
 		}
 	}
 } // namespace rsl

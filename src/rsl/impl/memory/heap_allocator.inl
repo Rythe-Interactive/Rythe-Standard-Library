@@ -5,7 +5,7 @@ namespace rsl
 {
 	inline constexpr void* heap_allocator::allocate(size_type size) noexcept
 	{
-		if constexpr (is_constant_evaluated())
+		if (is_constant_evaluated())
 		{
 			return new byte[size];
 		}
@@ -17,7 +17,7 @@ namespace rsl
 
 	inline constexpr void* heap_allocator::allocate(size_type size, size_type alignment) noexcept
 	{
-		if constexpr (is_constant_evaluated())
+		if (is_constant_evaluated())
 		{
 			return new byte[size];
 		}
@@ -29,7 +29,7 @@ namespace rsl
 
 	inline constexpr void* heap_allocator::reallocate(void* ptr, size_type oldSize, size_type newSize) noexcept
 	{
-		if constexpr (is_constant_evaluated())
+		if (is_constant_evaluated())
 		{
 			void* mem = nullptr;
 
@@ -65,7 +65,7 @@ namespace rsl
 	inline constexpr void*
 	heap_allocator::reallocate(void* ptr, size_type oldSize, size_type newSize, size_type alignment) noexcept
 	{
-		if constexpr (is_constant_evaluated())
+		if (is_constant_evaluated())
 		{
 			void* mem = nullptr;
 
@@ -100,7 +100,7 @@ namespace rsl
 
 	inline constexpr void heap_allocator::deallocate(void* ptr, size_type size) noexcept
 	{
-		if constexpr (is_constant_evaluated())
+		if (is_constant_evaluated())
 		{
 			delete[] bit_cast<byte*>(ptr);
 		}
@@ -112,7 +112,7 @@ namespace rsl
 
 	inline constexpr void heap_allocator::deallocate(void* ptr, size_type size, size_type alignment) noexcept
 	{
-		if constexpr (is_constant_evaluated())
+		if (is_constant_evaluated())
 		{
 			delete[] bit_cast<byte*>(ptr);
 		}

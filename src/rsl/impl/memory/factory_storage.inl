@@ -32,4 +32,9 @@ namespace rsl
 		: value(std::move(other.value))
 	{
 	}
+
+	inline constexpr factory_storage<polymorphic_factory>::factory_storage(polymorphic_factory& factory) noexcept
+		: value(&factory)
+	{
+	}
 } // namespace rsl

@@ -27,6 +27,21 @@ namespace rsl
 
 		Factory value;
 	};
+
+	template <>
+	struct factory_storage<polymorphic_factory> final
+	{
+		[[rythe_always_inline]] constexpr factory_storage() noexcept = default;
+
+		[[rythe_always_inline]] constexpr factory_storage(polymorphic_factory& factory) noexcept;
+
+		[[rythe_always_inline]] constexpr polymorphic_factory& operator*() noexcept { return *value; }
+		[[rythe_always_inline]] constexpr const polymorphic_factory& operator*() const noexcept { return *value; }
+		[[rythe_always_inline]] constexpr polymorphic_factory* operator->() noexcept { return value; }
+		[[rythe_always_inline]] constexpr const polymorphic_factory* operator->() const noexcept { return value; }
+
+		mutable polymorphic_factory* value = nullptr;
+	};
 } // namespace rsl
 
 #include "factory_storage.inl"

@@ -64,7 +64,7 @@ namespace rsl
 		template <typename T>
 		[[nodiscard]] [[rythe_always_inline]] constexpr T* try_get() noexcept
 		{
-			return const_cast<T*>(rsl::as_const(*this).template try_get<T>());
+			return const_cast<T*>(as_const(*this).template try_get<T>());
 		}
 
 		template <typename T>
@@ -78,7 +78,7 @@ namespace rsl
 		template <typename T>
 		[[nodiscard]] [[rythe_always_inline]] constexpr T& get()
 		{
-			return const_cast<T&>(rsl::as_const(*this).template get<T>());
+			return const_cast<T&>(as_const(*this).template get<T>());
 		}
 
 		template <typename T, typename... Args>

@@ -25,14 +25,12 @@ namespace rsl
 		};
 	} // namespace internal
 
-	template <typename T, allocator_type Alloc = default_allocator, factory_type Factory = default_factory<T>>
+	template <typename T, allocator_type Alloc = default_allocator, untyped_factory_type Factory = type_erased_factory>
 	class managed_resource :
-		public basic_reference_counter<
-			internal::managed_payload_base, Alloc, typename Factory::template retarget<internal::managed_payload_base>>
+		public basic_reference_counter<internal::managed_payload_base, Alloc, Factory>
 	{
 	protected:
-		using ref_counter = basic_reference_counter<
-			internal::managed_payload_base, Alloc, typename Factory::template retarget<internal::managed_payload_base>>;
+		using ref_counter = basic_reference_counter<internal::managed_payload_base, Alloc, Factory>;
 		using mem_rsc = ref_counter::mem_rsc;
 
 	public:

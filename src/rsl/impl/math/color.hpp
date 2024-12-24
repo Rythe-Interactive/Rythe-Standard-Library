@@ -19,7 +19,7 @@ namespace rsl::math
 			: float4(other)
 		{
 		}
-		constexpr color(rsl::float32 _r, rsl::float32 _g, rsl::float32 _b, rsl::float32 _a = 1.f)
+		constexpr color(float32 _r, float32 _g, float32 _b, float32 _a = 1.f)
 			: float4(_r, _g, _b, _a)
 		{
 		}
@@ -40,7 +40,7 @@ namespace rsl::math
 			: double4(other)
 		{
 		}
-		constexpr dcolor(rsl::float64 _r, rsl::float64 _g, rsl::float64 _b, rsl::float64 _a = 1.0)
+		constexpr dcolor(float64 _r, float64 _g, float64 _b, float64 _a = 1.0)
 			: double4(_r, _g, _b, _a)
 		{
 		}

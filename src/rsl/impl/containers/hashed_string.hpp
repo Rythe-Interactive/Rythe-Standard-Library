@@ -22,7 +22,7 @@ namespace rsl
 		constexpr hashed_string_view() noexcept = default;
 
 		constexpr hashed_string_view(const hashed_string& str) noexcept;
-		constexpr hashed_string_view(rsl::cstring str) noexcept
+		constexpr hashed_string_view(cstring str) noexcept
 			: value(hash_string(str)),
 			  str(str)
 		{
@@ -76,7 +76,7 @@ namespace rsl
 
 		constexpr basic_hashed_string() noexcept = default;
 
-		explicit constexpr basic_hashed_string(rsl::cstring str) noexcept
+		explicit constexpr basic_hashed_string(cstring str) noexcept
 			: value(hash_string(str)),
 			  str(str)
 		{

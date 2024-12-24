@@ -16,6 +16,14 @@ namespace rsl
 		return std::is_constant_evaluated();
 	}
 
+	template <typename T>
+	struct construct_type_signal_type
+	{
+	};
+
+	template <typename T>
+	constexpr construct_type_signal_type construct_type_signal = construct_type_signal_type<T>{};
+
 	template <typename T, T Val>
 	struct integral_constant
 	{
@@ -1424,4 +1432,24 @@ namespace rsl
 	struct is_ratio : bool_constant<is_ratio_v<Type>>
 	{
 	};
+
+	[[rythe_always_inline]] constexpr const void* advance(const void* ptr, size_type count) noexcept
+	{
+		return bit_cast<const byte*>(ptr) + count;
+	}
+
+    [[rythe_always_inline]] constexpr void* advance(void* ptr, size_type count) noexcept
+    {
+		return bit_cast<byte*>(ptr) + count;
+	}
+
+	[[rythe_always_inline]] constexpr const void* advance(const void* ptr, diff_type count) noexcept
+	{
+		return bit_cast<const byte*>(ptr) + count;
+	}
+
+	[[rythe_always_inline]] constexpr void* advance(void* ptr, diff_type count) noexcept
+	{
+		return bit_cast<byte*>(ptr) + count;
+	}
 } // namespace rsl

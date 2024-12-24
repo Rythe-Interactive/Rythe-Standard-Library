@@ -40,13 +40,31 @@ namespace rsl
 
 	constexpr arm_signal_type arm_signal;
 
+	namespace internal
+	{
+		template <typename T, allocator_type Alloc, factory_type Factory, bool AllowRawDataAccess, bool Untyped>
+		struct select_memory_resource
+		{
+			using type = typed_memory_resource_base<T, Alloc, Factory, AllowRawDataAccess>;
+		};
+
+		template <typename T, allocator_type Alloc, factory_type Factory, bool AllowRawDataAccess>
+		struct select_memory_resource<T, Alloc, Factory, AllowRawDataAccess, true>
+		{
+			using type = untyped_memory_resource_base<Alloc, Factory>;
+		};
+	} // namespace internal
+
 	template <
 		reference_counted Counter = manual_reference_counter, allocator_type Alloc = default_allocator,
 		factory_type Factory = default_factory<Counter>>
-	class basic_reference_counter : public memory_resource_base<Counter, Alloc, Factory, false>
+	class basic_reference_counter :
+		public internal::select_memory_resource<Counter, Alloc, Factory, false, untyped_factory_type<Factory>>::type
 	{
 	protected:
-		using mem_rsc = memory_resource_base<Counter, Alloc, Factory>;
+		constexpr static bool untypedMemoryResource = untyped_factory_type<Factory>;
+		using mem_rsc =
+			internal::select_memory_resource<Counter, Alloc, Factory, false, untyped_factory_type<Factory>>::type;
 		using allocator_storage_type = mem_rsc::allocator_storage_type;
 		using allocator_t = mem_rsc::allocator_t;
 		using factory_storage_type = mem_rsc::factory_storage_type;
@@ -76,6 +94,9 @@ namespace rsl
 
 	protected:
 		[[rythe_always_inline]] constexpr void arm(Counter* ptr) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr Counter* get_ptr() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const Counter* get_ptr() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr void set_ptr(Counter* ptr) noexcept;
 	};
 
 	using reference_counter = basic_reference_counter<>;

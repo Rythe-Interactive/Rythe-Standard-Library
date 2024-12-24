@@ -1,36 +1,230 @@
 #define RYTHE_VALIDATE
 
-#include<rsl/memory>
+#include <rsl/memory>
 
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("memory resource", "[memory]") {
-
-}
+TEST_CASE("memory resource", "[memory]") {}
 
 TEST_CASE("reference counter", "[memory]")
 {
-    SECTION("manual reference counter")
-    {
+	SECTION("manual reference counter")
+	{
 		rsl::manual_reference_counter refCounter;
+
+		REQUIRE(refCounter.count() == 0);
+		REQUIRE(!refCounter.occupied());
+		REQUIRE(refCounter.free());
+
+		rsl::size_type index = refCounter.borrow();
+
+		REQUIRE(index == 0);
+		REQUIRE(refCounter.count() == 1);
+		REQUIRE(refCounter.occupied());
+		REQUIRE(!refCounter.free());
+
+		rsl::size_type index2 = refCounter.borrow();
+
+		REQUIRE(index2 == 1);
+		REQUIRE(refCounter.count() == 2);
+		REQUIRE(refCounter.occupied());
+		REQUIRE(!refCounter.free());
+
+		refCounter.release();
+
+		for (rsl::size_type i = 0; i < 135; i++)
+		{
+			refCounter.borrow();
+			REQUIRE(refCounter.count() == (2 + i));
+		}
+
+		REQUIRE(refCounter.count() == 136);
+		REQUIRE(refCounter.occupied());
+		REQUIRE(!refCounter.free());
+
+		index = refCounter.count();
+		for (; index != 0; index--)
+		{
+			refCounter.release();
+		}
+
+		REQUIRE(refCounter.count() == 0);
+		REQUIRE(!refCounter.occupied());
+		REQUIRE(refCounter.free());
 	}
 
 	SECTION("basic reference counter")
 	{
-		rsl::reference_counter refCounter;
+		SECTION("basic functionality and copy")
+		{
+			rsl::reference_counter refCounter;
+
+			REQUIRE(!refCounter.is_armed());
+			REQUIRE(refCounter.count() == 0);
+			REQUIRE(!refCounter.occupied());
+			REQUIRE(refCounter.free());
+
+			refCounter.arm();
+
+			REQUIRE(refCounter.is_armed());
+			REQUIRE(refCounter.count() == 1);
+			REQUIRE(!refCounter.occupied());
+			REQUIRE(refCounter.free());
+
+			rsl::size_type index = refCounter.borrow();
+
+			REQUIRE(index == 1);
+			REQUIRE(refCounter.count() == 2);
+			REQUIRE(refCounter.occupied());
+			REQUIRE(!refCounter.free());
+
+			rsl::size_type index2 = refCounter.borrow();
+
+			REQUIRE(index2 == 2);
+			REQUIRE(refCounter.count() == 3);
+			REQUIRE(refCounter.occupied());
+			REQUIRE(!refCounter.free());
+
+            refCounter.release();
+            
+			REQUIRE(refCounter.count() == 2);
+			REQUIRE(refCounter.occupied());
+			REQUIRE(!refCounter.free());
+
+			{
+				rsl::reference_counter cpy = refCounter;
+
+				REQUIRE(refCounter.count() == 3);
+				REQUIRE(cpy.count() == 3);
+
+				REQUIRE(refCounter.occupied());
+				REQUIRE(!refCounter.free());
+				REQUIRE(cpy.occupied());
+				REQUIRE(!cpy.free());
+
+				cpy.release();
+
+				REQUIRE(refCounter.count() == 2);
+				REQUIRE(cpy.count() == 2);
+
+				REQUIRE(refCounter.occupied());
+				REQUIRE(!refCounter.free());
+				REQUIRE(cpy.occupied());
+				REQUIRE(!cpy.free());
+			}
+
+			REQUIRE(refCounter.count() == 1);
+			REQUIRE(!refCounter.occupied());
+			REQUIRE(refCounter.free());
+
+			REQUIRE(refCounter.is_armed());
+
+			refCounter.disarm();
+
+			REQUIRE(!refCounter.is_armed());
+			REQUIRE(refCounter.count() == 0);
+			REQUIRE(!refCounter.occupied());
+			REQUIRE(refCounter.free());
+
+			refCounter.arm();
+
+			REQUIRE(refCounter.is_armed());
+			REQUIRE(refCounter.count() == 1);
+			REQUIRE(!refCounter.occupied());
+			REQUIRE(refCounter.free());
+
+			rsl::reference_counter tmp = refCounter;
+
+			REQUIRE(refCounter.count() == 2);
+			REQUIRE(refCounter.occupied());
+			REQUIRE(!refCounter.free());
+
+			REQUIRE(refCounter.is_armed());
+
+			refCounter.disarm();
+
+			REQUIRE(!refCounter.is_armed());
+			REQUIRE(refCounter.count() == 0);
+			REQUIRE(!refCounter.occupied());
+			REQUIRE(refCounter.free());
+		}
+
+		SECTION("move")
+		{
+			rsl::reference_counter refCounter(rsl::arm_signal);
+			REQUIRE(refCounter.count() == 1);
+			REQUIRE(refCounter.is_armed());
+
+			rsl::reference_counter cpy;
+			REQUIRE(cpy.count() == 0);
+			REQUIRE(!cpy.is_armed());
+
+            cpy.arm();
+
+			REQUIRE(cpy.is_armed());
+			REQUIRE(cpy.count() == 1);
+
+            refCounter.disarm();
+			REQUIRE(!refCounter.is_armed());
+			REQUIRE(refCounter.count() == 0);
+			cpy.disarm();
+			REQUIRE(!cpy.is_armed());
+			REQUIRE(cpy.count() == 0);
+
+			{
+				rsl::reference_counter moveSrc(rsl::arm_signal);
+
+				REQUIRE(moveSrc.count() == 1);
+				REQUIRE(!moveSrc.occupied());
+				REQUIRE(moveSrc.free());
+
+				cpy = moveSrc;
+				REQUIRE(moveSrc.count() == 2);
+				REQUIRE(cpy.count() == 2);
+
+				refCounter = std::move(moveSrc);
+
+                REQUIRE(!moveSrc.is_armed());
+				REQUIRE(moveSrc.count() == 0);
+				REQUIRE(!moveSrc.occupied());
+				REQUIRE(moveSrc.free());
+
+				REQUIRE(refCounter.is_armed());
+				REQUIRE(cpy.count() == 2);
+				REQUIRE(refCounter.count() == 2);
+				REQUIRE(refCounter.occupied());
+				REQUIRE(!refCounter.free());
+			}
+
+			REQUIRE(refCounter.is_armed());
+			REQUIRE(cpy.count() == 2);
+			REQUIRE(refCounter.count() == 2);
+			REQUIRE(refCounter.occupied());
+			REQUIRE(!refCounter.free());
+
+            cpy.disarm();
+			REQUIRE(!cpy.is_armed());
+			REQUIRE(cpy.count() == 0);
+			REQUIRE(!cpy.occupied());
+			REQUIRE(cpy.free());
+
+			REQUIRE(refCounter.count() == 1);
+			REQUIRE(refCounter.is_armed());
+			REQUIRE(!refCounter.occupied());
+			REQUIRE(refCounter.free());
+
+            refCounter.disarm();
+			REQUIRE(!refCounter.is_armed());
+			REQUIRE(refCounter.count() == 0);
+			REQUIRE(!refCounter.occupied());
+			REQUIRE(refCounter.free());
+		}
 	}
 }
 
 TEST_CASE("managed resource", "[memory]")
 {
-    SECTION("construction")
-    {
+	SECTION("construction") {}
 
-    }
-
-    SECTION("reference counting")
-    {
-
-    }
+	SECTION("reference counting") {}
 }
-
