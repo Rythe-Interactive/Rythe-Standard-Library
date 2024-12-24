@@ -96,7 +96,7 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void arm(Counter* ptr) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr Counter* get_ptr() noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const Counter* get_ptr() const noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr void set_ptr(Counter* ptr) noexcept;
+		[[rythe_always_inline]] constexpr void set_ptr(Counter* ptr) noexcept;
 	};
 
 	using reference_counter = basic_reference_counter<>;

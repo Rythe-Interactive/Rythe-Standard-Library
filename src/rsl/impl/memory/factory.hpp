@@ -76,7 +76,7 @@ namespace rsl
     };
 
     template<typename T>
-    class typed_polymorphic_factory final
+	class typed_polymorphic_factory final : public polymorphic_factory
 	{
 	public:
 		using ptr_type = void*;
