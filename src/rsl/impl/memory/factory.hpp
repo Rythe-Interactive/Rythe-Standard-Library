@@ -63,7 +63,7 @@ namespace rsl
 		void destroy(T* ptr, size_type count) noexcept;
 	};
 
-    class polymorphic_factory
+	class polymorphic_factory
 	{
 	public:
 		using ptr_type = void*;
@@ -73,9 +73,9 @@ namespace rsl
 		virtual void destroy(void* ptr, size_type count) const noexcept = 0;
 		virtual size_type typeSize() const noexcept = 0;
 		virtual bool trivialCopy() const noexcept = 0;
-    };
+	};
 
-    template<typename T>
+	template <typename T>
 	class typed_polymorphic_factory final : public polymorphic_factory
 	{
 	public:
@@ -86,10 +86,10 @@ namespace rsl
 		void destroy(void* ptr, size_type count) const noexcept override;
 		size_type typeSize() const noexcept override;
 		bool trivialCopy() const noexcept override;
-    };
+	};
 
-    class type_erased_factory
-    {
+	class type_erased_factory
+	{
 	public:
 		using ptr_type = void*;
 
@@ -97,8 +97,8 @@ namespace rsl
 		using move_func = void* (*)(void* dst, void* src, size_type count);
 		using destroy_func = void (*)(void* ptr, size_type count);
 
-        type_erased_factory() noexcept = default;
-        template<typename T>
+		type_erased_factory() noexcept = default;
+		template <typename T>
 		type_erased_factory(construct_type_signal_type<T>) noexcept;
 
 		void* construct(void* ptr, size_type count) const;
@@ -107,15 +107,15 @@ namespace rsl
 		size_type typeSize() const noexcept;
 		bool trivialCopy() const noexcept;
 
-    private:
-        construct_func m_constructFunc = nullptr;
+	private:
+		construct_func m_constructFunc = nullptr;
 		move_func m_moveFunc = nullptr;
 		destroy_func m_destroyFunc = nullptr;
 		size_type m_typeSize = 0;
 		bool m_triviallyCopyable = false;
-    };
+	};
 
-    template <untyped_factory_type Factory>
+	template <untyped_factory_type Factory>
 	bool can_trivially_copy(Factory& factory) noexcept;
 
 } // namespace rsl

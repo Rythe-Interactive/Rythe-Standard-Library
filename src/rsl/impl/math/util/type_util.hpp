@@ -409,7 +409,7 @@ namespace rsl::math
 	using int_least = decltype(internal::_int_least_impl<size>());
 
 	template <size_type size>
-	using uint_least = std::make_unsigned_t<int_least<size>>;
+	using uint_least = make_unsigned_t<int_least<size>>;
 
 	template <typename TypeA, typename TypeB>
 	struct highest_epsilon
@@ -465,59 +465,6 @@ namespace rsl::math
 
 	template <typename TypeA, typename TypeB>
 	using select_vector_type_t = typename select_vector_type<TypeA, TypeB>::type;
-
-	template <typename T>
-	struct make_signed : ::std::make_signed<T>
-	{
-	};
-
-	template <>
-	struct make_signed<float>
-	{
-		using type = float;
-	};
-
-	template <>
-	struct make_signed<double>
-	{
-		using type = double;
-	};
-
-	template <>
-	struct make_signed<long double>
-	{
-		using type = long double;
-	};
-
-	template <typename T>
-	using make_signed_t = typename make_signed<T>::type;
-
-
-	template <typename T>
-	struct make_unsigned : ::std::make_unsigned<T>
-	{
-	};
-
-	template <>
-	struct make_unsigned<float>
-	{
-		using type = float;
-	};
-
-	template <>
-	struct make_unsigned<double>
-	{
-		using type = double;
-	};
-
-	template <>
-	struct make_unsigned<long double>
-	{
-		using type = long double;
-	};
-
-	template <typename T>
-	using make_unsigned_t = typename make_unsigned<T>::type;
 
 	template <typename A, typename B>
 	struct largest : conditional<(sizeof(A) > sizeof(B)), A, B>

@@ -65,7 +65,7 @@ namespace rsl
 			disarm();
 		}
 
-        mem_rsc::operator=(other);
+		mem_rsc::operator=(other);
 
 		if (is_armed())
 		{
@@ -93,7 +93,7 @@ namespace rsl
 	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
 	inline constexpr void basic_reference_counter<Counter, Alloc, Factory>::arm() noexcept
 	{
-		arm(bit_cast<Counter*>(mem_rsc::m_alloc.allocate()));
+		arm(bit_cast<Counter*>(mem_rsc::m_alloc.allocate_and_construct()));
 	}
 
 	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
@@ -106,26 +106,26 @@ namespace rsl
 
 		if (free())
 		{
-			mem_rsc::deallocate();
+			mem_rsc::destroy_and_deallocate();
 		}
 		else
 		{
 			release();
-			set_ptr(nullptr);
+			mem_rsc::set_ptr(nullptr);
 		}
 	}
 
 	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
 	inline constexpr bool basic_reference_counter<Counter, Alloc, Factory>::is_armed() const noexcept
 	{
-		return get_ptr();
+		return mem_rsc::get_ptr();
 	}
 
 	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
 	inline constexpr size_type basic_reference_counter<Counter, Alloc, Factory>::borrow() noexcept
 	{
 		rsl_assert_invalid_object(is_armed());
-		return get_ptr()->borrow();
+		return mem_rsc::get_ptr()->borrow();
 	}
 
 	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
@@ -133,20 +133,20 @@ namespace rsl
 	{
 		rsl_assert_invalid_object(is_armed());
 		rsl_assert_borrow_release_mismatch(occupied());
-		get_ptr()->release();
+		mem_rsc::get_ptr()->release();
 	}
 
 	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
 	inline constexpr size_type basic_reference_counter<Counter, Alloc, Factory>::count() const noexcept
 	{
-		return is_armed() ? get_ptr()->count() : 0ull;
+		return is_armed() ? mem_rsc::get_ptr()->count() : 0ull;
 	}
 
 	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
 	inline constexpr bool basic_reference_counter<Counter, Alloc, Factory>::occupied() const noexcept
 	{
 		// Don't count ourselves, we will release the last reference upon destruction.
-		return is_armed() && get_ptr()->count() > 1;
+		return is_armed() && mem_rsc::get_ptr()->count() > 1;
 	}
 
 	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
@@ -159,39 +159,7 @@ namespace rsl
 	inline constexpr void basic_reference_counter<Counter, Alloc, Factory>::arm(Counter* ptr) noexcept
 	{
 		rsl_assert_duplicate_object(!is_armed());
-		set_ptr(ptr);
+		mem_rsc::set_ptr(ptr);
 		borrow();
-	}
-
-	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
-	inline constexpr Counter* basic_reference_counter<Counter, Alloc, Factory>::get_ptr() noexcept
-	{
-		if constexpr (untypedMemoryResource)
-		{
-			return bit_cast<Counter*>(mem_rsc::m_ptr);
-		}
-		else
-		{
-			return mem_rsc::m_ptr;
-		}
-	}
-
-	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
-	inline constexpr const Counter* basic_reference_counter<Counter, Alloc, Factory>::get_ptr() const noexcept
-	{
-		if constexpr (untypedMemoryResource)
-		{
-			return bit_cast<const Counter*>(mem_rsc::m_ptr);
-		}
-		else
-		{
-			return mem_rsc::m_ptr;
-		}
-	}
-
-	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
-	inline constexpr void basic_reference_counter<Counter, Alloc, Factory>::set_ptr(Counter* ptr) noexcept
-	{
-		mem_rsc::m_ptr = ptr;
 	}
 } // namespace rsl

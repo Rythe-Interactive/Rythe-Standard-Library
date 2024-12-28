@@ -210,7 +210,8 @@ namespace rsl
 			template <typename Other>
 			using rebind = typename get_rebind_alias<T, Other>::type;
 
-			[[nodiscard]] static constexpr ptr_type pointer_to(conditional_t<is_void_v<Elem>, char, Elem>& val)
+			[[nodiscard]] [[rythe_always_inline]] static constexpr ptr_type
+			pointer_to(conditional_t<is_void_v<Elem>, char, Elem>& val)
 				noexcept(noexcept(T::pointer_to(val))) /* strengthened */
 			{                                          // Per LWG-3454
 				return T::pointer_to(val);
@@ -250,7 +251,8 @@ namespace rsl
 		template <typename Other>
 		using rebind = Other*;
 
-		[[nodiscard]] static constexpr ptr_type pointer_to(conditional_t<is_void_v<T>, char, T>& val) noexcept
+		[[nodiscard]] [[rythe_always_inline]] static constexpr ptr_type
+		pointer_to(conditional_t<is_void_v<T>, char, T>& val) noexcept
 		{
 			return addressof(val);
 		}
@@ -266,14 +268,14 @@ namespace rsl
 
 		using type = T;
 
-		constexpr reference_wrapper(T& value) noexcept
+		[[rythe_always_inline]] constexpr reference_wrapper(T& value) noexcept
 			: m_ptr(addressof(value))
 		{
 		}
 
 
-		[[nodiscard]] constexpr T& get() const noexcept { return *m_ptr; }
-		constexpr operator T&() const noexcept { return *m_ptr; }
+		[[nodiscard]] [[rythe_always_inline]] constexpr T& get() const noexcept { return *m_ptr; }
+		[[rythe_always_inline]] constexpr operator T&() const noexcept { return *m_ptr; }
 
 	private:
 		T* m_ptr{};
@@ -283,7 +285,7 @@ namespace rsl
 	reference_wrapper(T&) -> reference_wrapper<T>;
 
 	template <typename T>
-	[[nodiscard]] constexpr reference_wrapper<T> ref(T& value) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr reference_wrapper<T> ref(T& value) noexcept
 	{
 		return reference_wrapper<T>(value);
 	}
@@ -292,13 +294,13 @@ namespace rsl
 	void ref(const T&&) = delete;
 
 	template <class T>
-	[[nodiscard]] constexpr reference_wrapper<T> ref(reference_wrapper<T> value) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr reference_wrapper<T> ref(reference_wrapper<T> value) noexcept
 	{
 		return value;
 	}
 
 	template <typename T>
-	[[nodiscard]] constexpr reference_wrapper<const T> cref(const T& value) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr reference_wrapper<const T> cref(const T& value) noexcept
 	{
 		return reference_wrapper<const T>(value);
 	}
@@ -307,7 +309,7 @@ namespace rsl
 	void cref(const T&&) = delete;
 
 	template <typename T>
-	[[nodiscard]] constexpr reference_wrapper<const T> cref(reference_wrapper<T> value) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr reference_wrapper<const T> cref(reference_wrapper<T> value) noexcept
 	{
 		return value;
 	}

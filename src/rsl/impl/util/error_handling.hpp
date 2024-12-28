@@ -41,7 +41,7 @@ namespace rsl
 	constexpr errc no_error_code = 0;
 
 	template <typename ERRC>
-	concept error_code = std::is_enum_v<ERRC> && rsl::is_same_v<std::underlying_type_t<ERRC>, errc>;
+	concept error_code = is_enum_v<ERRC> && is_same_v<std::underlying_type_t<ERRC>, errc>;
 
 	enum struct error_severity : uint8
 	{

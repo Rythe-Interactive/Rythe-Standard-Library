@@ -6,7 +6,7 @@
 
 namespace rsl
 {
-	template <allocator_type Alloc = default_allocator, untyped_factory_type Factory = type_erased_factory>
+	template <allocator_type Alloc = default_allocator, untyped_factory_type Factory = type_erased_factory, typename UtilType = void>
 	class untyped_memory_resource_base
 	{
 	public:
@@ -31,12 +31,15 @@ namespace rsl
 		const factory_t& get_factory() const noexcept;
 
 	protected:
-		[[rythe_allocating]] [[rythe_always_inline]] constexpr void allocate(size_type count = 1)
+		[[rythe_allocating]] [[rythe_always_inline]] constexpr void allocate_and_construct(size_type count = 1)
 			noexcept(factory_traits<Factory>::template noexcept_constructable<>);
+
+		[[rythe_allocating]] [[rythe_always_inline]] constexpr void allocate_bytes(size_type count = 1)
+			noexcept;
 
 		template <typename... Args>
 		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
-		allocate_aligned(size_type count, size_type alignment)
+		allocate_aligned_and_construct(size_type count, size_type alignment)
 			noexcept(factory_traits<Factory>::template noexcept_constructable<>);
 
 		template <typename... Args>
@@ -44,19 +47,25 @@ namespace rsl
 			noexcept(factory_traits<Factory>::template noexcept_constructable<>);
 
 		template <typename... Args>
-		[[rythe_allocating]] [[rythe_always_inline]] constexpr void reallocate(size_type oldCount, size_type newCount)
+		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
+		reallocate_and_construct(size_type oldCount, size_type newCount)
 			noexcept(
 				factory_traits<Factory>::template noexcept_constructable<> && factory_traits<Factory>::noexcept_moveable
 			);
 
 		template <typename... Args>
 		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
-		reallocate_aligned(size_type oldCount, size_type newCount, size_type alignment) noexcept(
+		reallocate_aligned_and_construct(size_type oldCount, size_type newCount, size_type alignment) noexcept(
 			factory_traits<Factory>::template noexcept_constructable<> && factory_traits<Factory>::noexcept_moveable
 		);
 
-		[[rythe_always_inline]] constexpr void deallocate(size_type count = 1) noexcept;
-		[[rythe_always_inline]] constexpr void deallocate_aligned(size_type count, size_type alignment) noexcept;
+		[[rythe_always_inline]] constexpr void destroy_and_deallocate(size_type count = 1) noexcept;
+		[[rythe_always_inline]] constexpr void
+		destroy_and_deallocate_aligned(size_type count, size_type alignment) noexcept;
+                
+		[[nodiscard]] [[rythe_always_inline]] constexpr UtilType* get_ptr() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const UtilType* get_ptr() const noexcept;
+		[[rythe_always_inline]] constexpr void set_ptr(UtilType* const& ptr) noexcept;
 
 		typed_alloc_type m_alloc;
 		void* m_ptr = nullptr;
@@ -64,8 +73,7 @@ namespace rsl
 
 
 	template <
-		typename T, allocator_type Alloc = default_allocator, factory_type Factory = default_factory<T>,
-		bool AllowRawDataAccess = false>
+		typename T, allocator_type Alloc = default_allocator, factory_type Factory = default_factory<T>>
 	class typed_memory_resource_base
 	{
 	public:
@@ -81,12 +89,6 @@ namespace rsl
 		using typed_alloc_type = typed_allocator<T, Alloc, Factory>;
 
 		virtual ~typed_memory_resource_base() = default;
-
-		[[nodiscard]] constexpr ptr_type data() noexcept
-			requires AllowRawDataAccess;
-
-		[[nodiscard]] constexpr const_ptr_type data() const noexcept
-			requires AllowRawDataAccess;
 
 		void set_allocator(const allocator_storage_type& allocStorage)
 			noexcept(is_nothrow_copy_assignable_v<allocator_storage_type>);
@@ -131,9 +133,30 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void deallocate(size_type count = 1) noexcept;
 		[[rythe_always_inline]] constexpr void deallocate_aligned(size_type count, size_type alignment) noexcept;
 
+		[[nodiscard]] [[rythe_always_inline]] constexpr T* get_ptr() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const T* get_ptr() const noexcept;
+		[[rythe_always_inline]] constexpr void set_ptr(T* const& ptr) noexcept;
+
 		typed_alloc_type m_alloc;
 		ptr_type m_ptr = nullptr;
 	};
+
+	namespace internal
+	{
+		template <typename T, allocator_type Alloc, factory_type Factory, bool Untyped = untyped_factory_type<Factory>>
+		struct select_memory_resource
+		{
+			using type = typed_memory_resource_base<T, Alloc, Factory>;
+			constexpr static bool isUntyped = false;
+		};
+
+		template <typename T, allocator_type Alloc, factory_type Factory>
+		struct select_memory_resource<T, Alloc, Factory, true>
+		{
+			using type = untyped_memory_resource_base<Alloc, Factory, T>;
+			constexpr static bool isUntyped = true;
+		};
+	} // namespace internal
 } // namespace rsl
 
 #include "memory_resource_base.inl"

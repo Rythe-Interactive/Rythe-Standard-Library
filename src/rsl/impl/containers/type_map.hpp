@@ -91,13 +91,13 @@ namespace rsl
 				result.first->second.template construct<T>(this, forward<Args>(args)...);
 			}
 
-			return std::make_pair(std::ref(*(result.first->second.template cast<T>())), result.second);
+			return std::make_pair(ref(*(result.first->second.template cast<T>())), result.second);
 		}
 
 		template <typename T, typename... Args>
 		[[rythe_always_inline]] constexpr T& emplace(Args&&... args)
 		{
-			return try_emplace<T>(std::forward<Args>(args)...).first;
+			return try_emplace<T>(forward<Args>(args)...).first;
 		}
 
 		template <typename T, typename... Args>

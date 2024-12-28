@@ -1,183 +1,315 @@
-#include "contiguous_container_base.hpp"
 #pragma once
+#include "contiguous_container_base.hpp"
 
 namespace rsl
 {
-#define CCB_TEMPLATE_ARGS typename T, typename Alloc, typename Iter, typename ConstIter
-
-#define CCB_VALUE_TYPE typename contiguous_container_base<T, Alloc, Iter, ConstIter>::value_type
-
-#define CCB_ITER_TYPE typename contiguous_container_base<T, Alloc, Iter, ConstIter>::iterator_type
-
-#define CCB_CONST_ITER_TYPE typename contiguous_container_base<T, Alloc, Iter, ConstIter>::const_iterator_type
-
-#define CCB_REVERSE_ITER_TYPE typename contiguous_container_base<T, Alloc, Iter, ConstIter>::reverse_iterator_type
-
-#define CCB_CONST_REVERSE_ITER_TYPE                                                                                    \
-	typename contiguous_container_base<T, Alloc, Iter, ConstIter>::const_reverse_iterator_type
-
-#define CCB_TYPE contiguous_container_base<T, Alloc, Iter, ConstIter>
-
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr size_type CCB_TYPE::size() const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr size_type contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::size() const noexcept
 	{
 		return m_size;
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr bool CCB_TYPE::empty() const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr bool contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::empty() const noexcept
 	{
 		return m_size == 0;
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_VALUE_TYPE& CCB_TYPE::at(size_type i) noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::value_type&
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::at(size_type i) noexcept
 	{
 		return *(begin() + i);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr const CCB_VALUE_TYPE& CCB_TYPE::at(size_type i) const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr const typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::value_type&
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::at(size_type i) const noexcept
 	{
 		return *(cbegin() + i);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_VALUE_TYPE& CCB_TYPE::operator[](size_type i) noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::value_type&
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::operator[](size_type i) noexcept
 	{
 		return at(i);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr const CCB_VALUE_TYPE& CCB_TYPE::operator[](size_type i) const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr const typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::value_type&
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::operator[](size_type i) const noexcept
 	{
 		return at(i);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_VALUE_TYPE& CCB_TYPE::front() noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::view_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::view() noexcept
+	{
+		return view_type(mem_rsc::get_ptr(), m_size);
+	}
+
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_view_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::view() const noexcept
+	{
+		return const_view_type(mem_rsc::get_ptr(), m_size);
+	}
+
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::operator view_type() noexcept
+	{
+		return view();
+	}
+
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::operator const_view_type(
+	) const noexcept
+	{
+		return view();
+	}
+
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::value_type&
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::front() noexcept
 	{
 		return at(0);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr const CCB_VALUE_TYPE& CCB_TYPE::front() const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr const typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::value_type&
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::front() const noexcept
 	{
 		return at(0);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_VALUE_TYPE& CCB_TYPE::back() noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::value_type&
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::back() noexcept
 	{
 		return at(m_size - 1);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr const CCB_VALUE_TYPE& CCB_TYPE::back() const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr const typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::value_type&
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::back() const noexcept
 	{
 		return at(m_size - 1);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_ITER_TYPE CCB_TYPE::begin() noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::iterator_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::begin() noexcept
 	{
-		return CCB_ITER_TYPE(m_ptr);
+		return typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::iterator_type(m_ptr);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_CONST_ITER_TYPE CCB_TYPE::begin() const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_iterator_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::begin() const noexcept
 	{
 		return cbegin();
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_CONST_ITER_TYPE CCB_TYPE::cbegin() const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_iterator_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::cbegin() const noexcept
 	{
-		return CCB_CONST_ITER_TYPE(m_ptr);
+		return const_iterator_type(mem_rsc::get_ptr());
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_ITER_TYPE CCB_TYPE::end() noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::iterator_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::end() noexcept
 	{
-		return CCB_ITER_TYPE(m_ptr + m_size);
+		return iterator_type(mem_rsc::get_ptr() + m_size);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_CONST_ITER_TYPE CCB_TYPE::end() const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_iterator_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::end() const noexcept
 	{
 		return cend();
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_CONST_ITER_TYPE CCB_TYPE::cend() const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_iterator_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::cend() const noexcept
 	{
-		return CCB_CONST_ITER_TYPE(m_ptr + m_size);
+		return const_iterator_type(mem_rsc::get_ptr() + m_size);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_REVERSE_ITER_TYPE CCB_TYPE::rbegin() noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::reverse_iterator_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::rbegin() noexcept
 	{
-		return CCB_REVERSE_ITER_TYPE(m_ptr + m_size - 1);
+		return reverse_iterator_type(mem_rsc::get_ptr() + m_size - 1);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_CONST_REVERSE_ITER_TYPE CCB_TYPE::rbegin() const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_reverse_iterator_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::rbegin() const noexcept
 	{
 		return crbegin();
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_CONST_REVERSE_ITER_TYPE CCB_TYPE::crbegin() const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_reverse_iterator_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::crbegin() const noexcept
 	{
-		return CCB_CONST_REVERSE_ITER_TYPE(m_ptr + m_size - 1);
+		return const_reverse_iterator_type(mem_rsc::get_ptr() + m_size - 1);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_REVERSE_ITER_TYPE CCB_TYPE::rend() noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::reverse_iterator_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::rend() noexcept
 	{
-		return CCB_REVERSE_ITER_TYPE(m_ptr - 1);
+		return reverse_iterator_type(mem_rsc::get_ptr() - 1);
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_CONST_REVERSE_ITER_TYPE CCB_TYPE::rend() const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_reverse_iterator_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::rend() const noexcept
 	{
 		return crend();
 	}
 
-	template <CCB_TEMPLATE_ARGS>
-	[[nodiscard]]
-	constexpr CCB_CONST_REVERSE_ITER_TYPE CCB_TYPE::crend() const noexcept
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+
+	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_reverse_iterator_type
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::crend() const noexcept
 	{
-		return CCB_CONST_REVERSE_ITER_TYPE(m_ptr - 1);
+		return const_reverse_iterator_type(mem_rsc::get_ptr() - 1);
 	}
 
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::copy_assign_from_unsafe_impl(
+		size_type offset, size_type end, const value_type* src
+	) noexcept(copy_assign_noexcept)
+	{
+		for (auto to = begin() + offset; to != begin() + end; to++, src++)
+		{
+			*to = *src;
+		}
+	}
 
-#undef CCB_TEMPLATE_ARGS
-#undef CCB_VALUE_TYPE
-#undef CCB_ITER_TYPE
-#undef CCB_CONST_ITER_TYPE
-#undef CCB_REVERSE_ITER_TYPE
-#undef CCB_CONST_REVERSE_ITER_TYPE
-#undef CCB_TYPE
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr void
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::copy_construct_from_unsafe_impl(
+		size_type offset, size_type end, const value_type* src
+	) noexcept(copy_construct_noexcept)
+	{
+		for (auto to = begin() + offset; to != begin() + end; to++, src++)
+		{
+			new (to_address(to)) value_type(*src);
+		}
+	}
+
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::move_assign_from_unsafe_impl(
+		size_type offset, size_type end, const value_type* src
+	) noexcept(move_assign_noexcept)
+	{
+		for (auto to = begin() + offset; to != begin() + end; to++, src++)
+		{
+			*to_address(to) = move(*src);
+		}
+	}
+
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	template <typename... Args>
+	inline constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::emplace_unsafe_impl(
+		size_type offset, size_type end, Args&&... args
+	) noexcept(construct_noexcept<Args...>)
+	{
+		for (auto to = begin() + offset; to != begin() + end; to++)
+		{
+			new (to_address(to)) value_type(forward<Args>(args)...);
+		}
+	}
+
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr void
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::move_construct_from_unsafe_impl(
+		size_type offset, size_type end, const value_type* src
+	) noexcept(move_construct_noexcept)
+	{
+		for (auto to = begin() + offset; to != begin() + end; to++, src++)
+		{
+			new (to_address(to)) value_type(move(*src));
+		}
+	}
+
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::reset_unsafe_impl(
+		size_type offset, size_type end
+	) noexcept
+	{
+		for (size_type i = offset; i < end; i++)
+		{
+			at(i).~value_type();
+		}
+	}
+
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::copy_assign_impl(
+		const value_type* src, size_type srcSize
+	) noexcept(copy_assign_noexcept && copy_construct_noexcept)
+	{
+		if (m_size >= srcSize)
+		{
+			reset_unsafe_impl(srcSize, m_size);
+			m_size = srcSize;
+			copy_assign_from_unsafe_impl(0, m_size, src);
+		}
+		else
+		{
+			copy_assign_from_unsafe_impl(0, m_size, src);
+			copy_construct_from_unsafe_impl(m_size, srcSize, src);
+			m_size = srcSize;
+		}
+	}
 } // namespace rsl

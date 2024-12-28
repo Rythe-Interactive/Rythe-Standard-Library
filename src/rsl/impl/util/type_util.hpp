@@ -1,11 +1,13 @@
 #pragma once
+#include "../defines.hpp"
+
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(5046)
 #include <concepts>
-#include <ratio>
 #include <utility>
+RYTHE_MSVC_SUPPRESS_WARNING_POP
 
 #include "common.hpp"
 
-#include "../defines.hpp"
 #include "string_util.hpp"
 
 namespace rsl
@@ -155,77 +157,124 @@ namespace rsl
 
 	template <typename T>
 	using is_always_equal_t = is_always_equal<T>::type;
+    
+	template <size_type>
+	struct select_sized_integer;
 
-	template <typename Derived, typename Base>
-	concept derived_from =
-		::rsl::is_base_of_v<Base, Derived> && ::rsl::is_convertible_v<const volatile Derived*, const volatile Base*>;
+	template <>
+	struct select_sized_integer<1>
+	{
+		using type = int8;
+	};
 
-	template <typename From, typename To>
-	concept convertible_to = ::rsl::is_convertible_v<From, To> && requires { static_cast<To>(::rsl::declval<From>()); };
+	template <>
+	struct select_sized_integer<2>
+	{
+		using type = int16;
+	};
 
-	template <typename LHS, typename RHS>
-	concept assignable_from =
-		::rsl::is_lvalue_reference_v<LHS> &&
-		::std::common_reference_with<const ::rsl::remove_reference_t<LHS>&, const ::rsl::remove_reference_t<RHS>&> &&
-		requires(LHS lhs, RHS&& rhs) {
-			{ lhs = static_cast<RHS&&>(rhs) } -> same_as<LHS>;
-		};
+	template <>
+	struct select_sized_integer<4>
+	{
+		using type = int32;
+	};
+
+	template <>
+	struct select_sized_integer<8>
+	{
+		using type = int64;
+	};
+
+	template <size_type S>
+	using select_sized_integer_t = typename select_sized_integer<S>::type;
 
 	template <typename T>
-	concept destructible = ::std::destructible<T>; // Compiler magic behind the scenes.
+	struct make_signed
+	{
+		static_assert(is_nonbool_integral_v<T> || is_enum_v<T>);
 
-	template <typename T, typename... Args>
-	concept constructible_from = ::std::constructible_from<T, Args...>; // Compiler magic behind the scenes.
+		using type = select_sized_integer_t<sizeof(remove_cv_t<T>)>;
+	};
 
-	template <typename T>
-	concept default_initializable = constructible_from<T> && requires {
-		T{};
-		::new (static_cast<void*>(nullptr)) T; // is-default-initializable<T>
+	template <>
+	struct make_signed<float>
+	{
+		using type = float;
+	};
+
+	template <>
+	struct make_signed<double>
+	{
+		using type = double;
+	};
+
+	template <>
+	struct make_signed<long double>
+	{
+		using type = long double;
 	};
 
 	template <typename T>
-	concept move_constructible = constructible_from<T, T> && convertible_to<T, T>;
+	using make_signed_t = typename make_signed<T>::type;
+    
+	template <size_type>
+	struct select_sized_unsigned_integer;
 
-	template <typename T>
-	concept copy_constructible = move_constructible<T> && constructible_from<T, T&> && convertible_to<T&, T> &&
-								 constructible_from<T, const T&> && convertible_to<const T&, T> &&
-								 constructible_from<T, const T> && convertible_to<const T, T>;
-
-	template <typename T>
-	concept movable = is_object_v<T> && move_constructible<T> && assignable_from<T&, T> && ::std::swappable<T>;
-
-	template <typename T>
-	concept copyable = copy_constructible<T> && movable<T> && assignable_from<T&, T&> &&
-					   assignable_from<T&, const T&> && assignable_from<T&, const T>;
-
-	namespace internal
+	template <>
+	struct select_sized_unsigned_integer<1>
 	{
-		template <typename T>
-		struct func_traits
-		{
-			static_assert(
-				::rsl::integral_constant<bool_t<T>, false>::value, "Template param needs to be of function type."
-			);
-		};
+		using type = uint8;
+	};
 
-		template <typename Ret, typename... Args>
-		struct func_traits<Ret(Args...)>
-		{
-			using return_type = Ret;
-			using parameter_list = type_sequence<Args...>;
+	template <>
+	struct select_sized_unsigned_integer<2>
+	{
+		using type = uint16;
+	};
 
-			template <typename Func>
-			auto test_func(Func&&) -> decltype(std::invoke(rsl::declval<Func>(), rsl::declval<Args>()...));
+	template <>
+	struct select_sized_unsigned_integer<4>
+	{
+		using type = uint32;
+	};
 
-			template <typename Func>
-			constexpr static bool is_compatible_with = requires(Func&& func, Args&&... args) {
-				{ std::invoke(forward<Func>(func), forward<Args>(args)...) } -> convertible_to<Ret>;
-			};
-		};
-	} // namespace internal
+	template <>
+	struct select_sized_unsigned_integer<8>
+	{
+		using type = uint64;
+	};
 
-	template <typename Func, typename FuncType>
-	concept invocable = internal::func_traits<FuncType>::template is_compatible_with<Func>;
+	template <size_type S>
+	using select_sized_unsigned_integer_t = typename select_sized_unsigned_integer<S>::type;
+
+	template <typename T>
+	struct make_unsigned
+	{
+		static_assert(is_nonbool_integral_v<T> || is_enum_v<T>);
+
+		using type = select_sized_unsigned_integer_t<sizeof(remove_cv_t<T>)>;
+	};
+
+	template <>
+	struct make_unsigned<float>
+	{
+		using type = float;
+	};
+
+	template <>
+	struct make_unsigned<double>
+	{
+		using type = double;
+	};
+
+	template <>
+	struct make_unsigned<long double>
+	{
+		using type = long double;
+	};
+
+	template <typename T>
+	using make_unsigned_t = typename make_unsigned<T>::type;
 
 #define RYTHE_HAS_FUNC(x)                                                                                              \
 	namespace internal                                                                                                 \

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../util/primitives.hpp"
 #include "../util/common.hpp"
+#include "../util/primitives.hpp"
 #include "string_view.hpp"
 
 namespace rsl

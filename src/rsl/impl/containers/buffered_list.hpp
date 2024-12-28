@@ -22,107 +22,7 @@ namespace rsl
 		using view_type = std::span<value_type>;
 		using const_view_type = std::span<const value_type>;
 
-	private:
-		union value_container
-		{
-			value_type value;
-			byte dummy;
-		};
-
-		value_container m_buffer[maxSize];
-		size_type m_size;
-
-		constexpr static size_type validate_size(size_type newSize) noexcept
-		{
-			return newSize < maxSize ? newSize : maxSize;
-		}
-
-		constexpr static bool copy_assign_noexcept = std::is_nothrow_copy_assignable_v<value_type>;
-		constexpr static bool copy_construct_noexcept = std::is_nothrow_copy_constructible_v<value_type>;
-		constexpr static bool move_assign_noexcept = std::is_nothrow_move_assignable_v<value_type>;
-		constexpr static bool move_construct_noexcept = std::is_nothrow_move_constructible_v<value_type>;
-
-		template <typename... Args>
-		constexpr static bool construct_noexcept = std::is_nothrow_constructible_v<value_type, Args...>;
-
-		[[rythe_always_inline]] constexpr void
-		copy_assign_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
-			noexcept(copy_assign_noexcept)
-		{
-			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
-			{
-				to->value = *src;
-			}
-		}
-
-		[[rythe_always_inline]] constexpr void
-		copy_construct_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
-			noexcept(copy_construct_noexcept)
-		{
-			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
-			{
-				new (&to->value) value_type(*src);
-			}
-		}
-
-		[[rythe_always_inline]] constexpr void
-		move_assign_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
-			noexcept(move_assign_noexcept)
-		{
-			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
-			{
-				to->value = rsl::move(*src);
-			}
-		}
-
-		[[rythe_always_inline]] constexpr void
-		move_construct_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
-			noexcept(move_construct_noexcept)
-		{
-			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
-			{
-				new (&to->value) value_type(rsl::move(*src));
-			}
-		}
-
-		template <typename... Args>
-		[[rythe_always_inline]] constexpr void emplace_unsafe_impl(size_type begin, size_type end, Args&&... args)
-			noexcept(construct_noexcept<Args...>)
-		{
-			for (auto* to = m_buffer + begin; to != m_buffer + end; to++)
-			{
-				new (&to->value) value_type(rsl::forward<Args>(args)...);
-			}
-		}
-
-		[[rythe_always_inline]] constexpr void reset_unsafe_impl(size_type begin, size_type end) noexcept
-		{
-			for (size_type i = begin; i < end; i++)
-			{
-				m_buffer[i].value.~value_type();
-			}
-		}
-
-		[[rythe_always_inline]] constexpr void copy_assign_impl(const value_type* src, size_type srcSize)
-			noexcept(copy_assign_noexcept && copy_construct_noexcept)
-		{
-			if (m_size >= srcSize)
-			{
-				reset_unsafe_impl(srcSize, m_size);
-				m_size = srcSize;
-				copy_assign_from_unsafe_impl(0, m_size, src);
-			}
-			else
-			{
-				size_type effectiveSize = validate_size(srcSize);
-				copy_assign_from_unsafe_impl(0, m_size, src);
-				copy_construct_from_unsafe_impl(m_size, effectiveSize, src);
-				m_size = effectiveSize;
-			}
-		}
-
-	public:
-		constexpr buffered_list() noexcept = default;
+		[[rythe_always_inline]] constexpr buffered_list() noexcept = default;
 
 		[[rythe_always_inline]] constexpr buffered_list(const buffered_list& src) noexcept(copy_construct_noexcept)
 			: m_size(validate_size(src.m_size))
@@ -300,6 +200,105 @@ namespace rsl
 		[[rythe_always_inline]] constexpr const_reverse_iterator crbegin() const noexcept
 		{
 			return const_reverse_iterator(&m_buffer->value);
+		}
+
+	private:
+		union value_container
+		{
+			value_type value;
+			byte dummy;
+		};
+
+		value_container m_buffer[maxSize];
+		size_type m_size;
+
+		constexpr static size_type validate_size(size_type newSize) noexcept
+		{
+			return newSize < maxSize ? newSize : maxSize;
+		}
+
+		constexpr static bool copy_assign_noexcept = is_nothrow_copy_assignable_v<value_type>;
+		constexpr static bool copy_construct_noexcept = is_nothrow_copy_constructible_v<value_type>;
+		constexpr static bool move_assign_noexcept = is_nothrow_move_assignable_v<value_type>;
+		constexpr static bool move_construct_noexcept = is_nothrow_move_constructible_v<value_type>;
+
+		template <typename... Args>
+		constexpr static bool construct_noexcept = is_nothrow_constructible_v<value_type, Args...>;
+
+		[[rythe_always_inline]] constexpr void
+		copy_assign_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
+			noexcept(copy_assign_noexcept)
+		{
+			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
+			{
+				to->value = *src;
+			}
+		}
+
+		[[rythe_always_inline]] constexpr void
+		copy_construct_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
+			noexcept(copy_construct_noexcept)
+		{
+			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
+			{
+				new (&to->value) value_type(*src);
+			}
+		}
+
+		[[rythe_always_inline]] constexpr void
+		move_assign_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
+			noexcept(move_assign_noexcept)
+		{
+			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
+			{
+				to->value = rsl::move(*src);
+			}
+		}
+
+		[[rythe_always_inline]] constexpr void
+		move_construct_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
+			noexcept(move_construct_noexcept)
+		{
+			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
+			{
+				new (&to->value) value_type(rsl::move(*src));
+			}
+		}
+
+		template <typename... Args>
+		[[rythe_always_inline]] constexpr void emplace_unsafe_impl(size_type begin, size_type end, Args&&... args)
+			noexcept(construct_noexcept<Args...>)
+		{
+			for (auto* to = m_buffer + begin; to != m_buffer + end; to++)
+			{
+				new (&to->value) value_type(rsl::forward<Args>(args)...);
+			}
+		}
+
+		[[rythe_always_inline]] constexpr void reset_unsafe_impl(size_type begin, size_type end) noexcept
+		{
+			for (size_type i = begin; i < end; i++)
+			{
+				m_buffer[i].value.~value_type();
+			}
+		}
+
+		[[rythe_always_inline]] constexpr void copy_assign_impl(const value_type* src, size_type srcSize)
+			noexcept(copy_assign_noexcept && copy_construct_noexcept)
+		{
+			if (m_size >= srcSize)
+			{
+				reset_unsafe_impl(srcSize, m_size);
+				m_size = srcSize;
+				copy_assign_from_unsafe_impl(0, m_size, src);
+			}
+			else
+			{
+				size_type effectiveSize = validate_size(srcSize);
+				copy_assign_from_unsafe_impl(0, m_size, src);
+				copy_construct_from_unsafe_impl(m_size, effectiveSize, src);
+				m_size = effectiveSize;
+			}
 		}
 	};
 

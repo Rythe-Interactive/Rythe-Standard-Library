@@ -26,7 +26,8 @@ namespace rsl
 	{
 		allocator_storage() noexcept;
 		[[rythe_always_inline]] constexpr allocator_storage(const allocator_storage& other) noexcept = default;
-		[[rythe_always_inline]] constexpr allocator_storage& operator=(const allocator_storage& other) noexcept = default;
+		[[rythe_always_inline]] constexpr allocator_storage& operator=(const allocator_storage& other
+		) noexcept = default;
 
 		[[rythe_always_inline]] constexpr allocator_storage(polymorphic_allocator& alloc) noexcept;
 

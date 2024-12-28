@@ -8,6 +8,7 @@ namespace rsl
 {
 	template <typename FuncSig>
 	class delegate;
+
 	template <
 		typename FuncSig, template <typename, typename> typename ContainerType = std::vector,
 		template <typename> typename Allocator = std::allocator>

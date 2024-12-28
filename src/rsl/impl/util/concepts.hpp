@@ -1,12 +1,16 @@
 #pragma once
+#include "../defines.hpp"
+
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(5046)
 #include <concepts>
+RYTHE_MSVC_SUPPRESS_WARNING_POP
 
 #include "common.hpp"
 
 namespace rsl
 {
 	template <class T>
-	concept enum_type = std::is_enum_v<T>;
+	concept enum_type = is_enum_v<T>;
 
 	template <typename Func>
 	concept invocable_undetermined = is_invocable_any_v<Func>;
@@ -55,4 +59,141 @@ namespace rsl
 
 	template <typename T>
 	concept nothrow_move_constructible = is_nothrow_move_constructible_v<T>;
+
+	template <typename Derived, typename Base>
+	concept derived_from =
+		::rsl::is_base_of_v<Base, Derived> && ::rsl::is_convertible_v<const volatile Derived*, const volatile Base*>;
+
+	template <typename From, typename To>
+	concept convertible_to = ::rsl::is_convertible_v<From, To> && requires { static_cast<To>(::rsl::declval<From>()); };
+
+	template <typename LHS, typename RHS>
+	concept common_reference_with =
+		requires {
+			typename common_reference_t<LHS, RHS>;
+			typename common_reference_t<RHS, LHS>;
+		} && same_as<common_reference_t<LHS, RHS>, common_reference_t<RHS, LHS>> &&
+		convertible_to<LHS, common_reference_t<LHS, RHS>> && convertible_to<RHS, common_reference_t<LHS, RHS>>;
+
+	template <typename LHS, typename RHS>
+	concept assignable_from =
+		::rsl::is_lvalue_reference_v<LHS> &&
+		common_reference_with<const ::rsl::remove_reference_t<LHS>&, const ::rsl::remove_reference_t<RHS>&> &&
+		requires(LHS lhs, RHS&& rhs) {
+			{ lhs = static_cast<RHS&&>(rhs) } -> same_as<LHS>;
+		};
+
+	template <typename T>
+	concept destructible = ::std::destructible<T>; // Compiler magic behind the scenes.
+
+	template <typename T, typename... Args>
+	concept constructible_from = ::std::constructible_from<T, Args...>; // Compiler magic behind the scenes.
+
+	template <typename T>
+	concept default_initializable = constructible_from<T> && requires {
+		T{};
+		::new (static_cast<void*>(nullptr)) T; // is-default-initializable<T>
+	};
+
+	template <typename T>
+	concept move_constructible = constructible_from<T, T> && convertible_to<T, T>;
+
+	template <typename T>
+	concept copy_constructible = move_constructible<T> && constructible_from<T, T&> && convertible_to<T&, T> &&
+								 constructible_from<T, const T&> && convertible_to<const T&, T> &&
+								 constructible_from<T, const T> && convertible_to<const T, T>;
+
+	template <typename T>
+	concept boolean_testable = convertible_to<T, bool> && requires(T&& val) {
+		{ !static_cast<T&&>(val) } -> convertible_to<bool>;
+	};
+
+	namespace internal
+	{
+		template <typename LHS, typename RHS>
+		concept half_equality_comparable =
+			requires(const remove_reference_t<LHS>& lhs, const remove_reference_t<RHS>& rhs) {
+				{ lhs == rhs } -> boolean_testable;
+				{ lhs != rhs } -> boolean_testable;
+			};
+
+		template <typename LHS, typename RHS>
+		concept weakly_equality_comparable_with =
+			internal::half_equality_comparable<LHS, RHS> && internal::half_equality_comparable<RHS, LHS>;
+	} // namespace internal
+
+	template <typename T>
+	concept equality_comparable = internal::half_equality_comparable<T, T>;
+
+	template <typename LHS, typename RHS>
+	concept equality_comparable_with =
+		equality_comparable<LHS> && equality_comparable<RHS> &&
+		common_reference_with<const remove_reference_t<LHS>&, const remove_reference_t<RHS>&> &&
+		equality_comparable<common_reference_t<const remove_reference_t<LHS>&, const remove_reference_t<RHS>&>> &&
+		internal::weakly_equality_comparable_with<LHS, RHS>;
+
+	namespace internal
+	{
+		template <typename LHS, typename RHS>
+		concept half_ordered = requires(const remove_reference_t<LHS>& lhs, const remove_reference_t<RHS>& rhs) {
+			{ lhs < rhs } -> boolean_testable;
+			{ lhs > rhs } -> boolean_testable;
+			{ lhs <= rhs } -> boolean_testable;
+			{ lhs >= rhs } -> boolean_testable;
+		};
+
+		template <typename LHS, typename RHS>
+		concept partially_ordered_with = half_ordered<LHS, RHS> && half_ordered<RHS, LHS>;
+	} // namespace internal
+
+	template <typename T>
+	concept totally_ordered = equality_comparable<T> && internal::half_ordered<T, T>;
+
+		template <typename LHS, typename RHS>
+	concept totally_ordered_with =
+		totally_ordered<LHS> && totally_ordered<RHS> && equality_comparable_with<LHS, RHS> &&
+		totally_ordered<common_reference_t<const remove_reference_t<LHS>&, const remove_reference_t<RHS>&>> &&
+		internal::partially_ordered_with<LHS, RHS>;
+
+	template <typename T>
+	concept movable = is_object_v<T> && move_constructible<T> && assignable_from<T&, T> && ::std::swappable<T>;
+
+	template <typename T>
+	concept copyable = copy_constructible<T> && movable<T> && assignable_from<T&, T&> &&
+					   assignable_from<T&, const T&> && assignable_from<T&, const T>;
+
+	template <typename T>
+	concept semiregular = copyable<T> && default_initializable<T>;
+
+	template <typename T>
+	concept regular = semiregular<T> && equality_comparable<T>;
+
+	namespace internal
+	{
+		template <typename T>
+		struct func_traits
+		{
+			static_assert(
+				::rsl::integral_constant<bool_t<T>, false>::value, "Template param needs to be of function type."
+			);
+		};
+
+		template <typename Ret, typename... Args>
+		struct func_traits<Ret(Args...)>
+		{
+			using return_type = Ret;
+			using parameter_list = type_sequence<Args...>;
+
+			template <typename Func>
+			auto test_func(Func&&) -> decltype(std::invoke(rsl::declval<Func>(), rsl::declval<Args>()...));
+
+			template <typename Func>
+			constexpr static bool is_compatible_with = requires(Func&& func, Args&&... args) {
+				{ std::invoke(forward<Func>(func), forward<Args>(args)...) } -> convertible_to<Ret>;
+			};
+		};
+	} // namespace internal
+
+	template <typename Func, typename FuncType>
+	concept invocable = internal::func_traits<FuncType>::template is_compatible_with<Func>;
 } // namespace rsl

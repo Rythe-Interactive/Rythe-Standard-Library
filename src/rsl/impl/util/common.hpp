@@ -99,6 +99,14 @@ namespace rsl
 	{
 	};
 
+	template <typename T>
+	constexpr bool is_enum_v = ::std::is_enum_v<T>; // Compiler magic behind the scenes.
+
+	template <typename T>
+	struct is_enum : bool_constant<is_enum_v<T>>
+	{
+	};
+
 	template <bool Test, typename TrueType, typename FalseType>
 	struct conditional
 	{
@@ -326,6 +334,14 @@ namespace rsl
 
 	template <typename T>
 	struct is_signed : bool_constant<is_signed_v<T>>
+	{
+	};
+
+	template <typename T>
+	constexpr bool is_nonbool_integral_v = is_integral_v<T> && !is_same_v<remove_cv_t<T>, bool>;
+
+	template <typename T>
+	struct is_nonbool_integral : bool_constant<is_nonbool_integral_v<T>>
 	{
 	};
 
@@ -666,6 +682,19 @@ namespace rsl
 		{
 			return memcpy(dst, src, count);
 		}
+	}
+
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr T* to_address(T* const val) noexcept
+	{
+		static_assert(!is_function_v<T>);
+		return val;
+	}
+
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto to_address(const T& val) noexcept
+	{
+		return to_address(val.operator->());
 	}
 
 	template <typename>
@@ -1438,8 +1467,8 @@ namespace rsl
 		return bit_cast<const byte*>(ptr) + count;
 	}
 
-    [[rythe_always_inline]] constexpr void* advance(void* ptr, size_type count) noexcept
-    {
+	[[rythe_always_inline]] constexpr void* advance(void* ptr, size_type count) noexcept
+	{
 		return bit_cast<byte*>(ptr) + count;
 	}
 
