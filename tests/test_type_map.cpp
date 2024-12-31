@@ -46,6 +46,7 @@ namespace
 		{
 		}
 	};
+
 	struct test2
 	{
 		int value = CONST2;
@@ -55,6 +56,7 @@ namespace
 		{
 		}
 	};
+
 	struct test3
 	{
 		int value = CONST3;
@@ -64,6 +66,7 @@ namespace
 		{
 		}
 	};
+
 	struct test4
 	{
 		int value = CONST4;

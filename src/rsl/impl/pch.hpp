@@ -14,6 +14,7 @@
 #include "containers/buffered_string.hpp"
 #include "containers/constexpr_string.hpp"
 #include "containers/delegate.hpp"
+#include "containers/dynamic_array.hpp"
 #include "containers/multicast_delegate.hpp"
 #include "containers/type_map.hpp"
 

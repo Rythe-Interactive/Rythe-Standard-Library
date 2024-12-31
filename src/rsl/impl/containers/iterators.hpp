@@ -84,8 +84,9 @@ namespace rsl
 
 	template <typename T>
 		requires is_object_v<T>
-	struct indirectly_readable_traits<T*> : remove_cv_t<T>
+	struct indirectly_readable_traits<T*>
 	{
+		using value_type = remove_cv_t<T>;
 	};
 
 	template <typename T>

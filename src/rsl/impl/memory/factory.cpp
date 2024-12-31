@@ -27,4 +27,9 @@ namespace rsl
 	{
 		return m_triviallyCopyable;
 	}
+
+	id_type type_erased_factory::typeId() const noexcept
+	{
+		return m_typeId;
+	}
 } // namespace rsl

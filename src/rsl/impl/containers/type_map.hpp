@@ -137,7 +137,7 @@ namespace rsl
 		template <typename T>
 		static void deallocate_entry(basic_type_map& map, entry_item& entry)
 		{
-			alloc_type<T>(map.m_allocator).deallocate(entry.template cast<T>());
+			alloc_type<T>(map.m_allocator).destroy_and_deallocate(entry.template cast<T>());
 			entry.data = nullptr;
 			entry.map = nullptr;
 			entry.deallocate_entry = nullptr;
@@ -175,7 +175,7 @@ namespace rsl
 			template <typename T, typename... Args>
 			void construct(basic_type_map* mapPtr, Args&&... args)
 			{
-				data = alloc_type<T>(mapPtr->m_allocator).allocate(1, forward<Args>(args)...);
+				data = alloc_type<T>(mapPtr->m_allocator).allocate_and_construct(1, forward<Args>(args)...);
 				map = mapPtr;
 				deallocate_entry = &basic_type_map::deallocate_entry<T>;
 			}

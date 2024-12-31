@@ -33,14 +33,46 @@ namespace rsl
 		using mem_rsc = ref_counter::mem_rsc;
 
 	public:
-		[[rythe_always_inline]] constexpr managed_resource(nullptr_type) noexcept;
+		[[rythe_always_inline]] constexpr managed_resource(nullptr_type)
+			noexcept(is_nothrow_constructible_v<ref_counter>);
+
+		[[rythe_always_inline]] explicit managed_resource(const allocator_storage_type& allocStorage)
+			noexcept(is_nothrow_constructible_v<ref_counter, const allocator_storage_type&>);
+
+		[[rythe_always_inline]] explicit managed_resource(const factory_storage_type& factoryStorage)
+			noexcept(is_nothrow_constructible_v<ref_counter, const factory_storage_type&>);
+
+		[[rythe_always_inline]] managed_resource(
+			const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage
+		) noexcept(is_nothrow_constructible_v<ref_counter, const allocator_storage_type&, const factory_storage_type&>);
 
 		template <typename Deleter, typename... Args>
-		[[rythe_always_inline]] constexpr explicit managed_resource(Deleter deleter, Args&&... args) noexcept;
+		[[rythe_always_inline]] constexpr explicit managed_resource(Deleter deleter, Args&&... args)
+			noexcept(is_nothrow_constructible_v<ref_counter> && is_nothrow_constructible_v<T, Args...>);
+
+		template <typename Deleter, typename... Args>
+		[[rythe_always_inline]] managed_resource(
+			const allocator_storage_type& allocStorage, Deleter deleter, Args&&... args
+		) noexcept(is_nothrow_constructible_v<ref_counter, const allocator_storage_type&> && is_nothrow_constructible_v<T, Args...>);
+
+		template <typename Deleter, typename... Args>
+		[[rythe_always_inline]] managed_resource(
+			const factory_storage_type& factoryStorage, Deleter deleter, Args&&... args
+		) noexcept(is_nothrow_constructible_v<ref_counter, const factory_storage_type&> && is_nothrow_constructible_v<T, Args...>);
+
+		template <typename Deleter, typename... Args>
+		[[rythe_always_inline]] managed_resource(
+			const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage, Deleter deleter,
+			Args&&... args
+		) noexcept(is_nothrow_constructible_v<ref_counter, const allocator_storage_type&, const factory_storage_type&> && is_nothrow_constructible_v<T, Args...>);
 
 		[[rythe_always_inline]] constexpr managed_resource() noexcept = default;
 
 		[[rythe_always_inline]] constexpr ~managed_resource() noexcept;
+
+		template <typename Deleter, typename... Args>
+		[[rythe_always_inline]] constexpr void arm(Deleter deleter, Args&&... args)
+			noexcept(is_nothrow_constructible_v<T, Args...>);
 
 		[[rythe_always_inline]] constexpr T* get() noexcept { return &m_value; }
 		[[rythe_always_inline]] constexpr const T* get() const noexcept { return &m_value; }
@@ -51,7 +83,11 @@ namespace rsl
 		[[rythe_always_inline]] constexpr const T* operator->() const noexcept { return &m_value; }
 
 	private:
-		T m_value;
+		union
+		{
+			T m_value;
+			byte m_dummy;
+		};
 	};
 } // namespace rsl
 

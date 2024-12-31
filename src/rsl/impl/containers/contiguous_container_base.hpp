@@ -18,15 +18,37 @@ namespace rsl
 		using const_reverse_iterator_type = std::reverse_iterator<const_iterator_type>;
 		using view_type = std::span<value_type>;
 		using const_view_type = std::span<const value_type>;
+		using allocator_storage_type = mem_rsc::allocator_storage_type;
+		using allocator_t = mem_rsc::allocator_t;
+		using factory_storage_type = mem_rsc::factory_storage_type;
+		using factory_t = mem_rsc::factory_t;
+
+		[[rythe_always_inline]] constexpr contiguous_container_base()
+			noexcept(is_nothrow_constructible_v<mem_rsc>) =
+			default;
+		virtual ~contiguous_container_base() = default;
+
+		[[rythe_always_inline]] explicit contiguous_container_base(const allocator_storage_type& allocStorage
+		) noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>);
+		[[rythe_always_inline]] explicit contiguous_container_base(const factory_storage_type& factoryStorage)
+			noexcept(is_nothrow_constructible_v<mem_rsc, const factory_storage_type&>);
+		[[rythe_always_inline]] contiguous_container_base(
+			const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage
+		) noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&, const factory_storage_type&>);
+
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr size_type size() const noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool empty() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr size_type capacity() const noexcept;
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr value_type& at(size_type i) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type& at(size_type i) const noexcept;
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr value_type& operator[](size_type i) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type& operator[](size_type i) const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr value_type* data() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type* data() const noexcept;
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr view_type view() noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const_view_type view() const noexcept;
@@ -84,12 +106,10 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void emplace_unsafe_impl(size_type offset, size_type end, Args&&... args)
 			noexcept(construct_noexcept<Args...>);
 
-		[[rythe_always_inline]] constexpr void reset_unsafe_impl(size_type offset, size_type end) noexcept;
-
-		[[rythe_always_inline]] constexpr void copy_assign_impl(const value_type* src, size_type srcSize)
-			noexcept(copy_assign_noexcept && copy_construct_noexcept);
+		[[rythe_always_inline]] constexpr void reset_unsafe_impl(size_type offset = 0, size_type end = npos) noexcept;
 
 		size_type m_size;
+		size_type m_capacity;
 	};
 } // namespace rsl
 

@@ -6,23 +6,29 @@
 
 namespace rsl
 {
-	template <typename FuncSig>
+	template <
+		typename FuncSig, allocator_type Alloc = default_allocator, untyped_factory_type Factory = type_erased_factory>
 	class delegate;
 
 	template <
-		typename FuncSig, template <typename, typename> typename ContainerType = std::vector,
-		template <typename> typename Allocator = std::allocator>
+		typename FuncSig, allocator_type Alloc = default_allocator, untyped_factory_type Factory = type_erased_factory>
 	class multicast_delegate;
 
-	template <typename ReturnType, typename... ParamTypes>
-	class delegate<ReturnType(ParamTypes...)> final : private delegate_base<ReturnType(ParamTypes...)>
+	template <typename ReturnType, typename... ParamTypes, allocator_type Alloc, untyped_factory_type Factory>
+	class delegate<ReturnType(ParamTypes...), Alloc, Factory> final :
+		private delegate_base<ReturnType(ParamTypes...), Alloc, Factory>
 	{
-		using base = delegate_base<ReturnType(ParamTypes...)>;
+		using base = delegate_base<ReturnType(ParamTypes...), Alloc, Factory>;
+		using typed_alloc_type = typename base::typed_alloc_type;
 
 	public:
 		using return_type = ReturnType;
 		using param_types = type_sequence<ParamTypes...>;
 		using invocation_element = typename base::invocation_element;
+		using allocator_storage_type = typename base::allocator_storage_type;
+		using allocator_t = typename base::allocator_t;
+		using factory_storage_type = typename base::factory_storage_type;
+		using factory_t = typename base::factory_t;
 
 	private:
 		using stub_type = typename base::stub_type;

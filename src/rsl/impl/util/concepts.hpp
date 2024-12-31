@@ -149,7 +149,7 @@ namespace rsl
 	template <typename T>
 	concept totally_ordered = equality_comparable<T> && internal::half_ordered<T, T>;
 
-		template <typename LHS, typename RHS>
+	template <typename LHS, typename RHS>
 	concept totally_ordered_with =
 		totally_ordered<LHS> && totally_ordered<RHS> && equality_comparable_with<LHS, RHS> &&
 		totally_ordered<common_reference_t<const remove_reference_t<LHS>&, const remove_reference_t<RHS>&>> &&

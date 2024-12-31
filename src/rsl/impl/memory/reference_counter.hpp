@@ -43,20 +43,20 @@ namespace rsl
 	template <
 		reference_counted Counter = manual_reference_counter, allocator_type Alloc = default_allocator,
 		factory_type Factory = default_factory<Counter>>
-	class basic_reference_counter :
-		public internal::select_memory_resource<Counter, Alloc, Factory>::type
+	class basic_reference_counter : public internal::select_memory_resource<Counter, Alloc, Factory>::type
 	{
 	protected:
-		constexpr static bool untypedMemoryResource = internal::select_memory_resource<Counter, Alloc, Factory>::isUntyped;
-		using mem_rsc =
-			internal::select_memory_resource<Counter, Alloc, Factory>::type;
+		constexpr static bool untypedMemoryResource =
+			internal::select_memory_resource<Counter, Alloc, Factory>::isUntyped;
+		using mem_rsc = internal::select_memory_resource<Counter, Alloc, Factory>::type;
 		using allocator_storage_type = mem_rsc::allocator_storage_type;
 		using allocator_t = mem_rsc::allocator_t;
 		using factory_storage_type = mem_rsc::factory_storage_type;
 		using factory_t = mem_rsc::factory_t;
 
 	public:
-		[[rythe_always_inline]] constexpr basic_reference_counter() noexcept = default;
+		[[rythe_always_inline]] constexpr basic_reference_counter()
+			noexcept(is_nothrow_constructible_v<mem_rsc>) = default;
 		[[rythe_always_inline]] constexpr basic_reference_counter(arm_signal_type) noexcept;
 		[[rythe_always_inline]] constexpr basic_reference_counter(const basic_reference_counter& other) noexcept;
 		[[rythe_always_inline]] constexpr basic_reference_counter(basic_reference_counter&& other) noexcept;
@@ -64,6 +64,16 @@ namespace rsl
 		) noexcept;
 		[[rythe_always_inline]] constexpr basic_reference_counter& operator=(basic_reference_counter&& other) noexcept;
 		[[rythe_always_inline]] constexpr ~basic_reference_counter() noexcept;
+
+		[[rythe_always_inline]] explicit basic_reference_counter(const allocator_storage_type& allocStorage)
+			noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>);
+
+		[[rythe_always_inline]] explicit basic_reference_counter(const factory_storage_type& factoryStorage)
+			noexcept(is_nothrow_constructible_v<mem_rsc, const factory_storage_type&>);
+
+		[[rythe_always_inline]] basic_reference_counter(
+			const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage
+		) noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&, const factory_storage_type&>);
 
 		[[rythe_always_inline]] constexpr void arm() noexcept;
 		[[rythe_always_inline]] constexpr void disarm() noexcept;

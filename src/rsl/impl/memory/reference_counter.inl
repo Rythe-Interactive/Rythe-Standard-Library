@@ -91,6 +91,30 @@ namespace rsl
 	}
 
 	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
+	inline basic_reference_counter<Counter, Alloc, Factory>::basic_reference_counter(
+		const allocator_storage_type& allocStorage
+	) noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>)
+		: mem_rsc(allocStorage)
+	{
+	}
+
+	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
+	inline basic_reference_counter<Counter, Alloc, Factory>::basic_reference_counter(
+		const factory_storage_type& factoryStorage
+	) noexcept(is_nothrow_constructible_v<mem_rsc, const factory_storage_type&>)
+		: mem_rsc(factoryStorage)
+	{
+	}
+
+	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
+	inline basic_reference_counter<Counter, Alloc, Factory>::basic_reference_counter(
+		const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage
+	) noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&, const factory_storage_type&>)
+		: mem_rsc(allocStorage, factoryStorage)
+	{
+	}
+
+	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
 	inline constexpr void basic_reference_counter<Counter, Alloc, Factory>::arm() noexcept
 	{
 		arm(bit_cast<Counter*>(mem_rsc::m_alloc.allocate_and_construct()));

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../util/concepts.hpp"
+#include "../util/type_traits.hpp"
 
 namespace rsl
 {
@@ -19,12 +20,13 @@ namespace rsl
 	};
 
 	template <typename T>
-	concept untyped_factory_type = requires(T factory, void* mem, void* ptr, size_type n) {
-		{ factory.construct(mem, n) } -> convertible_to<void*>;
-		{ factory.move(mem, ptr, n) } -> convertible_to<void*>;
-		{ factory.destroy(ptr, n) } noexcept;
-		{ factory.typeSize() } noexcept;
+	concept untyped_factory_type = factory_type<T> && requires(T factory) {
+		{ factory.typeSize() } noexcept -> convertible_to<size_type>;
 	};
+
+
+	template <typename T>
+	concept typed_factory_type = factory_type<T> && not_same_as<typename T::ptr_type, void*>;
 
 	template <factory_type Factory>
 	struct factory_traits
@@ -73,6 +75,7 @@ namespace rsl
 		virtual void destroy(void* ptr, size_type count) const noexcept = 0;
 		virtual size_type typeSize() const noexcept = 0;
 		virtual bool trivialCopy() const noexcept = 0;
+		virtual id_type typeId() const noexcept = 0;
 	};
 
 	template <typename T>
@@ -86,6 +89,7 @@ namespace rsl
 		void destroy(void* ptr, size_type count) const noexcept override;
 		size_type typeSize() const noexcept override;
 		bool trivialCopy() const noexcept override;
+		id_type typeId() const noexcept override;
 	};
 
 	class type_erased_factory
@@ -99,13 +103,14 @@ namespace rsl
 
 		type_erased_factory() noexcept = default;
 		template <typename T>
-		type_erased_factory(construct_type_signal_type<T>) noexcept;
+		[[rythe_always_inline]] type_erased_factory(construct_type_signal_type<T>) noexcept;
 
 		void* construct(void* ptr, size_type count) const;
 		void* move(void* dst, void* src, size_type count) const;
 		void destroy(void* ptr, size_type count) const noexcept;
-		size_type typeSize() const noexcept;
-		bool trivialCopy() const noexcept;
+		[[nodiscard]] size_type typeSize() const noexcept;
+		[[nodiscard]] bool trivialCopy() const noexcept;
+		[[nodiscard]] id_type typeId() const noexcept;
 
 	private:
 		construct_func m_constructFunc = nullptr;
@@ -113,10 +118,11 @@ namespace rsl
 		destroy_func m_destroyFunc = nullptr;
 		size_type m_typeSize = 0;
 		bool m_triviallyCopyable = false;
+		id_type m_typeId = invalid_id;
 	};
 
 	template <untyped_factory_type Factory>
-	bool can_trivially_copy(Factory& factory) noexcept;
+	[[nodiscard]] [[rythe_always_inline]] bool can_trivially_copy(Factory& factory) noexcept;
 
 } // namespace rsl
 

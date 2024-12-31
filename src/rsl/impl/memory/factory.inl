@@ -128,12 +128,19 @@ namespace rsl
 	}
 
 	template <typename T>
+	inline id_type typed_polymorphic_factory<T>::typeId() const noexcept
+	{
+		return type_id<T>();
+	}
+
+	template <typename T>
 	inline type_erased_factory::type_erased_factory(construct_type_signal_type<T>) noexcept
 		: m_constructFunc(&internal::defaultConstruct<T>),
 		  m_moveFunc(&internal::defaultMove<T>),
 		  m_destroyFunc(&internal::defaultDestroy<T>),
 		  m_typeSize(sizeof(T)),
-		  m_triviallyCopyable(is_trivially_copyable_v<T>)
+		  m_triviallyCopyable(is_trivially_copyable_v<T>),
+		  m_typeId(type_id<T>())
 	{
 	}
 

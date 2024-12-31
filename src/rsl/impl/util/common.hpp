@@ -24,6 +24,12 @@ namespace rsl
 	template <typename T>
 	constexpr construct_type_signal_type construct_type_signal = construct_type_signal_type<T>{};
 
+	struct in_place_signal_type
+	{
+	};
+
+	inline constexpr in_place_signal_type in_place_signal = in_place_signal_type{};
+
 	template <typename T, T Val>
 	struct integral_constant
 	{

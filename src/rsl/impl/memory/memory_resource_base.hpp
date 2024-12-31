@@ -6,7 +6,9 @@
 
 namespace rsl
 {
-	template <allocator_type Alloc = default_allocator, untyped_factory_type Factory = type_erased_factory, typename UtilType = void>
+	template <
+		allocator_type Alloc = default_allocator, untyped_factory_type Factory = type_erased_factory,
+		typename UtilType = void>
 	class untyped_memory_resource_base
 	{
 	public:
@@ -16,7 +18,24 @@ namespace rsl
 		using factory_t = Factory;
 		using typed_alloc_type = type_erased_allocator<Alloc, Factory>;
 
+		[[rythe_always_inline]] constexpr untyped_memory_resource_base()
+			noexcept(is_nothrow_constructible_v<typed_alloc_type>) = default;
+
 		virtual ~untyped_memory_resource_base() = default;
+
+		[[rythe_always_inline]] constexpr explicit untyped_memory_resource_base(
+			const allocator_storage_type& allocStorage
+		) noexcept(is_nothrow_constructible_v<typed_alloc_type, const allocator_storage_type&>);
+
+		[[rythe_always_inline]] constexpr explicit untyped_memory_resource_base(
+			const factory_storage_type& factoryStorage
+		) noexcept(is_nothrow_constructible_v<typed_alloc_type, const factory_storage_type&>);
+
+		[[rythe_always_inline]] constexpr untyped_memory_resource_base(
+			const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage
+		)
+			noexcept(is_nothrow_constructible_v<
+					 typed_alloc_type, const allocator_storage_type&, const factory_storage_type&>);
 
 		void set_allocator(const allocator_storage_type& allocStorage)
 			noexcept(is_nothrow_copy_assignable_v<allocator_storage_type>);
@@ -31,11 +50,23 @@ namespace rsl
 		const factory_t& get_factory() const noexcept;
 
 	protected:
+		[[rythe_allocating]] [[rythe_always_inline]] constexpr void allocate(size_type count = 1) noexcept;
+		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
+		allocate(size_type count, size_type alignment) noexcept;
+		[[rythe_allocating]] [[rythe_always_inline]] constexpr void reallocate(size_type oldCount, size_type newCount)
+			noexcept(factory_traits<Factory>::noexcept_moveable);
+		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
+		reallocate(size_type oldCount, size_type newCount, size_type alignment)
+			noexcept(factory_traits<Factory>::noexcept_moveable);
+		[[rythe_always_inline]] constexpr void deallocate(size_type count = 1) noexcept;
+		[[rythe_always_inline]] constexpr void deallocate(size_type count, size_type alignment) noexcept;
+
+		[[rythe_always_inline]] constexpr void construct(size_type count = 1, size_type offset = 0)
+			noexcept(factory_traits<Factory>::template noexcept_constructable<>);
+		[[rythe_always_inline]] constexpr void destroy(size_type count = 1, size_type offset = 0) noexcept;
+
 		[[rythe_allocating]] [[rythe_always_inline]] constexpr void allocate_and_construct(size_type count = 1)
 			noexcept(factory_traits<Factory>::template noexcept_constructable<>);
-
-		[[rythe_allocating]] [[rythe_always_inline]] constexpr void allocate_bytes(size_type count = 1)
-			noexcept;
 
 		template <typename... Args>
 		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
@@ -43,15 +74,10 @@ namespace rsl
 			noexcept(factory_traits<Factory>::template noexcept_constructable<>);
 
 		template <typename... Args>
-		[[rythe_always_inline]] constexpr void construct(size_type count = 1, size_type offset = 0)
-			noexcept(factory_traits<Factory>::template noexcept_constructable<>);
-
-		template <typename... Args>
 		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
-		reallocate_and_construct(size_type oldCount, size_type newCount)
-			noexcept(
-				factory_traits<Factory>::template noexcept_constructable<> && factory_traits<Factory>::noexcept_moveable
-			);
+		reallocate_and_construct(size_type oldCount, size_type newCount) noexcept(
+			factory_traits<Factory>::template noexcept_constructable<> && factory_traits<Factory>::noexcept_moveable
+		);
 
 		template <typename... Args>
 		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
@@ -62,7 +88,7 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void destroy_and_deallocate(size_type count = 1) noexcept;
 		[[rythe_always_inline]] constexpr void
 		destroy_and_deallocate_aligned(size_type count, size_type alignment) noexcept;
-                
+
 		[[nodiscard]] [[rythe_always_inline]] constexpr UtilType* get_ptr() noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const UtilType* get_ptr() const noexcept;
 		[[rythe_always_inline]] constexpr void set_ptr(UtilType* const& ptr) noexcept;
@@ -72,8 +98,7 @@ namespace rsl
 	};
 
 
-	template <
-		typename T, allocator_type Alloc = default_allocator, factory_type Factory = default_factory<T>>
+	template <typename T, allocator_type Alloc = default_allocator, factory_type Factory = default_factory<T>>
 	class typed_memory_resource_base
 	{
 	public:
@@ -88,7 +113,22 @@ namespace rsl
 		using factory_t = Factory;
 		using typed_alloc_type = typed_allocator<T, Alloc, Factory>;
 
+		[[rythe_always_inline]] constexpr typed_memory_resource_base()
+			noexcept(is_nothrow_constructible_v<typed_alloc_type>) = default;
+
 		virtual ~typed_memory_resource_base() = default;
+
+		[[rythe_always_inline]] constexpr explicit typed_memory_resource_base(const allocator_storage_type& allocStorage
+		) noexcept(is_nothrow_constructible_v<typed_alloc_type, const allocator_storage_type&>);
+
+		[[rythe_always_inline]] constexpr explicit typed_memory_resource_base(const factory_storage_type& factoryStorage
+		) noexcept(is_nothrow_constructible_v<typed_alloc_type, const factory_storage_type&>);
+
+		[[rythe_always_inline]] constexpr typed_memory_resource_base(
+			const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage
+		)
+			noexcept(is_nothrow_constructible_v<
+					 typed_alloc_type, const allocator_storage_type&, const factory_storage_type&>);
 
 		void set_allocator(const allocator_storage_type& allocStorage)
 			noexcept(is_nothrow_copy_assignable_v<allocator_storage_type>);
@@ -103,35 +143,50 @@ namespace rsl
 		const factory_t& get_factory() const noexcept;
 
 	protected:
-		template <typename... Args>
-		[[rythe_allocating]] [[rythe_always_inline]] constexpr void allocate(size_type count = 1, Args&&... args)
-			noexcept(factory_traits<Factory>::template noexcept_constructable<Args...>);
-
-		template <typename... Args>
+		[[rythe_allocating]] [[rythe_always_inline]] constexpr void allocate(size_type count = 1) noexcept;
 		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
-		allocate_aligned(size_type count, size_type alignment, Args&&... args)
-			noexcept(factory_traits<Factory>::template noexcept_constructable<Args...>);
+		allocate(size_type count, size_type alignment) noexcept;
+		[[rythe_allocating]] [[rythe_always_inline]] constexpr void reallocate(size_type oldCount, size_type newCount)
+			noexcept(factory_traits<Factory>::noexcept_moveable);
+		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
+		reallocate(size_type oldCount, size_type newCount, size_type alignment)
+			noexcept(factory_traits<Factory>::noexcept_moveable);
+		[[rythe_always_inline]] constexpr void deallocate(size_type count = 1) noexcept;
+		[[rythe_always_inline]] constexpr void deallocate(size_type count, size_type alignment) noexcept;
 
 		template <typename... Args>
 		[[rythe_always_inline]] constexpr void construct(size_type count = 1, size_type offset = 0, Args&&... args)
 			noexcept(factory_traits<Factory>::template noexcept_constructable<Args...>);
+		[[rythe_always_inline]] constexpr void destroy(size_type count = 1, size_type offset = 0) noexcept;
 
 		template <typename... Args>
 		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
-		reallocate(size_type oldCount, size_type newCount, Args&&... args) noexcept(
+		allocate_and_construct(size_type count = 1, Args&&... args)
+			noexcept(factory_traits<Factory>::template noexcept_constructable<Args...>);
+
+		template <typename... Args>
+		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
+		allocate_aligned_and_construct(size_type count, size_type alignment, Args&&... args)
+			noexcept(factory_traits<Factory>::template noexcept_constructable<Args...>);
+
+		template <typename... Args>
+		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
+		reallocate_and_construct(size_type oldCount, size_type newCount, Args&&... args) noexcept(
 			factory_traits<Factory>::template noexcept_constructable<Args...> &&
 			factory_traits<Factory>::noexcept_moveable
 		);
 
 		template <typename... Args>
 		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
-		reallocate_aligned(size_type oldCount, size_type newCount, size_type alignment, Args&&... args) noexcept(
-			factory_traits<Factory>::template noexcept_constructable<Args...> &&
-			factory_traits<Factory>::noexcept_moveable
-		);
+		reallocate_aligned_and_construct(size_type oldCount, size_type newCount, size_type alignment, Args&&... args)
+			noexcept(
+				factory_traits<Factory>::template noexcept_constructable<Args...> &&
+				factory_traits<Factory>::noexcept_moveable
+			);
 
-		[[rythe_always_inline]] constexpr void deallocate(size_type count = 1) noexcept;
-		[[rythe_always_inline]] constexpr void deallocate_aligned(size_type count, size_type alignment) noexcept;
+		[[rythe_always_inline]] constexpr void destroy_and_deallocate(size_type count = 1) noexcept;
+		[[rythe_always_inline]] constexpr void
+		destroy_and_deallocate_aligned(size_type count, size_type alignment) noexcept;
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr T* get_ptr() noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const T* get_ptr() const noexcept;

@@ -157,7 +157,7 @@ namespace rsl
 
 	template <typename T>
 	using is_always_equal_t = is_always_equal<T>::type;
-    
+
 	template <size_type>
 	struct select_sized_integer;
 
@@ -216,7 +216,7 @@ namespace rsl
 
 	template <typename T>
 	using make_signed_t = typename make_signed<T>::type;
-    
+
 	template <size_type>
 	struct select_sized_unsigned_integer;
 
