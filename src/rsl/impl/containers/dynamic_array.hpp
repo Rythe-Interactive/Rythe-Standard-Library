@@ -85,31 +85,35 @@ namespace rsl
 
 		[[rythe_always_inline]] constexpr void clear() noexcept;
 
-        [[rythe_always_inline]] constexpr void void assign(size_type count, const value_type& value);
+		[[rythe_always_inline]] constexpr void assign(size_type count, const value_type& value);
 		template <input_iterator InputIt>
-		[[rythe_always_inline]] constexpr void void assign(InputIt first, InputIt last);
+		[[rythe_always_inline]] constexpr void assign(InputIt first, InputIt last);
 
-		[[rythe_always_inline]] constexpr iterator insert(const_iterator pos, const value_type& value)
+		[[rythe_always_inline]] constexpr iterator_type iterator_at(size_type i) noexcept;
+		[[rythe_always_inline]] constexpr const_iterator_type iterator_at(size_type i) const noexcept;
+
+		[[rythe_always_inline]] constexpr size_type insert(size_type pos, const value_type& value)
 			noexcept(container_base::move_construct_noexcept && container_base::copy_construct_noexcept);
-		[[rythe_always_inline]] constexpr iterator insert(const_iterator pos, value_type&& value)
+		[[rythe_always_inline]] constexpr size_type insert(size_type pos, value_type&& value)
 			noexcept(container_base::move_construct_noexcept);
-		[[rythe_always_inline]] constexpr iterator insert(const_iterator pos, size_type count, const value_type& value)
+		[[rythe_always_inline]] constexpr size_type insert(size_type pos, size_type count, const value_type& value)
 			noexcept(container_base::move_construct_noexcept && container_base::copy_construct_noexcept);
 		template <input_iterator InputIt>
-		[[rythe_always_inline]] constexpr iterator insert(
-			const_iterator pos, InputIt first, InputIt last
+		[[rythe_always_inline]] constexpr size_type insert(
+			size_type pos, InputIt first, InputIt last
 		) noexcept(container_base::move_construct_noexcept && container_base::template construct_noexcept<iter_value_t<InputIt>>);
 
-		[[rythe_always_inline]] constexpr iterator erase(const_iterator pos)
+		[[rythe_always_inline]] constexpr size_type erase(size_type pos)
 			noexcept(container_base::move_construct_noexcept);
-		[[rythe_always_inline]] constexpr iterator erase(const_iterator first, const_iterator last)
+		[[rythe_always_inline]] constexpr size_type erase(size_type first, size_type last)
 			noexcept(container_base::move_construct_noexcept);
-        template<typename Comp>
-		[[rythe_always_inline]] constexpr iterator erase(Comp&& comparable)
+		template <typename Comp>
+		[[rythe_always_inline]] constexpr size_type erase(Comp&& comparable)
 			noexcept(container_base::move_construct_noexcept);
-		template <invocable<bool(const_iterator)> Func>
-		[[rythe_always_inline]] constexpr iterator erase(Func&& comparer)
-			noexcept(container_base::move_construct_noexcept);
+		template <typename Func>
+		[[rythe_always_inline]] constexpr size_type erase(Func&& comparer)
+			noexcept(container_base::move_construct_noexcept)
+			requires invocable<Func, bool(const_iterator_type)>;
 
 	private:
 		[[rythe_always_inline]] constexpr void maybe_grow() noexcept(container_base::move_construct_noexcept);
@@ -120,6 +124,8 @@ namespace rsl
 
 		[[rythe_always_inline]] constexpr void move_data_assign_impl(const value_type* src, size_type srcSize)
 			noexcept(container_base::move_assign_noexcept && container_base::move_construct_noexcept);
+
+		[[rythe_always_inline]] constexpr void split_reserve(size_type pos, size_type count, size_type newSize) noexcept(container_base::move_construct_noexcept);
 	};
 } // namespace rsl
 

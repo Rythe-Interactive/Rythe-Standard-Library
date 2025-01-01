@@ -18,21 +18,6 @@ namespace rsl
 	}
 
 	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
-	inline managed_resource<T, Alloc, Factory>::managed_resource(const factory_storage_type& factoryStorage)
-		noexcept(is_nothrow_constructible_v<ref_counter, const factory_storage_type&>)
-		: ref_counter(factoryStorage)
-	{
-	}
-
-	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
-	inline managed_resource<T, Alloc, Factory>::managed_resource(
-		const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage
-	) noexcept(is_nothrow_constructible_v<ref_counter, const allocator_storage_type&, const factory_storage_type&>)
-		: ref_counter(allocStorage, factoryStorage)
-	{
-	}
-
-	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
 	template <typename Deleter, typename... Args>
 	inline constexpr managed_resource<T, Alloc, Factory>::managed_resource(Deleter deleter, Args&&... args)
 		noexcept(is_nothrow_constructible_v<ref_counter> && is_nothrow_constructible_v<T, Args...>)
@@ -47,27 +32,6 @@ namespace rsl
 		const allocator_storage_type& allocStorage, Deleter deleter, Args&&... args
 	) noexcept(is_nothrow_constructible_v<ref_counter, const allocator_storage_type&> && is_nothrow_constructible_v<T, Args...>)
 		: ref_counter(allocStorage)
-	{
-		arm(deleter, forward<Args>(args)...);
-	}
-
-	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
-	template <typename Deleter, typename... Args>
-	inline managed_resource<T, Alloc, Factory>::managed_resource(
-		const factory_storage_type& factoryStorage, Deleter deleter, Args&&... args
-	) noexcept(is_nothrow_constructible_v<ref_counter, const factory_storage_type&> && is_nothrow_constructible_v<T, Args...>)
-		: ref_counter(factoryStorage)
-	{
-		arm(deleter, forward<Args>(args)...);
-	}
-
-	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
-	template <typename Deleter, typename... Args>
-	inline managed_resource<T, Alloc, Factory>::managed_resource(
-		const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage, Deleter deleter,
-		Args&&... args
-	) noexcept(is_nothrow_constructible_v<ref_counter, const allocator_storage_type&, const factory_storage_type&> && is_nothrow_constructible_v<T, Args...>)
-		: ref_counter(allocStorage, factoryStorage)
 	{
 		arm(deleter, forward<Args>(args)...);
 	}

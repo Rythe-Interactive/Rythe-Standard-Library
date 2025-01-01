@@ -229,6 +229,44 @@ namespace rsl
 			{ to_address(iter) } -> same_as<add_pointer_t<iter_reference_t<It>>>;
 		};
 
+	namespace internal
+	{
+		template <typename It>
+		struct iterator_diff_impl;
+
+		template <forward_iterator It>
+		struct iterator_diff_impl<It>
+		{
+			[[nodiscard]] [[rythe_always_inline]] constexpr size_type operator()(It first, It last) const noexcept
+			{
+				size_type diff = 0;
+				while (first != last)
+				{
+					first++;
+					diff++;
+				}
+
+				return diff;
+			}
+		};
+
+		template <typename It>
+			requires sized_sentinel_for<It, It>
+		struct iterator_diff_impl<It>
+		{
+			[[nodiscard]] [[rythe_always_inline]] constexpr size_type operator()(It first, It last) const noexcept
+			{
+				return last - first;
+			}
+		};
+	} // namespace internal
+
+	template <typename It>
+	[[nodiscard]] [[rythe_always_inline]] constexpr size_type iterator_diff(It first, It last) noexcept
+	{
+		return internal::iterator_diff_impl<It>{}(first, last);
+	}
+
 	template <class T>
 	struct pair_range
 	{

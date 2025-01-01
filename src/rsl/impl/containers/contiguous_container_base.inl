@@ -332,11 +332,44 @@ namespace rsl
 		size_type offset, size_type end
 	) noexcept
 	{
-		if (end == npos)
+		if (end > m_size)
 		{
 			end = m_size;
 		}
 
 		mem_rsc::destroy(end - offset, offset);
+	}
+
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::move_shift_elements_unsafe(
+		size_type offset, size_type end, diff_type shift
+	) noexcept(move_construct_noexcept)
+	{
+		if (end > m_size)
+		{
+			end = m_size;
+		}
+
+		for (size_type i = offset; i != end; i++)
+		{
+			mem_rsc::construct(1, static_cast<size_type>(i + shift), move(at(i)));
+		}
+	}
+
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr T* contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::get_ptr_at(size_type i
+	) noexcept
+	{
+		return mem_rsc::get_ptr() + i;
+	}
+
+	template <
+		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	inline constexpr const T*
+	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::get_ptr_at(size_type i) const noexcept
+	{
+		return mem_rsc::get_ptr() + i;
 	}
 } // namespace rsl

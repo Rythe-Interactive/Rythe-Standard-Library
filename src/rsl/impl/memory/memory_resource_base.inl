@@ -203,7 +203,7 @@ namespace rsl
 	{
 	}
 
-    template <typename T, allocator_type Alloc, factory_type Factory>
+	template <typename T, allocator_type Alloc, factory_type Factory>
 	inline constexpr typed_memory_resource_base<T, Alloc, Factory>::typed_memory_resource_base(
 		const factory_storage_type& factoryStorage
 	) noexcept(is_nothrow_constructible_v<typed_alloc_type, const factory_storage_type&>)
@@ -211,7 +211,7 @@ namespace rsl
 	{
 	}
 
-    template <typename T, allocator_type Alloc, factory_type Factory>
+	template <typename T, allocator_type Alloc, factory_type Factory>
 	inline constexpr typed_memory_resource_base<T, Alloc, Factory>::typed_memory_resource_base(
 		const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage
 	) noexcept(is_nothrow_constructible_v<typed_alloc_type, const allocator_storage_type&, const factory_storage_type&>)

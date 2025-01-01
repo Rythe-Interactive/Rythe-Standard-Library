@@ -1,8 +1,5 @@
 #pragma once
 
-#include <bit>
-#include <memory>
-
 #include "../defines.hpp"
 #include "../util/concepts.hpp"
 #include "../util/hash.hpp"
@@ -38,12 +35,11 @@ namespace rsl
 			constexpr invocation_element() = default;
 
 			constexpr invocation_element(
-				const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage, void* object,
-				stub_type stub, id_type id, deleter_type deleter = nullptr
+				const allocator_storage_type& allocStorage, void* object, stub_type stub, id_type id,
+				deleter_type deleter = nullptr
 			)
 				noexcept(is_nothrow_constructible_v<
-						 managed_resource<void*, Alloc, Factory>, const allocator_storage_type&,
-						 const factory_storage_type&, deleter_type, void*>);
+						 managed_resource<void*, Alloc, Factory>, const allocator_storage_type&, deleter_type, void*>);
 
 			constexpr invocation_element(const invocation_element& other)
 				noexcept(is_nothrow_copy_constructible_v<managed_resource<void*, Alloc, Factory>>);
@@ -95,24 +91,19 @@ namespace rsl
 			requires invocable<Functor, ReturnType(ParamTypes...)>;
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		[[rythe_always_inline]] static invocation_element create_element(
-			const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage, T& instance
-		);
+		[[rythe_always_inline]] static invocation_element
+		create_element(const allocator_storage_type& allocStorage, T& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-		[[rythe_always_inline]] static invocation_element create_element(
-			const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage, const T& instance
-		);
+		[[rythe_always_inline]] static invocation_element
+		create_element(const allocator_storage_type& allocStorage, const T& instance);
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
-		[[rythe_always_inline]] static invocation_element
-		create_element(const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage);
+		[[rythe_always_inline]] static invocation_element create_element(const allocator_storage_type& allocStorage);
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
-		[[rythe_always_inline]] static invocation_element create_element(
-			const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage,
-			const Functor& instance
-		);
+		[[rythe_always_inline]] static invocation_element
+		create_element(const allocator_storage_type& allocStorage, const Functor& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
 		[[rythe_always_inline]] static id_type create_id(T& instance);

@@ -5,13 +5,12 @@ namespace rsl
 {
 	template <typename ReturnType, typename... ParamTypes, allocator_type Alloc, untyped_factory_type Factory>
 	inline constexpr delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::invocation_element::invocation_element(
-		const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage, void* object,
-		stub_type stub, id_type id, deleter_type deleter
+		const allocator_storage_type& allocStorage, void* object, stub_type stub, id_type id, deleter_type deleter
 	)
 		noexcept(is_nothrow_constructible_v<
 				 managed_resource<void*, Alloc, Factory>, const allocator_storage_type&, const factory_storage_type&,
 				 deleter_type, void*>)
-		: object(allocStorage, factoryStorage, deleter ? deleter : defaultDeleter, object),
+		: object(allocStorage, deleter ? deleter : defaultDeleter, object),
 		  ownsData(deleter != nullptr),
 		  stub(stub),
 		  id(id)
@@ -114,65 +113,56 @@ namespace rsl
 	template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
 	inline delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::invocation_element
 	delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::create_element(
-		const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage, T& instance
+		const allocator_storage_type& allocStorage, T& instance
 	)
 	{
-		return invocation_element(
-			allocStorage, factoryStorage, &instance, method_stub<T, TMethod>, method_id<T, TMethod>(instance)
-		);
+		return invocation_element(allocStorage, &instance, method_stub<T, TMethod>, method_id<T, TMethod>(instance));
 	}
 
 	template <typename ReturnType, typename... ParamTypes, allocator_type Alloc, untyped_factory_type Factory>
 	template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 	inline delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::invocation_element
 	delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::create_element(
-		const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage, const T& instance
+		const allocator_storage_type& allocStorage, const T& instance
 	)
 	{
 		return invocation_element(
-			allocStorage, factoryStorage, force_cast<void*>(&instance), const_method_stub<T, TMethod>,
-			method_id<T, TMethod>(instance)
+			allocStorage, force_cast<void*>(&instance), const_method_stub<T, TMethod>, method_id<T, TMethod>(instance)
 		);
 	}
 
 	template <typename ReturnType, typename... ParamTypes, allocator_type Alloc, untyped_factory_type Factory>
 	template <ReturnType (*TMethod)(ParamTypes...)>
 	inline delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::invocation_element
-	delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::create_element(
-		const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage
-	)
+	delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::create_element(const allocator_storage_type& allocStorage)
 	{
-		return invocation_element(
-			allocStorage, factoryStorage, nullptr, function_stub<TMethod>, function_id<TMethod>()
-		);
+		return invocation_element(allocStorage, nullptr, function_stub<TMethod>, function_id<TMethod>());
 	}
 
 	template <typename ReturnType, typename... ParamTypes, allocator_type Alloc, untyped_factory_type Factory>
 	template <invocable<ReturnType(ParamTypes...)> Functor>
 	inline delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::invocation_element
 	delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::create_element(
-		const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage, const Functor& instance
+		const allocator_storage_type& allocStorage, const Functor& instance
 	)
 	{
 		if constexpr (!is_functor_v<Functor>)
 		{
 			return invocation_element(
-				allocStorage, factoryStorage, *bit_cast<void**>(&instance), function_ptr_stub<Functor>,
+				allocStorage, *bit_cast<void**>(&instance), function_ptr_stub<Functor>,
 				function_ptr_id<Functor>(instance)
 			);
 		}
 		else if constexpr (is_empty_v<Functor>)
 		{
 			return invocation_element(
-				allocStorage, factoryStorage, force_cast<void*>(&instance), functor_stub<Functor>,
-				functor_id<Functor>(instance)
+				allocStorage, force_cast<void*>(&instance), functor_stub<Functor>, functor_id<Functor>(instance)
 			);
 		}
 		else
 		{
 			return invocation_element(
-				allocStorage, factoryStorage, new Functor(instance), functor_stub<Functor>,
-				functor_id<Functor>(instance),
+				allocStorage, new Functor(instance), functor_stub<Functor>, functor_id<Functor>(instance),
 				[](void* vptr)
 			{
 				Functor* ptr = static_cast<Functor*>(vptr);
@@ -184,16 +174,14 @@ namespace rsl
 
 	template <typename ReturnType, typename... ParamTypes, allocator_type Alloc, untyped_factory_type Factory>
 	template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-	inline id_type
-	delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::create_id(T& instance)
+	inline id_type delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::create_id(T& instance)
 	{
 		return method_id<T, TMethod>(instance);
 	}
 
 	template <typename ReturnType, typename... ParamTypes, allocator_type Alloc, untyped_factory_type Factory>
 	template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-	inline id_type
-	delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::create_id(const T& instance)
+	inline id_type delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::create_id(const T& instance)
 	{
 		return method_id<T, TMethod>(instance);
 	}

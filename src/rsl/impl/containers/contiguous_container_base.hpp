@@ -24,12 +24,11 @@ namespace rsl
 		using factory_t = mem_rsc::factory_t;
 
 		[[rythe_always_inline]] constexpr contiguous_container_base()
-			noexcept(is_nothrow_constructible_v<mem_rsc>) =
-			default;
+			noexcept(is_nothrow_constructible_v<mem_rsc>) = default;
 		virtual ~contiguous_container_base() = default;
 
-		[[rythe_always_inline]] explicit contiguous_container_base(const allocator_storage_type& allocStorage
-		) noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>);
+		[[rythe_always_inline]] explicit contiguous_container_base(const allocator_storage_type& allocStorage)
+			noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>);
 		[[rythe_always_inline]] explicit contiguous_container_base(const factory_storage_type& factoryStorage)
 			noexcept(is_nothrow_constructible_v<mem_rsc, const factory_storage_type&>);
 		[[rythe_always_inline]] contiguous_container_base(
@@ -107,6 +106,12 @@ namespace rsl
 			noexcept(construct_noexcept<Args...>);
 
 		[[rythe_always_inline]] constexpr void reset_unsafe_impl(size_type offset = 0, size_type end = npos) noexcept;
+
+		[[rythe_always_inline]] constexpr void
+		move_shift_elements_unsafe(size_type offset, size_type end, diff_type shift) noexcept(move_construct_noexcept);
+
+        [[nodiscard]] [[rythe_always_inline]] constexpr value_type* get_ptr_at(size_type i) noexcept;
+        [[nodiscard]] [[rythe_always_inline]] constexpr const value_type* get_ptr_at(size_type i) const noexcept;
 
 		size_type m_size;
 		size_type m_capacity;

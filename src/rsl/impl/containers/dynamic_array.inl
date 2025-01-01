@@ -24,7 +24,7 @@ namespace rsl
 		src.m_capacity = 0;
 	}
 
-    template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	inline constexpr dynamic_array<T, Alloc, Factory>::dynamic_array(const allocator_storage_type& allocStorage)
 		noexcept(is_nothrow_constructible_v<container_base, const allocator_storage_type&>)
 		: container_base(allocStorage)
@@ -171,6 +171,11 @@ namespace rsl
 	inline constexpr void dynamic_array<T, Alloc, Factory>::reserve(size_type newCapacity)
 		noexcept(container_base::move_construct_noexcept)
 	{
+		if (newCapacity < container_base::m_capacity)
+		{
+			return;
+		}
+
 		if constexpr (is_trivially_copyable_v<T>)
 		{
 			mem_rsc::reallocate(container_base::m_capacity, newCapacity);
@@ -180,11 +185,11 @@ namespace rsl
 			T* newMem = mem_rsc::m_alloc.allocate(newCapacity);
 			if (newMem)
 			{
-				mem_rsc::m_alloc.move(newMem, mem_rsc::m_ptr, container_base::m_size);
+				mem_rsc::m_alloc.move(newMem, mem_rsc::get_ptr(), container_base::m_size);
 			}
 
 			mem_rsc::deallocate(container_base::m_capacity);
-			mem_rsc::m_ptr = newMem;
+			mem_rsc::set_ptr(newMem);
 		}
 
 		container_base::m_capacity = newCapacity;
@@ -192,7 +197,7 @@ namespace rsl
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	inline constexpr void dynamic_array<T, Alloc, Factory>::push_back(const value_type& value)
-		noexcept(container_base::move_construct_noexcept)
+		noexcept(container_base::copy_construct_noexcept)
 	{
 		maybe_grow();
 		container_base::emplace_unsafe_impl(container_base::m_size, container_base::m_size + 1, value);
@@ -219,31 +224,6 @@ namespace rsl
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
-	template <typename Comp>
-	inline constexpr dynamic_array<T, Alloc, Factory>::iterator
-	dynamic_array<T, Alloc, Factory>::erase(Comp&& comparable)
-		noexcept(container_base::move_construct_noexcept)
-	{
-		return erase([&](const_iterator iter) { return (*iter) == comparable });
-	}
-
-	template <typename T, allocator_type Alloc, typed_factory_type Factory>
-	template <invocable<bool(dynamic_array<T, Alloc, Factory>::const_iterator)> Func>
-	inline constexpr dynamic_array<T, Alloc, Factory>::iterator dynamic_array<T, Alloc, Factory>::erase(Func&& comparer)
-		noexcept(container_base::move_construct_noexcept)
-	{
-        for (const_iterator iter = cbegin(); iter != cend(); ++iter)
-        {
-            if (comparer(iter))
-            {
-				return erase(iter);
-            }
-        }
-
-        return end();
-	}
-
-	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	inline constexpr void dynamic_array<T, Alloc, Factory>::pop_back(size_type count) noexcept
 	{
 		if (count > container_base::m_size)
@@ -263,6 +243,166 @@ namespace rsl
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	inline constexpr void dynamic_array<T, Alloc, Factory>::assign(size_type count, const value_type& value)
+	{
+		clear();
+		insert(0, count, value);
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	template <input_iterator InputIt>
+	inline constexpr void dynamic_array<T, Alloc, Factory>::assign(InputIt first, InputIt last)
+	{
+		clear();
+		insert(0, first, last);
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	inline constexpr dynamic_array<T, Alloc, Factory>::iterator_type
+	dynamic_array<T, Alloc, Factory>::iterator_at(size_type i) noexcept
+	{
+		return container_base::begin() + i;
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	inline constexpr dynamic_array<T, Alloc, Factory>::const_iterator_type
+	dynamic_array<T, Alloc, Factory>::iterator_at(size_type i) const noexcept
+	{
+		return container_base::begin() + i;
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	inline constexpr size_type dynamic_array<T, Alloc, Factory>::insert(size_type pos, const value_type& value)
+		noexcept(container_base::move_construct_noexcept && container_base::copy_construct_noexcept)
+	{
+		split_reserve(
+			pos, 1,
+			container_base::m_size == container_base::m_capacity ? container_base::m_capacity * 2
+																 : container_base::m_size + 1
+		);
+
+		mem_rsc::construct(1, pos, value);
+
+		return pos;
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	inline constexpr size_type dynamic_array<T, Alloc, Factory>::insert(size_type pos, value_type&& value)
+		noexcept(container_base::move_construct_noexcept)
+	{
+		split_reserve(
+			pos, 1,
+			container_base::m_size == container_base::m_capacity ? container_base::m_capacity * 2
+																 : container_base::m_size + 1);
+
+		mem_rsc::construct(1, pos, move(value));
+
+		return pos;
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	inline constexpr size_type
+	dynamic_array<T, Alloc, Factory>::insert(size_type pos, size_type count, const value_type& value)
+		noexcept(container_base::move_construct_noexcept && container_base::copy_construct_noexcept)
+	{
+		split_reserve(pos, count, container_base::m_size + count);
+
+        mem_rsc::construct(count, pos, value);
+
+		return pos;
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	template <input_iterator InputIt>
+	inline constexpr size_type dynamic_array<T, Alloc, Factory>::insert(
+		size_type pos, InputIt first, InputIt last
+	) noexcept(container_base::move_construct_noexcept && container_base::template construct_noexcept<iter_value_t<InputIt>>)
+	{
+		size_type count = iterator_diff(first, last);
+		split_reserve(pos, count, container_base::m_size + count);
+
+		size_type i = pos;
+		for (InputIt iter = first; iter != last; iter++, i++)
+		{
+			mem_rsc::construct(1, i, *iter);
+		}
+
+		return pos;
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	inline constexpr size_type dynamic_array<T, Alloc, Factory>::erase(size_type pos)
+		noexcept(container_base::move_construct_noexcept)
+	{
+		mem_rsc::destroy(1, pos);
+		container_base::move_shift_elements_unsafe(pos + 1, npos, -1ll);
+		container_base::m_size--;
+		return pos;
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	inline constexpr size_type dynamic_array<T, Alloc, Factory>::erase(size_type first, size_type last)
+		noexcept(container_base::move_construct_noexcept)
+	{
+		if (last > container_base::m_size)
+		{
+			last = container_base::m_size;
+		}
+
+		size_type count = last - first;
+		mem_rsc::destroy(count, first);
+		container_base::move_shift_elements_unsafe(last, npos, -static_cast<diff_type>(count));
+		container_base::m_size -= count;
+		return last - count;
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	template <typename Comp>
+	inline constexpr size_type dynamic_array<T, Alloc, Factory>::erase(Comp&& comparable)
+		noexcept(container_base::move_construct_noexcept)
+	{
+		return erase([&](const_iterator_type iter) { return (*iter) == comparable; });
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	template <typename Func>
+	inline constexpr size_type dynamic_array<T, Alloc, Factory>::erase(Func&& comparer)
+		noexcept(container_base::move_construct_noexcept)
+		requires invocable<Func, bool(const_iterator_type)>
+	{
+		size_type eraseLocation = npos;
+		diff_type shift = -1ll;
+
+		const size_type originalSize = container_base::m_size;
+
+		for (size_type i = 0; i < originalSize; i++)
+		{
+			if (comparer(iterator_at(iter)))
+			{
+				if (eraseLocation != npos)
+				{
+					mem_rsc::destroy(1, eraseLocation);
+					container_base::move_shift_elements_unsafe(pos + 1, i, shift);
+					container_base::m_size--;
+					shift -= 1ll;
+				}
+
+				eraseLocation = i;
+			}
+		}
+
+		if (eraseLocation != npos)
+		{
+			mem_rsc::destroy(1, eraseLocation);
+			container_base::move_shift_elements_unsafe(pos + 1, npos, shift);
+			container_base::m_size--;
+			return eraseLocation;
+		}
+
+		return npos;
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	inline constexpr void dynamic_array<T, Alloc, Factory>::maybe_grow()
 		noexcept(container_base::move_construct_noexcept)
 	{
@@ -279,7 +419,7 @@ namespace rsl
 	{
 		if (srcSize > container_base::m_capacity || alloc != nullptr)
 		{
-			if (mem_rsc::m_ptr)
+			if (mem_rsc::get_ptr())
 			{
 				container_base::reset_unsafe_impl();
 				mem_rsc::deallocate(container_base::m_capacity);
@@ -326,7 +466,7 @@ namespace rsl
 	{
 		if (srcSize > container_base::m_capacity)
 		{
-			if (mem_rsc::m_ptr)
+			if (mem_rsc::get_ptr())
 			{
 				container_base::reset_unsafe_impl();
 				mem_rsc::deallocate(container_base::m_capacity);
@@ -359,5 +499,40 @@ namespace rsl
 			);
 			container_base::m_size = srcSize;
 		}
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	inline constexpr void
+	dynamic_array<T, Alloc, Factory>::split_reserve(size_type pos, size_type count, size_type newSize)
+		noexcept(container_base::move_construct_noexcept)
+	{
+		if (newSize > container_base::m_capacity)
+		{
+			if constexpr (is_trivially_copyable_v<T>)
+			{
+				mem_rsc::reallocate(container_base::m_capacity, newSize);
+				container_base::move_shift_elements_unsafe(pos, npos, count);
+			}
+			else
+			{
+				T* newMem = mem_rsc::m_alloc.allocate(newSize);
+				if (newMem)
+				{
+					mem_rsc::m_alloc.move(newMem, mem_rsc::get_ptr(), pos);
+					mem_rsc::m_alloc.move(newMem + pos, container_base::get_ptr_at(pos), pos + count);
+				}
+
+				mem_rsc::deallocate(container_base::m_capacity);
+				mem_rsc::set_ptr(newMem);
+			}
+
+			container_base::m_capacity = newSize;
+		}
+		else
+		{
+			container_base::move_shift_elements_unsafe(pos, npos, count);
+		}
+
+        container_base::m_size = newSize;
 	}
 } // namespace rsl
