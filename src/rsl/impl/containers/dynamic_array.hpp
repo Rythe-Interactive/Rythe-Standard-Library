@@ -54,6 +54,9 @@ namespace rsl
 		[[rythe_always_inline]] constexpr dynamic_array(size_type count, in_place_signal_type, Args&&... args)
 			noexcept(container_base::template construct_noexcept<Args...>);
 
+        using container_base::operator view_type;
+        using container_base::operator const_view_type;
+
 		[[rythe_always_inline]] constexpr dynamic_array& operator=(const dynamic_array& src)
 			noexcept(container_base::copy_assign_noexcept && container_base::copy_construct_noexcept);
 		[[rythe_always_inline]] constexpr dynamic_array& operator=(dynamic_array&& src) noexcept;
@@ -89,8 +92,8 @@ namespace rsl
 		template <input_iterator InputIt>
 		[[rythe_always_inline]] constexpr void assign(InputIt first, InputIt last);
 
-		[[rythe_always_inline]] constexpr iterator_type iterator_at(size_type i) noexcept;
-		[[rythe_always_inline]] constexpr const_iterator_type iterator_at(size_type i) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr iterator_type iterator_at(size_type i) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type iterator_at(size_type i) const noexcept;
 
 		[[rythe_always_inline]] constexpr size_type insert(size_type pos, const value_type& value)
 			noexcept(container_base::move_construct_noexcept && container_base::copy_construct_noexcept);

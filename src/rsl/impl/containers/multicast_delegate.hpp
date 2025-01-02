@@ -26,350 +26,193 @@ namespace rsl
 		using const_reverse_iterator_type = typename invocation_container::const_reverse_iterator_type;
 		using view_type = typename invocation_container::view_type;
 		using const_view_type = typename invocation_container::const_view_type;
-		using allocator_storage_type = allocator_storage<Alloc>;
-		using allocator_t = Alloc;
-		using factory_storage_type = factory_storage<Factory>;
-		using factory_t = Factory;
+		using allocator_storage_type = typename invocation_container::allocator_storage_type;
+		using allocator_t = typename invocation_container::allocator_t;
+		using factory_storage_type = typename invocation_container::factory_storage_type;
+		using factory_t = typename invocation_container::factory_t;
 
 		[[rythe_always_inline]] constexpr multicast_delegate() noexcept = default;
 
-		[[rythe_always_inline]] constexpr multicast_delegate(const value_type& val) noexcept
-			: m_invocationList(1, in_place_signal, val.m_invocation)
-		{
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate(const value_type& val) noexcept;
+		[[rythe_always_inline]] explicit constexpr multicast_delegate(const allocator_storage_type& allocStorage)
+			noexcept(is_nothrow_constructible_v<invocation_container, const allocator_storage_type&>);
+		[[rythe_always_inline]] explicit constexpr multicast_delegate(const factory_storage_type& factoryStorage)
+			noexcept(is_nothrow_constructible_v<invocation_container, const factory_storage_type&>);
+		[[rythe_always_inline]] constexpr multicast_delegate(
+			const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage
+		)
+			noexcept(is_nothrow_constructible_v<
+					 invocation_container, const allocator_storage_type&, const factory_storage_type&>);
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr bool empty() const noexcept { return m_invocationList.empty(); }
-		[[rythe_always_inline]] constexpr void clear() noexcept { m_invocationList.clear(); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr size_type size() const noexcept
-		{
-			return m_invocationList.size();
-		}
-		[[rythe_always_inline]] constexpr void reserve(size_type newCap) noexcept { m_invocationList.reserve(newCap); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr size_type capacity() const noexcept
-		{
-			return m_invocationList.capacity();
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool empty() const noexcept;
+		[[rythe_always_inline]] constexpr void clear() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr size_type size() const noexcept;
+		[[rythe_always_inline]] constexpr void reserve(size_type newCap) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr size_type capacity() const noexcept;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr auto begin() noexcept { return m_invocationList.begin(); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr auto cbegin() const noexcept
-		{
-			return m_invocationList.cbegin();
-		}
-		[[nodiscard]] [[rythe_always_inline]] constexpr auto begin() const noexcept { return cbegin(); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr auto rbegin() noexcept { return m_invocationList.rbegin(); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr auto crbegin() const noexcept
-		{
-			return m_invocationList.crbegin();
-		}
-		[[nodiscard]] [[rythe_always_inline]] constexpr auto rbegin() const noexcept { return crbegin(); }
+		[[nodiscard]] [[rythe_always_inline]] constexpr allocator_t& get_allocator() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const allocator_t& get_allocator() const noexcept;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr auto end() noexcept { return m_invocationList.end(); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr auto cend() const noexcept { return m_invocationList.cend(); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr auto end() const noexcept { return cend(); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr auto rend() noexcept { return m_invocationList.rend(); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr auto crend() const noexcept { return m_invocationList.crend(); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr auto rend() const noexcept { return crend(); }
+		[[rythe_always_inline]] constexpr void set_factory(const factory_storage_type& factoryStorage)
+			noexcept(is_nothrow_copy_assignable_v<factory_storage_type>);
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr value_type& at(size_type i) noexcept
-		{
-			return m_invocationList.at(i);
-		}
-		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type& at(size_type i) const noexcept
-		{
-			return m_invocationList.at(i);
-		}
-		[[nodiscard]] [[rythe_always_inline]] constexpr value_type& operator[](size_type i) noexcept { return at(i); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type& operator[](size_type i) const noexcept
-		{
-			return at(i);
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr factory_t& get_factory() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const factory_t& get_factory() const noexcept;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr value_type& front() noexcept
-		{
-			return m_invocationList.front();
-		}
-		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type& front() const noexcept
-		{
-			return m_invocationList.front();
-		}
-		[[nodiscard]] [[rythe_always_inline]] constexpr value_type& back() noexcept { return m_invocationList.back(); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type& back() const noexcept
-		{
-			return m_invocationList.back();
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr allocator_storage_type& get_allocator_storage() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const allocator_storage_type&
+		get_allocator_storage() const noexcept;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr bool operator==(nullptr_type) const noexcept { return empty(); }
-		[[nodiscard]] [[rythe_always_inline]] constexpr bool operator!=(nullptr_type) const noexcept
-		{
-			return !empty();
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr factory_storage_type& get_factory_storage() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const factory_storage_type&
+		get_factory_storage() const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto begin() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto cbegin() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto begin() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto rbegin() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto crbegin() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto rbegin() const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto end() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto cend() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto end() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto rend() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto crend() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto rend() const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr iterator_type iterator_at(size_type i) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type iterator_at(size_type i) const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr value_type& at(size_type i) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type& at(size_type i) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr value_type& operator[](size_type i) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type& operator[](size_type i) const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr view_type view() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_view_type view() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr operator view_type() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr operator const_view_type() const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr value_type& front() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type& front() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr value_type& back() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type& back() const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool operator==(nullptr_type) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool operator!=(nullptr_type) const noexcept;
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool
 		operator==(const multicast_delegate&) const noexcept = default;
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool
 		operator!=(const multicast_delegate&) const noexcept = default;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr bool operator==(const value_type& other) const noexcept
-		{
-			return size() == 1 && at(0) == other;
-		}
-		[[nodiscard]] [[rythe_always_inline]] constexpr bool operator!=(const value_type& other) const noexcept
-		{
-			return !(*this == other);
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool operator==(const value_type& other) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool operator!=(const value_type& other) const noexcept;
 
-		[[rythe_always_inline]] constexpr multicast_delegate& push_back(const value_type& e)
-		{
-			m_invocationList.push_back(e);
-			return *this;
-		}
-
-		[[rythe_always_inline]] constexpr multicast_delegate& push_back(value_type&& e)
-		{
-			m_invocationList.push_back(move(e));
-			return *this;
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& push_back(const value_type& e);
+		[[rythe_always_inline]] constexpr multicast_delegate& push_back(value_type&& e);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		[[rythe_always_inline]] constexpr multicast_delegate& push_back(T& instance)
-		{
-			return push_back(
-				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
-			);
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& push_back(T& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-		[[rythe_always_inline]] constexpr multicast_delegate& push_back(const T& instance)
-		{
-			return push_back(
-				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
-			);
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& push_back(const T& instance);
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
-		[[rythe_always_inline]] constexpr multicast_delegate& push_back()
-		{
-			return push_back(base::template create_element<TMethod>(m_invocationList.get_allocator_storage()));
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& push_back();
 
 		template <functor Functor>
-			requires invocable<Functor, ReturnType(ParamTypes...)>
 		[[rythe_always_inline]] constexpr multicast_delegate& push_back(const Functor& instance)
-		{
-			return push_back(base::template create_element<Functor>(m_invocationList.get_allocator_storage(), instance)
-			);
-		}
+			requires invocable<Functor, ReturnType(ParamTypes...)>;
 
-		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(const value_type& another)
-		{
-			return push_back(another);
-		}
-
-		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(value_type&& another)
-		{
-			return push_back(move(another));
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(const value_type& another);
+		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(value_type&& another);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(T& instance)
-		{
-			return push_back(
-				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
-			);
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(T& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(const T& instance)
-		{
-			return push_back(
-				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
-			);
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(const T& instance);
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
-		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(const Functor& instance)
-		{
-			return push_back(base::template create_element<Functor>(m_invocationList.get_allocator_storage(), instance)
-			);
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(const Functor& instance);
 
-		[[rythe_always_inline]] constexpr size_type erase(size_type pos) { return m_invocationList.erase(pos); }
+		[[rythe_always_inline]] constexpr size_type erase(size_type pos);
+		[[rythe_always_inline]] constexpr size_type erase(size_type first, size_type last);
 
-		[[rythe_always_inline]] constexpr size_type erase(size_type first, size_type last)
-		{
-			return m_invocationList.erase(first, last);
-		}
+		[[rythe_always_inline]] constexpr void pop_back();
 
-		[[rythe_always_inline]] constexpr void pop_back() { erase(size() - 1); }
-
-		[[rythe_always_inline]] constexpr multicast_delegate& remove(const value_type& del)
-		{
-			return remove(del.m_invocation.id);
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& remove(const value_type& del);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		[[rythe_always_inline]] constexpr multicast_delegate& remove(T& instance)
-		{
-			return remove(base::template create_id<T, TMethod>(instance));
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& remove(T& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-		[[rythe_always_inline]] constexpr multicast_delegate& remove(const T& instance)
-		{
-			return remove(base::template create_id<T, TMethod>(instance));
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& remove(const T& instance);
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
-		[[rythe_always_inline]] constexpr multicast_delegate& remove()
-		{
-			return remove(base::template create_id<TMethod>());
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& remove();
 
 		template <functor Functor>
-			requires invocable<Functor, ReturnType(ParamTypes...)>
 		[[rythe_always_inline]] constexpr multicast_delegate& remove(const Functor& instance)
-		{
-			return remove(base::template create_id<Functor>(instance));
-		}
+			requires invocable<Functor, ReturnType(ParamTypes...)>;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr bool contains(const value_type& del) const noexcept
-		{
-			return contains(del.m_invocation.id);
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool contains(const value_type& del) const noexcept;
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		[[nodiscard]] [[rythe_always_inline]] constexpr bool contains(T& instance) const noexcept
-		{
-			return contains(base::template create_id<T, TMethod>(instance));
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool contains(T& instance) const noexcept;
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-		[[nodiscard]] [[rythe_always_inline]] constexpr bool contains(const T& instance) const noexcept
-		{
-			return contains(base::template create_id<T, TMethod>(instance));
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool contains(const T& instance) const noexcept;
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
-		[[nodiscard]] [[rythe_always_inline]] constexpr bool contains() const noexcept
-		{
-			return contains(base::template create_id<TMethod>());
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool contains() const noexcept;
 
 		template <functor Functor>
-			requires invocable<Functor, ReturnType(ParamTypes...)>
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool contains(const Functor& instance) const noexcept
-		{
-			return contains(base::template create_id<Functor>(instance));
-		}
+			requires invocable<Functor, ReturnType(ParamTypes...)>;
 
-		[[rythe_always_inline]] constexpr multicast_delegate& operator-=(const value_type& another)
-		{
-			return remove(another.m_invocation.id);
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& operator-=(const value_type& another);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		[[rythe_always_inline]] constexpr multicast_delegate& operator-=(T& instance)
-		{
-			return remove(base::template create_id<T, TMethod>(instance));
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& operator-=(T& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-		[[rythe_always_inline]] constexpr multicast_delegate& operator-=(const T& instance)
-		{
-			return remove(base::template create_id<T, TMethod>(instance));
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& operator-=(const T& instance);
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
-		[[rythe_always_inline]] constexpr multicast_delegate& operator-=(const Functor& instance)
-		{
-			return remove(base::template create_id<Functor>(instance));
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& operator-=(const Functor& instance);
 
 		[[rythe_always_inline]] constexpr multicast_delegate& operator=(const multicast_delegate&) = default;
-
-		[[rythe_always_inline]] constexpr multicast_delegate& operator=(const value_type& del)
-		{
-			clear();
-			return push_back(del);
-		}
-
-		[[rythe_always_inline]] constexpr multicast_delegate& operator=(value_type&& del)
-		{
-			clear();
-			return push_back(move(del));
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& operator=(multicast_delegate&&) = default;
+		[[rythe_always_inline]] constexpr multicast_delegate& operator=(const value_type& del);
+		[[rythe_always_inline]] constexpr multicast_delegate& operator=(value_type&& del);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		[[rythe_always_inline]] constexpr multicast_delegate& operator=(T& instance)
-		{
-			clear();
-			return push_back(
-				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
-			);
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& operator=(T& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-		[[rythe_always_inline]] constexpr multicast_delegate& operator=(const T& instance)
-		{
-			clear();
-			return push_back(
-				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
-			);
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& operator=(const T& instance);
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
-		[[rythe_always_inline]] constexpr multicast_delegate& operator=(const Functor& instance)
-		{
-			clear();
-			return push_back(base::template create_element<Functor>(m_invocationList.get_allocator_storage(), instance)
-			);
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& operator=(const Functor& instance);
 
-		[[rythe_always_inline]] constexpr multicast_delegate& assign(const value_type& del)
-		{
-			clear();
-			return push_back(del);
-		}
-
-		[[rythe_always_inline]] constexpr multicast_delegate& assign(value_type&& del)
-		{
-			clear();
-			return push_back(move(del));
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& assign(const value_type& del);
+		[[rythe_always_inline]] constexpr multicast_delegate& assign(value_type&& del);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		[[rythe_always_inline]] multicast_delegate& assign(T& instance)
-		{
-			clear();
-			return push_back(
-				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
-			);
-		}
+		[[rythe_always_inline]] multicast_delegate& assign(T& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-		[[rythe_always_inline]] constexpr multicast_delegate& assign(const T& instance)
-		{
-			clear();
-			return push_back(
-				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
-			);
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& assign(const T& instance);
 
 		template <functor Functor>
-			requires invocable<Functor, ReturnType(ParamTypes...)>
 		[[rythe_always_inline]] constexpr multicast_delegate& assign(const Functor& instance)
-		{
-			clear();
-			return push_back(base::template create_element<Functor>(m_invocationList.get_allocator_storage(), instance)
-			);
-		}
+			requires invocable<Functor, ReturnType(ParamTypes...)>;
 
 		template <input_iterator InputIt>
-		[[rythe_always_inline]] constexpr multicast_delegate& assign(InputIt first, InputIt last)
-		{
-			m_invocationList.assign(first, last);
-			return *this;
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& assign(InputIt first, InputIt last);
 
 	private:
 		template <typename T>
@@ -388,54 +231,16 @@ namespace rsl
 		using invocation_result_t = typename invocation_result<T>::type;
 
 	public:
-		[[rythe_always_inline]] constexpr auto operator()(ParamTypes... args) const { return invoke(args...); }
+		[[rythe_always_inline]] constexpr auto operator()(ParamTypes... args) const;
 
-		[[rythe_always_inline]] constexpr auto invoke(ParamTypes... args) const -> invocation_result_t<ReturnType>
-		{
-			if constexpr (same_as<ReturnType, void>)
-			{
-				for (auto& m_item : m_invocationList)
-				{
-					m_item.invoke(args...);
-				}
-			}
-			else
-			{
-				invocation_result_t<ReturnType> result;
-				result.reserve(size());
-				for (auto& m_item : m_invocationList)
-				{
-					result.push_back(m_item.invoke(args...));
-				}
-
-				return result;
-			}
-		}
+		[[rythe_always_inline]] constexpr auto invoke(ParamTypes... args) const -> invocation_result_t<ReturnType>;
 
 	private:
-		[[rythe_always_inline]] constexpr multicast_delegate(invocation_container&& e)
-			: m_invocationList(move(e))
-		{
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate(invocation_container&& e);
 
-		[[rythe_always_inline]] constexpr multicast_delegate& remove(id_type id)
-		{
-			m_invocationList.erase([id](const value_type* elem) { return elem->m_invocation.id == id; });
-			return *this;
-		}
+		[[rythe_always_inline]] constexpr multicast_delegate& remove(id_type id);
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr bool contains(id_type id) const noexcept
-		{
-			for (auto& element : m_invocationList)
-			{
-				if (element.m_invocation.id == id)
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool contains(id_type id) const noexcept;
 
 		[[rythe_always_inline]] constexpr multicast_delegate& push_back(invocation_element&& elem);
 
