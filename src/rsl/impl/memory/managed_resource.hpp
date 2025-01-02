@@ -1,6 +1,6 @@
 #pragma once
-#include "reference_counter.hpp"
 #include "../containers/optional.hpp"
+#include "reference_counter.hpp"
 
 namespace rsl
 {

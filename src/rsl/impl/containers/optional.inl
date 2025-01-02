@@ -23,10 +23,10 @@ namespace rsl
 		: m_factory(other.m_factory),
 		  m_hasValue(false)
 	{
-        if (other.m_hasValue)
+		if (other.m_hasValue)
 		{
 			emplace(other.m_value);
-        }
+		}
 	}
 
 	template <typename T, factory_type Factory>
@@ -118,12 +118,12 @@ namespace rsl
 	{
 		reset();
 
-        m_factory = other.m_factory;
+		m_factory = other.m_factory;
 
-        if (other.m_hasValue)
-        {
+		if (other.m_hasValue)
+		{
 			emplace(other.m_value);
-        }
+		}
 
 		return *this;
 	}

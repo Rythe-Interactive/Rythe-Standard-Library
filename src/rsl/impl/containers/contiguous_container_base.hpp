@@ -110,8 +110,8 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void
 		move_shift_elements_unsafe(size_type offset, size_type end, diff_type shift) noexcept(move_construct_noexcept);
 
-        [[nodiscard]] [[rythe_always_inline]] constexpr value_type* get_ptr_at(size_type i) noexcept;
-        [[nodiscard]] [[rythe_always_inline]] constexpr const value_type* get_ptr_at(size_type i) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr value_type* get_ptr_at(size_type i) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type* get_ptr_at(size_type i) const noexcept;
 
 		size_type m_size = 0;
 		size_type m_capacity = 0;

@@ -125,7 +125,8 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void move_data_assign_impl(const value_type* src, size_type srcSize)
 			noexcept(container_base::move_assign_noexcept && container_base::move_construct_noexcept);
 
-		[[rythe_always_inline]] constexpr void split_reserve(size_type pos, size_type count, size_type newSize) noexcept(container_base::move_construct_noexcept);
+		[[rythe_always_inline]] constexpr void split_reserve(size_type pos, size_type count, size_type newSize)
+			noexcept(container_base::move_construct_noexcept);
 	};
 } // namespace rsl
 

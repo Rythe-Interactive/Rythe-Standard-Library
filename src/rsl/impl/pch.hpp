@@ -16,8 +16,8 @@
 #include "containers/delegate.hpp"
 #include "containers/dynamic_array.hpp"
 #include "containers/multicast_delegate.hpp"
-#include "containers/type_map.hpp"
 #include "containers/optional.hpp"
+#include "containers/type_map.hpp"
 
 #include "memory/allocator.hpp"
 #include "memory/allocator_storage.hpp"

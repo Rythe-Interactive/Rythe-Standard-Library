@@ -176,15 +176,15 @@ namespace rsl
 			return;
 		}
 
-        if (container_base::m_capacity == 0)
-        {
+		if (container_base::m_capacity == 0)
+		{
 			rsl_assert_invalid_object(!mem_rsc::get_ptr());
 
-            mem_rsc::allocate(newCapacity);
+			mem_rsc::allocate(newCapacity);
 
 			container_base::m_capacity = newCapacity;
-            return;
-        }
+			return;
+		}
 
 		if constexpr (is_trivially_copyable_v<T>)
 		{
@@ -303,7 +303,8 @@ namespace rsl
 		split_reserve(
 			pos, 1,
 			container_base::m_size == container_base::m_capacity ? container_base::m_capacity * 2
-																 : container_base::m_size + 1);
+																 : container_base::m_size + 1
+		);
 
 		mem_rsc::construct(1, pos, move(value));
 
@@ -317,7 +318,7 @@ namespace rsl
 	{
 		split_reserve(pos, count, container_base::m_size + count);
 
-        mem_rsc::construct(count, pos, value);
+		mem_rsc::construct(count, pos, value);
 
 		return pos;
 	}
@@ -416,11 +417,11 @@ namespace rsl
 	inline constexpr void dynamic_array<T, Alloc, Factory>::maybe_grow()
 		noexcept(container_base::move_construct_noexcept)
 	{
-        if (container_base::m_capacity == 0)
+		if (container_base::m_capacity == 0)
 		{
 			reserve(1);
 			return;
-        }
+		}
 
 		if (container_base::m_size == container_base::m_capacity)
 		{
@@ -549,6 +550,6 @@ namespace rsl
 			container_base::move_shift_elements_unsafe(pos, npos, count);
 		}
 
-        container_base::m_size = newSize;
+		container_base::m_size = newSize;
 	}
 } // namespace rsl

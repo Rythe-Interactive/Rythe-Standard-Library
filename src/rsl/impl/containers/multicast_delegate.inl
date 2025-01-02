@@ -9,4 +9,4 @@ namespace rsl
 	{
 		return push_back(value_type(m_invocationList.get_allocator_storage(), move(elem)));
 	}
-}
+} // namespace rsl

@@ -8,8 +8,7 @@ namespace rsl
 		const allocator_storage_type& allocStorage, void* object, stub_type stub, id_type id, deleter_type deleter
 	)
 		noexcept(is_nothrow_constructible_v<
-				 managed_resource<void*, Alloc, Factory>, const allocator_storage_type&,
-				 deleter_type, void*>)
+				 managed_resource<void*, Alloc, Factory>, const allocator_storage_type&, deleter_type, void*>)
 		: object(allocStorage, deleter ? deleter : defaultDeleter, object),
 		  ownsData(deleter != nullptr),
 		  stub(stub),

@@ -119,7 +119,7 @@ namespace rsl
 		using retarget = type_erased_allocator<Alloc>;
 
 		type_erased_allocator() = default;
-        template<typename T>
+		template <typename T>
 		type_erased_allocator(const allocator_storage_type& allocStorage, construct_type_signal_type<T>)
 			noexcept(is_nothrow_copy_constructible_v<allocator_storage_type> && is_nothrow_constructible_v<factory_t, construct_type_signal_type<T>> && is_nothrow_constructible_v<factory_storage_type, factory_t&&>);
 		type_erased_allocator(const factory_storage_type& factoryStorage

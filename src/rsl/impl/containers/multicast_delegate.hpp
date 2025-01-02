@@ -437,7 +437,7 @@ namespace rsl
 			return false;
 		}
 
-        [[rythe_always_inline]] constexpr multicast_delegate& push_back(invocation_element&& elem);
+		[[rythe_always_inline]] constexpr multicast_delegate& push_back(invocation_element&& elem);
 
 		invocation_container m_invocationList;
 	};

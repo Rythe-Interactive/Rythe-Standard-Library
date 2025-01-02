@@ -85,8 +85,8 @@ namespace rsl
 		[[rythe_always_inline]] constexpr ~optional() noexcept;
 
 		[[rythe_always_inline]] constexpr optional& operator=(nullptr_type) noexcept;
-		[[rythe_always_inline]] constexpr optional& operator=(const optional& other
-		) noexcept(is_nothrow_copy_assignable_v<factory_storage_type> && is_nothrow_copy_constructible_v<value_type>);
+		[[rythe_always_inline]] constexpr optional& operator=(const optional& other)
+			noexcept(is_nothrow_copy_assignable_v<factory_storage_type> && is_nothrow_copy_constructible_v<value_type>);
 		[[rythe_always_inline]] constexpr optional& operator=(optional&& other)
 			noexcept(is_nothrow_move_assignable_v<factory_storage_type> && is_nothrow_move_constructible_v<value_type>);
 		[[rythe_always_inline]] constexpr optional& operator=(const value_type& value)

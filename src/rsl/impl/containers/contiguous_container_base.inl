@@ -359,16 +359,15 @@ namespace rsl
 
 	template <
 		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
-	inline constexpr T* contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::get_ptr_at(size_type i
-	) noexcept
+	inline constexpr T* contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::get_ptr_at(size_type i) noexcept
 	{
 		return mem_rsc::get_ptr() + i;
 	}
 
 	template <
 		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
-	inline constexpr const T*
-	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::get_ptr_at(size_type i) const noexcept
+	inline constexpr const T* contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::get_ptr_at(size_type i
+	) const noexcept
 	{
 		return mem_rsc::get_ptr() + i;
 	}
