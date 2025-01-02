@@ -22,7 +22,7 @@ namespace rsl
 	template <typename ReturnType, typename... ParamTypes, allocator_type Alloc, untyped_factory_type Factory>
 	inline constexpr multicast_delegate<ReturnType(ParamTypes...), Alloc, Factory>::multicast_delegate(
 		const factory_storage_type& factoryStorage
-	) noexcept
+	) noexcept(is_nothrow_constructible_v<invocation_container, const factory_storage_type&>)
 		: m_invocationList(factoryStorage)
 	{
 	}
