@@ -54,8 +54,8 @@ namespace rsl
 		[[rythe_always_inline]] constexpr dynamic_array(size_type count, in_place_signal_type, Args&&... args)
 			noexcept(container_base::template construct_noexcept<Args...>);
 
-        using container_base::operator view_type;
-        using container_base::operator const_view_type;
+		using container_base::operator view_type;
+		using container_base::operator const_view_type;
 
 		[[rythe_always_inline]] constexpr dynamic_array& operator=(const dynamic_array& src)
 			noexcept(container_base::copy_assign_noexcept && container_base::copy_construct_noexcept);
