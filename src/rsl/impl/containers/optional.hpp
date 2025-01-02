@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../util/type_util.hpp"
+#include "../memory/factory_storage.hpp"
+#include "../util/type_traits.hpp"
 
 namespace rsl
 {
@@ -45,4 +46,85 @@ namespace rsl
 	{
 		constexpr static bool holds_value = false;
 	};
+
+	template <typename T, factory_type Factory = default_factory<T>>
+	class optional
+	{
+	public:
+		using value_type = T;
+		using factory_storage_type = factory_storage<Factory>;
+		using factory_t = Factory;
+
+		[[rythe_always_inline]] constexpr optional() noexcept;
+		[[rythe_always_inline]] constexpr optional(nullptr_type) noexcept;
+		[[rythe_always_inline]] constexpr optional(const optional& other
+		) noexcept(is_nothrow_copy_constructible_v<factory_storage_type> && is_nothrow_copy_constructible_v<value_type>);
+		[[rythe_always_inline]] constexpr optional(optional&& other
+		) noexcept(is_nothrow_move_constructible_v<factory_storage_type> && is_nothrow_move_constructible_v<value_type>);
+		[[rythe_always_inline]] explicit constexpr optional(const factory_storage_type& factoryStorage)
+			noexcept(is_nothrow_copy_constructible_v<factory_storage_type>);
+
+		template <typename... Args>
+		[[rythe_always_inline]] constexpr optional(in_place_signal_type, Args&&... args)
+			noexcept(is_nothrow_constructible_v<value_type, Args...>);
+		template <typename... Args>
+		[[rythe_always_inline]] constexpr optional(
+			const factory_storage_type& factoryStorage, in_place_signal_type, Args&&... args
+		) noexcept(is_nothrow_constructible_v<value_type, Args...>);
+
+		[[rythe_always_inline]] constexpr optional(const value_type& value)
+			noexcept(is_nothrow_copy_constructible_v<value_type>);
+		[[rythe_always_inline]] constexpr optional(const factory_storage_type& factoryStorage, const value_type& value)
+			noexcept(is_nothrow_copy_constructible_v<value_type>);
+
+		[[rythe_always_inline]] constexpr optional(value_type&& value)
+			noexcept(is_nothrow_move_constructible_v<value_type>);
+		[[rythe_always_inline]] constexpr optional(const factory_storage_type& factoryStorage, value_type&& value)
+			noexcept(is_nothrow_move_constructible_v<value_type>);
+
+		[[rythe_always_inline]] constexpr ~optional() noexcept;
+
+		[[rythe_always_inline]] constexpr optional& operator=(nullptr_type) noexcept;
+		[[rythe_always_inline]] constexpr optional& operator=(const optional& other
+		) noexcept(is_nothrow_copy_assignable_v<factory_storage_type> && is_nothrow_copy_constructible_v<value_type>);
+		[[rythe_always_inline]] constexpr optional& operator=(optional&& other)
+			noexcept(is_nothrow_move_assignable_v<factory_storage_type> && is_nothrow_move_constructible_v<value_type>);
+		[[rythe_always_inline]] constexpr optional& operator=(const value_type& value)
+			noexcept(is_nothrow_copy_constructible_v<value_type>);
+		[[rythe_always_inline]] constexpr optional& operator=(value_type&& value)
+			noexcept(is_nothrow_move_constructible_v<value_type>);
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr value_type* operator->() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type* operator->() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr value_type& operator*() & noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type& operator*() const& noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr value_type&& operator*() && noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type&& operator*() const&& noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr value_type& value() & noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type& value() const& noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr value_type&& value() && noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type&& value() const&& noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool holds_value() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr operator bool() noexcept;
+
+		template <typename... Args>
+		[[rythe_always_inline]] constexpr value_type& emplace(Args&&... args)
+			noexcept(is_nothrow_constructible_v<value_type, Args...>);
+
+		[[rythe_always_inline]] constexpr void reset() noexcept;
+
+	private:
+		factory_storage_type m_factory;
+		bool m_hasValue;
+
+		union
+		{
+			value_type m_value;
+			byte m_dummy;
+		};
+	};
 } // namespace rsl
+
+#include "optional.inl"

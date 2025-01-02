@@ -113,8 +113,8 @@ namespace rsl
         [[nodiscard]] [[rythe_always_inline]] constexpr value_type* get_ptr_at(size_type i) noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const value_type* get_ptr_at(size_type i) const noexcept;
 
-		size_type m_size;
-		size_type m_capacity;
+		size_type m_size = 0;
+		size_type m_capacity = 0;
 	};
 } // namespace rsl
 

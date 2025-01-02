@@ -8,7 +8,7 @@ namespace rsl
 		const allocator_storage_type& allocStorage, void* object, stub_type stub, id_type id, deleter_type deleter
 	)
 		noexcept(is_nothrow_constructible_v<
-				 managed_resource<void*, Alloc, Factory>, const allocator_storage_type&, const factory_storage_type&,
+				 managed_resource<void*, Alloc, Factory>, const allocator_storage_type&,
 				 deleter_type, void*>)
 		: object(allocStorage, deleter ? deleter : defaultDeleter, object),
 		  ownsData(deleter != nullptr),
@@ -19,7 +19,7 @@ namespace rsl
 
 	template <typename ReturnType, typename... ParamTypes, allocator_type Alloc, untyped_factory_type Factory>
 	inline constexpr delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::invocation_element::invocation_element(
-		const invocation_element& other
+		const delegate_base<ReturnType(ParamTypes...), Alloc, Factory>::invocation_element& other
 	) noexcept(is_nothrow_copy_constructible_v<managed_resource<void*, Alloc, Factory>>)
 		: object(other.object),
 		  ownsData(other.ownsData),

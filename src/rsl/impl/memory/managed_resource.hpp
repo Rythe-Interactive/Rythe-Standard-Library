@@ -1,5 +1,6 @@
 #pragma once
 #include "reference_counter.hpp"
+#include "../containers/optional.hpp"
 
 namespace rsl
 {
@@ -60,20 +61,16 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void arm(Deleter deleter, Args&&... args)
 			noexcept(is_nothrow_constructible_v<T, Args...>);
 
-		[[rythe_always_inline]] constexpr T* get() noexcept { return &m_value; }
-		[[rythe_always_inline]] constexpr const T* get() const noexcept { return &m_value; }
+		[[rythe_always_inline]] constexpr T* get() noexcept { return &*m_value; }
+		[[rythe_always_inline]] constexpr const T* get() const noexcept { return &*m_value; }
 
-		[[rythe_always_inline]] constexpr T& operator*() noexcept { return m_value; }
-		[[rythe_always_inline]] constexpr const T& operator*() const noexcept { return m_value; }
-		[[rythe_always_inline]] constexpr T* operator->() noexcept { return &m_value; }
-		[[rythe_always_inline]] constexpr const T* operator->() const noexcept { return &m_value; }
+		[[rythe_always_inline]] constexpr T& operator*() noexcept { return *m_value; }
+		[[rythe_always_inline]] constexpr const T& operator*() const noexcept { return *m_value; }
+		[[rythe_always_inline]] constexpr T* operator->() noexcept { return &*m_value; }
+		[[rythe_always_inline]] constexpr const T* operator->() const noexcept { return &*m_value; }
 
 	private:
-		union
-		{
-			T m_value;
-			byte m_dummy;
-		};
+		optional<T> m_value;
 	};
 } // namespace rsl
 

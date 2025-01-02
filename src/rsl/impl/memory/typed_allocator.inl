@@ -333,9 +333,28 @@ namespace rsl
 	}
 
 	template <allocator_type Alloc, untyped_factory_type Factory>
+	template <typename T>
+	inline type_erased_allocator<
+		Alloc,
+		Factory>::type_erased_allocator(const allocator_storage_type& allocStorage, construct_type_signal_type<T>)
+		noexcept(is_nothrow_copy_constructible_v<allocator_storage_type> && is_nothrow_constructible_v<factory_t, construct_type_signal_type<T>> && is_nothrow_constructible_v<factory_storage_type, factory_t&&>)
+		: m_alloc(allocStorage),
+		  m_factory(factory_t(construct_type_signal<T>))
+	{
+	}
+
+	template <allocator_type Alloc, untyped_factory_type Factory>
+	inline type_erased_allocator<Alloc, Factory>::type_erased_allocator(const factory_storage_type& factoryStorage
+	) noexcept(is_nothrow_constructible_v<allocator_storage_type> && is_nothrow_copy_constructible_v<factory_storage_type>)
+		: m_alloc(),
+		  m_factory(factoryStorage)
+	{
+	}
+
+	template <allocator_type Alloc, untyped_factory_type Factory>
 	inline type_erased_allocator<Alloc, Factory>::type_erased_allocator(
 		const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage
-	)
+	) noexcept(is_nothrow_copy_constructible_v<allocator_storage_type> && is_nothrow_copy_constructible_v<factory_storage_type>)
 		: m_alloc(allocStorage),
 		  m_factory(factoryStorage)
 	{

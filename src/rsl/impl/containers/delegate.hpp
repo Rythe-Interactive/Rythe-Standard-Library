@@ -34,158 +34,89 @@ namespace rsl
 
 		[[rythe_always_inline]] constexpr delegate() = default;
 
-		[[rythe_always_inline]] explicit delegate(const allocator_storage_type& allocStorage)
-			: m_alloc(allocStorage)
-		{
-		}
+		[[rythe_always_inline]] explicit constexpr delegate(const allocator_storage_type& allocStorage);
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
-		constexpr delegate(const Functor& instance)
-			: m_invocation(base::template create_element<Functor>(instance))
-		{
-		}
+		[[rythe_always_inline]] constexpr delegate(const Functor& instance);
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
-		constexpr delegate(const allocator_storage_type& allocStorage, const Functor& instance)
-			: m_alloc(allocStorage),
-			  m_invocation(base::template create_element<Functor>(instance))
-		{
-		}
+		[[rythe_always_inline]] constexpr delegate(const allocator_storage_type& allocStorage, const Functor& instance);
 
 		template <functor Functor>
 			requires invocable<Functor, ReturnType(ParamTypes...)>
-		constexpr delegate(const Functor& instance)
-			: m_invocation(base::template create_element<Functor>(instance))
-		{
-		}
+		[[rythe_always_inline]] constexpr delegate(const Functor& instance);
 
 		template <functor Functor>
 			requires invocable<Functor, ReturnType(ParamTypes...)>
-		constexpr delegate(const allocator_storage_type& allocStorage, const Functor& instance)
-			: m_alloc(allocStorage),
-			  m_invocation(base::template create_element<Functor>(instance))
-		{
-		}
+		[[rythe_always_inline]] constexpr delegate(const allocator_storage_type& allocStorage, const Functor& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		constexpr static delegate create(T& instance)
-		{
-			return delegate(base::template create_element<T, TMethod>(allocator_storage_type{}, instance));
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr static delegate create(T& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		constexpr static delegate create(const allocator_storage_type& alloc, T& instance)
-		{
-			return delegate(base::template create_element<T, TMethod>(alloc, instance));
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr static delegate
+		create(const allocator_storage_type& alloc, T& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-		constexpr static delegate create(const T& instance)
-		{
-			return delegate(base::template create_element<T, TMethod>(allocator_storage_type{}, instance));
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr static delegate create(const T& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-		constexpr static delegate create(const allocator_storage_type& alloc, const T& instance)
-		{
-			return delegate(base::template create_element<T, TMethod>(alloc, instance));
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr static delegate
+		create(const allocator_storage_type& alloc, const T& instance);
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
-		constexpr static delegate create()
-		{
-			return delegate(base::template create_element<TMethod>(allocator_storage_type{}));
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr static delegate create();
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
-		constexpr static delegate create(const allocator_storage_type& alloc)
-		{
-			return delegate(base::template create_element<TMethod>(alloc));
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr static delegate create(const allocator_storage_type& alloc);
 
 		template <functor Functor>
 			requires invocable<Functor, ReturnType(ParamTypes...)>
-		constexpr static delegate create(const Functor& instance)
-		{
-			return delegate(base::template create_element<Functor>(allocator_storage_type{}, instance));
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr static delegate create(const Functor& instance);
 
 		template <functor Functor>
 			requires invocable<Functor, ReturnType(ParamTypes...)>
-		constexpr static delegate create(const allocator_storage_type& alloc, const Functor& instance)
-		{
-			return delegate(base::template create_element<Functor>(alloc, instance));
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr static delegate
+		create(const allocator_storage_type& alloc, const Functor& instance);
 
-		void set_allocator(const allocator_storage_type& allocStorage)
-			noexcept(is_nothrow_copy_assignable_v<allocator_storage_type>)
-		{
-			m_alloc = allocStorage;
-		}
+		[[rythe_always_inline]] constexpr void set_allocator(const allocator_storage_type& allocStorage)
+			noexcept(is_nothrow_copy_assignable_v<allocator_storage_type>);
 
-		allocator_t& get_allocator() noexcept { return *m_alloc; }
-		const allocator_t& get_allocator() const noexcept { return *m_alloc; }
+		[[nodiscard]] [[rythe_always_inline]] constexpr allocator_t& get_allocator() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const allocator_t& get_allocator() const noexcept;
 
-		constexpr bool empty() const { return m_invocation.stub == nullptr; }
-		constexpr void clear() { m_invocation = invocation_element(); }
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool empty() const noexcept;
+		[[rythe_always_inline]] constexpr void clear() noexcept;
 
-		constexpr bool operator==(nullptr_type) const { return empty(); }
-		constexpr bool operator!=(nullptr_type) const { return !empty(); }
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool operator==(nullptr_type) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool operator!=(nullptr_type) const noexcept;
 
-		constexpr bool operator==(const delegate&) const = default;
-		constexpr bool operator!=(const delegate&) const = default;
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool operator==(const delegate&) const noexcept = default;
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool operator!=(const delegate&) const noexcept = default;
 
-		constexpr bool operator==(const multicast_delegate<ReturnType(ParamTypes...)>& other) const
-		{
-			return other == (*this);
-		}
-		constexpr bool operator!=(const multicast_delegate<ReturnType(ParamTypes...)>& other) const
-		{
-			return other != (*this);
-		}
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool
+		operator==(const multicast_delegate<ReturnType(ParamTypes...)>& other) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool
+		operator!=(const multicast_delegate<ReturnType(ParamTypes...)>& other) const noexcept;
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		constexpr delegate& assign(T& instance)
-		{
-			m_invocation = base::template create_element<T, TMethod>(m_alloc, instance);
-			return *this;
-		}
+		[[rythe_always_inline]] constexpr delegate& assign(T& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
-		constexpr delegate& assign(const T& instance)
-		{
-			m_invocation = base::template create_element<T, TMethod>(m_alloc, instance);
-			return *this;
-		}
+		[[rythe_always_inline]] constexpr delegate& assign(const T& instance);
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
-		constexpr delegate& assign()
-		{
-			m_invocation = base::template create_element<TMethod>(m_alloc);
-			return *this;
-		}
-
-		constexpr delegate& operator=(const delegate&) = default;
+		[[rythe_always_inline]] constexpr delegate& assign();
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
-		constexpr delegate& operator=(const Functor& instance)
-		{
-			m_invocation = base::template create_element<Functor>(m_alloc, instance);
-			return *this;
-		}
+		[[rythe_always_inline]] constexpr delegate& operator=(const Functor& instance);
+		[[rythe_always_inline]] constexpr delegate& operator=(const delegate&) = default;
 
-		constexpr ReturnType operator()(ParamTypes... args) const { return invoke(args...); }
-
-		constexpr ReturnType invoke(ParamTypes... args) const
-		{
-			return (*m_invocation.stub)(*m_invocation.object, args...);
-		}
+		[[rythe_always_inline]] constexpr ReturnType operator()(ParamTypes... args) const;
+		[[rythe_always_inline]] constexpr ReturnType invoke(ParamTypes... args) const;
 
 	private:
-		constexpr delegate(invocation_element&& e)
-			: m_invocation(e)
-		{
-		}
+		[[rythe_always_inline]] constexpr delegate(const allocator_storage_type& allocStorage, invocation_element&& e);
 
 		allocator_storage_type m_alloc;
 		invocation_element m_invocation;

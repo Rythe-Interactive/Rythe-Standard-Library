@@ -32,7 +32,7 @@ namespace rsl
 		{
 			using return_type = ReturnType;
 			using param_types = type_sequence<ParamTypes...>;
-			constexpr invocation_element() = default;
+			constexpr invocation_element() noexcept = default;
 
 			constexpr invocation_element(
 				const allocator_storage_type& allocStorage, void* object, stub_type stub, id_type id,
@@ -118,3 +118,5 @@ namespace rsl
 		[[rythe_always_inline]] static id_type create_id(const Functor& instance);
 	};
 } // namespace rsl
+
+#include "delegate_base.inl"

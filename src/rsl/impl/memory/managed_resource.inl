@@ -41,7 +41,7 @@ namespace rsl
 	inline constexpr void managed_resource<T, Alloc, Factory>::arm(Deleter deleter, Args&&... args)
 		noexcept(is_nothrow_constructible_v<T, Args...>)
 	{
-		default_factory<T>{}.construct(&m_value, 1, forward<Args>(args)...);
+		m_value.emplace(forward<Args>(args)...);
 
 		ref_counter::set_factory(Factory(construct_type_signal<internal::managed_payload<T, Deleter>>));
 		ref_counter::arm();
@@ -53,7 +53,7 @@ namespace rsl
 	{
 		if (ref_counter::is_armed() && ref_counter::free())
 		{
-			mem_rsc::get_ptr()->destroy(&m_value);
+			mem_rsc::get_ptr()->destroy(get());
 		}
 	}
 } // namespace rsl

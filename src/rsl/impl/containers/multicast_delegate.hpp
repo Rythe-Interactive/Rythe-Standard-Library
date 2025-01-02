@@ -133,26 +133,31 @@ namespace rsl
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
 		[[rythe_always_inline]] constexpr multicast_delegate& push_back(T& instance)
 		{
-			return push_back(base::template create_element<T, TMethod>(m_alloc, instance));
+			return push_back(
+				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
+			);
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		[[rythe_always_inline]] constexpr multicast_delegate& push_back(const T& instance)
 		{
-			return push_back(base::template create_element<T, TMethod>(m_alloc, instance));
+			return push_back(
+				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
+			);
 		}
 
 		template <ReturnType (*TMethod)(ParamTypes...)>
 		[[rythe_always_inline]] constexpr multicast_delegate& push_back()
 		{
-			return push_back(base::template create_element<TMethod>(m_alloc));
+			return push_back(base::template create_element<TMethod>(m_invocationList.get_allocator_storage()));
 		}
 
 		template <functor Functor>
 			requires invocable<Functor, ReturnType(ParamTypes...)>
 		[[rythe_always_inline]] constexpr multicast_delegate& push_back(const Functor& instance)
 		{
-			return push_back(base::template create_element<Functor>(m_alloc, instance));
+			return push_back(base::template create_element<Functor>(m_invocationList.get_allocator_storage(), instance)
+			);
 		}
 
 		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(const value_type& another)
@@ -168,19 +173,24 @@ namespace rsl
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
 		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(T& instance)
 		{
-			return push_back(base::template create_element<T, TMethod>(m_alloc, instance));
+			return push_back(
+				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
+			);
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(const T& instance)
 		{
-			return push_back(base::template create_element<T, TMethod>(m_alloc, instance));
+			return push_back(
+				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
+			);
 		}
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
 		[[rythe_always_inline]] constexpr multicast_delegate& operator+=(const Functor& instance)
 		{
-			return push_back(base::template create_element<Functor>(m_alloc, instance));
+			return push_back(base::template create_element<Functor>(m_invocationList.get_allocator_storage(), instance)
+			);
 		}
 
 		[[rythe_always_inline]] constexpr size_type erase(size_type pos) { return m_invocationList.erase(pos); }
@@ -293,21 +303,26 @@ namespace rsl
 		[[rythe_always_inline]] constexpr multicast_delegate& operator=(T& instance)
 		{
 			clear();
-			return push_back(base::template create_element<T, TMethod>(m_alloc, instance));
+			return push_back(
+				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
+			);
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		[[rythe_always_inline]] constexpr multicast_delegate& operator=(const T& instance)
 		{
 			clear();
-			return push_back(base::template create_element<T, TMethod>(m_alloc, instance));
+			return push_back(
+				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
+			);
 		}
 
 		template <invocable<ReturnType(ParamTypes...)> Functor>
 		[[rythe_always_inline]] constexpr multicast_delegate& operator=(const Functor& instance)
 		{
 			clear();
-			return push_back(base::template create_element<Functor>(m_alloc, instance));
+			return push_back(base::template create_element<Functor>(m_invocationList.get_allocator_storage(), instance)
+			);
 		}
 
 		[[rythe_always_inline]] constexpr multicast_delegate& assign(const value_type& del)
@@ -326,14 +341,18 @@ namespace rsl
 		[[rythe_always_inline]] multicast_delegate& assign(T& instance)
 		{
 			clear();
-			return push_back(base::template create_element<T, TMethod>(m_alloc, instance));
+			return push_back(
+				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
+			);
 		}
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		[[rythe_always_inline]] constexpr multicast_delegate& assign(const T& instance)
 		{
 			clear();
-			return push_back(base::template create_element<T, TMethod>(m_alloc, instance));
+			return push_back(
+				base::template create_element<T, TMethod>(m_invocationList.get_allocator_storage(), instance)
+			);
 		}
 
 		template <functor Functor>
@@ -341,7 +360,8 @@ namespace rsl
 		[[rythe_always_inline]] constexpr multicast_delegate& assign(const Functor& instance)
 		{
 			clear();
-			return push_back(base::template create_element<Functor>(m_alloc, instance));
+			return push_back(base::template create_element<Functor>(m_invocationList.get_allocator_storage(), instance)
+			);
 		}
 
 		template <input_iterator InputIt>
@@ -400,7 +420,7 @@ namespace rsl
 
 		[[rythe_always_inline]] constexpr multicast_delegate& remove(id_type id)
 		{
-			m_invocationList.erase(id);
+			m_invocationList.erase([id](const value_type* elem) { return elem->m_invocation.id == id; });
 			return *this;
 		}
 
@@ -408,7 +428,7 @@ namespace rsl
 		{
 			for (auto& element : m_invocationList)
 			{
-				if (element.id == id)
+				if (element.m_invocation.id == id)
 				{
 					return true;
 				}
@@ -417,7 +437,8 @@ namespace rsl
 			return false;
 		}
 
-		allocator_storage_type m_alloc;
+        [[rythe_always_inline]] constexpr multicast_delegate& push_back(invocation_element&& elem);
+
 		invocation_container m_invocationList;
 	};
 

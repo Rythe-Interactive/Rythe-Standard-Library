@@ -176,6 +176,16 @@ namespace rsl
 			return;
 		}
 
+        if (container_base::m_capacity == 0)
+        {
+			rsl_assert_invalid_object(!mem_rsc::get_ptr());
+
+            mem_rsc::allocate(newCapacity);
+
+			container_base::m_capacity = newCapacity;
+            return;
+        }
+
 		if constexpr (is_trivially_copyable_v<T>)
 		{
 			mem_rsc::reallocate(container_base::m_capacity, newCapacity);
@@ -377,12 +387,12 @@ namespace rsl
 
 		for (size_type i = 0; i < originalSize; i++)
 		{
-			if (comparer(iterator_at(iter)))
+			if (comparer(iterator_at(i)))
 			{
 				if (eraseLocation != npos)
 				{
 					mem_rsc::destroy(1, eraseLocation);
-					container_base::move_shift_elements_unsafe(pos + 1, i, shift);
+					container_base::move_shift_elements_unsafe(eraseLocation + 1, i, shift);
 					container_base::m_size--;
 					shift -= 1ll;
 				}
@@ -394,7 +404,7 @@ namespace rsl
 		if (eraseLocation != npos)
 		{
 			mem_rsc::destroy(1, eraseLocation);
-			container_base::move_shift_elements_unsafe(pos + 1, npos, shift);
+			container_base::move_shift_elements_unsafe(eraseLocation + 1, npos, shift);
 			container_base::m_size--;
 			return eraseLocation;
 		}
@@ -406,6 +416,12 @@ namespace rsl
 	inline constexpr void dynamic_array<T, Alloc, Factory>::maybe_grow()
 		noexcept(container_base::move_construct_noexcept)
 	{
+        if (container_base::m_capacity == 0)
+		{
+			reserve(1);
+			return;
+        }
+
 		if (container_base::m_size == container_base::m_capacity)
 		{
 			reserve(container_base::m_capacity * 2);
