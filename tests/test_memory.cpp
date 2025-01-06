@@ -4,6 +4,14 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+namespace
+{
+	struct alignas(16) test_struct
+	{
+		rsl::f32 x, y, z;
+	};
+} // namespace
+
 TEST_CASE("memory resource", "[memory]") {}
 
 TEST_CASE("reference counter", "[memory]")
@@ -227,4 +235,33 @@ TEST_CASE("managed resource", "[memory]")
 	SECTION("construction") {}
 
 	SECTION("reference counting") {}
+}
+
+TEST_CASE("memory pool", "[memory]")
+{
+	SECTION("construction")
+	{
+		rsl::memory_pool<test_struct> pool;
+
+		REQUIRE(pool.capacity() == 0);
+	}
+
+	SECTION("allocation & reset")
+	{
+		rsl::memory_pool<test_struct> pool;
+
+		REQUIRE(pool.capacity() == 0);
+
+		auto* ptr = pool.allocate();
+
+		REQUIRE(ptr);
+		REQUIRE(
+			pool.capacity() ==
+			rsl::memory_pool<test_struct>::get_element_count(rsl::memory_pool<test_struct>::minimumBlockSize)
+		);
+	}
+
+	SECTION("deallocation") {}
+
+	SECTION("external memory blocks") {}
 }

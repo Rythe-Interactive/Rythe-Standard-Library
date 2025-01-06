@@ -20,10 +20,10 @@
 #include "containers/type_map.hpp"
 
 #include "memory/allocator.hpp"
+#include "memory/allocator_context.hpp"
 #include "memory/allocator_storage.hpp"
 #include "memory/factory.hpp"
 #include "memory/managed_resource.hpp"
-#include "memory/memory.hpp"
 #include "memory/memory_resource_base.hpp"
 #include "memory/reference_counter.hpp"
 #include "memory/stl_compatibility.hpp"
