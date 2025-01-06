@@ -196,4 +196,7 @@ namespace rsl
 
 	template <typename Func, typename FuncType>
 	concept invocable = internal::func_traits<FuncType>::template is_compatible_with<Func>;
+
+	template <typename T, typename... Args>
+	concept constructable_type = is_constructible_v<T, Args...>;
 } // namespace rsl

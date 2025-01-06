@@ -279,6 +279,16 @@ namespace rsl
 #endif
 
 #if defined(RYTHE_GCC)
+	#define rythe_never_inline gnu::noinline
+#elif defined(RYTHE_CLANG)
+	#define rythe_never_inline clang::noinline
+#elif defined(RYTHE_MSVC)
+	#define rythe_never_inline msvc::noinline
+#else
+	#define rythe_never_inline
+#endif
+
+#if defined(RYTHE_GCC)
 	#define rythe_allocating gnu::allocating
 #elif defined(RYTHE_CLANG)
 	#define rythe_allocating
