@@ -24,6 +24,10 @@ namespace rsl::math
 
 		static const vector one;
 		static const vector zero;
+		static const vector<Scalar, 3, Mode> right;
+		static const vector<Scalar, 3, Mode> up;
+		static const vector<Scalar, 3, Mode> forward;
+
 
 		[[rythe_always_inline]] constexpr vector() noexcept;
 		[[rythe_always_inline]] constexpr vector(const vector&) noexcept = default;
@@ -40,7 +44,7 @@ namespace rsl::math
 
 		template <typename vec_type>
 			requires not_same_as<Scalar, typename vec_type::scalar> || (vec_type::size != 3)
-		[[rythe_always_inline]] constexpr vector(const vec_type& other) noexcept;
+		[[rythe_always_inline]] constexpr vector(const vec_type & other) noexcept;
 
 		[[rythe_always_inline]] constexpr vector& operator=(const vector&) noexcept = default;
 
@@ -81,7 +85,7 @@ namespace rsl::math
 
 		template <typename vec_type>
 			requires not_same_as<bool, typename vec_type::scalar> || (vec_type::size != 3)
-		[[rythe_always_inline]] constexpr vector(const vec_type& other) noexcept;
+		[[rythe_always_inline]] constexpr vector(const vec_type & other) noexcept;
 
 		[[rythe_always_inline]] constexpr void set_mask(bitfield8 mask) noexcept
 		{
@@ -94,7 +98,7 @@ namespace rsl::math
 		{
 			return static_cast<bitfield8>(
 				static_cast<uint32>(data[0]) | static_cast<uint32>(data[1]) << 1u | static_cast<uint32>(data[2]) << 2u
-			);
+				);
 		}
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr operator bool() const noexcept

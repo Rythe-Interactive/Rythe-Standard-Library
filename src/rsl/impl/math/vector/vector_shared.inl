@@ -19,6 +19,7 @@ namespace rsl::math
 	VectorTemplate const vector<ScalarSpecialization, SizeSpecialization, Mode>
 		vector<ScalarSpecialization, SizeSpecialization, Mode>::zero(ScalarSpecialization(0));
 
+
 	VectorTemplate constexpr vector<ScalarSpecialization, SizeSpecialization, Mode>::vector() noexcept
 		: data()
 	{

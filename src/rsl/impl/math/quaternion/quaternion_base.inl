@@ -68,19 +68,19 @@ namespace rsl::math
 	template <arithmetic_type Scalar, mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::right() const noexcept
 	{
-		return vec_type::right * *this;
+		return vector<Scalar,3, Mode>(1,0,0) * *this;
 	}
 
 	template <arithmetic_type Scalar, mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::forward() const noexcept
 	{
-		return vec_type::forward * *this;
+		return vector<Scalar, 3, Mode>(0, 0, 1)* *this;
 	}
 
 	template <arithmetic_type Scalar, mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::up() const noexcept
 	{
-		return vec_type::up * *this;
+		return vector<Scalar, 3, Mode>(0, 1, 0)* *this;
 	}
 
 	template <arithmetic_type Scalar, mode Mode>

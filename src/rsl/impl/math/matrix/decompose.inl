@@ -275,10 +275,14 @@ namespace rsl::math
 	) noexcept
 	{
 		matrix<Scalar, 4, 4> result = { matrix<Scalar,3,3>(orientation) };
-		result[3].xyz = translation;
-		result[0].xyz *= scale[0];
-		result[1].xyz *= scale[1];
-		result[2].xyz *= scale[2];
+		result[3] = translation;
+		result[0] *= scale[0];
+		result[1] *= scale[1];
+		result[2] *= scale[2];
+		result[0].w = 0;
+		result[1].w = 0;
+		result[2].w = 0;
+		result[3].w = 1;
 		return result;
 	}
 
