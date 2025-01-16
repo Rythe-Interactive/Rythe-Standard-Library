@@ -8,32 +8,71 @@ namespace rsl
 {
 	namespace internal
 	{
+		template <size_type I>
+		consteval constexpr_string<I> post_process_compiler_dependent_type_name(constexpr_string<I> name) noexcept
+		{
+			constexpr_string ret = name;
+
+			constexpr_string cxxfilter = "__cxx11::";
+			ret = ret.filter(cxxfilter);
+			constexpr_string classFilter = "class ";
+			constexpr_string classReplace = "";
+			ret = ret.replace(classFilter, classReplace);
+			constexpr_string structFilter = "struct ";
+			constexpr_string structReplace = "";
+			ret = ret.replace(structFilter, structReplace);
+			constexpr_string cdeclFilter = "(__cdecl ";
+			constexpr_string cdeclReplace = " (";
+			ret = ret.replace(cdeclFilter, cdeclReplace);
+			constexpr_string funcPtrFilter = "* )";
+			constexpr_string funcPtrReplace = "*)";
+			ret = ret.replace(funcPtrFilter, funcPtrReplace);
+			constexpr_string voidParamFilter = "(void)";
+			constexpr_string voidParamReplace = "()";
+			ret = ret.replace(voidParamFilter, voidParamReplace);
+			constexpr_string refFilter = " &";
+			constexpr_string refReplace = "&";
+			ret = ret.replace(refFilter, refReplace);
+			constexpr_string ptrFilter = " *";
+			constexpr_string ptrReplace = "*";
+			ret = ret.replace(ptrFilter, ptrReplace);
+			constexpr_string commaFilter = ",";
+			constexpr_string commaReplace = ", ";
+			ret = ret.replace(commaFilter, commaReplace, 0, true);
+			constexpr_string comma2Filter = ",  ";
+			constexpr_string comma2Replace = ", ";
+			ret = ret.replace(comma2Filter, comma2Replace);
+
+			return ret;
+		}
+
 		template <typename T>
 		consteval auto compiler_dependent_type_name() noexcept
 		{
 			string_view functionName = __RYTHE_FULL_FUNC__;
-			string_view typeName;
 
+			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
 #if defined(RYTHE_MSVC)
-			auto first = functionName.find_first_of('<') + 1;
+			auto first = functionName.find_first_of('<', functionName.find("compiler_dependent_type_name")) + 1;
 			auto end = functionName.find_last_of('>');
-			if (auto t = functionName.find_first_of(' ', first) + 1; t < end)
-			{
-				first = t;
-			}
 
-			typeName = functionName.substr(first, end - first);
+			ret.copy_from(functionName.substr(first, end - first));
 #elif defined(RYTHE_GCC)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			typeName = functionName.substr(first, functionName.find_last_of(';') - first);
+			auto end = functionName.find_last_of(';');
+			if (end == std::string_view::npos)
+			{
+				end = functionName.find_last_of(']');
+			}
+
+			ret.copy_from(functionName.substr(first, end - first));
 #elif defined(RYTHE_CLANG)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			typeName = functionName.substr(first, functionName.find_last_of(']') - first);
+			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
 #else
-			typeName = functionName;
+			ret.copy_from(functionName);
 #endif
-			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
-			ret.copy_from(typeName);
+
 			return ret;
 		}
 
@@ -41,28 +80,24 @@ namespace rsl
 		consteval auto compiler_dependent_templated_type_name() noexcept
 		{
 			string_view functionName = __RYTHE_FULL_FUNC__;
-			string_view typeName;
 
+			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
 #if defined(RYTHE_MSVC)
-			auto first = functionName.find_first_of('<') + 1;
+			auto first =
+				functionName.find_first_of('<', functionName.find("compiler_dependent_templated_type_name")) + 1;
 			auto end = functionName.find_last_of('>');
-			if (auto t = functionName.find_first_of(' ', first) + 1; t < end)
-			{
-				first = t;
-			}
 
-			typeName = functionName.substr(first, end - first);
+			ret.copy_from(functionName.substr(first, end - first));
 #elif defined(RYTHE_GCC)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			typeName = functionName.substr(first, functionName.find_last_of(';') - first);
+			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
 #elif defined(RYTHE_CLANG)
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			typeName = functionName.substr(first, functionName.find_last_of(']') - first);
+			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
 #else
-			typeName = functionName;
+			ret.copy_from(functionName);
 #endif
-			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
-			ret.copy_from(typeName);
+
 			return ret;
 		}
 
@@ -71,7 +106,7 @@ namespace rsl
 		{
 			consteval static auto get_value() noexcept
 			{
-				constexpr auto ret = compiler_dependent_type_name<T>();
+				constexpr auto ret = post_process_compiler_dependent_type_name(compiler_dependent_type_name<T>());
 				return ret.template refit<ret.size() + 1>();
 			}
 		};
@@ -105,7 +140,7 @@ namespace rsl
 
 			consteval static auto get_value() noexcept
 			{
-				constexpr auto ret = construct_value();
+				constexpr auto ret = post_process_compiler_dependent_type_name(construct_value());
 				return ret.template refit<ret.size() + 1>();
 			}
 		};
@@ -221,194 +256,61 @@ namespace rsl
 		}
 	};
 
-	namespace internal
+	template <typename T>
+	struct reference_wrapper
 	{
-		template <typename T, typename = void, typename = void>
-		struct get_ptr_type
-		{
-			using type = add_pointer_t<typename T::value_type>;
-		};
+		static_assert(
+			is_object_v<T> || is_function_v<T>,
+			"reference_wrapper<T> requires T to be an object type or a function type."
+		);
 
-		template <typename T, typename U>
-		struct get_ptr_type<T, U, void_t<typename T::ptr_type>>
-		{
-			using type = typename T::ptr_type;
-		};
+		using type = T;
 
-		template <typename T>
-		struct get_ptr_type<T, void_t<typename T::pointer>>
+		constexpr reference_wrapper(T& value) noexcept
+			: m_ptr(addressof(value))
 		{
-			using type = typename T::pointer;
-		};
+		}
 
-		template <typename T, typename = void, typename = void>
-		struct get_const_ptr_type
-		{
-			using type = decorate_type_t<typename T::value_type, const_signal, pointer_signal>;
-		};
 
-		template <typename T, typename U>
-		struct get_const_ptr_type<T, U, void_t<typename T::const_ptr_type>>
-		{
-			using type = typename T::const_ptr_type;
-		};
+		[[nodiscard]] constexpr T& get() const noexcept { return *m_ptr; }
+		constexpr operator T&() const noexcept { return *m_ptr; }
 
-		template <typename T>
-		struct get_const_ptr_type<T, void_t<typename T::const_pointer>>
-		{
-			using type = typename T::const_pointer;
-		};
-
-		template <typename T, typename = void, typename = void>
-		struct get_void_ptr_type
-		{
-			using type = decorate_type_t<typename T::value_type, const_signal, pointer_signal>;
-		};
-
-		template <typename T, typename U>
-		struct get_void_ptr_type<T, U, void_t<typename T::void_ptr_type>>
-		{
-			using type = typename T::void_ptr_type;
-		};
-
-		template <typename T>
-		struct get_void_ptr_type<T, void_t<typename T::void_pointer>>
-		{
-			using type = typename T::void_pointer;
-		};
-
-		template <typename T, typename = void, typename = void>
-		struct get_const_void_ptr_type
-		{
-			using type = typename pointer_traits<typename get_ptr_type<T>::type>::template rebind<const void>;
-		};
-
-		template <typename T, typename U>
-		struct get_const_void_ptr_type<T, U, void_t<typename T::const_void_ptr_type>>
-		{
-			using type = typename T::const_void_ptr_type;
-		};
-
-		template <typename T>
-		struct get_const_void_ptr_type<T, void_t<typename T::const_void_pointer>>
-		{
-			using type = typename T::const_void_pointer;
-		};
-
-		template <typename T, typename Other, typename = void>
-		struct get_rebind_type
-		{
-			using type = typename replace_first_parameter<Other, T>::type;
-		};
-
-		template <typename T, typename Other>
-		struct get_rebind_type<T, Other, void_t<typename T::template rebind<Other>::other>>
-		{
-			using type = typename T::template rebind<Other>::other;
-		};
-
-		RYTHE_HAS_FUNC(allocate_hint)
-		RYTHE_HAS_FUNC(allocate_at_least)
-		RYTHE_HAS_FUNC(construct)
-		RYTHE_HAS_FUNC(destroy)
-		RYTHE_HAS_FUNC(max_size)
-	} // namespace internal
+	private:
+		T* m_ptr{};
+	};
 
 	template <typename T>
-	struct allocation_result
+	reference_wrapper(T&) -> reference_wrapper<T>;
+
+	template <typename T>
+	[[nodiscard]] constexpr reference_wrapper<T> ref(T& value) noexcept
 	{
-		T ptr;
-		size_type count;
-	};
+		return reference_wrapper<T>(value);
+	}
 
-	template <typename Alloc>
-	struct allocator_traits
+	template <typename T>
+	void ref(const T&&) = delete;
+
+	template <class T>
+	[[nodiscard]] constexpr reference_wrapper<T> ref(reference_wrapper<T> value) noexcept
 	{
-		using allocator_type = Alloc;
-		using value_type = typename Alloc::value_type;
+		return value;
+	}
 
-		using ptr_type = typename internal::get_ptr_type<Alloc>::type;
-		using const_ptr = typename internal::get_const_ptr_type<Alloc>::type;
-		using void_ptr_type = typename internal::get_void_ptr_type<Alloc>::type;
-		using const_void_ptr = typename internal::get_const_void_ptr_type<Alloc>::type;
+	template <typename T>
+	[[nodiscard]] constexpr reference_wrapper<const T> cref(const T& value) noexcept
+	{
+		return reference_wrapper<const T>(value);
+	}
 
-		using is_always_equal = is_always_equal_t<Alloc>;
+	template <typename T>
+	void cref(const T&&) = delete;
 
-		template <typename Other>
-		using rebind_alloc = typename internal::get_rebind_type<Alloc, Other>::type;
+	template <typename T>
+	[[nodiscard]] constexpr reference_wrapper<const T> cref(reference_wrapper<T> value) noexcept
+	{
+		return value;
+	}
 
-		template <typename Other>
-		using rebind_traits = allocator_traits<rebind_alloc<Other>>;
 
-		[[nodiscard]] static constexpr ptr_type allocate(Alloc& alloc, const size_type count)
-		{
-			return alloc.allocate(count);
-		}
-
-		[[nodiscard]] static constexpr ptr_type
-		allocate(Alloc& alloc, const size_type count, [[maybe_unused]] const const_void_ptr hint)
-		{
-			if constexpr (internal::has_allocate_hint_v<Alloc, ptr_type(size_type, const_void_ptr)>)
-			{
-				return alloc.allocate(count, hint);
-			}
-			else
-			{
-				return alloc.allocate(count);
-			}
-		}
-
-		[[nodiscard]] static constexpr allocation_result<ptr_type>
-		allocate_at_least(Alloc& alloc, const size_type count)
-		{
-			if constexpr (internal::has_allocate_at_least_v<Alloc, allocation_result<ptr_type>(size_type)>)
-			{
-				return alloc.allocate_at_least(count);
-			}
-			else
-			{
-				return {alloc.allocate(count), count};
-			}
-		}
-
-		static constexpr void deallocate(Alloc& alloc, ptr_type ptr, size_type count) { alloc.deallocate(ptr, count); }
-
-		template <typename T, typename... Args>
-		static constexpr void construct(Alloc& alloc, T* ptr, Args&&... args)
-		{
-			if constexpr (internal::has_construct_v<Alloc, void(T*, Args...)>)
-			{
-				alloc.construct(ptr, ::rsl::forward<Args>(args)...);
-			}
-			else
-			{
-				::rsl::construct_at(ptr, ::rsl::forward<Args>(args)...);
-			}
-		}
-
-		template <typename T>
-		static constexpr void destroy(Alloc& alloc, T* ptr)
-		{
-			if constexpr (internal::has_destroy_v<Alloc, void(T*)>)
-			{
-				alloc.destroy(ptr);
-			}
-			else
-			{
-				::rsl::destroy_at(ptr);
-			}
-		}
-
-		[[nodiscard]] static constexpr size_type max_size(const Alloc& alloc) noexcept
-		{
-			if constexpr (internal::has_max_size_v<Alloc, void()>)
-			{
-				return alloc.max_size();
-			}
-			else
-			{
-				return (::std::numeric_limits<size_type>::max)() / sizeof(value_type);
-			}
-		}
-	};
 } // namespace rsl

@@ -32,19 +32,7 @@ namespace rsl
 	RYTHE_COMPILER_ERROR("RSL_ERR_MAX_COUNT cannot be user defined, use RSL_ERR_ID_UNDERLYING instead")
 #endif
 
-#if !defined(RSL_HANDLE_ERROR_WARNING)
-#define RSL_HANDLE_ERROR_WARNING(condition, message) rsl_soft_assert_msg_consistent(condition, message)
-#endif
-
-#if !defined(RSL_HANDLE_ERROR_ERROR)
-#define RSL_HANDLE_ERROR_ERROR(condition, message) rsl_hard_assert_msg(condition, message)
-#endif
-
-#if !defined(RSL_HANDLE_ERROR_FATAL)
-#define RSL_HANDLE_ERROR_FATAL(condition, message) rsl_hard_assert_msg(condition, message)
-#endif
-
-		using errid = RSL_ERR_ID_UNDERLYING;
+	using errid = RSL_ERR_ID_UNDERLYING;
 
 #define RSL_ERR_MAX_COUNT std::numeric_limits<errid>::max()
 
@@ -78,16 +66,53 @@ namespace rsl
 		}
 	};
 
-	constexpr static error_type success =
-		error_type{ .code = no_error_code, .message = {}, .severity = static_cast<error_severity>(-1), .errorBlockStart = 0 };
+	constexpr static error_type success = error_type{
+		.code = no_error_code, .message = {}, .severity = static_cast<error_severity>(-1), .errorBlockStart = 0
+	};
 
 	using error_list = buffered_list<error_type, RSL_ERR_MAX_COUNT>;
 	using error_view = typename error_list::view_type;
+
+	struct error_handler
+	{
+		virtual void handle_assert(
+			std::string_view expression, std::string_view file, size_type line, std::string_view message, bool soft
+		)
+		{
+			rsl::asserts::internal::default_assert_handler(expression, file, line, message, soft);
+		}
+
+		virtual void handle_error(const error_type& error, bool assertError);
+	};
 
 	struct error_context
 	{
 		thread_local static error_list errors;
 		thread_local static errid currentError;
+		thread_local static error_handler* errorHandlerOverride;
+		thread_local static bool assertOnError;
+		static error_handler defaultErrorHandler;
+	};
+
+	void enable_assert_on_error(bool enabled = true) noexcept;
+	void disable_assert_on_error() noexcept;
+	bool assert_on_error_enabled() noexcept;
+
+	struct scoped_assert_on_error final
+	{
+		bool wasEnabled;
+		scoped_assert_on_error(bool enabled = true);
+		~scoped_assert_on_error();
+	};
+
+	void set_error_handler(error_handler* errorHandler) noexcept;
+	error_handler* get_error_handler() noexcept;
+
+	struct scoped_error_handler final
+	{
+		error_handler* previousErrorHandler;
+		scoped_error_handler(error_handler* errorHandler);
+		~scoped_error_handler();
 	};
 
 	struct error_signal
@@ -143,7 +168,7 @@ namespace rsl
 
 			auto& error = error_context::errors[error_context::currentError];
 			error_context::errors.pop_back((error_context::currentError - error.errorBlockStart) + 1);
-			error_context::currentError = error_context::errors.size() - 1;
+			error_context::currentError = static_cast<errid>(error_context::errors.size() - 1);
 			m_errid = invalid_err_id;
 		}
 
@@ -151,14 +176,11 @@ namespace rsl
 
 		errc report_errors() noexcept
 		{
+			error_handler* errorHandler = get_error_handler();
+
 			for (auto& error : get_errors())
 			{
-				switch (error.severity)
-				{
-				case error_severity::warning: RSL_HANDLE_ERROR_WARNING(error == success, error.message); break;
-				case error_severity::error: RSL_HANDLE_ERROR_ERROR(error == success, error.message); break;
-				case error_severity::fatal: RSL_HANDLE_ERROR_FATAL(error == success, error.message); break;
-				}
+				errorHandler->handle_error(error, assert_on_error_enabled());
 			}
 
 			errc errorCode = no_error_code;
@@ -193,6 +215,8 @@ namespace rsl
 		};
 
 	public:
+		using result_type = remove_cvr_t<T>;
+
 		[[rythe_always_inline]] result(error_signal) noexcept
 			: result_base(error_signal{}),
 			m_dummy(0)
@@ -219,13 +243,13 @@ namespace rsl
 			return true;
 		}
 
-		[[nodiscard]] [[rythe_always_inline]] T& value() noexcept
+		[[nodiscard]] [[rythe_always_inline]] result_type& value() noexcept
 		{
 			rsl_hard_assert_msg(is_okay(), "Tried to get value of result with unresolved error.");
 			return m_value;
 		}
 
-		[[nodiscard]] [[rythe_always_inline]] const T& value() const noexcept
+		[[nodiscard]] [[rythe_always_inline]] const result_type& value() const noexcept
 		{
 			rsl_hard_assert_msg(is_okay(), "Tried to get value of result with unresolved error.");
 			return m_value;
@@ -258,7 +282,7 @@ namespace rsl
 				"Max error count overflow, consider changing RSL_ERR_ID_UNDERLYING to a larger type."
 			);
 
-			error_context::currentError = error_context::errors.size();
+			error_context::currentError = static_cast<errid>(error_context::errors.size());
 			error_context::errors.emplace_back(error_type{
 				.code = static_cast<errc>(errorType),
 				.message = message,
@@ -272,7 +296,7 @@ namespace rsl
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto
 		make_error(ErrorType errorType, std::string_view message, error_severity severity = error_severity::error) noexcept
 	{
-		internal::append_error(error_context::errors.size(), errorType, message, severity);
+		internal::append_error(static_cast<errid>(error_context::errors.size()), errorType, message, severity);
 		return error_signal{};
 	}
 
@@ -332,4 +356,20 @@ namespace rsl
 	}
 
 	inline static result<void> okay = result<void>();
+
+	struct unspecified_error
+	{
+		enum struct unspecified_error_code : errc
+		{
+			unspecified = -1,
+		};
+
+		template <typename T>
+		operator result<T>()
+		{
+			return make_error(unspecified_error_code::unspecified, "Unspecified error");
+		}
+	};
+
+	inline static unspecified_error error = unspecified_error{};
 } // namespace rsl

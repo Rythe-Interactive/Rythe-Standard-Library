@@ -1,9 +1,13 @@
 #pragma once
+#include "../defines.hpp"
+
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(5046)
 #include <cstddef>
 #include <cstdint>
 #include <string>
 #include <string_view>
 #include <vector>
+RYTHE_MSVC_SUPPRESS_WARNING_POP
 
 namespace rsl
 {
@@ -23,6 +27,7 @@ namespace rsl
 	using index_type = std::size_t;
 	using diff_type = std::ptrdiff_t;
 	using ptr_type = std::uintptr_t;
+	using nullptr_type = std::nullptr_t;
 
 	using float32 = float;
 	using float64 = double;

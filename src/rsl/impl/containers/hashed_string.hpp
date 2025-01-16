@@ -22,7 +22,7 @@ namespace rsl
 		constexpr hashed_string_view() noexcept = default;
 
 		constexpr hashed_string_view(const hashed_string& str) noexcept;
-		constexpr hashed_string_view(rsl::cstring str) noexcept
+		constexpr hashed_string_view(cstring str) noexcept
 			: value(hash_string(str)),
 			  str(str)
 		{
@@ -66,8 +66,9 @@ namespace rsl
 	} // namespace hashed_string_literals
 
 	template <typename Alloc>
-	struct basic_hashed_string
+	class basic_hashed_string
 	{
+	public:
 		using string_type = std::basic_string<char, std::char_traits<char>, Alloc>;
 
 		u64 value = 0;
@@ -75,7 +76,7 @@ namespace rsl
 
 		constexpr basic_hashed_string() noexcept = default;
 
-		explicit constexpr basic_hashed_string(rsl::cstring str) noexcept
+		explicit constexpr basic_hashed_string(cstring str) noexcept
 			: value(hash_string(str)),
 			  str(str)
 		{

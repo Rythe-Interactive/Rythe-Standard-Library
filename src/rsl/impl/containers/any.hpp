@@ -1,8 +1,8 @@
 #pragma once
-#include <type_traits>
 #include <typeinfo>
 
 #include "../util/assert.hpp"
+#include "../util/common.hpp"
 #include "../util/primitives.hpp"
 
 namespace rsl

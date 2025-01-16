@@ -1,8 +1,9 @@
 #pragma once
+#include <bit>
 #include <vector>
 
-
 #include "../defines.hpp"
+#include "common.hpp"
 #include "primitives.hpp"
 
 namespace rsl
@@ -26,18 +27,18 @@ namespace rsl
 		static_assert(alignof(T) == alignof(U), "Illegal cast of unaligned types.");
 		static_assert(sizeof(T) <= sizeof(U), "Illegal cast of non size similar types.");
 
-		return *reinterpret_cast<std::remove_reference_t<T>*>(&value);
+		return *bit_cast<T*>(&value);
 	}
 
 	template <typename To, typename From>
-	[[rythe_always_inline]] To force_cast(From& f)
+	[[rythe_always_inline]] constexpr To force_cast(From& f) noexcept
 	{
-		return *reinterpret_cast<To*>(&f);
+		return *bit_cast<To*>(&f);
 	}
 
 	template <typename To, typename From>
-	[[rythe_always_inline]] const To force_cast(const From& f)
+	[[rythe_always_inline]] constexpr To force_cast(const From& f) noexcept
 	{
-		return *reinterpret_cast<const To*>(&f);
+		return *bit_cast<To*>(&f);
 	}
 } // namespace rsl

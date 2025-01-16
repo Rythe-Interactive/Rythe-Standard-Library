@@ -8,8 +8,8 @@ namespace rsl::math::internal
 	{
 	};
 
-	template <arithmetic_type Scalar, mode Mode, bool isSigned>
-	struct vector_additions<Scalar, 2, Mode, isSigned>
+	template <arithmetic_type Scalar, mode Mode>
+	struct vector_additions<Scalar, 2, Mode, false>
 	{
 		static const vector<Scalar, 2, Mode> up;
 		static const vector<Scalar, 2, Mode> right;
@@ -24,8 +24,8 @@ namespace rsl::math::internal
 		static const vector<Scalar, 2, Mode> left;
 	};
 
-	template <arithmetic_type Scalar, mode Mode, bool isSigned>
-	struct vector_additions<Scalar, 3, Mode, isSigned>
+	template <arithmetic_type Scalar, mode Mode>
+	struct vector_additions<Scalar, 3, Mode, false>
 	{
 		static const vector<Scalar, 3, Mode> up;
 		static const vector<Scalar, 3, Mode> right;
@@ -43,8 +43,8 @@ namespace rsl::math::internal
 		static const vector<Scalar, 3, Mode> backward;
 	};
 
-	template <arithmetic_type Scalar, mode Mode, bool isSigned>
-	struct vector_additions<Scalar, 4, Mode, isSigned>
+	template <arithmetic_type Scalar, mode Mode>
+	struct vector_additions<Scalar, 4, Mode, false>
 	{
 		static const vector<Scalar, 4, Mode> up;
 		static const vector<Scalar, 4, Mode> right;

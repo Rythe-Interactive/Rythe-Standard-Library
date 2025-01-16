@@ -4,8 +4,9 @@
 namespace rsl
 {
 	template <typename T, typename Alloc, typename Iter, typename ConstIter>
-	struct contiguous_container_base : public memory_resource_base<T, Alloc>
+	class contiguous_container_base : public memory_resource_base<T, Alloc>
 	{
+	public:
 		using base_type = memory_resource_base<T, Alloc>;
 		using value_type = typename base_type::value_type;
 		using iterator_type = Iter;

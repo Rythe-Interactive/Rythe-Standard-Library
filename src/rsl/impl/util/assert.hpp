@@ -1,9 +1,7 @@
 #pragma once
 
-#include <cstdlib>
-#include <iostream>
-
 #include "../defines.hpp"
+#include "primitives.hpp"
 
 #define rsl_mock_assert(expr)                                                                                          \
 	if constexpr (false)                                                                                               \
@@ -78,6 +76,8 @@ namespace rsl::asserts
 		if (!!!(expr))                                                                                                 \
 			__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, msg, true)                                    \
 	}
+
+#define rsl_assert_unreachable() rsl_always_assert_msg(false, "reached unreachable code")
 
 #ifdef RYTHE_VALIDATE
 	#define rsl_hard_assert(expr) rsl_always_assert(expr)
@@ -162,5 +162,8 @@ namespace rsl::asserts
 #define rsl_assert_out_of_range(expr) rsl_assert_msg_frequent(expr, "out of range")
 #define rsl_assert_out_of_range_msg(expr, msg) rsl_assert_msg_frequent(expr, msg)
 #define rsl_assert_invalid_object(expr) rsl_assert_msg_frequent(expr, "invalid object")
+#define rsl_assert_duplicate_object(expr) rsl_assert_msg_frequent(expr, "duplicate object")
+#define rsl_assert_borrow_release_mismatch(expr) rsl_assert_msg_frequent(expr, "borrow release mismatch")
+#define rsl_assert_invalid_cast(expr) rsl_assert_msg_frequent(expr, "invalid cast")
 #define rsl_assert_alignment(ptr, alignment)                                                                           \
 	rsl_assert_msg_frequent((reinterpret_cast<size_type>(ptr) & ((alignment) - 1)) == 0, "wrong alignment")

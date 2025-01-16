@@ -712,12 +712,12 @@ TEST_CASE("vectors", "[math]")
 		}
 	}
 
-    SECTION("vector length") {}
-    SECTION("vector cross") {}
-    SECTION("vector distance") {}
-    SECTION("vector dot") {}
-    SECTION("vector normalize") {}
-    SECTION("vector inverse") {}
+	SECTION("vector length") {}
+	SECTION("vector cross") {}
+	SECTION("vector distance") {}
+	SECTION("vector dot") {}
+	SECTION("vector normalize") {}
+	SECTION("vector inverse") {}
 }
 
 TEST_CASE("matrices", "[math]")

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <type_traits>
-
 #include "../defines.hpp"
 #include "type_util.hpp"
 

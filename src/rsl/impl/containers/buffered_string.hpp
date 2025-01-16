@@ -8,8 +8,9 @@
 namespace rsl
 {
 	template <size_type maxSize, typename CharType = char>
-	struct buffered_string
+	class buffered_string
 	{
+	public:
 		using value_type = CharType;
 		using reference = value_type&;
 		using const_reference = const value_type&;

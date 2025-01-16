@@ -8,7 +8,7 @@
 
 namespace rsl::math
 {
-	template <typename type, typename valueType = rsl::remove_cvr_t<typename type::Scalar>>
+	template <typename type, typename valueType = remove_cvr_t<typename type::Scalar>>
 	[[nodiscard]] valueType* value_ptr(type t)
 	{
 		return t.data;

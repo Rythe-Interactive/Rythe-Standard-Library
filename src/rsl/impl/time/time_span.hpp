@@ -238,8 +238,8 @@ namespace rsl::time
 	template <duration_rep precisionLHS, duration_rep precisionRHS>
 	using common_span = time::span<std::common_type_t<precisionLHS, precisionRHS>>;
 
-    using span32 = span<time32>;
-    using span64 = span<time64>;
+	using span32 = span<time32>;
+	using span64 = span<time64>;
 } // namespace rsl::time
 
 template <rsl::time::duration_rep precisionLHS, rsl::time::duration_rep precisionRHS>

@@ -1,16 +1,17 @@
 #pragma once
 
 #include <span>
-#include <type_traits>
 
 #include "../util/assert.hpp"
+#include "../util/common.hpp"
 #include "../util/primitives.hpp"
 
 namespace rsl
 {
 	template <typename ValueType, size_type maxSize>
-	struct buffered_list
+	class buffered_list
 	{
+	public:
 		using value_type = ValueType;
 		using reference = value_type&;
 		using const_reference = const value_type&;
@@ -253,9 +254,15 @@ namespace rsl
 		[[rythe_always_inline]] constexpr size_type max_size() const noexcept { return maxSize; }
 
 		[[rythe_always_inline]] constexpr view_type view() noexcept { return view_type(&m_buffer->value, m_size); }
-		[[rythe_always_inline]] constexpr const_view_type view() const noexcept { return const_view_type(&m_buffer->value, m_size); }
+		[[rythe_always_inline]] constexpr const_view_type view() const noexcept
+		{
+			return const_view_type(&m_buffer->value, m_size);
+		}
 		[[rythe_always_inline]] constexpr view_type raw_view() noexcept { return view_type(&m_buffer->value, maxSize); }
-		[[rythe_always_inline]] constexpr const_view_type raw_view() const noexcept { return const_view_type(&m_buffer->value, maxSize); }
+		[[rythe_always_inline]] constexpr const_view_type raw_view() const noexcept
+		{
+			return const_view_type(&m_buffer->value, maxSize);
+		}
 
 		[[rythe_always_inline]] constexpr operator const value_type*() const noexcept { return &m_buffer->value; }
 		[[rythe_always_inline]] constexpr operator view_type() noexcept { return view(); }
@@ -269,7 +276,10 @@ namespace rsl
 		[[rythe_always_inline]] constexpr const_iterator end() const noexcept { return &m_buffer[m_size].value; }
 		[[rythe_always_inline]] constexpr const_iterator cend() const noexcept { return &m_buffer[m_size].value; }
 
-		[[rythe_always_inline]] constexpr reverse_iterator rend() noexcept { return reverse_iterator(&m_buffer[m_size].value); }
+		[[rythe_always_inline]] constexpr reverse_iterator rend() noexcept
+		{
+			return reverse_iterator(&m_buffer[m_size].value);
+		}
 		[[rythe_always_inline]] constexpr const_reverse_iterator rend() const noexcept
 		{
 			return const_reverse_iterator(&m_buffer[m_size].value);
@@ -279,9 +289,18 @@ namespace rsl
 			return const_reverse_iterator(&m_buffer[m_size].value);
 		}
 
-		[[rythe_always_inline]] constexpr reverse_iterator rbegin() noexcept { return reverse_iterator(&m_buffer->value); }
-		[[rythe_always_inline]] constexpr const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(&m_buffer->value); }
-		[[rythe_always_inline]] constexpr const_reverse_iterator crbegin() const noexcept { return const_reverse_iterator(&m_buffer->value); }
+		[[rythe_always_inline]] constexpr reverse_iterator rbegin() noexcept
+		{
+			return reverse_iterator(&m_buffer->value);
+		}
+		[[rythe_always_inline]] constexpr const_reverse_iterator rbegin() const noexcept
+		{
+			return const_reverse_iterator(&m_buffer->value);
+		}
+		[[rythe_always_inline]] constexpr const_reverse_iterator crbegin() const noexcept
+		{
+			return const_reverse_iterator(&m_buffer->value);
+		}
 	};
 
 	template <typename ValueType, size_type maxSize>

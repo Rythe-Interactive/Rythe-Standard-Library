@@ -218,8 +218,8 @@ namespace rsl::time
 		}
 	};
 
-    using point32 = point<time32>;
-    using point64 = point<time64>;
+	using point32 = point<time32>;
+	using point64 = point<time64>;
 
 	extern const point32 genesis;
 } // namespace rsl::time
