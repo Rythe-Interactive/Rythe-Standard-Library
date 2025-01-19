@@ -66,6 +66,16 @@ namespace rsl::math
 	}
 
 	template <typename Scalar>
+	[[nodiscard]] matrix<Scalar, 3, 3> transpose(matrix<Scalar, 3, 3> mat) noexcept
+	{
+		matrix<Scalar, 3, 3> result(1);
+		result.row0 = mat.col0;
+		result.row1 = mat.col1;
+		result.row2 = mat.col2;
+		return result;
+	}
+
+	template <typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> transpose(matrix<Scalar, 4, 4> mat) noexcept
 	{
 		matrix<Scalar, 4, 4> result(1);

@@ -20,6 +20,9 @@ namespace rsl::math
 	look_at(vector<Scalar, 3> eye, vector<Scalar, 3> center, vector<Scalar, 3> up) noexcept;
 
 	template <typename Scalar>
+	[[nodiscard]] matrix<Scalar, 3, 3> transpose(matrix<Scalar, 3, 3> mat) noexcept;
+
+	template <typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> transpose(matrix<Scalar, 4, 4> mat) noexcept;
 
 	template <typename Scalar>

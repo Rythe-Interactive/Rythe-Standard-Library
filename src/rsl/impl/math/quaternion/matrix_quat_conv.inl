@@ -85,10 +85,10 @@ namespace rsl::math
 	constexpr quaternion<Scalar, Mode>::quaternion(const matrix<scalar, 3, 3, M>& m) noexcept
 	{
 		const scalar& m00 = m[0][0];
-		const scalar& m11 = m[0][0];
-		const scalar& m22 = m[0][0];
+		const scalar& m11 = m[1][1];
+		const scalar& m22 = m[2][2];
 
-		const scalar qwijk[] = {m00 - m11 - m22, m11 - m00 - m22, m22 - m00 - m11, m00 + m11 + m22};
+		const scalar qwijk[] = { m00 + m11 + m22, m00 - m11 - m22, m11 - m00 - m22, m22 - m00 - m11 };
 
 		size_type idx = 0;
 		scalar qMax = qwijk[0];
@@ -101,17 +101,51 @@ namespace rsl::math
 			}
 		}
 
-		qMax = ::std::sqrt(qMax + static_cast<scalar>(1)) * static_cast<scalar>(0.5);
+		qMax = -::std::sqrt(qMax + static_cast<scalar>(1)) * static_cast<scalar>(0.5);
 		scalar mult = static_cast<scalar>(0.25) / qMax;
 
-		scalar qPerms[] = {qMax, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult};
+		//scalar qPerms[] = { qMax, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult };
 
-		size_type invIdx = 3 - idx;
+		switch (idx)
+		{
+		case 0:
+			w = qMax;
+			i = (m[1][2] - m[2][1]) * mult;
+			j = (m[2][0] - m[0][2]) * mult;
+			k = (m[0][1] - m[1][0]) * mult;
+			break;
+		case 1:
+			w = (m[1][2] - m[2][1]) * mult;
+			i = qMax;
+			j = (m[0][1] + m[1][0]) * mult;
+			k = (m[2][0] + m[0][2]) * mult;
+			break;
+		case 2:
+			w = (m[2][0] - m[0][2]) * mult;
+			i = (m[0][1] + m[1][0]) * mult;
+			j = qMax;
+			k = (m[1][2] + m[2][1])* mult;
+			break;
+		case 3:
+			w = (m[0][1] - m[1][0]) * mult;
+			i = (m[2][0] + m[0][2]) * mult;
+			j = (m[1][2] + m[2][1]) * mult;
+			k = qMax;
+			break;
+		default: // Silence a -Wswitch-default warning in GCC. Should never actually get here. Assert is just for sanity.
+			w = 1;
+			i = 0;
+			j = 0;
+			k = 0;
+			break;
+		}
 
-		w = qPerms[idx];
-		i = qPerms[(invIdx + 2) % 4];
-		j = qPerms[(idx + 2) % 4];
-		k = qPerms[invIdx];
+		//size_type invIdx = 3 - idx;
+
+		//w = qPerms[idx];
+		//i = qPerms[(invIdx + 2) % 4];
+		//j = qPerms[(idx + 2) % 4];
+		//k = qPerms[invIdx];
 	}
 
 	template <arithmetic_type Scalar, mode Mode>
@@ -119,10 +153,10 @@ namespace rsl::math
 	constexpr quaternion<Scalar, Mode>::quaternion(const matrix<scalar, 4, 4, M>& m) noexcept
 	{
 		const scalar& m00 = m[0][0];
-		const scalar& m11 = m[0][0];
-		const scalar& m22 = m[0][0];
+		const scalar& m11 = m[1][1];
+		const scalar& m22 = m[2][2];
 
-		const scalar qwijk[] = {m00 - m11 - m22, m11 - m00 - m22, m22 - m00 - m11, m00 + m11 + m22};
+		const scalar qwijk[] = { m00 + m11 + m22, m00 - m11 - m22, m11 - m00 - m22, m22 - m00 - m11 };
 
 		size_type idx = 0;
 		scalar qMax = qwijk[0];
@@ -138,7 +172,7 @@ namespace rsl::math
 		qMax = ::std::sqrt(qMax + static_cast<scalar>(1)) * static_cast<scalar>(0.5);
 		scalar mult = static_cast<scalar>(0.25) / qMax;
 
-		scalar qPerms[] = {qMax, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult};
+		scalar qPerms[] = { qMax, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult };
 
 		size_type invIdx = 3 - idx;
 

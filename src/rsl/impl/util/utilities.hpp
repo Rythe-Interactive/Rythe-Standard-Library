@@ -27,18 +27,18 @@ namespace rsl
 		static_assert(alignof(T) == alignof(U), "Illegal cast of unaligned types.");
 		static_assert(sizeof(T) <= sizeof(U), "Illegal cast of non size similar types.");
 
-		return *bit_cast<T*>(&value);
+		return *rsl::bit_cast<T*>(&value);
 	}
 
 	template <typename To, typename From>
 	[[rythe_always_inline]] constexpr To force_cast(From& f) noexcept
 	{
-		return *bit_cast<To*>(&f);
+		return *rsl::bit_cast<To*>(&f);
 	}
 
 	template <typename To, typename From>
 	[[rythe_always_inline]] constexpr To force_cast(const From& f) noexcept
 	{
-		return *bit_cast<To*>(&f);
+		return *rsl::bit_cast<To*>(&f);
 	}
 } // namespace rsl
