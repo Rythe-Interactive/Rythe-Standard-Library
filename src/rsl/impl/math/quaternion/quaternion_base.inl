@@ -75,7 +75,6 @@ namespace rsl::math
 		result.z = static_cast<Scalar>(2) * (i * k - w * j);
 
 		return result;
-		//return *this * vec_type::right;
 	}
 
 	template <arithmetic_type Scalar, mode Mode>
@@ -88,7 +87,6 @@ namespace rsl::math
 		result.z =  static_cast<Scalar>(1) - static_cast<Scalar>(2) * (i * i + j * j);
 
 		return result;
-		//return  *this * vec_type::forward;
 	}
 
 	template <arithmetic_type Scalar, mode Mode>
@@ -101,7 +99,6 @@ namespace rsl::math
 		result.z = static_cast<Scalar>(2) * (j * k + w * i);
 
 		return result;
-		//return  *this * vec_type::up;
 	}
 
 	template <arithmetic_type Scalar, mode Mode>
