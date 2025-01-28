@@ -68,19 +68,40 @@ namespace rsl::math
 	template <arithmetic_type Scalar, mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::right() const noexcept
 	{
-		return  *this * vec_type::right;
+		vector<Scalar, 3, Mode> result;
+
+		result.x = static_cast<Scalar>(1) - static_cast<Scalar>(2) * (j * j + k * k);
+		result.y = static_cast<Scalar>(2) * (i * j + w * k);
+		result.z = static_cast<Scalar>(2) * (i * k - w * j);
+
+		return result;
+		//return *this * vec_type::right;
 	}
 
 	template <arithmetic_type Scalar, mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::forward() const noexcept
 	{
-		return  *this * vec_type::forward;
+		vector<Scalar, 3, Mode> result;
+
+		result.x = static_cast<Scalar>(2) * (i * k + w * j);
+		result.y = static_cast<Scalar>(2) * (j * k - w * i);
+		result.z =  static_cast<Scalar>(1) - static_cast<Scalar>(2) * (i * i + j * j);
+
+		return result;
+		//return  *this * vec_type::forward;
 	}
 
 	template <arithmetic_type Scalar, mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::up() const noexcept
 	{
-		return  *this * vec_type::up;
+		vector<Scalar, 3, Mode> result;
+
+		result.x = static_cast<Scalar>(2) * (i * j - w * k);
+		result.y = static_cast<Scalar>(1) - static_cast<Scalar>(2) * (i * i + k * k); 
+		result.z = static_cast<Scalar>(2) * (j * k + w * i);
+
+		return result;
+		//return  *this * vec_type::up;
 	}
 
 	template <arithmetic_type Scalar, mode Mode>
@@ -90,7 +111,7 @@ namespace rsl::math
 
 		Scalar sinr_cosp = static_cast<Scalar>(2) * (w * i + j * k);
 		Scalar cosr_cosp = static_cast<Scalar>(1) - static_cast<Scalar>(2) * (i * i + j * j);
-		angles.x = atan2(sinr_cosp,cosr_cosp);
+		angles.x = atan2(sinr_cosp, cosr_cosp);
 
 		Scalar sinp = sqrt(static_cast<Scalar>(1) + static_cast<Scalar>(2) * (w * j - i * k));
 		Scalar cosp = sqrt(static_cast<Scalar>(1) - static_cast<Scalar>(2) * (w * j - i * k));
