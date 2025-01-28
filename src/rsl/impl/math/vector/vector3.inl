@@ -37,13 +37,6 @@ namespace rsl::math
 	{
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
-	const vector<Scalar, 3, Mode> vector<Scalar, 3, Mode>::right {1, 0, 0};
-	template <arithmetic_type Scalar, mode Mode>
-	const vector<Scalar, 3, Mode> vector<Scalar, 3, Mode>::up { 0, 1, 0 };
-	template <arithmetic_type Scalar, mode Mode>
-	const vector<Scalar, 3, Mode> vector<Scalar, 3, Mode>::forward { 0, 0, 1 };
-
 	template <mode Mode>
 	template <math::mode OtherMode>
 	constexpr vector<bool, 3, Mode>::vector(const vector<scalar, 2, OtherMode>& v, scalar s) noexcept

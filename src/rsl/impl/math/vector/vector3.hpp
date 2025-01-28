@@ -24,9 +24,6 @@ namespace rsl::math
 
 		static const vector one;
 		static const vector zero;
-		static const vector<Scalar, 3, Mode> right;
-		static const vector<Scalar, 3, Mode> up;
-		static const vector<Scalar, 3, Mode> forward;
 
 
 		[[rythe_always_inline]] constexpr vector() noexcept;

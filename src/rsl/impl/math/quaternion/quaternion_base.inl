@@ -68,19 +68,19 @@ namespace rsl::math
 	template <arithmetic_type Scalar, mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::right() const noexcept
 	{
-		return vector<Scalar, 3, Mode>(1, 0, 0)** this;
+		return  *this * vec_type::right;
 	}
 
 	template <arithmetic_type Scalar, mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::forward() const noexcept
 	{
-		return vector<Scalar, 3, Mode>(0, 0, 1)** this;
+		return  *this * vec_type::forward;
 	}
 
 	template <arithmetic_type Scalar, mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::up() const noexcept
 	{
-		return vector<Scalar, 3, Mode>(0, 1, 0)** this;
+		return  *this * vec_type::up;
 	}
 
 	template <arithmetic_type Scalar, mode Mode>
@@ -88,32 +88,17 @@ namespace rsl::math
 	{ // TODO(Glyn): Optimize
 		vector<Scalar, 3> angles;
 
-		//Scalar sinr_cosp = static_cast<Scalar>(2) * (w * i + j * k);
-		//Scalar cosr_cosp = static_cast<Scalar>(1) - static_cast<Scalar>(2) * (i * i + j * j);
-		//angles.x = atan2(sinr_cosp,cosr_cosp);
-		Scalar y = static_cast<Scalar>(2) * (j * k + w * i);
-		Scalar x = (w * w) - (i * i) - (j * j) + (k * k);
-		if (all((equals(vector<Scalar, 2>(x, y), vector<Scalar, 2>(0))))) //avoid atan2(0,0)
-			angles.x = static_cast<Scalar>(static_cast<Scalar>(2) * atan2(i, w));
-		else
-			angles.x = static_cast<Scalar>(atan2(y, x));
+		Scalar sinr_cosp = static_cast<Scalar>(2) * (w * i + j * k);
+		Scalar cosr_cosp = static_cast<Scalar>(1) - static_cast<Scalar>(2) * (i * i + j * j);
+		angles.x = atan2(sinr_cosp,cosr_cosp);
 
-		//Scalar sinp = sqrt(static_cast<Scalar>(1) + static_cast<Scalar>(2) * (w * j - i * k));
-		//Scalar cosp = sqrt(static_cast<Scalar>(1) - static_cast<Scalar>(2) * (w * j - i * k));
-		//angles.y = static_cast<Scalar>(2) * atan2(sinp, cosp) - pi() / static_cast<Scalar>(2);
-		angles.y = asin(clamp(static_cast<Scalar>(-2.0) * (i * k - w * j), static_cast<Scalar>(-1.0), static_cast<Scalar>(1.0)));
+		Scalar sinp = sqrt(static_cast<Scalar>(1) + static_cast<Scalar>(2) * (w * j - i * k));
+		Scalar cosp = sqrt(static_cast<Scalar>(1) - static_cast<Scalar>(2) * (w * j - i * k));
+		angles.y = static_cast<Scalar>(2) * atan2(sinp, cosp) - pi() / static_cast<Scalar>(2);
 
-
-		//Scalar siny_cosp = static_cast<Scalar>(2) * (w * k + i * j);
-		//Scalar cosy_cosp = static_cast<Scalar>(1) - static_cast<Scalar>(2) * (j * j + k * k);
-		//angles.z = atan2(siny_cosp, cosy_cosp);
-
-		y = static_cast<Scalar>(2.0) * (i * j + w * k);
-		x = (w * w) + (i * i) - (j * j) - (k * k);
-		if (all((equals(vector<Scalar, 2>(x, y), vector<Scalar, 2>(0))))) //avoid atan2(0,0)
-			angles.z = static_cast<Scalar>(0);
-		else
-			angles.z = static_cast<Scalar>(atan2(y, x));
+		Scalar siny_cosp = static_cast<Scalar>(2) * (w * k + i * j);
+		Scalar cosy_cosp = static_cast<Scalar>(1) - static_cast<Scalar>(2) * (j * j + k * k);
+		angles.z = atan2(siny_cosp, cosy_cosp);
 
 		return angles;
 	}
@@ -135,8 +120,8 @@ namespace rsl::math
 		vec_type const up(cross(forward, right));
 
 		const scalar qwijk[] = {
-			right.x - up.y - forward.z, up.y - right.x - forward.z, forward.z - right.x - up.y,
-			right.x + up.y + forward.z
+			right.x + up.y + forward.z, right.x - up.y - forward.z, up.y - right.x - forward.z, forward.z - right.x - up.y
+
 		};
 
 		size_type idx = 0;
