@@ -12,9 +12,9 @@ namespace rsl::log
 	struct impl
 	{
 		rsl::cstring logFile = "logs/rythe.log";
-		logger_ptr logger;
+		//logger_ptr logger;
 		logger_ptr fileLogger;
-		logger_ptr consoleLogger = spdlog::stdout_color_mt("console-logger");
+		logger_ptr logger = spdlog::stdout_color_mt("console-logger");
 		logger_ptr undecoratedLogger = spdlog::stdout_color_mt("undecorated-logger");
 		// async::rw_spinlock threadNamesLock;
 		std::unordered_map<std::thread::id, std::string> threadNames;
@@ -267,11 +267,11 @@ namespace rsl::log
 			inst.undecoratedLogger->set_formatter(std::move(f));
 
 			inst.fileLogger = spdlog::rotating_logger_mt(inst.logFile, inst.logFile, 1'048'576, 5);
-			initLogger(inst.consoleLogger);
+			initLogger(inst.logger);
 			initLogger(inst.fileLogger);
 
 #if defined(RYTHE_KEEP_CONSOLE) || defined(RYTHE_DEBUG)
-			inst.logger = inst.consoleLogger;
+			//inst.logger = inst.consoleLogger;
 #else
 			inst.logger = inst.fileLogger;
 #endif
