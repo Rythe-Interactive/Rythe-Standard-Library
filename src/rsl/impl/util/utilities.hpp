@@ -1,10 +1,14 @@
 #pragma once
-#include <bit>
-#include <vector>
 
 #include "../defines.hpp"
 #include "common.hpp"
 #include "primitives.hpp"
+
+#if defined(RYTHE_MSVC)
+	#include <intrin.h>
+	#pragma intrinsic(_BitScanForward64)
+	#pragma intrinsic(_BitScanReverse64)
+#endif
 
 namespace rsl
 {
@@ -20,6 +24,30 @@ namespace rsl
 		native = __BYTE_ORDER__
 #endif
 	};
+
+	[[rythe_always_inline]] size_type count_leading_zeros(size_type mask) noexcept
+	{
+#if defined(RYTHE_MSVC)
+		unsigned long index;
+		return _BitScanReverse64(&index, mask) ? static_cast<size_type>(index) : 64ull;
+#elif defined(RYTHE_CLANG) || defined(RYTHE_GCC)
+		return mask ? static_cast<size_type>(__builtin_clzll(mask)) : 64ull;
+#else
+		return npos;
+#endif
+	}
+
+	[[rythe_always_inline]] size_type count_trailing_zeros(size_type mask) noexcept
+	{
+#if defined(RYTHE_MSVC)
+		unsigned long index;
+		return _BitScanForward64(&index, mask) ? static_cast<size_type>(index) : 64ull;
+#elif defined(RYTHE_CLANG) || defined(RYTHE_GCC)
+		return mask ? static_cast<size_type>(__builtin_ctzll(mask)) : 64ull;
+#else
+		return npos;
+#endif
+	}
 
 	template <typename T, typename U>
 	constexpr T force_value_cast(U value)
@@ -40,5 +68,13 @@ namespace rsl
 	[[rythe_always_inline]] constexpr To force_cast(const From& f) noexcept
 	{
 		return *bit_cast<To*>(&f);
+	}
+
+	template <typename T>
+	[[rythe_always_inline]] constexpr T unaligned_load(const void* ptr) noexcept
+	{
+		T val;
+		constexpr_memcpy(&val, ptr, sizeof(T));
+		return val;
 	}
 } // namespace rsl

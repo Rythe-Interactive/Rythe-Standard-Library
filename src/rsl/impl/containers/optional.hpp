@@ -47,6 +47,9 @@ namespace rsl
 		constexpr static bool holds_value = false;
 	};
 
+	template <bool Condition, typename T>
+	using conditional_storage = conditional<Condition, optional_storage<T>, optional_storage<void>>::type;
+
 	template <typename T, factory_type Factory = default_factory<T>>
 	class optional
 	{

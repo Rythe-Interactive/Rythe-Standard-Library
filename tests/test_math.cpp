@@ -242,6 +242,20 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(!result.x);
 			REQUIRE(result.y);
 		}
+		{
+			float2 up = float2::up;
+			float2 down = float2::down;
+			float2 left = float2::left;
+			float2 right = float2::right;
+			float2 one = float2::one;
+			float2 zero = float2::zero;
+			REQUIRE(up == float2(0.f, 1.f));
+			REQUIRE(down == float2(0.f, -1.f));
+			REQUIRE(left == float2(-1.f, 0.f));
+			REQUIRE(right == float2(1.f, 0.f));
+			REQUIRE(one == float2(1.f, 1.f));
+			REQUIRE(zero == float2(0.f, 0.f));
+		}
 	}
 
 	SECTION("vector 3")
@@ -459,6 +473,24 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(!result.x);
 			REQUIRE(result.y);
 			REQUIRE(!result.z);
+		}
+		{
+			float3 up = float3::up;
+			float3 down = float3::down;
+			float3 left = float3::left;
+			float3 right = float3::right;
+			float3 forward = float3::forward;
+			float3 backward = float3::backward;
+			float3 one = float3::one;
+			float3 zero = float3::zero;
+			REQUIRE(up == float3(0.f, 1.f, 0.f));
+			REQUIRE(down == float3(0.f, -1.f, 0.f));
+			REQUIRE(left == float3(-1.f, 0.f, 0.f));
+			REQUIRE(right == float3(1.f, 0.f, 0.f));
+			REQUIRE(forward == float3(0.f, 0.f, 1.f));
+			REQUIRE(backward == float3(0.f, 0.f, -1.f));
+			REQUIRE(one == float3(1.f, 1.f, 1.f));
+			REQUIRE(zero == float3(0.f, 0.f, 0.f));
 		}
 	}
 
@@ -709,6 +741,28 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(result.y);
 			REQUIRE(!result.z);
 			REQUIRE(!result.w);
+		}
+		{
+			float4 up = float4::up;
+			float4 down = float4::down;
+			float4 left = float4::left;
+			float4 right = float4::right;
+			float4 forward = float4::forward;
+			float4 backward = float4::backward;
+			float4 positiveW = float4::positiveW;
+			float4 negativeW = float4::negativeW;
+			float4 one = float4::one;
+			float4 zero = float4::zero;
+			REQUIRE(up == float4(0.f, 1.f, 0.f, 0.f));
+			REQUIRE(down == float4(0.f, -1.f, 0.f, 0.f));
+			REQUIRE(left == float4(-1.f, 0.f, 0.f, 0.f));
+			REQUIRE(right == float4(1.f, 0.f, 0.f, 0.f));
+			REQUIRE(forward == float4(0.f, 0.f, 1.f, 0.f));
+			REQUIRE(backward == float4(0.f, 0.f, -1.f, 0.f));
+			REQUIRE(positiveW == float4(0.f, 0.f, 0.f, 1.f));
+			REQUIRE(negativeW == float4(0.f, 0.f, 0.f, -1.f));
+			REQUIRE(one == float4(1.f, 1.f, 1.f, 1.f));
+			REQUIRE(zero == float4(0.f, 0.f, 0.f, 0.f));
 		}
 	}
 

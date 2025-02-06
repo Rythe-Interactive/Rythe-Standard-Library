@@ -251,6 +251,7 @@ TEST_CASE("memory pool", "[memory]")
 		rsl::memory_pool<test_struct> pool;
 
 		REQUIRE(pool.capacity() == 0);
+		REQUIRE(pool.size() == 0);
 
 		auto* ptr = pool.allocate();
 
@@ -259,9 +260,41 @@ TEST_CASE("memory pool", "[memory]")
 			pool.capacity() ==
 			rsl::memory_pool<test_struct>::get_element_count(rsl::memory_pool<test_struct>::minimumBlockSize)
 		);
+		REQUIRE(pool.size() == 1);
+
+		pool.reset();
+		REQUIRE(pool.capacity() == 0);
+		REQUIRE(pool.size() == 0);
 	}
 
-	SECTION("deallocation") {}
+	SECTION("deallocation")
+	{
+		rsl::memory_pool<test_struct> pool;
+
+		REQUIRE(pool.capacity() == 0);
+		REQUIRE(pool.size() == 0);
+
+		auto* ptr = pool.allocate();
+
+		REQUIRE(ptr);
+		REQUIRE(
+			pool.capacity() ==
+			rsl::memory_pool<test_struct>::get_element_count(rsl::memory_pool<test_struct>::minimumBlockSize)
+		);
+		REQUIRE(pool.size() == 1);
+
+		pool.deallocate(ptr);
+
+		REQUIRE(
+			pool.capacity() ==
+			rsl::memory_pool<test_struct>::get_element_count(rsl::memory_pool<test_struct>::minimumBlockSize)
+		);
+		REQUIRE(pool.size() == 0);
+
+		pool.reset();
+		REQUIRE(pool.capacity() == 0);
+		REQUIRE(pool.size() == 0);
+	}
 
 	SECTION("external memory blocks") {}
 }

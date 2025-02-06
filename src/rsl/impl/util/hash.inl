@@ -3,28 +3,66 @@
 
 #include "common.hpp"
 
+namespace rsl::internal
+{
+	constexpr bool hash_static_assert_check =
+		hash_algorithm::default_hash == hash_algorithm::fnv1a || hash_algorithm::default_hash == hash_algorithm::robin;
+	template <typename T, hash_algorithm Algorithm>
+	struct hash_strategy
+	{
+		[[rythe_always_inline]] constexpr static id_type hash(const T& val) noexcept
+		{
+			return hash_bytes<Algorithm>(std::span(bit_cast<const byte*>(&val), sizeof(T)));
+		}
+	};
+
+	template <enum_type Enum, hash_algorithm Algorithm>
+	struct hash_strategy<Enum, Algorithm>
+	{
+		[[rythe_always_inline]] constexpr static id_type hash(const Enum& val) noexcept
+		{
+			using underlying = std::underlying_type_t<Enum>;
+			return hash_strategy<underlying, Algorithm>::hash(static_cast<underlying>(val));
+		}
+	};
+} // namespace rsl::internal
+
+#include "fnv1a.inl"
+#include "robin_hash.inl"
+
 namespace rsl
 {
-	constexpr id_type hash_bytes(span<const byte> bytes, id_type seed) noexcept
+	template <hash_algorithm Algorithm>
+	constexpr id_type hash_bytes(span<const byte> bytes) noexcept
 	{
-		for (byte b : bytes)
+		if constexpr (Algorithm == hash_algorithm::fnv1a)
 		{
-			seed ^= b;
-			seed *= internal::fnv1a::prime;
+			return internal::fnv1a::hash_bytes(bytes);
 		}
-
-		return seed;
+		else if constexpr (Algorithm == hash_algorithm::robin)
+		{
+			return internal::robin_hash::hash_bytes(bytes);
+		}
+		else
+		{
+			static_assert(internal::hash_static_assert_check, "unknown hash algorithm.");
+		}
 	}
 
-	constexpr id_type hash_string(string_view str, id_type seed) noexcept
+	constexpr id_type hash_bytes(span<const byte> bytes) noexcept
 	{
-		for (char b : str)
-		{
-			seed ^= b;
-			seed *= internal::fnv1a::prime;
-		}
+		return hash_bytes<hash_algorithm::default_hash>(bytes);
+	}
 
-		return seed;
+	template <hash_algorithm Algorithm>
+	constexpr id_type hash_string(string_view str) noexcept
+	{
+		return hash_bytes<Algorithm>(span<const byte>(bit_cast<const byte*>(str.data()), str.size()));
+	}
+
+	constexpr id_type hash_string(string_view str) noexcept
+	{
+		return hash_string<hash_algorithm::default_hash>(str);
 	}
 
 	template <same_as<id_type>... hash_types>
@@ -49,10 +87,16 @@ namespace rsl
 		}
 	}
 
+	template <hash_algorithm Algorithm, typename T>
+	constexpr id_type hash_value(const T& val) noexcept
+	{
+		return internal::hash_strategy<remove_cvr_t<T>, Algorithm>::hash(val);
+	}
+
 	template <typename T>
 	constexpr id_type hash_value(const T& val) noexcept
 	{
-		return hash_bytes(internal::fnv1a::offset_basis, std::span(bit_cast<const byte*>(&val), sizeof(T)));
+		return hash_value<hash_algorithm::default_hash>(val);
 	}
 
 } // namespace rsl

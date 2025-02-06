@@ -5,7 +5,8 @@
 namespace rsl
 {
 	template <
-		typename T, allocator_type Alloc = default_allocator, size_type MinBlockSize = 4, size_type MaxBlockSize = 256>
+		typename T, allocator_type Alloc = default_allocator, size_type MinBlockSize = 4,
+		size_type MaxBlockSize = 16384>
 		requires(MinBlockSize >= 1 && MaxBlockSize >= MinBlockSize)
 	class memory_pool
 	{
@@ -87,6 +88,7 @@ namespace rsl
 			return true;
 		}
 
+		// Very slow, use for debugging purposes only. Do not use in hot paths.
 		[[nodiscard]] size_type capacity()
 		{
 			memory_block* block = m_freeList;
@@ -99,6 +101,21 @@ namespace rsl
 			}
 
 			return capacity;
+		}
+
+		// Very slow, use for debugging purposes only. Do not use in hot paths.
+		[[nodiscard]] size_type size()
+		{
+			size_type usedCapacity = capacity();
+
+			element_node* node = m_head;
+			while (node)
+			{
+				node = node->next;
+				usedCapacity--;
+			}
+
+			return usedCapacity;
 		}
 
 		static constexpr size_type elementAlignment =
