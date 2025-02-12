@@ -86,6 +86,15 @@ namespace rsl
 #define RYTHE_PLATFORM_WINDOWS (RYTHE_PLATFORM_INDEX == RYTHE_WINDOWS_INDEX)
 #define RYTHE_PLATFORM_LINUX (RYTHE_PLATFORM_INDEX == RYTHE_LINUX_INDEX)
 
+#if RYTHE_PLATFORM_WINDOWS
+	#define RYTHE_PLATFORM_LITTLE_ENDIAN
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	#define RYTHE_PLATFORM_LITTLE_ENDIAN
+#else
+	#define RYTHE_PLATFORM_BIG_ENDIAN
+#endif
+
+
 #pragma endregion
 
 #pragma region ////////////////////////////////// Target architecture ///////////////////////////////////
@@ -219,6 +228,10 @@ namespace rsl
 #elif defined(RYTHE_GCC) || defined(RYTHE_CLANG)
 	#define RYTHE_COMPILER_WARNING(desc) _Pragma(RYTHE_STRINGIFY(GCC warning desc))
 	#define RYTHE_COMPILER_ERROR(desc) _Pragma(RYTHE_STRINGIFY(GCC error desc))
+#endif
+
+#if defined(__SIZEOF_INT128__)
+	#define RYTHE_HAS_INT128
 #endif
 
 #pragma endregion

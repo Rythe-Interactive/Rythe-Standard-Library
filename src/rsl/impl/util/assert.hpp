@@ -45,36 +45,44 @@ namespace rsl::asserts
 
 #define __rsl_assert_impl(expr, file, line, msg, soft)                                                                 \
 	{                                                                                                                  \
-		if (rsl::asserts::assert_handler)                                                                              \
+		if (!rsl::asserts::assert_handler)                                                                             \
 		{                                                                                                              \
-			rsl::asserts::assert_handler(expr, file, line, msg, soft);                                                 \
+			rsl::asserts::internal::default_assert_handler(expr, file, line, msg, soft);                               \
 		}                                                                                                              \
 		else                                                                                                           \
 		{                                                                                                              \
-			rsl::asserts::internal::default_assert_handler(expr, file, line, msg, soft);                               \
+			rsl::asserts::assert_handler(expr, file, line, msg, soft);                                                 \
 		}                                                                                                              \
 	}
 
 #define rsl_always_assert(expr)                                                                                        \
 	{                                                                                                                  \
-		if (!!!(expr))                                                                                                 \
+		if (!!!(expr)) [[unlikely]]                                                                                    \
+		{                                                                                                              \
 			__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, "", false)                                    \
+		}                                                                                                              \
 	}
 #define rsl_always_assert_msg(expr, msg)                                                                               \
 	{                                                                                                                  \
-		if (!!!(expr))                                                                                                 \
+		if (!!!(expr)) [[unlikely]]                                                                                    \
+		{                                                                                                              \
 			__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, msg, false)                                   \
+		}                                                                                                              \
 	}
 
 #define rsl_always_soft_assert(expr)                                                                                   \
 	{                                                                                                                  \
-		if (!!!(expr))                                                                                                 \
+		if (!!!(expr)) [[unlikely]]                                                                                    \
+		{                                                                                                              \
 			__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, "", true)                                     \
+		}                                                                                                              \
 	}
 #define rsl_always_soft_assert_msg(expr, msg)                                                                          \
 	{                                                                                                                  \
-		if (!!!(expr))                                                                                                 \
+		if (!!!(expr)) [[unlikely]]                                                                                    \
+		{                                                                                                              \
 			__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, msg, true)                                    \
+		}                                                                                                              \
 	}
 
 #define rsl_assert_unreachable() rsl_always_assert_msg(false, "reached unreachable code")

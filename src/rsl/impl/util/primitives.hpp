@@ -15,13 +15,22 @@ namespace rsl
 	using uint16 = std::uint16_t;
 	using uint32 = std::uint32_t;
 	using uint64 = std::uint64_t;
-	using uint_max = std::uintmax_t;
 
 	using int8 = std::int8_t;
 	using int16 = std::int16_t;
 	using int32 = std::int32_t;
 	using int64 = std::int64_t;
+
+#if defined(RYTHE_HAS_INT128)
+	using uint128 = __uint128_t;
+	using uint_max = uint128;
+
+	using int128 = __int128_t;
+	using int_max = int128;
+#else
+	using uint_max = std::uintmax_t;
 	using int_max = std::intmax_t;
+#endif
 
 	using size_type = std::size_t;
 	using index_type = std::size_t;
@@ -62,6 +71,13 @@ namespace rsl
 	using bitfield16 = uint16;
 	using bitfield32 = uint32;
 	using bitfield64 = uint64;
+
+
+#if defined(RYTHE_HAS_INT128)
+	using u128 = uint128;
+	using i128 = int128;
+	using bitfield128 = uint128;
+#endif
 
 	using priority_type = int8;
 #define default_priority 0

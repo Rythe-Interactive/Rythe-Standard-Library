@@ -69,12 +69,4 @@ namespace rsl
 	{
 		return *bit_cast<To*>(&f);
 	}
-
-	template <typename T>
-	[[rythe_always_inline]] constexpr T unaligned_load(const void* ptr) noexcept
-	{
-		T val;
-		constexpr_memcpy(&val, ptr, sizeof(T));
-		return val;
-	}
 } // namespace rsl

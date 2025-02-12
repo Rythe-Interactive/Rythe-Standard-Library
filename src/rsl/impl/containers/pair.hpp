@@ -14,12 +14,6 @@ namespace rsl
 		[[rythe_always_inline]] constexpr pair()
 			noexcept(is_nothrow_constructible_v<U1> && is_nothrow_constructible_v<U2>);
 
-		[[rythe_always_inline]] explicit constexpr pair(const std::pair<first_type, second_type>& other)
-			noexcept(is_nothrow_copy_constructible_v<first_type> && is_nothrow_copy_constructible_v<second_type>);
-
-		[[rythe_always_inline]] explicit constexpr pair(std::pair<first_type, second_type>&& other)
-			noexcept(is_nothrow_move_constructible_v<first_type> && is_nothrow_move_constructible_v<second_type>);
-
 		[[rythe_always_inline]] constexpr pair(first_type&& lhs, second_type&& rhs)
 			noexcept(is_nothrow_move_constructible_v<first_type> && is_nothrow_move_constructible_v<second_type>);
 

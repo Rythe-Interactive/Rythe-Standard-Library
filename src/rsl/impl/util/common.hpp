@@ -1185,6 +1185,40 @@ namespace rsl
 	template <template <typename...> typename T, typename U, size_type I, typename... Args>
 	using make_sequence_t = typename make_sequence<T, U, I, Args...>::type;
 
+	template <rsl::size_type I, typename Type, typename... Types>
+	struct element_at : element_at<I - 1, Types...>
+	{
+	};
+
+	template <typename Type, typename... Types>
+	struct element_at<0, Type, Types...>
+	{
+		using type = Type;
+	};
+
+	template <rsl::size_type I, typename Type, typename... Types>
+	using element_at_t = typename element_at<I, Type, Types...>::type;
+
+	namespace internal
+	{
+		template <size_type I, typename T, typename Type, typename... Types>
+		struct index_of_element_impl :
+			conditional_t<
+				is_same_v<T, Type>, integral_constant<size_type, I>, index_of_element_impl<I + 1, T, Types...>>
+		{
+		};
+	} // namespace internal
+
+	// Gets index of first ocurrance of T in type list.
+	template <typename T, typename Type, typename... Types>
+	struct index_of_element : internal::index_of_element_impl<0, T, Type, Types...>
+	{
+	};
+
+	// Gets index of first ocurrance of T in type list.
+	template <typename T, typename Type, typename... Types>
+	constexpr size_type index_of_element_v = index_of_element<T, Type, Types...>::value;
+
 	template <typename... Types>
 	struct type_sequence
 	{
@@ -1193,6 +1227,12 @@ namespace rsl
 
 		template <typename T>
 		constexpr static bool contains = disjunction<is_same<T, Types>...>::value;
+
+		template <typename T>
+		constexpr static size_type index_of_type = index_of_element_v<T, Types...>;
+
+		template <size_type I>
+		using type_at = element_at_t<I, Types...>;
 	};
 
 	template <typename T>
