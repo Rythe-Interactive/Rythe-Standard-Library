@@ -38,7 +38,7 @@ namespace rsl
 			}
 
 			hash_map_node(map_type&, hash_map_node&& other) noexcept
-				: m_data(::rsl::move(other.m_data))
+				: m_data(other.m_data)
 			{
 			}
 
@@ -178,13 +178,25 @@ namespace rsl
 
 		template <typename MapType>
 		using map_node = typename select_node_type<MapType, MapType::is_flat>::type;
+
+		struct hash_map_bucket
+		{
+			static constexpr size_type fingerprintSize = 16; // bits
+
+			// increment the Nth bit that skips all fingerprint bits.
+			static constexpr size_type pslIncrement = 1 << fingerprintSize;
+			static constexpr size_type fingerprintMask = pslIncrement - 1; // 0xFFFF
+
+			uint64 pslAndFingerprint;
+			uint64 index;
+		};
 	} // namespace internal
 
-	struct fast_forward_tag_type
+	struct move_to_next_tag_type
 	{
 	};
 
-	[[maybe_unused]] constexpr fast_forward_tag_type fast_forward_tag{};
+	[[maybe_unused]] constexpr move_to_next_tag_type move_to_next_tag{};
 
 	template <typename MapType, bool IsConst = false>
 	class hash_map_iterator
@@ -216,11 +228,11 @@ namespace rsl
 		{
 		}
 
-		hash_map_iterator(node_ptr node, const uint8* info, fast_forward_tag_type) noexcept
+		hash_map_iterator(node_ptr node, const uint8* info, move_to_next_tag_type) noexcept
 			: m_node(node),
 			  m_info(info)
 		{
-			fast_forward();
+			find_next();
 		}
 
 		template <bool OtherConst>
@@ -236,7 +248,7 @@ namespace rsl
 		{
 			m_info++;
 			m_node++;
-			fast_forward();
+			find_next();
 			return *this;
 		}
 
@@ -263,7 +275,7 @@ namespace rsl
 		}
 
 	private:
-		void fast_forward() noexcept
+		void find_next() noexcept
 		{
 			size_type n = 0ull;
 			while ((n = unaligned_load<size_type>(m_info)) == 0ull)
@@ -341,19 +353,12 @@ namespace rsl
 	};
 
 	// MaxLoadFactor100 could be a ratio instead
-	//
-	// info is PSL/wealth mixed with some specific hash???
-	//
-	// for us i don't think there's a use to a node map, if you can create a value stable map by using map<key,
-	// unique_ptr<value>> I don't think we ever need a key stable map, and if/when we do, we can create a node map
-	// later.
-
-	template <typename Hash, typename KeyEqual, size_type MaxLoadFactor = 80>
+	template <typename Hash, typename KeyEqual, bool IsFlat = true, size_type MaxLoadFactor = 80>
 	struct map_info
 	{
 		static_assert(MaxLoadFactor > 10 && MaxLoadFactor < 100, "MaxLoadFactor needs to be > 10 && < 100");
 
-		constexpr static bool is_flat = true; // currently ignored, always flat.
+		constexpr static bool is_flat = IsFlat;
 		constexpr static size_type max_load_factor = MaxLoadFactor;
 		using hasher_type = Hash;
 		using key_comparer_type = KeyEqual;
