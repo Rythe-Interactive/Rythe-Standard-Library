@@ -111,7 +111,7 @@ namespace std
 	template <typename T, typename T1, typename T2>
 	T& get(rsl::pair<T1, T2>& val)
 	{
-		return const_cast<rsl::element_at_t<I, T1, T2>&>(get<T>(rsl::as_const(val)));
+		return const_cast<rsl::element_at_t<rsl::index_of_element_v<T, T1, T2>, T1, T2>&>(get<T>(rsl::as_const(val)));
 	}
 
 	template <typename Tuple>

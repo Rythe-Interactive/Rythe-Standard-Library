@@ -1196,8 +1196,8 @@ namespace rsl
 		using type = Type;
 	};
 
-	template <rsl::size_type I, typename Type, typename... Types>
-	using element_at_t = typename element_at<I, Type, Types...>::type;
+	template <rsl::size_type I, typename... Types>
+	using element_at_t = typename element_at<I, Types...>::type;
 
 	namespace internal
 	{

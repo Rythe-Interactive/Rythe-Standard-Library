@@ -25,9 +25,9 @@ namespace rsl
 			constexpr uint64 default_secret[3] = {0x2d358dccaa6c78a5ull, 0x8bb84b93962eacc9ull, 0x4b33a62ed433d4a3ull};
 
 			template <hash_mode Mode>
-			inline void mum(uint64* a, uint64* b) noexcept
+			constexpr void mum(uint64* a, uint64* b) noexcept
 			{
-#if defined(RYTHE_HAS_INT128) && false
+#if defined(RYTHE_HAS_INT128)
 				uint128 result = *a;
 				result *= *b;
 				if constexpr (Mode == hash_mode::fast_hash)
@@ -40,61 +40,72 @@ namespace rsl
 					*a ^= static_cast<uint64>(result);
 					*b ^= static_cast<uint64>(result >> 64);
 				}
-#elif defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC) && false
-				if constexpr (Mode == hash_mode::fast_hash)
-				{
-					*a = _umul128(*a, *b, b);
-				}
-				else
-				{
-					uint64 a, b;
-					a = _umul128(*a, *b, &b);
-					*a ^= a;
-					*b ^= b;
-				}
 #else
-				uint64 ha = *a >> 32;
-				uint64 hb = *b >> 32;
-				uint64 la = static_cast<uint32>(*a);
-				uint64 lb = static_cast<uint32>(*b);
-				uint64 hi{};
-				uint64 lo{};
+	#if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
+				constexpr bool forceManual = false;
+	#else
+				constexpr bool forceManual = true;
+	#endif
 
-				uint64 rh = ha * hb;
-				uint64 rm0 = ha * lb;
-				uint64 rm1 = hb * la;
-				uint64 rl = la * lb;
-				uint64 t = rl + (rm0 << 32);
-				uint64 c = static_cast<uint64>(t < rl);
-
-				lo = t + (rm1 << 32);
-				c += static_cast<uint64>(lo < t);
-				hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
-
-				if constexpr (Mode == hash_mode::fast_hash)
+				if constexpr (is_constant_evaluated() || forceManual)
 				{
-					*a = lo;
-					*b = hi;
+					uint64 ha = *a >> 32;
+					uint64 hb = *b >> 32;
+					uint64 la = static_cast<uint32>(*a);
+					uint64 lb = static_cast<uint32>(*b);
+					uint64 hi{};
+					uint64 lo{};
+
+					uint64 rh = ha * hb;
+					uint64 rm0 = ha * lb;
+					uint64 rm1 = hb * la;
+					uint64 rl = la * lb;
+					uint64 t = rl + (rm0 << 32);
+					uint64 c = static_cast<uint64>(t < rl);
+
+					lo = t + (rm1 << 32);
+					c += static_cast<uint64>(lo < t);
+					hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
+
+					if constexpr (Mode == hash_mode::fast_hash)
+					{
+						*a = lo;
+						*b = hi;
+					}
+					else
+					{
+						*a ^= lo;
+						*b ^= hi;
+					}
 				}
 				else
 				{
-					*a ^= lo;
-					*b ^= hi;
+					if constexpr (Mode == hash_mode::fast_hash)
+					{
+						*a = _umul128(*a, *b, b);
+					}
+					else
+					{
+						uint64 a, b;
+						a = _umul128(*a, *b, &b);
+						*a ^= a;
+						*b ^= b;
+					}
 				}
 #endif
 			}
 
 			template <hash_mode Mode>
-			[[nodiscard]] [[rythe_always_inline]] inline uint64 mix(uint64 A, uint64 B) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 mix(uint64 A, uint64 B) noexcept
 			{
 				mum<Mode>(&A, &B);
 				return A ^ B;
 			}
 
-			[[nodiscard]] [[rythe_always_inline]] inline uint64 load64(const void* ptr) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load64(const void* ptr) noexcept
 			{
 				uint64 v;
-				memcpy(&v, ptr, sizeof(uint64));
+				constexpr_memcpy(&v, ptr, sizeof(uint64));
 
 				if constexpr (endian::native == endian::little)
 				{
@@ -102,25 +113,31 @@ namespace rsl
 				}
 				else
 				{
+
+					if constexpr (is_constant_evaluated())
+					{
+						return (
+							((v >> 56) & 0xff) | ((v >> 40) & 0xff00) | ((v >> 24) & 0xff0000) |
+							((v >> 8) & 0xff000000) | ((v << 8) & 0xff00000000) | ((v << 24) & 0xff0000000000) |
+							((v << 40) & 0xff000000000000) | ((v << 56) & 0xff00000000000000)
+						);
+					}
+					else
+					{
 #if defined(RYTHE_GCC) || defined(RYTHE_CLANG)
-					return __builtin_bswap64(v);
+						return __builtin_bswap64(v);
 
 #elif defined(RYTHE_MSVC)
-					return _byteswap_uint64(v);
-#else
-					return (
-						((v >> 56) & 0xff) | ((v >> 40) & 0xff00) | ((v >> 24) & 0xff0000) | ((v >> 8) & 0xff000000) |
-						((v << 8) & 0xff00000000) | ((v << 24) & 0xff0000000000) | ((v << 40) & 0xff000000000000) |
-						((v << 56) & 0xff00000000000000)
-					);
+						return _byteswap_uint64(v);
 #endif
+					}
 				}
 			}
 
-			[[nodiscard]] [[rythe_always_inline]] inline uint64 load32(const void* ptr) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load32(const void* ptr) noexcept
 			{
 				uint32 v;
-				memcpy(&v, ptr, sizeof(uint32));
+				constexpr_memcpy(&v, ptr, sizeof(uint32));
 
 				if constexpr (endian::native == endian::little)
 				{
@@ -128,26 +145,32 @@ namespace rsl
 				}
 				else
 				{
+
+					if constexpr (is_constant_evaluated())
+					{
+						return (
+							((v >> 24) & 0xff) | ((v >> 8) & 0xff00) | ((v << 8) & 0xff0000) | ((v << 24) & 0xff000000)
+						);
+					}
+					else
+					{
 #if defined(RYTHE_GCC) || defined(RYTHE_CLANG)
-					return __builtin_bswap32(v);
+						return __builtin_bswap32(v);
 
 #elif defined(RYTHE_MSVC)
-					return _byteswap_ulong(v);
-#else
-					return (
-						((v >> 24) & 0xff) | ((v >> 8) & 0xff00) | ((v << 8) & 0xff0000) | ((v << 24) & 0xff000000)
-					);
+						return _byteswap_ulong(v);
 #endif
+					}
 				}
 			}
 
-			[[nodiscard]] [[rythe_always_inline]] inline uint64 load_small(const uint8* p, size_type k) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load_small(const uint8* p, size_type k) noexcept
 			{
 				return (static_cast<uint64>(p[0]) << 56) | (static_cast<uint64>(p[k >> 1]) << 32) | p[k - 1];
 			}
 
 			template <hash_mode Mode>
-			[[nodiscard]] inline uint64
+			[[nodiscard]] constexpr uint64
 			hash_bytes(span<const byte> bytes, uint64 seed, const uint64 (&secret)[3]) noexcept
 			{
 				const byte* data = bytes.data();
@@ -229,7 +252,7 @@ namespace rsl
 			}
 
 			template <hash_mode Mode>
-			[[nodiscard]] inline uint64 hash_int(uint64 val)
+			[[nodiscard]] constexpr uint64 hash_int(uint64 val)
 			{
 				return mix<Mode>(val, 0x9e3779b97f4a7c15ull);
 			}
@@ -318,7 +341,7 @@ namespace rsl
 	template <hash_mode Mode, typename T>
 	constexpr id_type hash_value(const T& val) noexcept
 	{
-		return internal::hash_strategy<remove_cvr_t<T>, Mode>::hash(val);
+		return hash_strategy<remove_cvr_t<T>, Mode>::hash(val);
 	}
 
 	template <typename T>

@@ -424,7 +424,12 @@ namespace rsl
 		{
 		}
 
-	private:
+        memory_pool<value_type>& get_memory_pool() requires is_flat
+        {
+			return *m_memoryPool;
+        }
+
+    private:
 		using data_pool = conditional_storage<is_flat, memory_pool<value_type>>;
 
 		hasher_type m_hasher;
