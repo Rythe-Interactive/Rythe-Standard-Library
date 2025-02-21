@@ -4,8 +4,10 @@
 #include "../memory/memory_pool.hpp"
 #include "../util/hash.hpp"
 #include "../util/utilities.hpp"
+#include "dynamic_array.hpp"
 #include "iterators.hpp"
 #include "pair.hpp"
+#include "util/comparers.hpp"
 
 namespace rsl
 {
@@ -104,19 +106,19 @@ namespace rsl
 			using value_type = typename MapType::value_type;
 
 			template <typename... Args>
-			explicit flat_hash_map_node(map_type&, Args&&... args)
+			explicit flat_hash_map_node(map_type& map, Args&&... args)
 				noexcept(is_nothrow_constructible_v<value_type, Args...>)
-				: m_data(forward<Args>(args)...)
 			{
+				map.get_factory().construct(&m_data, 1, forward<Args>(args)...);
 			}
 
-			flat_hash_map_node(map_type&, flat_hash_map_node&& other)
+			flat_hash_map_node(map_type& map, flat_hash_map_node&& other)
 				noexcept(is_nothrow_move_constructible_v<value_type>)
-				: m_data(::rsl::move(other.m_data))
 			{
+				map.get_factory().move(&m_data, &other.m_data, 1);
 			}
 
-			void destroy(map_type&) noexcept {}
+			void destroy(map_type& map) noexcept { map.get_factory().destroy(&m_data, 1); }
 
 			value_type* operator->() noexcept { return &m_data; }
 			const value_type* operator->() const noexcept { return &m_data; }
@@ -161,7 +163,11 @@ namespace rsl
 			}
 
 		private:
-			value_type m_data;
+			union
+			{
+				value_type m_data;
+				byte m_dummy;
+			};
 		};
 
 		template <typename MapType, bool isFlat = false>
@@ -179,9 +185,28 @@ namespace rsl
 		template <typename MapType>
 		using map_node = typename select_node_type<MapType, MapType::is_flat>::type;
 
+		template <bool Large>
+		constexpr bool recommended_fingerprint_size = Large ? 16 : 8;
+
+		template <bool Large = false, size_type FingerprintSize = recommended_fingerprint_size<Large>>
 		struct hash_map_bucket
 		{
-			static constexpr size_type fingerprintSize = 16; // bits
+			static_assert(FingerprintSize < 32);
+			static constexpr size_type fingerprintSize = FingerprintSize; // bits
+
+			// increment the Nth bit that skips all fingerprint bits.
+			static constexpr size_type pslIncrement = 1 << fingerprintSize;
+			static constexpr size_type fingerprintMask = pslIncrement - 1; // 0xFF
+
+			uint32 pslAndFingerprint;
+			uint32 index;
+		};
+
+		template <size_type FingerprintSize>
+		struct hash_map_bucket<true, FingerprintSize>
+		{
+			static_assert(FingerprintSize < 64);
+			static constexpr size_type fingerprintSize = FingerprintSize; // bits
 
 			// increment the Nth bit that skips all fingerprint bits.
 			static constexpr size_type pslIncrement = 1 << fingerprintSize;
@@ -305,8 +330,12 @@ namespace rsl
 	template <typename MapType>
 	using const_hash_map_iterator = hash_map_iterator<MapType, true>;
 
+
+	template <typename KeyType, typename Hasher, bool hasIsTransparent = has_is_transparent<Hasher>::value>
+	struct hasher_wrapper;
+
 	template <typename KeyType, typename Hasher>
-	struct hasher_wrapper
+	struct hasher_wrapper<KeyType, Hasher, false>
 	{
 		Hasher hasher{};
 
@@ -319,10 +348,26 @@ namespace rsl
 		}
 	};
 
-	template <typename KeyType, typename T>
-	struct hasher_wrapper<KeyType, hash<T>>
+	template <typename KeyType, typename Hasher>
+	struct hasher_wrapper<KeyType, Hasher, true>
 	{
-		hash<T> hasher{};
+		using is_transparent = Hasher::is_transparent;
+
+		Hasher hasher{};
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr id_type hash(const KeyType& val) const noexcept
+		{
+			id_type hash = hasher(val);
+			hash *= 0xc4ceb9fe1a85ec53ull;
+			hash ^= hash >> 33;
+			return hash;
+		}
+	};
+
+	template <typename KeyType, typename T>
+	struct hasher_wrapper<KeyType, ::rsl::hash<T>, false>
+	{
+		::rsl::hash<T> hasher{};
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr id_type hash(const KeyType& val) const noexcept
 		{
@@ -331,7 +376,7 @@ namespace rsl
 	};
 
 	template <typename KeyType, typename T>
-	struct hasher_wrapper<KeyType, fast_hash<T>>
+	struct hasher_wrapper<KeyType, fast_hash<T>, false>
 	{
 		fast_hash<T> hasher{};
 
@@ -342,7 +387,7 @@ namespace rsl
 	};
 
 	template <typename KeyType, typename T>
-	struct hasher_wrapper<KeyType, protected_hash<T>>
+	struct hasher_wrapper<KeyType, protected_hash<T>, false>
 	{
 		protected_hash<T> hasher{};
 
@@ -352,16 +397,45 @@ namespace rsl
 		}
 	};
 
-	// MaxLoadFactor100 could be a ratio instead
-	template <typename Hash, typename KeyEqual, bool IsFlat = true, size_type MaxLoadFactor = 80>
+	namespace internal
+	{
+		template <typename Key, typename Value, bool IsFlat>
+		using map_value_type = typename conditional<
+			is_void<Value>::value, Key, pair<typename conditional<IsFlat, Key, const Key>::type, Value>>::type;
+	}
+
+	// MaxLoadFactor could be a ratio instead
+	template <
+		typename Key, typename Value, typename Hash = ::rsl::hash<Key>, typename KeyEqual = equal<Key>,
+		bool IsFlat = true, allocator_type Alloc = default_allocator,
+		typed_factory_type FactoryType = default_factory<internal::map_value_type<Key, Value, IsFlat>>,
+		ratio_type MaxLoadFactor = ::std::ratio<80, 100>, bool IsLarge = false,
+		size_type FingerprintSize = internal::recommended_fingerprint_size<IsLarge>>
 	struct map_info
 	{
-		static_assert(MaxLoadFactor > 10 && MaxLoadFactor < 100, "MaxLoadFactor needs to be > 10 && < 100");
+		constexpr static float32 max_load_factor = static_cast<float32>(MaxLoadFactor::num) / MaxLoadFactor::den;
+		static_assert(max_load_factor > 0.1f && max_load_factor <= 0.99f, "MaxLoadFactor needs to be > 0.1 && < 0.99");
+
+		using key_type = Key;
+		using mapped_type = Value;
 
 		constexpr static bool is_flat = IsFlat;
-		constexpr static size_type max_load_factor = MaxLoadFactor;
-		using hasher_type = Hash;
+
+		using bucket_type = internal::hash_map_bucket<IsLarge, FingerprintSize>;
+		using hasher_type = hasher_wrapper<key_type, Hash>;
 		using key_comparer_type = KeyEqual;
+
+		static constexpr bool is_map = !is_void<mapped_type>::value;
+		static constexpr bool is_set = !is_map;
+		static constexpr bool is_transparent =
+			has_is_transparent<hasher_type>::value && has_is_transparent<key_comparer_type>::value;
+
+		using value_type = internal::map_value_type<Key, Value, IsFlat>;
+
+		using allocator_t = Alloc;
+
+		template <typename T>
+		using factory_t = typename FactoryType::template retarget<T>;
 
 		constexpr static bool nothrow_constructible =
 			is_nothrow_constructible_v<hasher_type> && is_nothrow_constructible_v<key_comparer_type>;
@@ -374,26 +448,31 @@ namespace rsl
 	};
 
 	// Default implementation of a hash table using robin hood hashing
-	template <typename Key, typename Value, typename MapInfo>
+	template <typename MapInfo>
 	class hash_map_base
 	{
 	public:
 		static constexpr bool is_flat = MapInfo::is_flat;
-		using key_type = Key;
-		using mapped_type = Value;
+		using key_type = typename MapInfo::key_type;
+		using mapped_type = typename MapInfo::mapped_type;
 		using hasher_type = typename MapInfo::hasher_type;
 		using key_comparer_type = typename MapInfo::key_comparer_type;
 
-		static constexpr bool is_map = !is_void<Value>::value;
-		static constexpr bool is_set = !is_map;
-		static constexpr bool is_transparent =
-			has_is_transparent<hasher_type>::value && has_is_transparent<key_comparer_type>::value;
+		static constexpr bool is_map = MapInfo::is_map;
+		static constexpr bool is_set = MapInfo::is_set;
+		static constexpr bool is_transparent = MapInfo::is_transparent;
 
 		static constexpr size_type max_load_factor = MapInfo::max_load_factor;
 
-		using value_type =
-			typename conditional<is_set, Key, pair<typename conditional<is_flat, Key, Key const>::type, T>>::type;
+		using value_type = typename MapInfo::value_type;
 		using node_type = internal::map_node<hash_map_base>;
+		using bucket_type = typename MapInfo::bucket_type;
+
+		using allocator_t = typename MapInfo::allocator_t;
+		using allocator_storage_type = allocator_storage<allocator_t>;
+
+		using factory_t = typename MapInfo::template factory_t<node_type>;
+		using factory_storage_type = factory_storage<factory_t>;
 
 		hash_map_base() noexcept(MapInfo::nothrow_constructible)
 			: m_hasher(),
@@ -424,16 +503,42 @@ namespace rsl
 		{
 		}
 
-        memory_pool<value_type>& get_memory_pool() requires is_flat
-        {
+		[[nodiscard]] [[rythe_always_inline]] constexpr memory_pool<value_type>& get_memory_pool() noexcept
+			requires(!is_flat)
+		{
 			return *m_memoryPool;
-        }
+		}
 
-    private:
-		using data_pool = conditional_storage<is_flat, memory_pool<value_type>>;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const memory_pool<value_type>& get_memory_pool() const noexcept
+			requires(!is_flat)
+		{
+			return *m_memoryPool;
+		}
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr allocator_t& get_allocator() noexcept { return *m_alloc; }
+		[[nodiscard]] [[rythe_always_inline]] constexpr const allocator_t& get_allocator() const noexcept
+		{
+			return *m_alloc;
+		}
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr factory_t& get_factory() noexcept { return *m_factory; }
+		[[nodiscard]] [[rythe_always_inline]] constexpr const factory_t& get_factory() const noexcept
+		{
+			return *m_factory;
+		}
+
+	private:
+		using data_pool = conditional_storage<!is_flat, memory_pool<value_type, allocator_t>>;
+        using value_container = dynamic_array<node_type, allocator_t, factory_t>;
+		using bucket_container = dynamic_array<bucket_type, allocator_t, typename MapInfo::template factory_t<bucket_type>>;
+
+        value_container m_values;
+		bucket_container m_buckets;
 
 		hasher_type m_hasher;
 		key_comparer_type m_keyComparer;
+		allocator_storage_type m_alloc;
+		factory_storage_type m_factory;
 		data_pool m_memoryPool;
 	};
 } // namespace rsl
