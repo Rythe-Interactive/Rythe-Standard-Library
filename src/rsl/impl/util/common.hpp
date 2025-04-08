@@ -5,6 +5,7 @@ RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(5046)
 #include <bit>
 #include <ratio>
 #include <type_traits>
+#include <functional>
 RYTHE_MSVC_SUPPRESS_WARNING_POP
 
 #include "primitives.hpp"
