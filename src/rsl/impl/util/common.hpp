@@ -1308,7 +1308,7 @@ namespace rsl
     }
 
 	template <typename T, T Size>
-	using make_integer_sequence = internal::make_integer_seq_impl<T, 0, Size>::type;
+	using make_integer_sequence = typename internal::make_integer_seq_impl<T, 0, Size>::type;
 
 	template <size_type... Vals>
 	using index_sequence = integer_sequence<size_type, Vals...>;
