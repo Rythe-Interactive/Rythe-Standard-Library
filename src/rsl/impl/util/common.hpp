@@ -3,9 +3,9 @@
 
 RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(5046)
 #include <bit>
+#include <functional>
 #include <ratio>
 #include <type_traits>
-#include <functional>
 RYTHE_MSVC_SUPPRESS_WARNING_POP
 
 #include "primitives.hpp"
@@ -661,23 +661,74 @@ namespace rsl
 	{
 	};
 
+    namespace internal
+    {
+		template <typename To, typename From>
+			requires is_trivially_copyable_v<To> && is_trivially_copyable_v<From>
+		constexpr void constexpr_memcpy_impl(To* dst, const From* src, size_type count)
+        {
+			const size_type itemCount = count / sizeof(To);
+			constexpr size_type stepSize = sizeof(To) / sizeof(From);
+
+			struct converter
+			{
+				From from[stepSize];
+			};
+
+			for (size_type i = 0; i < itemCount; i++)
+			{
+				converter conv{};
+				for (size_type j = 0; j < stepSize; j++)
+				{
+					conv.from[j] = src[i * stepSize + j];
+				}
+
+				dst[i] = ::std::bit_cast<To>(conv);
+			}
+        }
+    }
+
 	template <typename To, typename From>
 		requires(sizeof(To) == sizeof(From)) && is_trivially_copyable_v<To> && is_trivially_copyable_v<From>
 	[[nodiscard]] constexpr To bit_cast(const From& value) noexcept
 	{
-		return ::std::bit_cast<To>(value);
+		if (is_constant_evaluated())
+		{
+			static_assert(
+				std::is_trivially_constructible_v<To>, "This implementation additionally requires "
+													   "destination type to be trivially constructible"
+			);
+
+			To dst;
+			internal::constexpr_memcpy_impl(&dst, &value, sizeof(To));
+			return dst;
+        }
+		else
+		{
+			return ::std::bit_cast<To>(value);
+		}
 	}
 
-	constexpr void* constexpr_memcpy(void* dst, const void* src, size_type count) noexcept
+    template<typename To, typename From>
+	constexpr void* constexpr_memcpy(To* dst, const From* src, size_type count) noexcept
 	{
-		if constexpr (is_constant_evaluated())
+		if (is_constant_evaluated())
 		{
-			for (size_type i = 0; i < count; i++)
-			{
-				bit_cast<byte*>(dst)[i] = *bit_cast<const byte*>(src);
-			}
-
+			internal::constexpr_memcpy_impl(dst, src, count);
 			return dst;
+		}
+		else
+		{
+			return memcpy(dst, src, count);
+		}
+	}
+
+	template <>
+	constexpr void* constexpr_memcpy<void, void>(void* dst, const void* src, size_type count) noexcept
+	{
+		if (is_constant_evaluated())
+		{
+			return constexpr_memcpy(bit_cast<byte*>(dst), bit_cast<const byte*>(src), count);
 		}
 		else
 		{
@@ -1293,8 +1344,8 @@ namespace rsl
 		constexpr static bool contains = ((Val == Vals) || ...);
 	};
 
-    namespace internal
-    {
+	namespace internal
+	{
 		template <class T, T I, T N, T... integers>
 		struct make_integer_seq_impl
 		{
@@ -1306,7 +1357,7 @@ namespace rsl
 		{
 			using type = integer_sequence<T, integers...>;
 		};
-    }
+	} // namespace internal
 
 	template <typename T, T Size>
 	using make_integer_sequence = typename internal::make_integer_seq_impl<T, 0, Size>::type;

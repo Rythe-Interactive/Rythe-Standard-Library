@@ -25,7 +25,7 @@ namespace rsl
 #endif
 	};
 
-	[[rythe_always_inline]] size_type count_leading_zeros(size_type mask) noexcept
+	[[rythe_always_inline]] [[maybe_unused]] static size_type count_leading_zeros(size_type mask) noexcept
 	{
 #if defined(RYTHE_MSVC)
 		unsigned long index;
@@ -37,7 +37,7 @@ namespace rsl
 #endif
 	}
 
-	[[rythe_always_inline]] size_type count_trailing_zeros(size_type mask) noexcept
+	[[rythe_always_inline]] [[maybe_unused]] static size_type count_trailing_zeros(size_type mask) noexcept
 	{
 #if defined(RYTHE_MSVC)
 		unsigned long index;

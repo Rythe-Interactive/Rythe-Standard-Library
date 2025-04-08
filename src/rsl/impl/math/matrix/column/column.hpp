@@ -3,12 +3,12 @@
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, mode Mode>
+	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode>
 	struct column
 	{
 		using scalar = Scalar;
 		static constexpr size_type size = RowCount;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		static constexpr size_type row_count = RowCount;
 		static constexpr size_type col_count = ColCount;
 		static constexpr size_type col_idx = ColIdx;
@@ -36,12 +36,12 @@ namespace rsl::math
 		}
 	};
 
-	template <size_type RowCount, size_type ColCount, size_type ColIdx, mode Mode>
+	template <size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode>
 	struct column<bool, RowCount, ColCount, ColIdx, Mode>
 	{
 		using scalar = bool;
 		static constexpr size_type size = RowCount;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		static constexpr size_type row_count = RowCount;
 		static constexpr size_type col_count = ColCount;
 		static constexpr size_type col_idx = ColIdx;
@@ -72,12 +72,12 @@ namespace rsl::math
 		}
 	};
 
-	template <arithmetic_type Scalar, size_type ColCount, size_type ColIdx, mode Mode>
+	template <arithmetic_type Scalar, size_type ColCount, size_type ColIdx, storage_mode Mode>
 	struct column<Scalar, 1, ColCount, ColIdx, Mode>
 	{
 		using scalar = Scalar;
 		static constexpr size_type size = 1;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		static constexpr size_type row_count = 1;
 		static constexpr size_type col_count = ColCount;
 		static constexpr size_type col_idx = ColIdx;
@@ -109,12 +109,12 @@ namespace rsl::math
 		}
 	};
 
-	template <size_type ColCount, size_type ColIdx, mode Mode>
+	template <size_type ColCount, size_type ColIdx, storage_mode Mode>
 	struct column<bool, 1, ColCount, ColIdx, Mode>
 	{
 		using scalar = bool;
 		static constexpr size_type size = 1;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		static constexpr size_type row_count = 1;
 		static constexpr size_type col_count = ColCount;
 		static constexpr size_type col_idx = ColIdx;

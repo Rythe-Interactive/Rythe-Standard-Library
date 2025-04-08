@@ -7,7 +7,7 @@ namespace rsl::math
 {
 	namespace internal
 	{
-		template <arithmetic_type Scalar, size_type Size, mode Mode>
+		template <arithmetic_type Scalar, size_type Size, storage_mode Mode>
 		struct compute_addition
 		{
 			static constexpr size_type size = Size;
@@ -36,7 +36,7 @@ namespace rsl::math
 			}
 		};
 
-		template <arithmetic_type Scalar, mode Mode>
+		template <arithmetic_type Scalar, storage_mode Mode>
 		struct compute_addition<Scalar, 1u, Mode>
 		{
 			static constexpr size_type size = 1u;
@@ -51,7 +51,7 @@ namespace rsl::math
 		template <typename T>
 		struct compute_quat_addition;
 
-		template <arithmetic_type Scalar, mode Mode>
+		template <arithmetic_type Scalar, storage_mode Mode>
 		struct compute_quat_addition<quaternion<Scalar, Mode>>
 		{
 			using value_type = quaternion<Scalar>;

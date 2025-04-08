@@ -9,12 +9,12 @@ RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201) // anonymous struct
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	struct vector<Scalar, 4, Mode> : internal::vector_additions<Scalar, 4, Mode>
 	{
 		using scalar = Scalar;
 		static constexpr size_type size = 4;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using storage_type = storage_t<Scalar, size, Mode>;
 
 		union
@@ -32,29 +32,29 @@ namespace rsl::math
 		[[rythe_always_inline]] constexpr vector(const vector&) noexcept = default;
 		[[rythe_always_inline]] explicit constexpr vector(scalar s) noexcept;
 
-		template <math::mode OtherMode>
+		template <math::storage_mode OtherMode>
 		[[rythe_always_inline]] explicit constexpr vector(
 			const vector<scalar, 3, OtherMode>& v, scalar s = static_cast<scalar>(0)
 		) noexcept;
 
-		template <math::mode OtherMode>
+		template <math::storage_mode OtherMode>
 		[[rythe_always_inline]] constexpr vector(scalar s, const vector<scalar, 3, OtherMode>& v) noexcept;
 
-		template <math::mode OtherMode>
+		template <math::storage_mode OtherMode>
 		[[rythe_always_inline]] constexpr vector(
 			scalar s0, const vector<scalar, 2, OtherMode>& v, scalar s1 = static_cast<scalar>(0)
 		) noexcept;
 
-		template <math::mode OtherMode>
+		template <math::storage_mode OtherMode>
 		[[rythe_always_inline]] constexpr vector(scalar s0, scalar s1, const vector<scalar, 2, OtherMode>& v) noexcept;
 
-		template <math::mode OtherMode>
+		template <math::storage_mode OtherMode>
 		[[rythe_always_inline]] explicit constexpr vector(
 			const vector<scalar, 2, OtherMode>& v, scalar s0 = static_cast<scalar>(0),
 			scalar s1 = static_cast<scalar>(0)
 		) noexcept;
 
-		template <math::mode Mode0, math::mode Mode1>
+		template <math::storage_mode Mode0, math::storage_mode Mode1>
 		[[rythe_always_inline]] constexpr vector(const vector<scalar, 2, Mode0>& v0, const vector<scalar, 2, Mode1>& v1)
 			noexcept;
 
@@ -72,12 +72,12 @@ namespace rsl::math
 		[[nodiscard]] [[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept;
 	};
 
-	template <mode Mode>
+	template <storage_mode Mode>
 	struct vector<bool, 4, Mode> : internal::vector_additions<bool, 4, Mode>
 	{
 		using scalar = bool;
 		static constexpr size_type size = 4;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using storage_type = storage_t<bool, size, Mode>;
 
 		union
@@ -94,29 +94,29 @@ namespace rsl::math
 		[[rythe_always_inline]] constexpr vector(const vector&) noexcept = default;
 		[[rythe_always_inline]] explicit constexpr vector(scalar s) noexcept;
 
-		template <math::mode OtherMode>
+		template <math::storage_mode OtherMode>
 		[[rythe_always_inline]] explicit constexpr vector(
 			const vector<scalar, 3, OtherMode>& v, scalar s = static_cast<scalar>(0)
 		) noexcept;
 
-		template <math::mode OtherMode>
+		template <math::storage_mode OtherMode>
 		[[rythe_always_inline]] constexpr vector(scalar s, const vector<scalar, 3, OtherMode>& v) noexcept;
 
-		template <math::mode OtherMode>
+		template <math::storage_mode OtherMode>
 		[[rythe_always_inline]] constexpr vector(
 			scalar s0, const vector<scalar, 2, OtherMode>& v, scalar s1 = static_cast<scalar>(0)
 		) noexcept;
 
-		template <math::mode OtherMode>
+		template <math::storage_mode OtherMode>
 		[[rythe_always_inline]] constexpr vector(scalar s0, scalar s1, const vector<scalar, 2, OtherMode>& v) noexcept;
 
-		template <math::mode OtherMode>
+		template <math::storage_mode OtherMode>
 		[[rythe_always_inline]] explicit constexpr vector(
 			const vector<scalar, 2, OtherMode>& v, scalar s0 = static_cast<scalar>(0),
 			scalar s1 = static_cast<scalar>(0)
 		) noexcept;
 
-		template <math::mode Mode0, math::mode Mode1>
+		template <math::storage_mode Mode0, math::storage_mode Mode1>
 		[[rythe_always_inline]] constexpr vector(const vector<scalar, 2, Mode0>& v0, const vector<scalar, 2, Mode1>& v1)
 			noexcept;
 

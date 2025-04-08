@@ -3,7 +3,7 @@
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	vector<Scalar, 3, Mode> spherical_rand(Scalar radius) noexcept
 	{
 		Scalar theta = linear_rand(static_cast<Scalar>(0), tau<Scalar>());

@@ -10,14 +10,14 @@ namespace rsl::math
 	{
 	};
 
-	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, mode Mode = mode::defaultp>
+	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, storage_mode Mode = storage_mode::defaultp>
 	struct matrix
 	{
 		using scalar = Scalar;
 		static constexpr size_type row_count = RowCount;
 		static constexpr size_type col_count = ColCount;
 		static constexpr size_type size = row_count * col_count;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 
 		using row_type = vector<scalar, col_count, Mode>;
 

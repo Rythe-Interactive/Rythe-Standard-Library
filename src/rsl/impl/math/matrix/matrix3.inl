@@ -4,13 +4,13 @@
 #define RowCountSpecialization 3
 #define ColCountSpecialization 3
 #define ScalarSpecialization Scalar
-#define MatrixTemplate template <arithmetic_type Scalar, mode Mode>
+#define MatrixTemplate template <arithmetic_type Scalar, storage_mode Mode>
 
 #include "matrix_shared.inl"
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr matrix<Scalar, 3, 3, Mode>::matrix(
 		scalar s00, scalar s01, scalar s02, scalar s10, scalar s11, scalar s12, scalar s20, scalar s21, scalar s22
 	) noexcept
@@ -20,7 +20,7 @@ namespace rsl::math
 	{
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr matrix<Scalar, 3, 3, Mode>::matrix(row_type r0, row_type r1, row_type r2) noexcept
 		: row0(r0),
 		  row1(r1),

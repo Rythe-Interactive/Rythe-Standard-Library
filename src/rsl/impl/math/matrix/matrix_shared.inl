@@ -18,7 +18,7 @@
 	#define MatrixTemplate                                                                                             \
 		template <                                                                                                     \
 			arithmetic_type ScalarSpecialization, size_type RowCountSpecialization, size_type ColCountSpecialization,  \
-			mode ModeSpecialization>
+			storage_mode ModeSpecialization>
 #endif // !MatrixTemplate
 
 namespace rsl::math

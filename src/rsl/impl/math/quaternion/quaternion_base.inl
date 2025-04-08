@@ -11,7 +11,7 @@
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr quaternion<Scalar, Mode>::quaternion() noexcept
 		: w(static_cast<scalar>(1)),
 		  i(static_cast<scalar>(0)),
@@ -20,7 +20,7 @@ namespace rsl::math
 	{
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr quaternion<Scalar, Mode>::quaternion(scalar _w, scalar _i, scalar _j, scalar _k) noexcept
 		: w(_w),
 		  i(_i),
@@ -29,7 +29,7 @@ namespace rsl::math
 	{
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	template <vector_type VecType>
 		requires(VecType::size == 3)
 	constexpr quaternion<Scalar, Mode>::quaternion(typename VecType::scalar s, const VecType& v) noexcept
@@ -40,7 +40,7 @@ namespace rsl::math
 	{
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	template <vector_type VecType>
 		requires(VecType::size == 4)
 	constexpr quaternion<Scalar, Mode>::quaternion(const VecType& other) noexcept
@@ -51,39 +51,39 @@ namespace rsl::math
 	{
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr Scalar& quaternion<Scalar, Mode>::operator[](size_type index) noexcept
 	{
 		rsl_assert_out_of_range_msg((index >= 0) && (index < size), "quaternion subscript out of range");
 		return data[index];
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr const Scalar& quaternion<Scalar, Mode>::operator[](size_type index) const noexcept
 	{
 		rsl_assert_out_of_range_msg((index >= 0) && (index < size), "quaternion subscript out of range");
 		return data[index];
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::right() const noexcept
 	{
 		return vec_type::right * *this;
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::forward() const noexcept
 	{
 		return vec_type::forward * *this;
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::up() const noexcept
 	{
 		return vec_type::up * *this;
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::euler_angles() const noexcept
 	{ // TODO(Glyn): Optimize
 		vector<Scalar, 3> angles;
@@ -103,7 +103,7 @@ namespace rsl::math
 		return angles;
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr quaternion<Scalar, Mode>
 	quaternion<Scalar, Mode>::angle_axis(radians<scalar> angle, const vec_type& vec) noexcept
 	{
@@ -111,7 +111,7 @@ namespace rsl::math
 		return quaternion<scalar>(cos(halfAngle), sin(halfAngle) * vec);
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr quaternion<Scalar, Mode>
 	quaternion<Scalar, Mode>::look_at(const vec_type& _pos, const vec_type& _center, const vec_type& _up) noexcept
 	{ // TODO(Glyn): Optimize
@@ -144,14 +144,14 @@ namespace rsl::math
 		return quaternion(qPerms[idx], qPerms[(invIdx + 2) % 4], qPerms[(idx + 2) % 4], qPerms[invIdx]);
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr quaternion<Scalar, Mode> quaternion<Scalar, Mode>::conjugate(const quaternion<Scalar, Mode>& _quat
 	) noexcept
 	{
 		return quaternion<Scalar>(_quat.w, -_quat.i, -_quat.j, -_quat.k);
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr quaternion<Scalar, Mode> quaternion<Scalar, Mode>::from_euler(const vec_type& euler) noexcept
 	{ // TODO(Glyn): Optimize
 		vector<Scalar, 3> c = cos(euler * static_cast<Scalar>(0.5));
@@ -168,31 +168,31 @@ namespace rsl::math
 #define sin45 0.70710678118654752440084436210485L
 #define cos45 0.70710678118654752440084436210485L
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::identity(
 		static_cast<Scalar>(1), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(0)
 	);
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_x_90(
 		static_cast<Scalar>(cos45), static_cast<Scalar>(sin45), static_cast<Scalar>(0), static_cast<Scalar>(0)
 	);
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_y_90(
 		static_cast<Scalar>(cos45), static_cast<Scalar>(0), static_cast<Scalar>(sin45), static_cast<Scalar>(0)
 	);
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_z_90(
 		static_cast<Scalar>(cos45), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(sin45)
 	);
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_x_180(
 		static_cast<Scalar>(0), static_cast<Scalar>(1), static_cast<Scalar>(0), static_cast<Scalar>(0)
 	);
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_y_180(
 		static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(1), static_cast<Scalar>(0)
 	);
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_z_180(
 		static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(1)
 	);

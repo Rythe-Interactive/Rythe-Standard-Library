@@ -15,7 +15,7 @@ namespace rsl::math
 	#define RSL_DEFAULT_MATH_MODE lowp
 #endif
 
-	enum struct mode : uint8
+	enum struct storage_mode : uint8
 	{
 		packed_highp,
 		packed_mediump,
@@ -35,27 +35,27 @@ namespace rsl::math
 		defaultp = RSL_DEFAULT_MATH_MODE,
 	};
 
-	template <mode M>
+	template <storage_mode M>
 	struct is_aligned : false_type
 	{
 	};
 
 	template <>
-	struct is_aligned<mode::aligned_highp> : true_type
+	struct is_aligned<storage_mode::aligned_highp> : true_type
 	{
 	};
 
 	template <>
-	struct is_aligned<mode::aligned_mediump> : true_type
+	struct is_aligned<storage_mode::aligned_mediump> : true_type
 	{
 	};
 
 	template <>
-	struct is_aligned<mode::aligned_lowp> : true_type
+	struct is_aligned<storage_mode::aligned_lowp> : true_type
 	{
 	};
 
-	template <mode M>
+	template <storage_mode M>
 	constexpr bool is_aligned_v = is_aligned<M>::value;
 
 	template <arithmetic_type T, size_type N, bool Aligned>
@@ -106,6 +106,6 @@ namespace rsl::math
 		};
 	};
 
-	template <arithmetic_type T, size_type N, mode M>
+	template <arithmetic_type T, size_type N, storage_mode M>
 	using storage_t = typename storage<T, N, is_aligned_v<M>>::type;
 } // namespace rsl::math

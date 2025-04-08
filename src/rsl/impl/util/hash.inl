@@ -1,8 +1,6 @@
 #include "hash.hpp"
 #pragma once
 
-#include "common.hpp"
-
 #if !defined(RYTHE_HAS_INT128) && (defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC))
 	#include <intrin.h>
 	#pragma intrinsic(_umul128)
@@ -47,7 +45,7 @@ namespace rsl
 				constexpr bool forceManual = true;
 	#endif
 
-				if constexpr (is_constant_evaluated() || forceManual)
+				if (is_constant_evaluated() || forceManual)
 				{
 					uint64 ha = *a >> 32;
 					uint64 hb = *b >> 32;
@@ -102,7 +100,7 @@ namespace rsl
 				return A ^ B;
 			}
 
-			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load64(const void* ptr) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load64(const byte* ptr) noexcept
 			{
 				uint64 v;
 				constexpr_memcpy(&v, ptr, sizeof(uint64));
@@ -114,7 +112,7 @@ namespace rsl
 				else
 				{
 
-					if constexpr (is_constant_evaluated())
+					if (is_constant_evaluated())
 					{
 						return (
 							((v >> 56) & 0xff) | ((v >> 40) & 0xff00) | ((v >> 24) & 0xff0000) |
@@ -134,7 +132,7 @@ namespace rsl
 				}
 			}
 
-			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load32(const void* ptr) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load32(const byte* ptr) noexcept
 			{
 				uint32 v;
 				constexpr_memcpy(&v, ptr, sizeof(uint32));
@@ -146,7 +144,7 @@ namespace rsl
 				else
 				{
 
-					if constexpr (is_constant_evaluated())
+					if (is_constant_evaluated())
 					{
 						return (
 							((v >> 24) & 0xff) | ((v >> 8) & 0xff00) | ((v << 8) & 0xff0000) | ((v << 24) & 0xff000000)
@@ -330,7 +328,21 @@ namespace rsl
 	template <hash_mode Mode>
 	constexpr id_type hash_string(string_view str) noexcept
 	{
-		return hash_bytes<Mode>(span<const byte>(bit_cast<const byte*>(str.data()), str.size()));
+        if (is_constant_evaluated())
+		{
+			byte* data = new byte[str.size()];
+			constexpr_memcpy(data, str.data(), str.size());
+
+			id_type result = hash_bytes<Mode>(span<const byte>(data, str.size()));
+
+            delete[] data;
+
+            return result;
+        }
+		else
+		{
+			return hash_bytes<Mode>(span<const byte>(bit_cast<const byte*>(str.data()), str.size()));
+		}
 	}
 
 	constexpr id_type hash_string(string_view str) noexcept
@@ -350,10 +362,10 @@ namespace rsl
 		return hash_value<hash_mode::default_hash>(val);
 	}
 
-	template <same_as<id_type>... hash_types>
-	constexpr id_type combine_hash(id_type seed, id_type hash, hash_types... hashes) noexcept
+	template <hash_mode Mode, same_as<id_type>... hash_types>
+    constexpr id_type combine_hash(id_type seed, id_type hash, hash_types... hashes) noexcept
 	{
-		seed = internal::hash::mix(seed + hash, 0x9ddfea08eb382d69ull);
+		seed = internal::hash::mix<Mode>(seed + hash, 0x9ddfea08eb382d69ull);
 
 		if constexpr (sizeof...(hash_types) != 0)
 		{
@@ -363,5 +375,11 @@ namespace rsl
 		{
 			return seed;
 		}
+    }
+
+	template <same_as<id_type>... hash_types>
+	constexpr id_type combine_hash(id_type seed, id_type hash, hash_types... hashes) noexcept
+	{
+		return combine_hash<hash_mode::default_hash>(seed, hash, hashes...);
 	}
 } // namespace rsl

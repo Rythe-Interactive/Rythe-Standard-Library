@@ -2,8 +2,7 @@
 
 #include "../containers/span.hpp"
 #include "../containers/string_view.hpp"
-#include "../defines.hpp"
-#include "primitives.hpp"
+#include "utilities.hpp"
 #include "string_util.hpp"
 #include "type_util.hpp"
 
@@ -29,6 +28,9 @@ namespace rsl
 	[[rythe_always_inline]] constexpr id_type hash_string(string_view str) noexcept;
 
 	[[rythe_always_inline]] constexpr id_type hash_string(string_view str) noexcept;
+
+	template <hash_mode Mode, same_as<id_type>... hash_types>
+	[[rythe_always_inline]] constexpr id_type combine_hash(id_type seed, id_type hash, hash_types... hashes) noexcept;
 
 	template <same_as<id_type>... hash_types>
 	[[rythe_always_inline]] constexpr id_type combine_hash(id_type seed, id_type hash, hash_types... hashes) noexcept;

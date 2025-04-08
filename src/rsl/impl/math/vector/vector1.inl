@@ -3,12 +3,12 @@
 
 #define SizeSpecialization 1
 #define ScalarSpecialization Scalar
-#define VectorTemplate template <arithmetic_type Scalar, mode Mode>
+#define VectorTemplate template <arithmetic_type Scalar, storage_mode Mode>
 
 #include "vector_shared.inl"
 
 #define SizeSpecialization 1
 #define ScalarSpecialization bool
-#define VectorTemplate template <mode Mode>
+#define VectorTemplate template <storage_mode Mode>
 
 #include "vector_shared.inl"

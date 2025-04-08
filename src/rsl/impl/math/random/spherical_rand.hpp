@@ -4,7 +4,7 @@
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	[[nodiscard]] vector<Scalar, 3, Mode> spherical_rand(Scalar radius) noexcept;
 
 	template <vector_type vec_type>

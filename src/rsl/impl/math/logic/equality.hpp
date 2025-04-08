@@ -36,7 +36,7 @@ namespace rsl::math
 			}
 		};
 
-		template <arithmetic_type Scalar, mode Mode>
+		template <arithmetic_type Scalar, storage_mode Mode>
 		struct compute_equality<vector<Scalar, 1, Mode>>
 		{
 			[[nodiscard]] [[rythe_always_inline]] constexpr static bool compute(Scalar a, Scalar b) noexcept

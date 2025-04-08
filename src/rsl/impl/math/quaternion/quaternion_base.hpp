@@ -12,15 +12,15 @@ RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201)
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, mode Mode>
+	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, storage_mode Mode>
 	struct matrix;
 
-	template <arithmetic_type Scalar, mode Mode = mode::defaultp>
+	template <arithmetic_type Scalar, storage_mode Mode = storage_mode::defaultp>
 	struct quaternion
 	{
 		using scalar = Scalar;
 		static constexpr size_type size = 4;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using vec_type = vector<scalar, 3, Mode>;
 
 		union
@@ -51,9 +51,9 @@ namespace rsl::math
 			requires(VecType::size == 4)
 		[[rythe_always_inline]] explicit constexpr quaternion(const VecType& other) noexcept;
 
-		template <math::mode M>
+		template <math::storage_mode M>
 		[[rythe_always_inline]] explicit constexpr quaternion(const matrix<scalar, 3, 3, M>& m) noexcept;
-		template <math::mode M>
+		template <math::storage_mode M>
 		[[rythe_always_inline]] explicit constexpr quaternion(const matrix<scalar, 4, 4, M>& m) noexcept;
 
 		static const quaternion identity;
