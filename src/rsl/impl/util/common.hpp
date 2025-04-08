@@ -661,12 +661,12 @@ namespace rsl
 	{
 	};
 
-    namespace internal
-    {
+	namespace internal
+	{
 		template <typename To, typename From>
 			requires is_trivially_copyable_v<To> && is_trivially_copyable_v<From>
 		constexpr void constexpr_memcpy_impl(To* dst, const From* src, size_type count)
-        {
+		{
 			const size_type itemCount = count / sizeof(To);
 			constexpr size_type stepSize = sizeof(To) / sizeof(From);
 
@@ -685,8 +685,8 @@ namespace rsl
 
 				dst[i] = ::std::bit_cast<To>(conv);
 			}
-        }
-    }
+		}
+	} // namespace internal
 
 	template <typename To, typename From>
 		requires(sizeof(To) == sizeof(From)) && is_trivially_copyable_v<To> && is_trivially_copyable_v<From>
@@ -702,14 +702,14 @@ namespace rsl
 			To dst;
 			internal::constexpr_memcpy_impl(&dst, &value, sizeof(To));
 			return dst;
-        }
+		}
 		else
 		{
 			return ::std::bit_cast<To>(value);
 		}
 	}
 
-    template<typename To, typename From>
+	template <typename To, typename From>
 	constexpr void* constexpr_memcpy(To* dst, const From* src, size_type count) noexcept
 	{
 		if (is_constant_evaluated())

@@ -328,17 +328,17 @@ namespace rsl
 	template <hash_mode Mode>
 	constexpr id_type hash_string(string_view str) noexcept
 	{
-        if (is_constant_evaluated())
+		if (is_constant_evaluated())
 		{
 			byte* data = new byte[str.size()];
 			constexpr_memcpy(data, str.data(), str.size());
 
 			id_type result = hash_bytes<Mode>(span<const byte>(data, str.size()));
 
-            delete[] data;
+			delete[] data;
 
-            return result;
-        }
+			return result;
+		}
 		else
 		{
 			return hash_bytes<Mode>(span<const byte>(bit_cast<const byte*>(str.data()), str.size()));
@@ -363,7 +363,7 @@ namespace rsl
 	}
 
 	template <hash_mode Mode, same_as<id_type>... hash_types>
-    constexpr id_type combine_hash(id_type seed, id_type hash, hash_types... hashes) noexcept
+	constexpr id_type combine_hash(id_type seed, id_type hash, hash_types... hashes) noexcept
 	{
 		seed = internal::hash::mix<Mode>(seed + hash, 0x9ddfea08eb382d69ull);
 
@@ -375,7 +375,7 @@ namespace rsl
 		{
 			return seed;
 		}
-    }
+	}
 
 	template <same_as<id_type>... hash_types>
 	constexpr id_type combine_hash(id_type seed, id_type hash, hash_types... hashes) noexcept
