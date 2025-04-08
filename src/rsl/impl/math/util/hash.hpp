@@ -11,11 +11,14 @@
 #include "../../util/primitives.hpp"
 #include "../vector/vector.hpp"
 
-template <typename Scalar, ::std::size_t Size, ::std::size_t... args>
-struct ::std::hash<::rsl::math::swizzle<Scalar, Size, args...>>
+namespace std
 {
-	::std::size_t operator()(const ::rsl::math::swizzle<Scalar, Size, args...>& vec) const noexcept
+	template <typename Scalar, std::size_t Size, std::size_t... args>
+	struct std::hash<rsl::math::swizzle<Scalar, Size, args...>>
 	{
-		return ::rsl::hash_value(typename ::rsl::math::swizzle<Scalar, Size, args...>::conv_type(vec));
-	}
-};
+		std::size_t operator()(const rsl::math::swizzle<Scalar, Size, args...>& vec) const noexcept
+		{
+			return rsl::hash_value(typename rsl::math::swizzle<Scalar, Size, args...>::conv_type(vec));
+		}
+	};
+} // namespace std
