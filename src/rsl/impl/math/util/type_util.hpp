@@ -8,10 +8,10 @@
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	struct quaternion;
 
-	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, mode Mode>
+	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode>
 	struct column;
 
 	namespace internal
@@ -21,17 +21,17 @@ namespace rsl::math
 		{
 		};
 
-		template <typename Scalar, size_type Size, mode Mode>
+		template <typename Scalar, size_type Size, storage_mode Mode>
 		struct _is_vector_impl<vector<Scalar, Size, Mode>> : true_type
 		{
 		};
 
-		template <typename Scalar, size_type Size, mode Mode, size_type... args>
+		template <typename Scalar, size_type Size, storage_mode Mode, size_type... args>
 		struct _is_vector_impl<swizzle<Scalar, Size, Mode, args...>> : true_type
 		{
 		};
 
-		template <typename Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, mode Mode>
+		template <typename Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode>
 		struct _is_vector_impl<column<Scalar, RowCount, ColCount, ColIdx, Mode>> : true_type
 		{
 		};
@@ -154,7 +154,7 @@ namespace rsl::math
 		{
 		};
 
-		template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, mode Mode>
+		template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, storage_mode Mode>
 		struct _is_matrix_impl<matrix<Scalar, RowCount, ColCount, Mode>> : true_type
 		{
 		};
@@ -207,7 +207,7 @@ namespace rsl::math
 		{
 		};
 
-		template <arithmetic_type Scalar, mode Mode>
+		template <arithmetic_type Scalar, storage_mode Mode>
 		struct _is_quat_impl<quaternion<Scalar, Mode>> : true_type
 		{
 		};
@@ -235,7 +235,7 @@ namespace rsl::math
 			}
 			else if constexpr (is_arithmetic_v<T>)
 			{
-				return quaternion<T, mode::defaultp>{};
+				return quaternion<T, storage_mode::defaultp>{};
 			}
 			else
 			{
@@ -270,26 +270,26 @@ namespace rsl::math
 		template <arithmetic_type T, size_type v>
 		struct _uniform_value_impl_;
 
-		template <arithmetic_type Scalar, size_type Size, mode Mode, size_type v>
+		template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type v>
 		struct _uniform_value_impl_<vector<Scalar, Size, Mode>, v>
 		{
 			constexpr static auto value = vector<Scalar, Size, Mode>(static_cast<Scalar>(v));
 		};
 
-		template <arithmetic_type Scalar, size_type Size, mode Mode, size_type... args, size_type v>
+		template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type... args, size_type v>
 		struct _uniform_value_impl_<swizzle<Scalar, Size, Mode, args...>, v>
 		{
 			constexpr static auto value = vector<Scalar, Size, Mode>(static_cast<Scalar>(v));
 		};
 
 		template <
-			arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, mode Mode, size_type v>
+			arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode, size_type v>
 		struct _uniform_value_impl_<column<Scalar, RowCount, ColCount, ColIdx, Mode>, v>
 		{
 			constexpr static auto value = vector<Scalar, RowCount, Mode>(static_cast<Scalar>(v));
 		};
 
-		template <arithmetic_type Scalar, mode Mode, size_type v>
+		template <arithmetic_type Scalar, storage_mode Mode, size_type v>
 		struct _uniform_value_impl_<quaternion<Scalar, Mode>, v>
 		{
 			constexpr static auto value = quaternion<Scalar, Mode>(
@@ -297,7 +297,7 @@ namespace rsl::math
 			);
 		};
 
-		template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, mode Mode, size_type v>
+		template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, storage_mode Mode, size_type v>
 		struct _uniform_value_impl_<matrix<Scalar, RowCount, ColCount, Mode>, v>
 		{
 			constexpr static auto value =

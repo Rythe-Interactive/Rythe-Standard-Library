@@ -7,12 +7,12 @@ RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201) // anonymous struct
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	struct vector<Scalar, 2, Mode> : internal::vector_additions<Scalar, 2, Mode>
 	{
 		using scalar = Scalar;
 		static constexpr size_type size = 2;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using storage_type = storage_t<Scalar, size, Mode>;
 
 		union
@@ -40,12 +40,12 @@ namespace rsl::math
 		[[nodiscard]] [[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept;
 	};
 
-	template <mode Mode>
+	template <storage_mode Mode>
 	struct vector<bool, 2, Mode> : internal::vector_additions<bool, 2, Mode>
 	{
 		using scalar = bool;
 		static constexpr size_type size = 2;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using storage_type = storage_t<bool, size, Mode>;
 
 		union

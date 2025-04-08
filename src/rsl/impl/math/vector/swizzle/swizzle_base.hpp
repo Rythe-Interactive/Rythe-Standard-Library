@@ -4,15 +4,15 @@
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, size_type Size, mode Mode, size_type... args>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type... args>
 	struct swizzle;
 
-	template <arithmetic_type Scalar, size_type Size, mode Mode, size_type s0>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type s0>
 	struct swizzle<Scalar, Size, Mode, s0>
 	{
 		using scalar = Scalar;
 		static constexpr size_type size = 1;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using conv_type = vector<scalar, 1, Mode>;
 		using storage_type = storage_t<scalar, Size, Mode>;
 
@@ -44,12 +44,12 @@ namespace rsl::math
 		}
 	};
 
-	template <size_type Size, mode Mode, size_type s0>
+	template <size_type Size, storage_mode Mode, size_type s0>
 	struct swizzle<bool, Size, Mode, s0>
 	{
 		using scalar = bool;
 		static constexpr size_type size = 1;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using conv_type = vector<scalar, 1, Mode>;
 		using storage_type = storage_t<scalar, Size, Mode>;
 
@@ -84,7 +84,7 @@ namespace rsl::math
 		}
 	};
 
-	template <arithmetic_type Scalar, size_type Size, mode Mode, size_type s0, size_type s1>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1>
 	struct swizzle<Scalar, Size, Mode, s0, s1>
 	{
 	private:
@@ -93,7 +93,7 @@ namespace rsl::math
 	public:
 		using scalar = Scalar;
 		static constexpr size_type size = 2;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using conv_type = vector<scalar, 2, Mode>;
 		using storage_type = storage_t<scalar, Size, Mode>;
 
@@ -121,7 +121,7 @@ namespace rsl::math
 		}
 	};
 
-	template <size_type Size, mode Mode, size_type s0, size_type s1>
+	template <size_type Size, storage_mode Mode, size_type s0, size_type s1>
 	struct swizzle<bool, Size, Mode, s0, s1>
 	{
 	private:
@@ -130,7 +130,7 @@ namespace rsl::math
 	public:
 		using scalar = bool;
 		static constexpr size_type size = 2;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using conv_type = vector<scalar, 2, Mode>;
 		using storage_type = storage_t<scalar, Size, Mode>;
 
@@ -161,7 +161,7 @@ namespace rsl::math
 		}
 	};
 
-	template <arithmetic_type Scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
 	struct swizzle<Scalar, Size, Mode, s0, s1, s2>
 	{
 	private:
@@ -170,7 +170,7 @@ namespace rsl::math
 	public:
 		using scalar = Scalar;
 		static constexpr size_type size = 3;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using conv_type = vector<scalar, 3, Mode>;
 		using storage_type = storage_t<scalar, Size, Mode>;
 
@@ -198,7 +198,7 @@ namespace rsl::math
 		}
 	};
 
-	template <size_type Size, mode Mode, size_type s0, size_type s1, size_type s2>
+	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
 	struct swizzle<bool, Size, Mode, s0, s1, s2>
 	{
 	private:
@@ -207,7 +207,7 @@ namespace rsl::math
 	public:
 		using scalar = bool;
 		static constexpr size_type size = 3;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using conv_type = vector<scalar, 3, Mode>;
 		using storage_type = storage_t<scalar, Size, Mode>;
 
@@ -238,7 +238,7 @@ namespace rsl::math
 		}
 	};
 
-	template <arithmetic_type Scalar, size_type Size, mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
 	struct swizzle<Scalar, Size, Mode, s0, s1, s2, s3>
 	{
 	private:
@@ -247,7 +247,7 @@ namespace rsl::math
 	public:
 		using scalar = Scalar;
 		static constexpr size_type size = 4;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using conv_type = vector<scalar, 4, Mode>;
 		using storage_type = storage_t<scalar, Size, Mode>;
 
@@ -275,7 +275,7 @@ namespace rsl::math
 		}
 	};
 
-	template <size_type Size, mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
+	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
 	struct swizzle<bool, Size, Mode, s0, s1, s2, s3>
 	{
 	private:
@@ -284,7 +284,7 @@ namespace rsl::math
 	public:
 		using scalar = bool;
 		static constexpr size_type size = 4;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using conv_type = vector<scalar, 4, Mode>;
 		using storage_type = storage_t<scalar, Size, Mode>;
 

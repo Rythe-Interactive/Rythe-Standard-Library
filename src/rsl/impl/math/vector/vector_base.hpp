@@ -4,12 +4,12 @@
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, size_type Size, mode Mode = mode::defaultp>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode = storage_mode::defaultp>
 	struct vector
 	{
 		using scalar = Scalar;
 		static constexpr size_type size = Size;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 		using storage_type = storage_t<Scalar, Size, Mode>;
 
 		storage_type data;

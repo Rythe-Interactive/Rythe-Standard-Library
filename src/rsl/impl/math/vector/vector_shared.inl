@@ -8,7 +8,7 @@
 #endif // !ScalarSpecialization
 
 #ifndef VectorTemplate
-	#define VectorTemplate template <arithmetic_type Scalar, size_type Size, mode Mode>
+	#define VectorTemplate template <arithmetic_type Scalar, size_type Size, storage_mode Mode>
 #endif // !VectorTemplate
 
 namespace rsl::math

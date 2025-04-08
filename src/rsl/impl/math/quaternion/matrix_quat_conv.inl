@@ -6,8 +6,8 @@
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, mode Mode>
-	template <arithmetic_type Scal, mode M>
+	template <arithmetic_type Scalar, storage_mode Mode>
+	template <arithmetic_type Scal, storage_mode M>
 	constexpr matrix<Scalar, 2, 2, Mode>::matrix(const quaternion<Scal, M>& orientation) noexcept
 	{
 		const scalar i2 = static_cast<scalar>(orientation.i * orientation.i);
@@ -23,8 +23,8 @@ namespace rsl::math
 		rows[1][1] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + k2);
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
-	template <arithmetic_type Scal, mode M>
+	template <arithmetic_type Scalar, storage_mode Mode>
+	template <arithmetic_type Scal, storage_mode M>
 	constexpr matrix<Scalar, 3, 3, Mode>::matrix(const quaternion<Scal, M>& orientation) noexcept
 	{
 		const scalar i2 = static_cast<scalar>(orientation.i * orientation.i);
@@ -50,8 +50,8 @@ namespace rsl::math
 		rows[2][2] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + j2);
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
-	template <arithmetic_type Scal0, math::mode M0, arithmetic_type Scal1, math::mode M1>
+	template <arithmetic_type Scalar, storage_mode Mode>
+	template <arithmetic_type Scal0, math::storage_mode M0, arithmetic_type Scal1, math::storage_mode M1>
 	constexpr matrix<Scalar, 4, 4, Mode>::matrix(
 		const quaternion<Scal0, M0>& orientation, const vector<Scal1, 3, M1>& position
 	) noexcept
@@ -80,8 +80,8 @@ namespace rsl::math
 		rows[2][2] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + j2);
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
-	template <mode M>
+	template <arithmetic_type Scalar, storage_mode Mode>
+	template <storage_mode M>
 	constexpr quaternion<Scalar, Mode>::quaternion(const matrix<scalar, 3, 3, M>& m) noexcept
 	{
 		const scalar& m00 = m[0][0];
@@ -114,8 +114,8 @@ namespace rsl::math
 		k = qPerms[invIdx];
 	}
 
-	template <arithmetic_type Scalar, mode Mode>
-	template <mode M>
+	template <arithmetic_type Scalar, storage_mode Mode>
+	template <storage_mode M>
 	constexpr quaternion<Scalar, Mode>::quaternion(const matrix<scalar, 4, 4, M>& m) noexcept
 	{
 		const scalar& m00 = m[0][0];

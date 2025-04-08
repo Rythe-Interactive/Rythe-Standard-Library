@@ -3,19 +3,19 @@
 
 namespace rsl::math::internal
 {
-	template <arithmetic_type Scalar, size_type size, mode Mode, bool isSigned = signed_type<Scalar>>
+	template <arithmetic_type Scalar, size_type size, storage_mode Mode, bool isSigned = signed_type<Scalar>>
 	struct vector_additions
 	{
 	};
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	struct vector_additions<Scalar, 2, Mode, false>
 	{
 		static const vector<Scalar, 2, Mode> up;
 		static const vector<Scalar, 2, Mode> right;
 	};
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	struct vector_additions<Scalar, 2, Mode, true>
 	{
 		static const vector<Scalar, 2, Mode> up;
@@ -24,7 +24,7 @@ namespace rsl::math::internal
 		static const vector<Scalar, 2, Mode> left;
 	};
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	struct vector_additions<Scalar, 3, Mode, false>
 	{
 		static const vector<Scalar, 3, Mode> up;
@@ -32,7 +32,7 @@ namespace rsl::math::internal
 		static const vector<Scalar, 3, Mode> forward;
 	};
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	struct vector_additions<Scalar, 3, Mode, true>
 	{
 		static const vector<Scalar, 3, Mode> up;
@@ -43,7 +43,7 @@ namespace rsl::math::internal
 		static const vector<Scalar, 3, Mode> backward;
 	};
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	struct vector_additions<Scalar, 4, Mode, false>
 	{
 		static const vector<Scalar, 4, Mode> up;
@@ -52,7 +52,7 @@ namespace rsl::math::internal
 		static const vector<Scalar, 4, Mode> positiveW;
 	};
 
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	struct vector_additions<Scalar, 4, Mode, true>
 	{
 		static const vector<Scalar, 4, Mode> up;

@@ -5,14 +5,14 @@ RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201) // anonymous struct
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, mode Mode>
+	template <arithmetic_type Scalar, storage_mode Mode>
 	struct matrix<Scalar, 2, 2, Mode>
 	{
 		using scalar = Scalar;
 		static constexpr size_type row_count = 2;
 		static constexpr size_type col_count = 2;
 		static constexpr size_type size = row_count * col_count;
-		static constexpr mode mode = Mode;
+		static constexpr storage_mode mode = Mode;
 
 		using row_type = vector<scalar, col_count, Mode>;
 
@@ -44,7 +44,7 @@ namespace rsl::math
 		[[rythe_always_inline]] explicit constexpr matrix(scalar s00, scalar s01, scalar s10, scalar s11) noexcept;
 		[[rythe_always_inline]] explicit constexpr matrix(row_type r0, row_type r1) noexcept;
 
-		template <arithmetic_type Scal, math::mode M>
+		template <arithmetic_type Scal, math::storage_mode M>
 		[[rythe_always_inline]] explicit constexpr matrix(const quaternion<Scal, M>& orientation) noexcept;
 
 		template <typename mat_type>

@@ -21,6 +21,30 @@ namespace rsl
 #endif
 	};
 
+	[[rythe_always_inline]] [[maybe_unused]] static size_type count_leading_zeros(size_type mask) noexcept
+	{
+#if defined(RYTHE_MSVC)
+		unsigned long index;
+		return _BitScanReverse64(&index, mask) ? static_cast<size_type>(index) : 64ull;
+#elif defined(RYTHE_CLANG) || defined(RYTHE_GCC)
+		return mask ? static_cast<size_type>(__builtin_clzll(mask)) : 64ull;
+#else
+		return npos;
+#endif
+	}
+
+	[[rythe_always_inline]] [[maybe_unused]] static size_type count_trailing_zeros(size_type mask) noexcept
+	{
+#if defined(RYTHE_MSVC)
+		unsigned long index;
+		return _BitScanForward64(&index, mask) ? static_cast<size_type>(index) : 64ull;
+#elif defined(RYTHE_CLANG) || defined(RYTHE_GCC)
+		return mask ? static_cast<size_type>(__builtin_ctzll(mask)) : 64ull;
+#else
+		return npos;
+#endif
+	}
+
 	template <typename T, typename U>
 	constexpr T force_value_cast(U value)
 	{
