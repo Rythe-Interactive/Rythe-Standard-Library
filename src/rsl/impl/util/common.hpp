@@ -1235,8 +1235,23 @@ namespace rsl
 		constexpr static bool contains = ((Val == Vals) || ...);
 	};
 
+    namespace internal
+    {
+		template <class T, T I, T N, T... integers>
+		struct make_integer_seq_impl
+		{
+			using type = typename make_integer_seq_impl<T, I + 1, N, integers..., I>::type;
+		};
+
+		template <class T, T N, T... integers>
+		struct make_integer_seq_impl<T, N, N, integers...>
+		{
+			using type = integer_sequence<T, integers...>;
+		};
+    }
+
 	template <typename T, T Size>
-	using make_integer_sequence = __make_integer_seq<integer_sequence, T, Size>;
+	using make_integer_sequence = internal::make_integer_seq_impl<T, 0, Size>::type;
 
 	template <size_type... Vals>
 	using index_sequence = integer_sequence<size_type, Vals...>;
