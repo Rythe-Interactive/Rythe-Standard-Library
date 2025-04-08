@@ -1,7 +1,7 @@
 #pragma once
 #include "../../../defines.hpp"
-#include "../predefined.hpp"
 #include "../../../util/assert.hpp"
+#include "../predefined.hpp"
 
 namespace rsl::math
 {
@@ -239,7 +239,9 @@ namespace rsl::math
 		}
 	};
 
-	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
+	template <
+		arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2,
+		size_type s3>
 	struct swizzle<Scalar, Size, Mode, s0, s1, s2, s3>
 	{
 	private:
