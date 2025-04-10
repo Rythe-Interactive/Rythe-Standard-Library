@@ -1,10 +1,14 @@
 #pragma once
-#include <bit>
-#include <vector>
 
 #include "../defines.hpp"
 #include "common.hpp"
 #include "primitives.hpp"
+
+#if defined(RYTHE_MSVC)
+	#include <intrin.h>
+	#pragma intrinsic(_BitScanForward64)
+	#pragma intrinsic(_BitScanReverse64)
+#endif
 
 namespace rsl
 {

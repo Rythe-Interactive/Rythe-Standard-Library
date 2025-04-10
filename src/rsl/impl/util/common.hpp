@@ -25,6 +25,12 @@ namespace rsl
 	template <typename T>
 	constexpr construct_type_signal_type construct_type_signal = construct_type_signal_type<T>{};
 
+	struct in_place_signal_type
+	{
+	};
+
+	inline constexpr in_place_signal_type in_place_signal = in_place_signal_type{};
+
 	template <typename T, T Val>
 	struct integral_constant
 	{
@@ -47,19 +53,13 @@ namespace rsl
 	using true_type = bool_constant<true>;
 	using false_type = bool_constant<false>;
 
-	template <bool Test, typename T = void>
-	struct enable_if
+	template <typename T>
+	struct alignment_of : integral_constant<size_type, alignof(T)>
 	{
-	};
+	}; // determine alignment of _Ty
 
 	template <typename T>
-	struct enable_if<true, T>
-	{
-		using type = T;
-	};
-
-	template <bool Test, typename T = void>
-	using enable_if_t = typename enable_if<Test, T>::type;
+	constexpr size_type alignment_of_v = alignof(T);
 
 	template <typename T>
 	inline constexpr bool is_empty_v = ::std::is_empty_v<T>; // Compiler magic behind the scenes.
@@ -97,6 +97,14 @@ namespace rsl
 
 	template <typename LHS, typename RHS>
 	struct is_same : bool_constant<is_same_v<LHS, RHS>>
+	{
+	};
+
+	template <typename T>
+	constexpr bool is_enum_v = ::std::is_enum_v<T>; // Compiler magic behind the scenes.
+
+	template <typename T>
+	struct is_enum : bool_constant<is_enum_v<T>>
 	{
 	};
 
@@ -327,6 +335,14 @@ namespace rsl
 
 	template <typename T>
 	struct is_signed : bool_constant<is_signed_v<T>>
+	{
+	};
+
+	template <typename T>
+	constexpr bool is_nonbool_integral_v = is_integral_v<T> && !is_same_v<remove_cv_t<T>, bool>;
+
+	template <typename T>
+	struct is_nonbool_integral : bool_constant<is_nonbool_integral_v<T>>
 	{
 	};
 
@@ -1026,8 +1042,8 @@ namespace rsl
 	template <typename...>
 	struct common_reference;
 
-	template <typename... _Types>
-	using common_reference_t = common_reference<_Types...>::type;
+	template <typename... Types>
+	using common_reference_t = common_reference<Types...>::type;
 
 	template <>
 	struct common_reference<>
@@ -1040,51 +1056,48 @@ namespace rsl
 		using type = T;
 	};
 
+	template <typename T>
+	concept lvalue_reference_type = is_lvalue_reference_v<T>;
+
 	namespace internal
 	{
-		template <typename _Ty1>
-		struct _Add_qualifiers
-		{ // _Add_qualifiers<A>::template _Apply is XREF(A) from N4950 [meta.trans.other]/2.2
-			template <typename _Ty2>
-			using _Apply = copy_qualifiers_t<_Ty1, _Ty2>;
-		};
-		template <typename _Ty1>
-		struct _Add_qualifiers<_Ty1&>
+		template <typename T1>
+		struct add_qualifiers
 		{
-			template <typename _Ty2>
-			using _Apply = add_lval_ref_t<copy_qualifiers_t<_Ty1, _Ty2>>;
+			template <typename T2>
+			using apply = copy_qualifiers_t<T1, T2>;
 		};
-		template <typename _Ty1>
-		struct _Add_qualifiers<_Ty1&&>
+		template <typename T1>
+		struct add_qualifiers<T1&>
 		{
-			template <typename _Ty2>
-			using _Apply = add_rval_ref_t<copy_qualifiers_t<_Ty1, _Ty2>>;
+			template <typename T2>
+			using apply = add_lval_ref_t<copy_qualifiers_t<T1, T2>>;
+		};
+		template <typename T1>
+		struct add_qualifiers<T1&&>
+		{
+			template <typename T2>
+			using apply = add_rval_ref_t<copy_qualifiers_t<T1, T2>>;
 		};
 
 		template <typename _Ty1, typename _Ty2>
-		using _Cond_res = // N4950 [meta.trans.other]/2.4
-			decltype(false ? ::rsl::returns_exactly<_Ty1>() : ::rsl::returns_exactly<_Ty2>());
-		// N4950 [meta.trans.other]/5.3: "...if sizeof...(T) is two..."
+		using _Cond_res = decltype(false ? ::rsl::returns_exactly<_Ty1>() : ::rsl::returns_exactly<_Ty2>());
 
-		// N4950 [meta.trans.other]/5.3.4: "if common_type_t<T1, T2> is well-formed..."
-		// N4950 [meta.trans.other]/5.3.5: "Otherwise, there shall be no member type."
 		template <typename _Ty1, typename _Ty2, typename = void>
 		struct _Common_reference2C : common_type<_Ty1, _Ty2>
 		{
 		};
 
-		// N4950 [meta.trans.other]/5.3.3: "if COND_RES(T1, T2) is well-formed..."
 		template <typename _Ty1, typename _Ty2>
 		struct _Common_reference2C<_Ty1, _Ty2, void_t<_Cond_res<_Ty1, _Ty2>>>
 		{
 			using type = _Cond_res<_Ty1, _Ty2>;
 		};
 
-		// N4950 [meta.trans.other]/5.3.2: "if basic_common_reference<[...]>::type is well-formed..."
 		template <typename _Ty1, typename _Ty2>
 		using _Basic_specialization = basic_common_reference<
-			remove_cvr_t<_Ty1>, remove_cvr_t<_Ty2>, _Add_qualifiers<_Ty1>::template _Apply,
-			_Add_qualifiers<_Ty2>::template _Apply>::type;
+			remove_cvr_t<_Ty1>, remove_cvr_t<_Ty2>, add_qualifiers<_Ty1>::template apply,
+			add_qualifiers<_Ty2>::template apply>::type;
 
 		template <typename _Ty1, typename _Ty2, typename = void>
 		struct _Common_reference2B : _Common_reference2C<_Ty1, _Ty2>
@@ -1097,72 +1110,70 @@ namespace rsl
 			using type = _Basic_specialization<_Ty1, _Ty2>;
 		};
 
-		// N4950 [meta.trans.other]/5.3.1: "Let R be COMMON-REF(T1, T2). If T1 and T2 are reference types, R is
-		// well-formed, and is_convertible_v<add_pointer_t<T1>, add_pointer_t<R>> && is_convertible_v<add_pointer_t<T2>,
-		// add_pointer_t<R>> is true, then the member typedef type denotes R."
-		template <typename _Ty1, typename _Ty2, typename = void>
+		template <typename _Ty1, typename _Ty2>
 		struct _Common_reference2A : _Common_reference2B<_Ty1, _Ty2>
 		{
 		};
 
-		template <
-			typename _Ty1, typename _Ty2,
-			typename _Result = _Cond_res<copy_qualifiers_t<_Ty1, _Ty2>&, copy_qualifiers_t<_Ty2, _Ty1>&>,
-			enable_if_t<is_lvalue_reference_v<_Result>, int> = 0>
-		using _LL_common_ref = _Result;
+		template <typename T1, typename T2>
+		concept lvalue_common_reference_valid =
+			lvalue_reference_type<_Cond_res<copy_qualifiers_t<T1, T2>&, copy_qualifiers_t<T1, T2>&>>;
 
-		template <typename _Ty1, typename _Ty2, typename = void>
+		template <typename T1, typename T2>
+			requires lvalue_common_reference_valid<T1, T2>
+		using lvalue_common_ref = _Cond_res<copy_qualifiers_t<T1, T2>&, copy_qualifiers_t<T2, T1>&>;
+
+		template <typename T1, typename T2>
 		struct _Common_reference2AX
 		{
 		};
 
-		template <typename _Ty1, typename _Ty2>
-		struct _Common_reference2AX<_Ty1&, _Ty2&, void_t<_LL_common_ref<_Ty1, _Ty2>>>
+		template <typename T1, typename T2>
+			requires lvalue_common_reference_valid<T1, T2>
+		struct _Common_reference2AX<T1&, T2&>
 		{
-			using type = _LL_common_ref<_Ty1, _Ty2>; // "both lvalues" case from N4950 [meta.trans.other]/2.5
+			using type = lvalue_common_ref<T1, T2>;
 		};
 
-		template <typename _Ty1, typename _Ty2>
-		struct _Common_reference2AX<
-			_Ty1&&, _Ty2&, enable_if_t<is_convertible_v<_Ty1&&, _LL_common_ref<const _Ty1, _Ty2>>>>
+		template <typename T1, typename T2>
+		concept rvalue_ref_convertible = is_convertible_v<T1&&, lvalue_common_ref<const T1, T2>>;
+
+		template <typename T1, typename T2>
+			requires rvalue_ref_convertible<T1, T2>
+		struct _Common_reference2AX<T1&&, T2&>
 		{
-			using type = _LL_common_ref<const _Ty1, _Ty2>; // "rvalue and lvalue" case from N4950 [meta.trans.other]/2.7
+			using type = lvalue_common_ref<const T1, T2>;
 		};
 
-		template <typename _Ty1, typename _Ty2>
-		struct _Common_reference2AX<
-			_Ty1&, _Ty2&&, enable_if_t<is_convertible_v<_Ty2&&, _LL_common_ref<const _Ty2, _Ty1>>>>
+		template <typename T1, typename T2>
+			requires rvalue_ref_convertible<T2, T1>
+		struct _Common_reference2AX<T1&, T2&&>
 		{
-			using type = _LL_common_ref<const _Ty2, _Ty1>; // "lvalue and rvalue" case from N4950 [meta.trans.other]/2.8
+			using type = lvalue_common_ref<const T2, T1>;
 		};
 
-		template <typename _Ty1, typename _Ty2>
-		using _RR_common_ref = remove_reference_t<_LL_common_ref<_Ty1, _Ty2>>&&;
+		template <typename T1, typename T2>
+		using rvalue_common_ref = remove_reference_t<lvalue_common_ref<T1, T2>>&&;
 
-		template <typename _Ty1, typename _Ty2>
-		struct _Common_reference2AX<
-			_Ty1&&, _Ty2&&,
-			enable_if_t<
-				is_convertible_v<_Ty1&&, _RR_common_ref<_Ty1, _Ty2>> &&
-				is_convertible_v<_Ty2&&, _RR_common_ref<_Ty1, _Ty2>>>>
+		template <typename T1, typename T2>
+			requires is_convertible_v<T1&&, rvalue_common_ref<T1, T2>> &&
+					 is_convertible_v<T1&&, rvalue_common_ref<T1, T2>>
+		struct _Common_reference2AX<T1&&, T2&&>
 		{
-			using type = _RR_common_ref<_Ty1, _Ty2>; // "both rvalues" case from N4950 [meta.trans.other]/2.6
+			using type = rvalue_common_ref<T1, T2>;
 		};
 
 		template <typename _Ty1, typename _Ty2>
 		using _Common_ref_2AX_t = _Common_reference2AX<_Ty1, _Ty2>::type;
 
 		template <typename _Ty1, typename _Ty2>
-		struct _Common_reference2A<
-			_Ty1, _Ty2,
-			enable_if_t<
-				is_convertible_v<add_pointer_t<_Ty1>, add_pointer_t<_Common_ref_2AX_t<_Ty1, _Ty2>>> &&
-				is_convertible_v<add_pointer_t<_Ty2>, add_pointer_t<_Common_ref_2AX_t<_Ty1, _Ty2>>>>>
+			requires is_convertible_v<add_pointer_t<_Ty1>, add_pointer_t<_Common_ref_2AX_t<_Ty1, _Ty2>>> &&
+					 is_convertible_v<add_pointer_t<_Ty2>, add_pointer_t<_Common_ref_2AX_t<_Ty1, _Ty2>>>
+		struct _Common_reference2A<_Ty1, _Ty2>
 		{
 			using type = _Common_ref_2AX_t<_Ty1, _Ty2>;
 		};
 
-		// N4950 [meta.trans.other]/5.4: "if sizeof...(T) is greater than two..."
 		template <typename _Void, typename _Ty1, typename _Ty2, typename... _Types>
 		struct _Fold_common_reference
 		{
@@ -1174,22 +1185,15 @@ namespace rsl
 		};
 	} // namespace internal
 
-	template <typename _Ty1, typename _Ty2>
-	struct common_reference<_Ty1, _Ty2> : internal::_Common_reference2A<_Ty1, _Ty2>
+	template <typename T1, typename T2>
+	struct common_reference<T1, T2> : internal::_Common_reference2A<T1, T2>
 	{
 	};
 
-	template <typename _Ty1, typename _Ty2, typename _Ty3, typename... Rest>
-	struct common_reference<_Ty1, _Ty2, _Ty3, Rest...> :
-		internal::_Fold_common_reference<void, _Ty1, _Ty2, _Ty3, Rest...>
+	template <typename T1, typename T2, typename T3, typename... Rest>
+	struct common_reference<T1, T2, T3, Rest...> : internal::_Fold_common_reference<void, T1, T2, T3, Rest...>
 	{
 	};
-
-	template <typename derived_type, typename base_type>
-	using inherits_from = typename enable_if<::rsl::is_base_of_v<base_type, derived_type>, int>::type;
-
-	template <typename derived_type, typename base_type>
-	using doesnt_inherit_from = typename enable_if<!::rsl::is_base_of_v<base_type, derived_type>, int>::type;
 
 	template <typename Type, template <typename...> typename Template>
 	constexpr bool is_specialization_v = false; // true if and only if Type is a specialization of Template
@@ -1233,6 +1237,40 @@ namespace rsl
 	template <template <typename...> typename T, typename U, size_type I, typename... Args>
 	using make_sequence_t = typename make_sequence<T, U, I, Args...>::type;
 
+	template <rsl::size_type I, typename Type, typename... Types>
+	struct element_at : element_at<I - 1, Types...>
+	{
+	};
+
+	template <typename Type, typename... Types>
+	struct element_at<0, Type, Types...>
+	{
+		using type = Type;
+	};
+
+	template <rsl::size_type I, typename... Types>
+	using element_at_t = typename element_at<I, Types...>::type;
+
+	namespace internal
+	{
+		template <size_type I, typename T, typename Type, typename... Types>
+		struct index_of_element_impl :
+			conditional_t<
+				is_same_v<T, Type>, integral_constant<size_type, I>, index_of_element_impl<I + 1, T, Types...>>
+		{
+		};
+	} // namespace internal
+
+	// Gets index of first ocurrance of T in type list.
+	template <typename T, typename Type, typename... Types>
+	struct index_of_element : internal::index_of_element_impl<0, T, Type, Types...>
+	{
+	};
+
+	// Gets index of first ocurrance of T in type list.
+	template <typename T, typename Type, typename... Types>
+	constexpr size_type index_of_element_v = index_of_element<T, Type, Types...>::value;
+
 	template <typename... Types>
 	struct type_sequence
 	{
@@ -1241,6 +1279,12 @@ namespace rsl
 
 		template <typename T>
 		constexpr static bool contains = disjunction<is_same<T, Types>...>::value;
+
+		template <typename T>
+		constexpr static size_type index_of_type = index_of_element_v<T, Types...>;
+
+		template <size_type I>
+		using type_at = element_at_t<I, Types...>;
 	};
 
 	template <typename T>
@@ -1518,8 +1562,8 @@ namespace rsl
 		return bit_cast<const byte*>(ptr) + count;
 	}
 
-    [[rythe_always_inline]] constexpr void* advance(void* ptr, size_type count) noexcept
-    {
+	[[rythe_always_inline]] constexpr void* advance(void* ptr, size_type count) noexcept
+	{
 		return bit_cast<byte*>(ptr) + count;
 	}
 
