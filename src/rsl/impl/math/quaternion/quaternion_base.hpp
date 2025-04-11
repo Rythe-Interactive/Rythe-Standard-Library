@@ -1,7 +1,6 @@
 #pragma once
 #include <immintrin.h>
 
-#include "../../util/assert.hpp"
 #include "../../util/primitives.hpp"
 
 #include "../trigonometric/angle.hpp"
@@ -77,8 +76,8 @@ namespace rsl::math
 		[[nodiscard]] [[rythe_always_inline]] static constexpr quaternion
 		angle_axis(radians<scalar> angle, const vec_type& vec) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] static constexpr quaternion
-		look_at(const vec_type& _pos, const vec_type& _center, const vec_type& _up = vec_type::up) noexcept;
-		[[nodiscard]] [[rythe_always_inline]] static constexpr quaternion conjugate(const quaternion& _quat) noexcept;
+		look_at(const vec_type& pos, const vec_type& center, const vec_type& up = vec_type::up) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] static constexpr quaternion conjugate(const quaternion& quat) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] static constexpr quaternion from_euler(const vec_type& euler) noexcept;
 	};
 

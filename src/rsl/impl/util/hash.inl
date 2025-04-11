@@ -1,12 +1,10 @@
-#include "hash.hpp"
 #pragma once
+#include "hash.hpp"
 
 #if !defined(RYTHE_HAS_INT128) && (defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC))
 	#include <intrin.h>
 	#pragma intrinsic(_umul128)
 #endif
-
-#include "../containers/pair.hpp"
 
 namespace rsl
 {
@@ -51,8 +49,6 @@ namespace rsl
 					uint64 hb = *b >> 32;
 					uint64 la = static_cast<uint32>(*a);
 					uint64 lb = static_cast<uint32>(*b);
-					uint64 hi{};
-					uint64 lo{};
 
 					uint64 rh = ha * hb;
 					uint64 rm0 = ha * lb;
@@ -61,9 +57,9 @@ namespace rsl
 					uint64 t = rl + (rm0 << 32);
 					uint64 c = static_cast<uint64>(t < rl);
 
-					lo = t + (rm1 << 32);
+					uint64 lo = t + (rm1 << 32);
 					c += static_cast<uint64>(lo < t);
-					hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
+					uint64 hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
 
 					if constexpr (Mode == hash_mode::fast_hash)
 					{
@@ -84,20 +80,20 @@ namespace rsl
 					}
 					else
 					{
-						uint64 a, b;
-						a = _umul128(*a, *b, &b);
-						*a ^= a;
-						*b ^= b;
+						uint64 tmpB;
+						const uint64 tmpA = _umul128(*a, *b, &tmpB);
+						*a ^= tmpA;
+						*b ^= tmpB;
 					}
 				}
 #endif
 			}
 
 			template <hash_mode Mode>
-			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 mix(uint64 A, uint64 B) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 mix(uint64 a, uint64 b) noexcept
 			{
-				mum<Mode>(&A, &B);
-				return A ^ B;
+				mum<Mode>(&a, &b);
+				return a ^ b;
 			}
 
 			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load64(const byte* ptr) noexcept
@@ -111,7 +107,6 @@ namespace rsl
 				}
 				else
 				{
-
 					if (is_constant_evaluated())
 					{
 						return (
@@ -143,7 +138,6 @@ namespace rsl
 				}
 				else
 				{
-
 					if (is_constant_evaluated())
 					{
 						return (
@@ -162,19 +156,20 @@ namespace rsl
 				}
 			}
 
-			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load_small(const uint8* p, size_type k) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr uint64
+			load_small(const uint8* p, const size_type k) noexcept
 			{
 				return (static_cast<uint64>(p[0]) << 56) | (static_cast<uint64>(p[k >> 1]) << 32) | p[k - 1];
 			}
 
 			template <hash_mode Mode>
 			[[nodiscard]] constexpr uint64
-			hash_bytes(span<const byte> bytes, uint64 seed, const uint64 (&secret)[3]) noexcept
+			hash_bytes(const span<const byte> bytes, uint64 seed, const uint64 (&secret)[3]) noexcept
 			{
 				const byte* data = bytes.data();
 				const size_type dataSize = bytes.size();
-				uint64 a{};
-				uint64 b{};
+				uint64 a;
+				uint64 b;
 
 				seed ^= mix<Mode>(seed ^ secret[0], secret[1]) ^ dataSize;
 
@@ -250,7 +245,7 @@ namespace rsl
 			}
 
 			template <hash_mode Mode>
-			[[nodiscard]] constexpr uint64 hash_int(uint64 val)
+			[[nodiscard]] constexpr uint64 hash_int(const uint64 val)
 			{
 				return mix<Mode>(val, 0x9e3779b97f4a7c15ull);
 			}
@@ -272,7 +267,7 @@ namespace rsl
 	{                                                                                                                  \
 		[[rythe_always_inline]] constexpr static id_type hash(const T& val) noexcept                                   \
 		{                                                                                                              \
-			return internal::hash::hash_int<Mode>(bit_cast<uint64>(val));                                              \
+			return internal::hash::hash_int<Mode>(uint64(val));                                                        \
 		}                                                                                                              \
 	};
 
@@ -304,29 +299,20 @@ namespace rsl
 		}
 	};
 
-	template <typename LHS, typename RHS, hash_mode Mode>
-	struct hash_strategy<pair<LHS, RHS>, Mode>
-	{
-		[[rythe_always_inline]] constexpr static id_type hash(const pair<LHS, RHS>& val) noexcept
-		{
-			return combine_hash(hash_strategy<LHS, Mode>::hash(val.first), hash_strategy<RHS, Mode>::hash(val.second));
-		}
-	};
-
 	template <hash_mode Mode>
-	constexpr id_type hash_bytes(span<const byte> bytes) noexcept
+	constexpr id_type hash_bytes(const span<const byte> bytes) noexcept
 	{
 		static_assert(internal::hash_static_assert_check<Mode>, "unknown hash mode.");
 		return internal::hash::hash_bytes<Mode>(bytes, internal::hash::default_seed, internal::hash::default_secret);
 	}
 
-	constexpr id_type hash_bytes(span<const byte> bytes) noexcept
+	constexpr id_type hash_bytes(const span<const byte> bytes) noexcept
 	{
 		return hash_bytes<hash_mode::default_hash>(bytes);
 	}
 
 	template <hash_mode Mode>
-	constexpr id_type hash_string(string_view str) noexcept
+	constexpr id_type hash_string(const string_view str) noexcept
 	{
 		if (is_constant_evaluated())
 		{
@@ -345,7 +331,7 @@ namespace rsl
 		}
 	}
 
-	constexpr id_type hash_string(string_view str) noexcept
+	constexpr id_type hash_string(const string_view str) noexcept
 	{
 		return hash_string<hash_mode::default_hash>(str);
 	}
@@ -362,12 +348,12 @@ namespace rsl
 		return hash_value<hash_mode::default_hash>(val);
 	}
 
-	template <hash_mode Mode, same_as<id_type>... hash_types>
-	constexpr id_type combine_hash(id_type seed, id_type hash, hash_types... hashes) noexcept
+	template <hash_mode Mode, same_as<id_type>... HashTypes>
+	constexpr id_type combine_hash(id_type seed, const id_type hash, HashTypes... hashes) noexcept
 	{
 		seed = internal::hash::mix<Mode>(seed + hash, 0x9ddfea08eb382d69ull);
 
-		if constexpr (sizeof...(hash_types) != 0)
+		if constexpr (sizeof...(HashTypes) != 0)
 		{
 			return combine_hash(seed, hashes...);
 		}
@@ -377,8 +363,8 @@ namespace rsl
 		}
 	}
 
-	template <same_as<id_type>... hash_types>
-	constexpr id_type combine_hash(id_type seed, id_type hash, hash_types... hashes) noexcept
+	template <same_as<id_type>... HashTypes>
+	constexpr id_type combine_hash(id_type seed, id_type hash, HashTypes... hashes) noexcept
 	{
 		return combine_hash<hash_mode::default_hash>(seed, hash, hashes...);
 	}

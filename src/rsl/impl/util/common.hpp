@@ -128,25 +128,29 @@ namespace rsl
 	{
 		template <bool First_value, typename First, typename... Rest>
 		struct conjunction_impl
-		{ // Handle false trait or last trait.
+		{
+			// Handle false trait or last trait.
 			using type = First;
 		};
 
 		template <typename True, typename Next, typename... Rest>
 		struct conjunction_impl<true, True, Next, Rest...>
-		{ // The first trait is true, try the next one.
+		{
+			// The first trait is true, try the next one.
 			using type = typename conjunction_impl<Next::value, Next, Rest...>::type;
 		};
 
 		template <bool First_value, typename First, typename... Rest>
 		struct disjuction_impl
-		{ // Handle true trait or last trait.
+		{
+			// Handle true trait or last trait.
 			using type = First;
 		};
 
 		template <typename False, typename Next, typename... Rest>
 		struct disjuction_impl<false, False, Next, Rest...>
-		{ // First trait is false, try the next trait.
+		{
+			// First trait is false, try the next trait.
 			using type = typename disjuction_impl<Next::value, Next, Rest...>::type;
 		};
 	} // namespace internal
@@ -228,6 +232,7 @@ namespace rsl
 	{
 		using type = T;
 	};
+
 	template <typename T>
 	using remove_const_t = typename remove_const<T>::type;
 
@@ -617,6 +622,15 @@ namespace rsl
 	{
 	};
 
+	template <typename T, typename... Args>
+	inline constexpr bool is_trivially_constructible_v =
+		::std::is_trivially_constructible_v<T, Args...>; // Uses compiler magic behind the scenes.
+
+	template <typename T>
+	struct is_trivially_constructible : bool_constant<is_trivially_constructible_v<T>>
+	{
+	};
+
 	template <typename T>
 	inline constexpr bool is_trivially_default_constructible_v =
 		::std::is_trivially_default_constructible_v<T>; // Uses compiler magic behind the scenes.
@@ -689,19 +703,22 @@ namespace rsl
 	} // namespace internal
 
 	template <typename To, typename From>
+		requires is_trivially_copyable_v<To> && is_trivially_copyable_v<From> &&
+				 is_trivially_default_constructible_v<To>
+	[[nodiscard]] constexpr To unaligned_load(const From* src) noexcept
+	{
+		To dst;
+		internal::constexpr_memcpy_impl(&dst, src, sizeof(To));
+		return dst;
+	}
+
+	template <typename To, typename From>
 		requires(sizeof(To) == sizeof(From)) && is_trivially_copyable_v<To> && is_trivially_copyable_v<From>
 	[[nodiscard]] constexpr To bit_cast(const From& value) noexcept
 	{
 		if (is_constant_evaluated())
 		{
-			static_assert(
-				std::is_trivially_constructible_v<To>, "This implementation additionally requires "
-													   "destination type to be trivially constructible"
-			);
-
-			To dst;
-			internal::constexpr_memcpy_impl(&dst, &value, sizeof(To));
-			return dst;
+			return unaligned_load<To>(&value);
 		}
 		else
 		{
@@ -710,7 +727,7 @@ namespace rsl
 	}
 
 	template <typename To, typename From>
-	constexpr void* constexpr_memcpy(To* dst, const From* src, size_type count) noexcept
+	constexpr void* constexpr_memcpy(To* dst, const From* src, const size_type count) noexcept
 	{
 		if (is_constant_evaluated())
 		{
@@ -724,7 +741,7 @@ namespace rsl
 	}
 
 	template <>
-	constexpr void* constexpr_memcpy<void, void>(void* dst, const void* src, size_type count) noexcept
+	constexpr void* constexpr_memcpy<void, void>(void* dst, const void* src, const size_type count) noexcept
 	{
 		if (is_constant_evaluated())
 		{
@@ -1005,18 +1022,21 @@ namespace rsl
 			template <typename To>
 			using result = To;
 		};
+
 		template <typename From>
 		struct copy_qualifiers_impl<const From>
 		{
 			template <typename To>
 			using result = const To;
 		};
+
 		template <typename From>
 		struct copy_qualifiers_impl<volatile From>
 		{
 			template <typename To>
 			using result = volatile To;
 		};
+
 		template <typename From>
 		struct copy_qualifiers_impl<const volatile From>
 		{
@@ -1067,12 +1087,14 @@ namespace rsl
 			template <typename T2>
 			using apply = copy_qualifiers_t<T1, T2>;
 		};
+
 		template <typename T1>
 		struct add_qualifiers<T1&>
 		{
 			template <typename T2>
 			using apply = add_lval_ref_t<copy_qualifiers_t<T1, T2>>;
 		};
+
 		template <typename T1>
 		struct add_qualifiers<T1&&>
 		{
@@ -1178,6 +1200,7 @@ namespace rsl
 		struct _Fold_common_reference
 		{
 		};
+
 		template <typename _Ty1, typename _Ty2, typename... _Types>
 		struct _Fold_common_reference<void_t<common_reference_t<_Ty1, _Ty2>>, _Ty1, _Ty2, _Types...> :
 			common_reference<common_reference_t<_Ty1, _Ty2>, _Types...>
@@ -1333,7 +1356,8 @@ namespace rsl
 
 	template <typename T, T... Vals>
 	struct integer_sequence
-	{ // sequence of integer parameters
+	{
+		// sequence of integer parameters
 		static_assert(is_integral_v<T>, "integer_sequence<T, I...> requires T to be an integral type.");
 
 		using value_type = T;

@@ -1,15 +1,15 @@
 #pragma once
 #include "vector2.hpp"
 
-#define SizeSpecialization 2
-#define ScalarSpecialization Scalar
-#define VectorTemplate template <arithmetic_type Scalar, storage_mode Mode>
+#define SIZE_SPECIALIZATION 2
+#define SCALAR_SPECIALIZATION Scalar
+#define VECTOR_TEMPLATE template <arithmetic_type Scalar, storage_mode Mode>
 
 #include "vector_shared.inl"
 
-#define SizeSpecialization 2
-#define ScalarSpecialization bool
-#define VectorTemplate template <storage_mode Mode>
+#define SIZE_SPECIALIZATION 2
+#define SCALAR_SPECIALIZATION bool
+#define VECTOR_TEMPLATE template <storage_mode Mode>
 
 #include "vector_shared.inl"
 
@@ -19,7 +19,7 @@ namespace rsl::math
 	constexpr vector<Scalar, 2, Mode>::vector(scalar _x, scalar _y) noexcept
 		: data{
 			  {_x, _y}
-	}
+    }
 	{
 	}
 
@@ -27,7 +27,7 @@ namespace rsl::math
 	constexpr vector<bool, 2, Mode>::vector(scalar _x, scalar _y) noexcept
 		: data{
 			  {_x, _y}
-	}
+    }
 	{
 	}
 } // namespace rsl::math

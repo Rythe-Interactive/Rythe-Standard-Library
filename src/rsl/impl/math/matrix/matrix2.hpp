@@ -14,23 +14,23 @@ namespace rsl::math
 		static constexpr size_type size = row_count * col_count;
 		static constexpr storage_mode mode = Mode;
 
-		using row_type = vector<scalar, col_count, Mode>;
+		using col_type = vector<scalar, row_count, Mode>;
 
 		template <size_type idx>
-		using col_type = column<scalar, row_count, col_count, idx, Mode>;
+		using row_type = row<scalar, row_count, col_count, idx, Mode>;
 
 		union
 		{
-			row_type rows[row_count];
+			col_type columns[col_count];
 
 			struct
 			{
-				row_type row0, row1;
+				col_type col0, col1;
 			};
 
 			scalar data[size];
-			col_type<0> col0;
-			col_type<1> col1;
+			row_type<0> row0;
+			row_type<1> row1;
 		};
 
 		static const matrix identity;
@@ -42,7 +42,7 @@ namespace rsl::math
 		[[rythe_always_inline]] explicit constexpr matrix(scalar s, uniform_matrix_signal) noexcept;
 		[[rythe_always_inline]] explicit constexpr matrix(scalar s, identity_matrix_signal) noexcept;
 		[[rythe_always_inline]] explicit constexpr matrix(scalar s00, scalar s01, scalar s10, scalar s11) noexcept;
-		[[rythe_always_inline]] explicit constexpr matrix(row_type r0, row_type r1) noexcept;
+		[[rythe_always_inline]] explicit constexpr matrix(col_type c0, col_type c1) noexcept;
 
 		template <arithmetic_type Scal, math::storage_mode M>
 		[[rythe_always_inline]] explicit constexpr matrix(const quaternion<Scal, M>& orientation) noexcept;
@@ -54,8 +54,8 @@ namespace rsl::math
 
 		[[rythe_always_inline]] constexpr matrix& operator=(const matrix&) noexcept = default;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr row_type& operator[](size_type i) noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr const row_type& operator[](size_type i) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr col_type& operator[](size_type i) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const col_type& operator[](size_type i) const noexcept;
 	};
 
 	using float2x2 = matrix<float32, 2, 2>;

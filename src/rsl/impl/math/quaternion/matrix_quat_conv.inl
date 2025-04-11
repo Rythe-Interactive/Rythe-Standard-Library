@@ -16,11 +16,11 @@ namespace rsl::math
 		const scalar ij = static_cast<scalar>(orientation.i * orientation.j);
 		const scalar wk = static_cast<scalar>(orientation.w * orientation.k);
 
-		rows[0][0] = static_cast<scalar>(1) - static_cast<scalar>(2) * (j2 + k2);
-		rows[0][1] = static_cast<scalar>(2) * (ij + wk);
+		columns[0][0] = static_cast<scalar>(1) - static_cast<scalar>(2) * (j2 + k2);
+		columns[0][1] = static_cast<scalar>(2) * (ij + wk);
 
-		rows[1][0] = static_cast<scalar>(2) * (ij - wk);
-		rows[1][1] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + k2);
+		columns[1][0] = static_cast<scalar>(2) * (ij - wk);
+		columns[1][1] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + k2);
 	}
 
 	template <arithmetic_type Scalar, storage_mode Mode>
@@ -37,17 +37,17 @@ namespace rsl::math
 		const scalar wj = static_cast<scalar>(orientation.w * orientation.j);
 		const scalar wk = static_cast<scalar>(orientation.w * orientation.k);
 
-		rows[0][0] = static_cast<scalar>(1) - static_cast<scalar>(2) * (j2 + k2);
-		rows[0][1] = static_cast<scalar>(2) * (ij + wk);
-		rows[0][2] = static_cast<scalar>(2) * (ik - wj);
+		columns[0][0] = static_cast<scalar>(1) - static_cast<scalar>(2) * (j2 + k2);
+		columns[0][1] = static_cast<scalar>(2) * (ij + wk);
+		columns[0][2] = static_cast<scalar>(2) * (ik - wj);
 
-		rows[1][0] = static_cast<scalar>(2) * (ij - wk);
-		rows[1][1] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + k2);
-		rows[1][2] = static_cast<scalar>(2) * (jk + wi);
+		columns[1][0] = static_cast<scalar>(2) * (ij - wk);
+		columns[1][1] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + k2);
+		columns[1][2] = static_cast<scalar>(2) * (jk + wi);
 
-		rows[2][0] = static_cast<scalar>(2) * (ik + wj);
-		rows[2][1] = static_cast<scalar>(2) * (jk - wi);
-		rows[2][2] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + j2);
+		columns[2][0] = static_cast<scalar>(2) * (ik + wj);
+		columns[2][1] = static_cast<scalar>(2) * (jk - wi);
+		columns[2][2] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + j2);
 	}
 
 	template <arithmetic_type Scalar, storage_mode Mode>
@@ -55,7 +55,7 @@ namespace rsl::math
 	constexpr matrix<Scalar, 4, 4, Mode>::matrix(
 		const quaternion<Scal0, M0>& orientation, const vector<Scal1, 3, M1>& position
 	) noexcept
-		: row3(position.x, position.y, position.z, static_cast<scalar>(1))
+		: col3(position.x, position.y, position.z, static_cast<scalar>(1))
 	{
 		const scalar i2 = static_cast<scalar>(orientation.i * orientation.i);
 		const scalar j2 = static_cast<scalar>(orientation.j * orientation.j);
@@ -67,17 +67,17 @@ namespace rsl::math
 		const scalar wj = static_cast<scalar>(orientation.w * orientation.j);
 		const scalar wk = static_cast<scalar>(orientation.w * orientation.k);
 
-		rows[0][0] = static_cast<scalar>(1) - static_cast<scalar>(2) * (j2 + k2);
-		rows[0][1] = static_cast<scalar>(2) * (ij + wk);
-		rows[0][2] = static_cast<scalar>(2) * (ik - wj);
+		columns[0][0] = static_cast<scalar>(1) - static_cast<scalar>(2) * (j2 + k2);
+		columns[0][1] = static_cast<scalar>(2) * (ij + wk);
+		columns[0][2] = static_cast<scalar>(2) * (ik - wj);
 
-		rows[1][0] = static_cast<scalar>(2) * (ij - wk);
-		rows[1][1] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + k2);
-		rows[1][2] = static_cast<scalar>(2) * (jk + wi);
+		columns[1][0] = static_cast<scalar>(2) * (ij - wk);
+		columns[1][1] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + k2);
+		columns[1][2] = static_cast<scalar>(2) * (jk + wi);
 
-		rows[2][0] = static_cast<scalar>(2) * (ik + wj);
-		rows[2][1] = static_cast<scalar>(2) * (jk - wi);
-		rows[2][2] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + j2);
+		columns[2][0] = static_cast<scalar>(2) * (ik + wj);
+		columns[2][1] = static_cast<scalar>(2) * (jk - wi);
+		columns[2][2] = static_cast<scalar>(1) - static_cast<scalar>(2) * (i2 + j2);
 	}
 
 	template <arithmetic_type Scalar, storage_mode Mode>
@@ -85,8 +85,8 @@ namespace rsl::math
 	constexpr quaternion<Scalar, Mode>::quaternion(const matrix<scalar, 3, 3, M>& m) noexcept
 	{
 		const scalar& m00 = m[0][0];
-		const scalar& m11 = m[0][0];
-		const scalar& m22 = m[0][0];
+		const scalar& m11 = m[1][1];
+		const scalar& m22 = m[2][2];
 
 		const scalar qwijk[] = {m00 - m11 - m22, m11 - m00 - m22, m22 - m00 - m11, m00 + m11 + m22};
 
@@ -119,8 +119,8 @@ namespace rsl::math
 	constexpr quaternion<Scalar, Mode>::quaternion(const matrix<scalar, 4, 4, M>& m) noexcept
 	{
 		const scalar& m00 = m[0][0];
-		const scalar& m11 = m[0][0];
-		const scalar& m22 = m[0][0];
+		const scalar& m11 = m[1][1];
+		const scalar& m22 = m[2][2];
 
 		const scalar qwijk[] = {m00 - m11 - m22, m11 - m00 - m22, m22 - m00 - m11, m00 + m11 + m22};
 

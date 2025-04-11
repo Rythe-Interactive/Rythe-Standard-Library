@@ -12,7 +12,7 @@ namespace rsl::math
 	struct quaternion;
 
 	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode>
-	struct column;
+	struct row;
 
 	namespace internal
 	{
@@ -32,7 +32,7 @@ namespace rsl::math
 		};
 
 		template <typename Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode>
-		struct _is_vector_impl<column<Scalar, RowCount, ColCount, ColIdx, Mode>> : true_type
+		struct _is_vector_impl<row<Scalar, RowCount, ColCount, ColIdx, Mode>> : true_type
 		{
 		};
 	} // namespace internal
@@ -283,8 +283,9 @@ namespace rsl::math
 		};
 
 		template <
-			arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode, size_type v>
-		struct _uniform_value_impl_<column<Scalar, RowCount, ColCount, ColIdx, Mode>, v>
+			arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode,
+			size_type v>
+		struct _uniform_value_impl_<row<Scalar, RowCount, ColCount, ColIdx, Mode>, v>
 		{
 			constexpr static auto value = vector<Scalar, RowCount, Mode>(static_cast<Scalar>(v));
 		};

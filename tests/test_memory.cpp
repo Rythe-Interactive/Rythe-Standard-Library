@@ -85,8 +85,8 @@ TEST_CASE("reference counter", "[memory]")
 			REQUIRE(refCounter.occupied());
 			REQUIRE(!refCounter.free());
 
-            refCounter.release();
-            
+			refCounter.release();
+
 			REQUIRE(refCounter.count() == 2);
 			REQUIRE(refCounter.occupied());
 			REQUIRE(!refCounter.free());
@@ -159,12 +159,12 @@ TEST_CASE("reference counter", "[memory]")
 			REQUIRE(cpy.count() == 0);
 			REQUIRE(!cpy.is_armed());
 
-            cpy.arm();
+			cpy.arm();
 
 			REQUIRE(cpy.is_armed());
 			REQUIRE(cpy.count() == 1);
 
-            refCounter.disarm();
+			refCounter.disarm();
 			REQUIRE(!refCounter.is_armed());
 			REQUIRE(refCounter.count() == 0);
 			cpy.disarm();
@@ -184,7 +184,7 @@ TEST_CASE("reference counter", "[memory]")
 
 				refCounter = std::move(moveSrc);
 
-                REQUIRE(!moveSrc.is_armed());
+				REQUIRE(!moveSrc.is_armed());
 				REQUIRE(moveSrc.count() == 0);
 				REQUIRE(!moveSrc.occupied());
 				REQUIRE(moveSrc.free());
@@ -202,7 +202,7 @@ TEST_CASE("reference counter", "[memory]")
 			REQUIRE(refCounter.occupied());
 			REQUIRE(!refCounter.free());
 
-            cpy.disarm();
+			cpy.disarm();
 			REQUIRE(!cpy.is_armed());
 			REQUIRE(cpy.count() == 0);
 			REQUIRE(!cpy.occupied());
@@ -213,7 +213,7 @@ TEST_CASE("reference counter", "[memory]")
 			REQUIRE(!refCounter.occupied());
 			REQUIRE(refCounter.free());
 
-            refCounter.disarm();
+			refCounter.disarm();
 			REQUIRE(!refCounter.is_armed());
 			REQUIRE(refCounter.count() == 0);
 			REQUIRE(!refCounter.occupied());

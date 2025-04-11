@@ -55,7 +55,7 @@ namespace rsl::math::internal
 			{
 				for (size_type j = 0; j < ColCount; j++)
 				{
-					result[i] += (b[i][j] * a[j]);
+					result[i] += (b[j][i] * a[j]);
 				}
 			}
 

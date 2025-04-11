@@ -8,7 +8,7 @@
 
 namespace rsl
 {
-	template <typename ValueType, size_type maxSize>
+	template <typename ValueType, size_type MaxSize>
 	class buffered_list
 	{
 	public:
@@ -29,12 +29,12 @@ namespace rsl
 			byte dummy;
 		};
 
-		value_container m_buffer[maxSize];
+		value_container m_buffer[MaxSize];
 		size_type m_size;
 
-		constexpr static size_type validate_size(size_type newSize) noexcept
+		constexpr static size_type validate_size(const size_type newSize) noexcept
 		{
-			return newSize < maxSize ? newSize : maxSize;
+			return newSize < MaxSize ? newSize : MaxSize;
 		}
 
 		constexpr static bool copy_assign_noexcept = std::is_nothrow_copy_assignable_v<value_type>;
@@ -49,7 +49,7 @@ namespace rsl
 		copy_assign_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
 			noexcept(copy_assign_noexcept)
 		{
-			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
+			for (auto* to = m_buffer + begin; to != m_buffer + end; ++to, ++src)
 			{
 				to->value = *src;
 			}
@@ -59,7 +59,7 @@ namespace rsl
 		copy_construct_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
 			noexcept(copy_construct_noexcept)
 		{
-			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
+			for (auto* to = m_buffer + begin; to != m_buffer + end; ++to, ++src)
 			{
 				new (&to->value) value_type(*src);
 			}
@@ -69,7 +69,7 @@ namespace rsl
 		move_assign_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
 			noexcept(move_assign_noexcept)
 		{
-			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
+			for (auto* to = m_buffer + begin; to != m_buffer + end; ++to, ++src)
 			{
 				to->value = rsl::move(*src);
 			}
@@ -79,7 +79,7 @@ namespace rsl
 		move_construct_from_unsafe_impl(size_type begin, size_type end, const value_type* src)
 			noexcept(move_construct_noexcept)
 		{
-			for (auto* to = m_buffer + begin; to != m_buffer + end; to++, src++)
+			for (auto* to = m_buffer + begin; to != m_buffer + end; ++to, ++src)
 			{
 				new (&to->value) value_type(rsl::move(*src));
 			}
@@ -89,21 +89,21 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void emplace_unsafe_impl(size_type begin, size_type end, Args&&... args)
 			noexcept(construct_noexcept<Args...>)
 		{
-			for (auto* to = m_buffer + begin; to != m_buffer + end; to++)
+			for (auto* to = m_buffer + begin; to != m_buffer + end; ++to)
 			{
 				new (&to->value) value_type(rsl::forward<Args>(args)...);
 			}
 		}
 
-		[[rythe_always_inline]] constexpr void reset_unsafe_impl(size_type begin, size_type end) noexcept
+		[[rythe_always_inline]] constexpr void reset_unsafe_impl(const size_type begin, const size_type end) noexcept
 		{
-			for (size_type i = begin; i < end; i++)
+			for (size_type i = begin; i < end; ++i)
 			{
 				m_buffer[i].value.~value_type();
 			}
 		}
 
-		[[rythe_always_inline]] constexpr void copy_assign_impl(const value_type* src, size_type srcSize)
+		[[rythe_always_inline]] constexpr void copy_assign_impl(const value_type* src, const size_type srcSize)
 			noexcept(copy_assign_noexcept && copy_construct_noexcept)
 		{
 			if (m_size >= srcSize)
@@ -179,7 +179,7 @@ namespace rsl
 		}
 
 		template <typename... Args>
-		[[rythe_always_inline]] constexpr void resize(size_type newSize, Args&&... args)
+		[[rythe_always_inline]] constexpr void resize(const size_type newSize, Args&&... args)
 			noexcept(construct_noexcept<Args...>)
 		{
 			size_type oldSize = m_size;
@@ -198,14 +198,14 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void push_back(const value_type& value) noexcept(move_construct_noexcept)
 		{
 			size_type oldSize = m_size++;
-			rsl_assert_out_of_range(m_size <= maxSize);
+			rsl_assert_out_of_range(m_size <= MaxSize);
 			copy_construct_from_unsafe_impl(oldSize, m_size, &value);
 		}
 
 		[[rythe_always_inline]] constexpr void push_back(value_type&& value) noexcept(move_construct_noexcept)
 		{
 			size_type oldSize = m_size++;
-			rsl_assert_out_of_range(m_size <= maxSize);
+			rsl_assert_out_of_range(m_size <= MaxSize);
 			move_construct_from_unsafe_impl(oldSize, m_size, &value);
 		}
 
@@ -213,19 +213,19 @@ namespace rsl
 		[[rythe_always_inline]] constexpr value_type& emplace_back(Args&&... args) noexcept(construct_noexcept<Args...>)
 		{
 			size_type oldSize = m_size++;
-			rsl_assert_out_of_range(m_size <= maxSize);
+			rsl_assert_out_of_range(m_size <= MaxSize);
 			emplace_unsafe_impl(oldSize, m_size, rsl::forward<Args>(args)...);
 			return m_buffer[m_size - 1].value;
 		}
 
-		[[rythe_always_inline]] constexpr void pop_back(size_type count = 1ull) noexcept
+		[[rythe_always_inline]] constexpr void pop_back(const size_type count = 1ull) noexcept
 		{
 			size_type oldSize = m_size;
 			m_size = count > m_size ? 0 : (m_size - count);
 			reset_unsafe_impl(m_size, oldSize);
 		}
 
-		[[rythe_always_inline]] constexpr void clear() noexcept { pop_back(maxSize); }
+		[[rythe_always_inline]] constexpr void clear() noexcept { pop_back(MaxSize); }
 
 		[[rythe_always_inline]] constexpr reference at(size_type i) noexcept
 		{
@@ -246,22 +246,22 @@ namespace rsl
 			return m_buffer[i].value;
 		}
 
-		[[rythe_always_inline]] constexpr reference operator[](size_type i) { return at(i); }
-		[[rythe_always_inline]] constexpr const_reference operator[](size_type i) const { return at(i); }
+		[[rythe_always_inline]] constexpr reference operator[](const size_type i) { return at(i); }
+		[[rythe_always_inline]] constexpr const_reference operator[](const size_type i) const { return at(i); }
 
 		[[rythe_always_inline]] constexpr bool empty() const noexcept { return m_size == 0; }
 		[[rythe_always_inline]] constexpr size_type size() const noexcept { return m_size; }
-		[[rythe_always_inline]] constexpr size_type max_size() const noexcept { return maxSize; }
+		[[rythe_always_inline]] static constexpr size_type max_size() noexcept { return MaxSize; }
 
 		[[rythe_always_inline]] constexpr view_type view() noexcept { return view_type(&m_buffer->value, m_size); }
 		[[rythe_always_inline]] constexpr const_view_type view() const noexcept
 		{
 			return const_view_type(&m_buffer->value, m_size);
 		}
-		[[rythe_always_inline]] constexpr view_type raw_view() noexcept { return view_type(&m_buffer->value, maxSize); }
+		[[rythe_always_inline]] constexpr view_type raw_view() noexcept { return view_type(&m_buffer->value, MaxSize); }
 		[[rythe_always_inline]] constexpr const_view_type raw_view() const noexcept
 		{
-			return const_view_type(&m_buffer->value, maxSize);
+			return const_view_type(&m_buffer->value, MaxSize);
 		}
 
 		[[rythe_always_inline]] constexpr operator const value_type*() const noexcept { return &m_buffer->value; }
@@ -303,8 +303,8 @@ namespace rsl
 		}
 	};
 
-	template <typename ValueType, size_type maxSize>
-	buffered_list(const ValueType (&)[maxSize]) -> buffered_list<ValueType, maxSize>;
+	template <typename ValueType, size_type MaxSize>
+	buffered_list(const ValueType (&)[MaxSize]) -> buffered_list<ValueType, MaxSize>;
 
 	template <typename ValueType>
 	using b_list64 = buffered_list<ValueType, 64>;

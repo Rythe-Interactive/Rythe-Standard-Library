@@ -1,15 +1,15 @@
 #pragma once
 #include "../vector/vector.hpp"
 
-#include "column/column.hpp"
 #include "matrix_base.hpp"
+#include "row/row.hpp"
 
 #include "matrix2.hpp"
 #include "matrix3.hpp"
 #include "matrix4.hpp"
 
-#include "column/column.inl"
 #include "matrix_base.inl"
+#include "row/row.inl"
 
 #include "matrix2.inl"
 #include "matrix3.inl"

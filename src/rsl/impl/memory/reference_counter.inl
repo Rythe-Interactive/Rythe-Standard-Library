@@ -65,7 +65,7 @@ namespace rsl
 			disarm();
 		}
 
-        mem_rsc::operator=(other);
+		mem_rsc::operator=(other);
 
 		if (is_armed())
 		{

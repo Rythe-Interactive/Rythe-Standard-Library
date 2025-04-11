@@ -4,15 +4,15 @@
 namespace rsl::math
 {
 	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar rads, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
+	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar fovY, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
 	{
-		Scalar const tanHalfFovy = tan(rads * static_cast<Scalar>(0.5));
+		Scalar const tanHalfFovY = tan(fovY * static_cast<Scalar>(0.5));
 		Scalar inverseFrustumDepth = static_cast<Scalar>(1) / (farZ - nearZ);
 
 		matrix<Scalar, 4, 4> result(static_cast<Scalar>(0));
 
-		result[0][0] = static_cast<Scalar>(1) / (aspect * tanHalfFovy);
-		result[1][1] = static_cast<Scalar>(1) / (tanHalfFovy);
+		result[0][0] = static_cast<Scalar>(1) / (aspect * tanHalfFovY);
+		result[1][1] = static_cast<Scalar>(1) / (tanHalfFovY);
 		result[2][2] = (farZ + nearZ) * inverseFrustumDepth;
 
 		result[2][3] = static_cast<Scalar>(1);
@@ -91,27 +91,27 @@ namespace rsl::math
 	//}
 
 	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> mat, Scalar rad, vector<Scalar, 3> axis) noexcept
+	[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> mat, Scalar rad, vector<Scalar, 3> _axis) noexcept
 	{
 		Scalar const a = rad;
 		Scalar const c = cos(a);
 		Scalar const s = sin(a);
 
-		vector<Scalar, 3> _axis(normalize(axis));
-		vector<Scalar, 3> temp((Scalar(1) - c) * _axis);
+		vector<Scalar, 3> axis(normalize(_axis));
+		vector<Scalar, 3> temp((Scalar(1) - c) * axis);
 
 		matrix<Scalar, 4, 4> rot;
-		rot[0][0] = c + temp[0] * _axis[0];
-		rot[0][1] = temp[0] * _axis[1] + s * _axis[2];
-		rot[0][2] = temp[0] * _axis[2] - s * _axis[1];
+		rot[0][0] = c + temp[0] * axis[0];
+		rot[0][1] = temp[0] * axis[1] + s * axis[2];
+		rot[0][2] = temp[0] * axis[2] - s * axis[1];
 
-		rot[1][0] = temp[1] * _axis[0] - s * _axis[2];
-		rot[1][1] = c + temp[1] * _axis[1];
-		rot[1][2] = temp[1] * _axis[2] + s * _axis[0];
+		rot[1][0] = temp[1] * axis[0] - s * axis[2];
+		rot[1][1] = c + temp[1] * axis[1];
+		rot[1][2] = temp[1] * axis[2] + s * axis[0];
 
-		rot[2][0] = temp[2] * _axis[0] + s * _axis[1];
-		rot[2][1] = temp[2] * _axis[1] - s * _axis[0];
-		rot[2][2] = c + temp[2] * _axis[2];
+		rot[2][0] = temp[2] * axis[0] + s * axis[1];
+		rot[2][1] = temp[2] * axis[1] - s * axis[0];
+		rot[2][2] = c + temp[2] * axis[2];
 
 		matrix<Scalar, 4, 4> result;
 		result[0] = mat[0] * rot[0][0] + mat[1] * rot[0][1] + mat[2] * rot[0][2];

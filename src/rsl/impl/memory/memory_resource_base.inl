@@ -50,7 +50,8 @@ namespace rsl
 
 	template <allocator_type Alloc, untyped_factory_type Factory>
 	template <typename... Args>
-	inline constexpr void untyped_memory_resource_base<Alloc, Factory>::allocate_aligned(size_type count, size_type alignment)
+	inline constexpr void
+	untyped_memory_resource_base<Alloc, Factory>::allocate_aligned(size_type count, size_type alignment)
 		noexcept(factory_traits<Factory>::template noexcept_constructable<>)
 	{
 		m_ptr = m_alloc.allocate_aligned(count, alignment);
@@ -127,15 +128,16 @@ namespace rsl
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory, bool AllowRawDataAccess>
-	inline const Alloc& typed_memory_resource_base<T, Alloc, Factory, AllowRawDataAccess>::get_allocator() const noexcept
+	inline const Alloc&
+	typed_memory_resource_base<T, Alloc, Factory, AllowRawDataAccess>::get_allocator() const noexcept
 	{
 		return m_alloc.get_allocator();
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory, bool AllowRawDataAccess>
-	inline void
-	typed_memory_resource_base<T, Alloc, Factory, AllowRawDataAccess>::set_factory(const factory_storage_type& factoryStorage)
-		noexcept(is_nothrow_copy_assignable_v<factory_storage_type>)
+	inline void typed_memory_resource_base<T, Alloc, Factory, AllowRawDataAccess>::set_factory(
+		const factory_storage_type& factoryStorage
+	) noexcept(is_nothrow_copy_assignable_v<factory_storage_type>)
 	{
 		m_alloc.set_factory(factoryStorage);
 	}
@@ -147,7 +149,8 @@ namespace rsl
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory, bool AllowRawDataAccess>
-	inline const Factory& typed_memory_resource_base<T, Alloc, Factory, AllowRawDataAccess>::get_factory() const noexcept
+	inline const Factory&
+	typed_memory_resource_base<T, Alloc, Factory, AllowRawDataAccess>::get_factory() const noexcept
 	{
 		return m_alloc.get_factory();
 	}

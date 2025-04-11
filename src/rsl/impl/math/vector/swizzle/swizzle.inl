@@ -3,294 +3,300 @@
 
 namespace rsl::math
 {
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0>
-	constexpr swizzle<scalar, Size, Mode, s0>::swizzle(scalar x) noexcept
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0>
+	constexpr swizzle<Scalar, Size, Mode, S0>::swizzle(Scalar x) noexcept
 	{
-		data[s0] = x;
+		data[S0] = x;
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0>
-	constexpr swizzle<scalar, Size, Mode, s0>::operator scalar() const noexcept
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0>
+	constexpr swizzle<Scalar, Size, Mode, S0>::operator Scalar() const noexcept
 	{
-		return data[s0];
+		return data[S0];
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0>
-	constexpr swizzle<scalar, Size, Mode, s0>::operator conv_type() const noexcept
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0>
+	constexpr swizzle<Scalar, Size, Mode, S0>::operator conv_type() const noexcept
 	{
 		conv_type result;
-		result.data[0] = data[s0];
+		result.data[0] = data[S0];
 		return result;
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0>
-	constexpr swizzle<scalar, Size, Mode, s0>& swizzle<scalar, Size, Mode, s0>::operator=(const conv_type& other
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0>
+	constexpr swizzle<Scalar, Size, Mode, S0>& swizzle<Scalar, Size, Mode, S0>::operator=(const conv_type& other
 	) noexcept
 	{
-		data[s0] = other[0];
+		data[S0] = other[0];
 		return *this;
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0>
-	constexpr swizzle<scalar, Size, Mode, s0>& swizzle<scalar, Size, Mode, s0>::operator=(scalar value) noexcept
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0>
+	constexpr swizzle<Scalar, Size, Mode, S0>& swizzle<Scalar, Size, Mode, S0>::operator=(Scalar value) noexcept
 	{
-		data[s0] = value;
+		data[S0] = value;
 		return *this;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0>
-	constexpr swizzle<bool, Size, Mode, s0>::swizzle(bool x) noexcept
+	template <size_type Size, storage_mode Mode, size_type S0>
+	constexpr swizzle<bool, Size, Mode, S0>::swizzle(bool x) noexcept
 	{
-		data[s0] = x;
+		data[S0] = x;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0>
-	constexpr void swizzle<bool, Size, Mode, s0>::set_mask(bitfield8 mask) noexcept
+	template <size_type Size, storage_mode Mode, size_type S0>
+	constexpr void swizzle<bool, Size, Mode, S0>::set_mask(const bitfield8 mask) noexcept
 	{
-		data[s0] = mask & 1;
+		data[S0] = mask & 1;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0>
-	constexpr bitfield8 swizzle<bool, Size, Mode, s0>::mask() const noexcept
+	template <size_type Size, storage_mode Mode, size_type S0>
+	constexpr bitfield8 swizzle<bool, Size, Mode, S0>::mask() const noexcept
 	{
-		return static_cast<bitfield8>(data[s0]);
+		return static_cast<bitfield8>(data[S0]);
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0>
-	constexpr swizzle<bool, Size, Mode, s0>::operator scalar() const noexcept
+	template <size_type Size, storage_mode Mode, size_type S0>
+	constexpr swizzle<bool, Size, Mode, S0>::operator scalar() const noexcept
 	{
-		return data[s0];
+		return data[S0];
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0>
-	constexpr swizzle<bool, Size, Mode, s0>::operator conv_type() const noexcept
+	template <size_type Size, storage_mode Mode, size_type S0>
+	constexpr swizzle<bool, Size, Mode, S0>::operator conv_type() const noexcept
 	{
 		conv_type result;
-		result.data[0] = data[s0];
+		result.data[0] = data[S0];
 		return result;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0>
-	constexpr swizzle<bool, Size, Mode, s0>& swizzle<bool, Size, Mode, s0>::operator=(const conv_type& other) noexcept
+	template <size_type Size, storage_mode Mode, size_type S0>
+	constexpr swizzle<bool, Size, Mode, S0>& swizzle<bool, Size, Mode, S0>::operator=(const conv_type& other) noexcept
 	{
-		data[s0] = other[0];
+		data[S0] = other[0];
 		return *this;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0>
-	constexpr swizzle<bool, Size, Mode, s0>& swizzle<bool, Size, Mode, s0>::operator=(scalar value) noexcept
+	template <size_type Size, storage_mode Mode, size_type S0>
+	constexpr swizzle<bool, Size, Mode, S0>& swizzle<bool, Size, Mode, S0>::operator=(scalar value) noexcept
 	{
-		data[s0] = value;
+		data[S0] = value;
 		return *this;
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1>
-	constexpr swizzle<scalar, Size, Mode, s0, s1>::swizzle(scalar x, scalar y) noexcept
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0, size_type S1>
+	constexpr swizzle<Scalar, Size, Mode, S0, S1>::swizzle(Scalar x, Scalar y) noexcept
 	{
-		data[s0] = x;
-		data[s1] = y;
+		data[S0] = x;
+		data[S1] = y;
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1>
-	constexpr swizzle<scalar, Size, Mode, s0, s1>::operator conv_type() const noexcept
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0, size_type S1>
+	constexpr swizzle<Scalar, Size, Mode, S0, S1>::operator conv_type() const noexcept
 	{
 		conv_type result;
-		result.data[0] = data[s0];
-		result.data[1] = data[s1];
+		result.data[0] = data[S0];
+		result.data[1] = data[S1];
 		return result;
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1>
-	constexpr swizzle<scalar, Size, Mode, s0, s1>& swizzle<scalar, Size, Mode, s0, s1>::operator=(const conv_type& other
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0, size_type S1>
+	constexpr swizzle<Scalar, Size, Mode, S0, S1>& swizzle<Scalar, Size, Mode, S0, S1>::operator=(const conv_type& other
 	) noexcept
 	{
-		data[s0] = other[0];
-		data[s1] = other[1];
+		data[S0] = other[0];
+		data[S1] = other[1];
 		return *this;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1>
-	constexpr swizzle<bool, Size, Mode, s0, s1>::swizzle(bool x, bool y) noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1>
+	constexpr swizzle<bool, Size, Mode, S0, S1>::swizzle(bool x, bool y) noexcept
 	{
-		data[s0] = x;
-		data[s1] = y;
+		data[S0] = x;
+		data[S1] = y;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1>
-	constexpr void swizzle<bool, Size, Mode, s0, s1>::set_mask(bitfield8 mask) noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1>
+	constexpr void swizzle<bool, Size, Mode, S0, S1>::set_mask(const bitfield8 mask) noexcept
 	{
-		data[s0] = mask & 1;
-		data[s1] = mask & 2;
+		data[S0] = mask & 1;
+		data[S1] = mask & 2;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1>
-	constexpr bitfield8 swizzle<bool, Size, Mode, s0, s1>::mask() const noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1>
+	constexpr bitfield8 swizzle<bool, Size, Mode, S0, S1>::mask() const noexcept
 	{
-		return static_cast<bitfield8>(data[s0] | data[s0] << 1u);
+		return static_cast<bitfield8>(data[S0] | data[S0] << 1u);
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1>
-	constexpr swizzle<bool, Size, Mode, s0, s1>::operator conv_type() const noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1>
+	constexpr swizzle<bool, Size, Mode, S0, S1>::operator conv_type() const noexcept
 	{
 		conv_type result;
-		result.data[0] = data[s0];
-		result.data[1] = data[s1];
+		result.data[0] = data[S0];
+		result.data[1] = data[S1];
 		return result;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1>
-	constexpr swizzle<bool, Size, Mode, s0, s1>& swizzle<bool, Size, Mode, s0, s1>::operator=(const conv_type& other
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1>
+	constexpr swizzle<bool, Size, Mode, S0, S1>& swizzle<bool, Size, Mode, S0, S1>::operator=(const conv_type& other
 	) noexcept
 	{
-		data[s0] = other[0];
-		data[s1] = other[1];
+		data[S0] = other[0];
+		data[S1] = other[1];
 		return *this;
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
-	constexpr swizzle<scalar, Size, Mode, s0, s1, s2>::swizzle(scalar x, scalar y, scalar z) noexcept
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2>
+	constexpr swizzle<Scalar, Size, Mode, S0, S1, S2>::swizzle(Scalar x, Scalar y, Scalar z) noexcept
 	{
-		data[s0] = x;
-		data[s1] = y;
-		data[s2] = z;
+		data[S0] = x;
+		data[S1] = y;
+		data[S2] = z;
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
-	constexpr swizzle<scalar, Size, Mode, s0, s1, s2>::operator conv_type() const noexcept
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2>
+	constexpr swizzle<Scalar, Size, Mode, S0, S1, S2>::operator conv_type() const noexcept
 	{
 		conv_type result;
-		result.data[0] = data[s0];
-		result.data[1] = data[s1];
-		result.data[2] = data[s2];
+		result.data[0] = data[S0];
+		result.data[1] = data[S1];
+		result.data[2] = data[S2];
 		return result;
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
-	constexpr swizzle<scalar, Size, Mode, s0, s1, s2>&
-	swizzle<scalar, Size, Mode, s0, s1, s2>::operator=(const conv_type& other) noexcept
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2>
+	constexpr swizzle<Scalar, Size, Mode, S0, S1, S2>&
+	swizzle<Scalar, Size, Mode, S0, S1, S2>::operator=(const conv_type& other) noexcept
 	{
-		data[s0] = other[0];
-		data[s1] = other[1];
-		data[s2] = other[2];
+		data[S0] = other[0];
+		data[S1] = other[1];
+		data[S2] = other[2];
 		return *this;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
-	constexpr swizzle<bool, Size, Mode, s0, s1, s2>::swizzle(bool x, bool y, bool z) noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2>
+	constexpr swizzle<bool, Size, Mode, S0, S1, S2>::swizzle(bool x, bool y, bool z) noexcept
 	{
-		data[s0] = x;
-		data[s1] = y;
-		data[s2] = z;
+		data[S0] = x;
+		data[S1] = y;
+		data[S2] = z;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
-	constexpr void swizzle<bool, Size, Mode, s0, s1, s2>::set_mask(bitfield8 mask) noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2>
+	constexpr void swizzle<bool, Size, Mode, S0, S1, S2>::set_mask(const bitfield8 mask) noexcept
 	{
-		data[s0] = mask & 1;
-		data[s1] = mask & 2;
-		data[s2] = mask & 4;
+		data[S0] = mask & 1;
+		data[S1] = mask & 2;
+		data[S2] = mask & 4;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
-	constexpr bitfield8 swizzle<bool, Size, Mode, s0, s1, s2>::mask() const noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2>
+	constexpr bitfield8 swizzle<bool, Size, Mode, S0, S1, S2>::mask() const noexcept
 	{
-		return static_cast<bitfield8>(data[s0] | data[s1] << 1u | data[s2] << 2u);
+		return static_cast<bitfield8>(data[S0] | data[S1] << 1u | data[S2] << 2u);
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
-	constexpr swizzle<bool, Size, Mode, s0, s1, s2>::operator conv_type() const noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2>
+	constexpr swizzle<bool, Size, Mode, S0, S1, S2>::operator conv_type() const noexcept
 	{
 		conv_type result;
-		result.data[0] = data[s0];
-		result.data[1] = data[s1];
-		result.data[2] = data[s2];
+		result.data[0] = data[S0];
+		result.data[1] = data[S1];
+		result.data[2] = data[S2];
 		return result;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
-	constexpr swizzle<bool, Size, Mode, s0, s1, s2>&
-	swizzle<bool, Size, Mode, s0, s1, s2>::operator=(const conv_type& other) noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2>
+	constexpr swizzle<bool, Size, Mode, S0, S1, S2>&
+	swizzle<bool, Size, Mode, S0, S1, S2>::operator=(const conv_type& other) noexcept
 	{
-		data[s0] = other[0];
-		data[s1] = other[1];
-		data[s2] = other[2];
+		data[S0] = other[0];
+		data[S1] = other[1];
+		data[S2] = other[2];
 		return *this;
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
-	constexpr swizzle<scalar, Size, Mode, s0, s1, s2, s3>::swizzle(scalar x, scalar y, scalar z, scalar w) noexcept
+	template <
+		arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2,
+		size_type S3>
+	constexpr swizzle<Scalar, Size, Mode, S0, S1, S2, S3>::swizzle(Scalar x, Scalar y, Scalar z, Scalar w) noexcept
 	{
-		data[s0] = x;
-		data[s1] = y;
-		data[s2] = z;
-		data[s3] = w;
+		data[S0] = x;
+		data[S1] = y;
+		data[S2] = z;
+		data[S3] = w;
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
-	constexpr swizzle<scalar, Size, Mode, s0, s1, s2, s3>::operator conv_type() const noexcept
+	template <
+		arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2,
+		size_type S3>
+	constexpr swizzle<Scalar, Size, Mode, S0, S1, S2, S3>::operator conv_type() const noexcept
 	{
 		conv_type result;
-		result.data[0] = data[s0];
-		result.data[1] = data[s1];
-		result.data[2] = data[s2];
-		result.data[3] = data[s3];
+		result.data[0] = data[S0];
+		result.data[1] = data[S1];
+		result.data[2] = data[S2];
+		result.data[3] = data[S3];
 		return result;
 	}
 
-	template <arithmetic_type scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
-	constexpr swizzle<scalar, Size, Mode, s0, s1, s2, s3>&
-	swizzle<scalar, Size, Mode, s0, s1, s2, s3>::operator=(const conv_type& other) noexcept
+	template <
+		arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2,
+		size_type S3>
+	constexpr swizzle<Scalar, Size, Mode, S0, S1, S2, S3>&
+	swizzle<Scalar, Size, Mode, S0, S1, S2, S3>::operator=(const conv_type& other) noexcept
 	{
-		data[s0] = other[0];
-		data[s1] = other[1];
-		data[s2] = other[2];
-		data[s3] = other[3];
+		data[S0] = other[0];
+		data[S1] = other[1];
+		data[S2] = other[2];
+		data[S3] = other[3];
 		return *this;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
-	constexpr swizzle<bool, Size, Mode, s0, s1, s2, s3>::swizzle(bool x, bool y, bool z, bool w) noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2, size_type S3>
+	constexpr swizzle<bool, Size, Mode, S0, S1, S2, S3>::swizzle(bool x, bool y, bool z, bool w) noexcept
 	{
-		data[s0] = x;
-		data[s1] = y;
-		data[s2] = z;
-		data[s3] = w;
+		data[S0] = x;
+		data[S1] = y;
+		data[S2] = z;
+		data[S3] = w;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
-	constexpr void swizzle<bool, Size, Mode, s0, s1, s2, s3>::set_mask(bitfield8 mask) noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2, size_type S3>
+	constexpr void swizzle<bool, Size, Mode, S0, S1, S2, S3>::set_mask(const bitfield8 mask) noexcept
 	{
-		data[s0] = mask & 1;
-		data[s1] = mask & 2;
-		data[s2] = mask & 4;
-		data[s3] = mask & 8;
+		data[S0] = mask & 1;
+		data[S1] = mask & 2;
+		data[S2] = mask & 4;
+		data[S3] = mask & 8;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
-	constexpr bitfield8 swizzle<bool, Size, Mode, s0, s1, s2, s3>::mask() const noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2, size_type S3>
+	constexpr bitfield8 swizzle<bool, Size, Mode, S0, S1, S2, S3>::mask() const noexcept
 	{
-		return static_cast<bitfield8>(data[s0] | data[s1] << 1u | data[s2] << 2u | data[s3] << 3u);
+		return static_cast<bitfield8>(data[S0] | data[S1] << 1u | data[S2] << 2u | data[S3] << 3u);
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
-	constexpr swizzle<bool, Size, Mode, s0, s1, s2, s3>::operator conv_type() const noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2, size_type S3>
+	constexpr swizzle<bool, Size, Mode, S0, S1, S2, S3>::operator conv_type() const noexcept
 	{
 		conv_type result;
-		result.data[0] = data[s0];
-		result.data[1] = data[s1];
-		result.data[2] = data[s2];
-		result.data[3] = data[s3];
+		result.data[0] = data[S0];
+		result.data[1] = data[S1];
+		result.data[2] = data[S2];
+		result.data[3] = data[S3];
 		return result;
 	}
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
-	constexpr swizzle<bool, Size, Mode, s0, s1, s2, s3>&
-	swizzle<bool, Size, Mode, s0, s1, s2, s3>::operator=(const conv_type& other) noexcept
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2, size_type S3>
+	constexpr swizzle<bool, Size, Mode, S0, S1, S2, S3>&
+	swizzle<bool, Size, Mode, S0, S1, S2, S3>::operator=(const conv_type& other) noexcept
 	{
-		data[s0] = other[0];
-		data[s1] = other[1];
-		data[s2] = other[2];
-		data[s3] = other[3];
+		data[S0] = other[0];
+		data[S1] = other[1];
+		data[S2] = other[2];
+		data[S3] = other[3];
 		return *this;
 	}
 } // namespace rsl::math

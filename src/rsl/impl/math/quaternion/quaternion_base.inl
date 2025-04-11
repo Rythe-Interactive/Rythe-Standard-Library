@@ -1,5 +1,4 @@
 #pragma once
-#include <cmath>
 
 #include "../arithmetic/multiplication.hpp"
 #include "../constants.hpp"
@@ -54,14 +53,14 @@ namespace rsl::math
 	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr Scalar& quaternion<Scalar, Mode>::operator[](size_type index) noexcept
 	{
-		rsl_assert_out_of_range_msg((index >= 0) && (index < size), "quaternion subscript out of range");
+		rsl_assert_out_of_range_msg(index < size, "quaternion subscript out of range");
 		return data[index];
 	}
 
 	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr const Scalar& quaternion<Scalar, Mode>::operator[](size_type index) const noexcept
 	{
-		rsl_assert_out_of_range_msg((index >= 0) && (index < size), "quaternion subscript out of range");
+		rsl_assert_out_of_range_msg(index < size, "quaternion subscript out of range");
 		return data[index];
 	}
 
@@ -88,17 +87,17 @@ namespace rsl::math
 	{ // TODO(Glyn): Optimize
 		vector<Scalar, 3> angles;
 
-		Scalar sinr_cosp = static_cast<Scalar>(2) * (w * i + j * k);
-		Scalar cosr_cosp = static_cast<Scalar>(1) - static_cast<Scalar>(2) * (i * i + j * j);
-		angles.x = atan2(sinr_cosp, cosr_cosp);
+		Scalar sinRCosP = static_cast<Scalar>(2) * (w * i + j * k);
+		Scalar cosRCosP = static_cast<Scalar>(1) - static_cast<Scalar>(2) * (i * i + j * j);
+		angles.x = atan2(sinRCosP, cosRCosP);
 
-		Scalar sinp = sqrt(static_cast<Scalar>(1) + static_cast<Scalar>(2) * (w * j - i * k));
-		Scalar cosp = sqrt(static_cast<Scalar>(1) - static_cast<Scalar>(2) * (w * j - i * k));
-		angles.y = static_cast<Scalar>(2) * atan2(sinp, cosp) - pi() / static_cast<Scalar>(2);
+		Scalar sinP = sqrt(static_cast<Scalar>(1) + static_cast<Scalar>(2) * (w * j - i * k));
+		Scalar cosP = sqrt(static_cast<Scalar>(1) - static_cast<Scalar>(2) * (w * j - i * k));
+		angles.y = static_cast<Scalar>(2) * atan2(sinP, cosP) - pi() / static_cast<Scalar>(2);
 
-		Scalar siny_cosp = static_cast<Scalar>(2) * (w * k + i * j);
-		Scalar cosy_cosp = static_cast<Scalar>(1) - static_cast<Scalar>(2) * (j * j + k * k);
-		angles.z = atan2(siny_cosp, cosy_cosp);
+		Scalar sinYCosP = static_cast<Scalar>(2) * (w * k + i * j);
+		Scalar cosYCosP = static_cast<Scalar>(1) - static_cast<Scalar>(2) * (j * j + k * k);
+		angles.z = atan2(sinYCosP, cosYCosP);
 
 		return angles;
 	}
@@ -113,9 +112,9 @@ namespace rsl::math
 
 	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr quaternion<Scalar, Mode>
-	quaternion<Scalar, Mode>::look_at(const vec_type& _pos, const vec_type& _center, const vec_type& _up) noexcept
+	quaternion<Scalar, Mode>::look_at(const vec_type& pos, const vec_type& center, const vec_type& _up) noexcept
 	{ // TODO(Glyn): Optimize
-		vec_type const forward(normalize(_center - _pos));
+		vec_type const forward(normalize(center - pos));
 		vec_type const right(normalize(cross(_up, forward)));
 		vec_type const up(cross(forward, right));
 
@@ -145,10 +144,10 @@ namespace rsl::math
 	}
 
 	template <arithmetic_type Scalar, storage_mode Mode>
-	constexpr quaternion<Scalar, Mode> quaternion<Scalar, Mode>::conjugate(const quaternion<Scalar, Mode>& _quat
+	constexpr quaternion<Scalar, Mode> quaternion<Scalar, Mode>::conjugate(const quaternion<Scalar, Mode>& quat
 	) noexcept
 	{
-		return quaternion<Scalar>(_quat.w, -_quat.i, -_quat.j, -_quat.k);
+		return quaternion<Scalar>(quat.w, -quat.i, -quat.j, -quat.k);
 	}
 
 	template <arithmetic_type Scalar, storage_mode Mode>
@@ -165,8 +164,8 @@ namespace rsl::math
 		return result;
 	}
 
-#define sin45 0.70710678118654752440084436210485L
-#define cos45 0.70710678118654752440084436210485L
+#define SIN45 0.70710678118654752440084436210485L
+#define COS45 0.70710678118654752440084436210485L
 
 	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::identity(
@@ -174,15 +173,15 @@ namespace rsl::math
 	);
 	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_x_90(
-		static_cast<Scalar>(cos45), static_cast<Scalar>(sin45), static_cast<Scalar>(0), static_cast<Scalar>(0)
+		static_cast<Scalar>(COS45), static_cast<Scalar>(SIN45), static_cast<Scalar>(0), static_cast<Scalar>(0)
 	);
 	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_y_90(
-		static_cast<Scalar>(cos45), static_cast<Scalar>(0), static_cast<Scalar>(sin45), static_cast<Scalar>(0)
+		static_cast<Scalar>(COS45), static_cast<Scalar>(0), static_cast<Scalar>(SIN45), static_cast<Scalar>(0)
 	);
 	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_z_90(
-		static_cast<Scalar>(cos45), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(sin45)
+		static_cast<Scalar>(COS45), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(SIN45)
 	);
 	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_x_180(
@@ -197,6 +196,6 @@ namespace rsl::math
 		static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(1)
 	);
 
-#undef sin45
-#undef cos45
+#undef SIN45
+#undef COS45
 } // namespace rsl::math

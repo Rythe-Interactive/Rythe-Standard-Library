@@ -10,7 +10,8 @@ namespace rsl::math
 	{
 	};
 
-	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, storage_mode Mode = storage_mode::defaultp>
+	template <
+		arithmetic_type Scalar, size_type RowCount, size_type ColCount, storage_mode Mode = storage_mode::defaultp>
 	struct matrix
 	{
 		using scalar = Scalar;
@@ -19,11 +20,11 @@ namespace rsl::math
 		static constexpr size_type size = row_count * col_count;
 		static constexpr storage_mode mode = Mode;
 
-		using row_type = vector<scalar, col_count, Mode>;
+		using col_type = vector<scalar, row_count, Mode>;
 
 		union
 		{
-			row_type rows[row_count];
+			col_type columns[col_count];
 			scalar data[size];
 		};
 
@@ -44,7 +45,7 @@ namespace rsl::math
 
 		[[rythe_always_inline]] constexpr matrix& operator=(const matrix&) noexcept = default;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr row_type& operator[](size_type i) noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr const row_type& operator[](size_type i) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr col_type& operator[](size_type i) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const col_type& operator[](size_type i) const noexcept;
 	};
 } // namespace rsl::math
