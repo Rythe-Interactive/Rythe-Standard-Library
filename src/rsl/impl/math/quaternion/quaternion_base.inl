@@ -107,7 +107,7 @@ namespace rsl::math
 	quaternion<Scalar, Mode>::angle_axis(radians<scalar> angle, const vec_type& vec) noexcept
 	{
 		auto halfAngle = angle.value * static_cast<scalar>(0.5);
-		return quaternion<scalar>(cos(halfAngle), sin(halfAngle) * vec);
+		return quaternion<scalar>(cos(halfAngle), sin(halfAngle) * normalize(vec));
 	}
 
 	template <arithmetic_type Scalar, storage_mode Mode>
@@ -162,6 +162,12 @@ namespace rsl::math
 		result.j = c.x * s.y * c.z + s.x * c.y * s.z;
 		result.k = c.x * c.y * s.z - s.x * s.y * c.z;
 		return result;
+	}
+
+	template <arithmetic_type Scalar, storage_mode Mode>
+	constexpr vector<Scalar, 4, Mode> as_vec(quaternion<Scalar, Mode> quat) noexcept
+	{
+		return vector<Scalar, 4>(quat.i, quat.j, quat.k, quat.w);
 	}
 
 #define SIN45 0.70710678118654752440084436210485L

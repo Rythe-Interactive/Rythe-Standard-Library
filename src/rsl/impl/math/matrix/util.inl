@@ -80,7 +80,7 @@ namespace rsl::math
 	[[nodiscard]] matrix<Scalar, 4, 4> translate(matrix<Scalar, 4, 4> mat, vector<Scalar, 3> pos) noexcept
 	{
 		matrix<Scalar, 4, 4> result(mat);
-		result[3] = mat[0] * pos[0] + mat[1] * pos[1] + mat[2] * pos[2] + mat[3];
+		result[3].xyz = pos;
 		return result;
 	}
 
@@ -91,9 +91,10 @@ namespace rsl::math
 	//}
 
 	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> mat, Scalar rad, vector<Scalar, 3> _axis) noexcept
+	[[nodiscard]] matrix<Scalar, 4, 4>
+	rotate(matrix<Scalar, 4, 4> mat, radians<Scalar> angle, vector<Scalar, 3> _axis) noexcept
 	{
-		Scalar const a = rad;
+		Scalar const a = angle;
 		Scalar const c = cos(a);
 		Scalar const s = sin(a);
 

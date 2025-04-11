@@ -732,22 +732,45 @@ TEST_CASE("matrices", "[math]")
 
 	SECTION("matrix decompose")
 	{
-		constexpr float4x4 matrix{};
+		{
+			constexpr float4x4 matrix{};
 
-		float3 scale;
-		quat orientation;
-		float3 translation;
+			float3 scale;
+			quat orientation;
+			float3 translation;
 
-		decompose(matrix, scale, orientation, translation);
+			decompose(matrix, scale, orientation, translation);
 
-		float4x4 out = compose(scale, orientation, translation);
+			float4x4 out = compose(scale, orientation, translation);
 
-		bool4x4 r = matrix == out;
+			REQUIRE(matrix == out);
+			REQUIRE(scale == float3::one);
+			REQUIRE(orientation == quat::identity);
+			REQUIRE(translation == float3::zero);
+		}
+		{
 
-		REQUIRE(r);
-		REQUIRE(scale == float3::one);
-		REQUIRE(orientation == quat::identity);
-		REQUIRE(translation == float3::zero);
+			constexpr float3 pos(2.0f);
+			constexpr float3 scal(2.0f);
+			constexpr float3 axis(1.f, 2.f, 3.f);
+			constexpr radians32 angle{0.123456f};
+			const quat expectedRotation = quat::angle_axis(angle, axis);
+
+			float4x4 matrix = rotate(translate(scale(float4x4{}, scal), pos), angle, axis);
+
+			float3 scale(3);
+			quat orientation;
+			float3 translation(3);
+
+			decompose(matrix, scale, orientation, translation);
+
+			float4x4 out = compose(scale, orientation, translation);
+
+			REQUIRE(orientation == expectedRotation);
+			REQUIRE(scale == scal);
+			REQUIRE(translation == pos);
+			REQUIRE(matrix == out);
+		}
 	}
 
 	SECTION("matrix determinant") {}

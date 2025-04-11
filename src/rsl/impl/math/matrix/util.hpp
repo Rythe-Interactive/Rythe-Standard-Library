@@ -27,7 +27,8 @@ namespace rsl::math
 	/*template<typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> matrix, quaternion<Scalar> orientation) noexcept;*/
 	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> mat, Scalar rad, vector<Scalar, 3> axis) noexcept;
+	[[nodiscard]] matrix<Scalar, 4, 4>
+	rotate(matrix<Scalar, 4, 4> mat, radians<Scalar> angle, vector<Scalar, 3> axis) noexcept;
 	template <typename Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4> scale(matrix<Scalar, 4, 4> mat, vector<Scalar, 3> scale) noexcept;
 } // namespace rsl::math

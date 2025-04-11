@@ -81,6 +81,10 @@ namespace rsl::math
 		[[nodiscard]] [[rythe_always_inline]] static constexpr quaternion from_euler(const vec_type& euler) noexcept;
 	};
 
+	template <arithmetic_type Scalar, storage_mode Mode>
+	[[nodiscard]] [[rythe_always_inline]] constexpr vector<Scalar, 4, Mode> as_vec(quaternion<Scalar, Mode> quat
+	) noexcept;
+
 	using quat = quaternion<float32>;
 	using quat64 = quaternion<float64>;
 	using quat_max = quaternion<float_max>;
