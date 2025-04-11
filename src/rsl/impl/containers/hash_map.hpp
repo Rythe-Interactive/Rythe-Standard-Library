@@ -1,5 +1,6 @@
 #pragma once
 
+#include "any.hpp"
 #include "../math/basic/constraint.hpp"
 #include "../memory/memory_pool.hpp"
 #include "../util/hash.hpp"
@@ -8,18 +9,15 @@
 #include "iterators.hpp"
 #include "pair.hpp"
 #include "util/comparers.hpp"
+#include "util/error_handling.hpp"
 
 namespace rsl
 {
 	template <typename T, typename = void>
-	struct has_is_transparent : public false_type
-	{
-	};
+	struct has_is_transparent : public false_type {};
 
 	template <typename T>
-	struct has_is_transparent<T, void_t<typename T::is_transparent>> : public true_type
-	{
-	};
+	struct has_is_transparent<T, void_t<typename T::is_transparent>> : public true_type {};
 
 	namespace internal
 	{
@@ -33,16 +31,14 @@ namespace rsl
 			using value_type = typename MapType::value_type;
 
 			template <typename... Args>
-			explicit hash_map_node(map_type& map, Args&&... args)
+			explicit hash_map_node(map_type& map, Args&&... args) // NOLINT(cppcoreguidelines*)
 				: m_data(map.get_memory_pool().allocate())
 			{
 				map.get_factory().construct(m_data, 1, forward<Args>(args)...);
 			}
 
-			hash_map_node(map_type&, hash_map_node&& other) noexcept
-				: m_data(other.m_data)
-			{
-			}
+			hash_map_node(map_type&, hash_map_node&& other) noexcept // NOLINT(cppcoreguidelines*)
+				: m_data(other.m_data) {}
 
 			void destroy(map_type& map) noexcept
 			{
@@ -106,13 +102,13 @@ namespace rsl
 			using value_type = typename MapType::value_type;
 
 			template <typename... Args>
-			explicit flat_hash_map_node(map_type& map, Args&&... args)
+			explicit flat_hash_map_node(map_type& map, Args&&... args) // NOLINT(cppcoreguidelines*)
 				noexcept(is_nothrow_constructible_v<value_type, Args...>)
 			{
 				map.get_factory().construct(&m_data, 1, forward<Args>(args)...);
 			}
 
-			flat_hash_map_node(map_type& map, flat_hash_map_node&& other)
+			flat_hash_map_node(map_type& map, flat_hash_map_node&& other) // NOLINT(cppcoreguidelines*)
 				noexcept(is_nothrow_move_constructible_v<value_type>)
 			{
 				map.get_factory().move(&m_data, &other.m_data, 1);
@@ -170,7 +166,7 @@ namespace rsl
 			};
 		};
 
-		template <typename MapType, bool isFlat = false>
+		template <typename MapType, bool IsFlat = false>
 		struct select_node_type
 		{
 			using type = hash_map_node<MapType>;
@@ -186,40 +182,54 @@ namespace rsl
 		using map_node = typename select_node_type<MapType, MapType::is_flat>::type;
 
 		template <bool Large>
-		constexpr bool recommended_fingerprint_size = Large ? 16 : 8;
+		constexpr size_type recommended_fingerprint_size = Large ? 16ull : 8ull;
+
+		template <typename Rep>
+		struct unpacked_psl
+		{
+			using storage_type = Rep;
+			storage_type psl;
+			storage_type fingerprint;
+		};
 
 		template <bool Large = false, size_type FingerprintSize = recommended_fingerprint_size<Large>>
 		struct hash_map_bucket
 		{
+			using storage_type = uint32;
+			using psl_type = unpacked_psl<storage_type>;
+
 			static_assert(FingerprintSize < 32);
-			static constexpr size_type fingerprintSize = FingerprintSize; // bits
+			static constexpr size_type fingerprint_size = FingerprintSize; // bits
 
 			// increment the Nth bit that skips all fingerprint bits.
-			static constexpr size_type pslIncrement = 1 << fingerprintSize;
-			static constexpr size_type fingerprintMask = pslIncrement - 1; // 0xFF
+			static constexpr storage_type psl_increment = 1 << fingerprint_size;
+			static constexpr storage_type fingerprint_mask = psl_increment - 1; // 0x00FF
+			static constexpr storage_type psl_mask = ~fingerprint_mask; // 0xFF00
 
-			uint32 pslAndFingerprint;
-			uint32 index;
+			storage_type pslAndFingerprint;
+			storage_type index;
 		};
 
 		template <size_type FingerprintSize>
 		struct hash_map_bucket<true, FingerprintSize>
 		{
+			using storage_type = uint64;
+			using psl_type = unpacked_psl<storage_type>;
+
 			static_assert(FingerprintSize < 64);
-			static constexpr size_type fingerprintSize = FingerprintSize; // bits
+			static constexpr size_type fingerprint_size = FingerprintSize; // bits
 
 			// increment the Nth bit that skips all fingerprint bits.
-			static constexpr size_type pslIncrement = 1 << fingerprintSize;
-			static constexpr size_type fingerprintMask = pslIncrement - 1; // 0xFFFF
+			static constexpr storage_type psl_increment = 1 << fingerprint_size;
+			static constexpr storage_type fingerprint_mask = psl_increment - 1; // 0x0000FFFF
+			static constexpr storage_type psl_mask = ~fingerprint_mask; // 0xFFFF0000
 
-			uint64 pslAndFingerprint;
-			uint64 index;
+			storage_type pslAndFingerprint;
+			storage_type index;
 		};
 	} // namespace internal
 
-	struct move_to_next_tag_type
-	{
-	};
+	struct move_to_next_tag_type {};
 
 	[[maybe_unused]] constexpr move_to_next_tag_type move_to_next_tag{};
 
@@ -243,15 +253,11 @@ namespace rsl
 		hash_map_iterator(const hash_map_iterator<map_type, OtherConst>& other) noexcept
 			requires(IsConst && !OtherConst)
 			: m_node(other.m_node),
-			  m_info(other.m_info)
-		{
-		}
+			  m_info(other.m_info) {}
 
 		hash_map_iterator(node_ptr node, const uint8* info) noexcept
 			: m_node(node),
-			  m_info(info)
-		{
-		}
+			  m_info(info) {}
 
 		hash_map_iterator(node_ptr node, const uint8* info, move_to_next_tag_type) noexcept
 			: m_node(node),
@@ -271,8 +277,8 @@ namespace rsl
 
 		hash_map_iterator& operator++() noexcept
 		{
-			m_info++;
-			m_node++;
+			++m_info;
+			++m_node;
 			find_next();
 			return *this;
 		}
@@ -331,7 +337,7 @@ namespace rsl
 	using const_hash_map_iterator = hash_map_iterator<MapType, true>;
 
 
-	template <typename KeyType, typename Hasher, bool hasIsTransparent = has_is_transparent<Hasher>::value>
+	template <typename KeyType, typename Hasher, bool HasIsTransparent = has_is_transparent<Hasher>::value>
 	struct hasher_wrapper;
 
 	template <typename KeyType, typename Hasher>
@@ -351,7 +357,7 @@ namespace rsl
 	template <typename KeyType, typename Hasher>
 	struct hasher_wrapper<KeyType, Hasher, true>
 	{
-		using is_transparent = Hasher::is_transparent;
+		using is_transparent = typename Hasher::is_transparent;
 
 		Hasher hasher{};
 
@@ -409,7 +415,7 @@ namespace rsl
 		typename Key, typename Value, typename Hash = ::rsl::hash<Key>, typename KeyEqual = equal<Key>,
 		bool IsFlat = true, allocator_type Alloc = default_allocator,
 		typed_factory_type FactoryType = default_factory<internal::map_value_type<Key, Value, IsFlat>>,
-		ratio_type MaxLoadFactor = ::std::ratio<80, 100>, bool IsLarge = false,
+		ratio_type MaxLoadFactor = ::std::ratio<80, 100>, bool IsLarge = true,
 		size_type FingerprintSize = internal::recommended_fingerprint_size<IsLarge>>
 	struct map_info
 	{
@@ -422,6 +428,9 @@ namespace rsl
 		constexpr static bool is_flat = IsFlat;
 
 		using bucket_type = internal::hash_map_bucket<IsLarge, FingerprintSize>;
+		using psl_type = typename bucket_type::psl_type;
+		using storage_type = typename bucket_type::storage_type;
+
 		using hasher_type = hasher_wrapper<key_type, Hash>;
 		using key_comparer_type = KeyEqual;
 
@@ -467,6 +476,8 @@ namespace rsl
 		using value_type = typename MapInfo::value_type;
 		using node_type = internal::map_node<hash_map_base>;
 		using bucket_type = typename MapInfo::bucket_type;
+		using psl_type = typename MapInfo::psl_type;
+		using storage_type = typename MapInfo::storage_type;
 
 		using allocator_t = typename MapInfo::allocator_t;
 		using allocator_storage_type = allocator_storage<allocator_t>;
@@ -477,31 +488,23 @@ namespace rsl
 		hash_map_base() noexcept(MapInfo::nothrow_constructible)
 			: m_hasher(),
 			  m_keyComparer(),
-			  m_memoryPool()
-		{
-		}
+			  m_memoryPool() {}
 
 		hash_map_base(const hasher_type& h, const key_comparer_type& equal)
 			noexcept(MapInfo::nothrow_copy_constructible)
 			: m_hasher(h),
 			  m_keyComparer(equal),
-			  m_memoryPool()
-		{
-		}
+			  m_memoryPool() {}
 
 		explicit hash_map_base(const hasher_type& h) noexcept(MapInfo::nothrow_hasher_copy_constructible)
 			: m_hasher(h),
 			  m_keyComparer(),
-			  m_memoryPool()
-		{
-		}
+			  m_memoryPool() {}
 
 		explicit hash_map_base(const key_comparer_type& equal) noexcept(MapInfo::nothrow_comparer_copy_constructible)
 			: m_hasher(),
 			  m_keyComparer(equal),
-			  m_memoryPool()
-		{
-		}
+			  m_memoryPool() {}
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr memory_pool<value_type>& get_memory_pool() noexcept
 			requires(!is_flat)
@@ -516,23 +519,197 @@ namespace rsl
 		}
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr allocator_t& get_allocator() noexcept { return *m_alloc; }
+
 		[[nodiscard]] [[rythe_always_inline]] constexpr const allocator_t& get_allocator() const noexcept
 		{
 			return *m_alloc;
 		}
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr factory_t& get_factory() noexcept { return *m_factory; }
+
 		[[nodiscard]] [[rythe_always_inline]] constexpr const factory_t& get_factory() const noexcept
 		{
 			return *m_factory;
 		}
 
+	protected:
+		static storage_type pack_bucket_psl(const psl_type& unpackedPsl)
+		{
+			return storage_type((unpackedPsl.psl << bucket_type::fingerprint_size) & unpackedPsl.fingerprint);
+		}
+
+		static psl_type unpack_bucket_psl(const bucket_type& bucket)
+		{
+			psl_type result{};
+			result.psl = bucket.pslAndFingerprint & bucket_type::psl_mask;
+			result.fingerprint = bucket.pslAndFingerprint & bucket_type::fingerprint_mask;
+
+			return result;
+		}
+
+		struct hash_result
+		{
+			storage_type fingerprint;
+			index_type homeIndex;
+		};
+
+		hash_result get_hash_result(const key_type& key) const
+		{
+			id_type hash = hash = m_hasher.hash(key);
+
+			hash_result result{};
+
+			result.fingerprint = result.hash & bucket_type::fingerprint_mask;
+			result.homeIndex = static_cast<index_type>(result.hash % m_buckets.size());
+
+			return result;
+		}
+
+		enum struct search_result_type : uint8
+		{
+			newInsertion,
+			swap,
+			existingItem,
+		};
+
+		struct bucket_search_result
+		{
+			psl_type unpackedPsl;
+			search_result_type type;
+		};
+
+		bucket_search_result find_next_available(index_type homeIndex, storage_type startPsl, storage_type fingerprint,
+		                                         const key_type& key) const
+		{
+			psl_type insertPsl{.psl = startPsl, .fingerprint = fingerprint};
+
+			index_type searchIndex = homeIndex + insertPsl.psl;
+			const size_type bucketCount = m_buckets.size();
+			while (searchIndex < bucketCount)
+			{
+				bucket_type& bucket = m_buckets[searchIndex];
+				if (bucket.pslAndFingerprint == 0u)
+				{
+					return bucket_search_result{.unpackedPsl = insertPsl, .type = search_result_type::newInsertion};
+				}
+
+				psl_type unpackedPsl = unpack_bucket_psl(bucket);
+
+				if (unpackedPsl.psl < insertPsl.psl)
+				{
+					return bucket_search_result{.unpackedPsl = insertPsl, .type = search_result_type::swap};
+				}
+
+				if (unpackedPsl.psl == insertPsl.psl && unpackedPsl.fingerprint == insertPsl.fingerprint)
+				{
+					if (m_keyComparer(m_values[bucket.index].key(), key))
+					{
+						return bucket_search_result{.unpackedPsl = insertPsl, .type = search_result_type::existingItem};
+					}
+				}
+
+				++insertPsl.psl;
+				searchIndex = homeIndex + insertPsl.psl;
+			}
+
+			rsl_assert_consistent(insertPsl.psl == (m_buckets.size() - homeIndex));
+			return bucket_search_result{.unpackedPsl = insertPsl, .type = search_result_type::newInsertion};
+		}
+
+		enum struct insert_result_type : uint8
+		{
+			newInsertion,
+			existingItem,
+		};
+
+		struct insert_result
+		{
+			index_type index;
+			insert_result_type type;
+		};
+
+		insert_result insert_key_internal(const key_type& key, const index_type valueIndexHint)
+		{
+			const hash_result hash = get_hash_result(key);
+
+			bucket_search_result searchResult = find_next_available(hash.homeIndex, 0u, hash.fingerprint, key);
+
+			const insert_result result{
+				.index = hash.homeIndex + searchResult.unpackedPsl.psl,
+				.type =
+				(searchResult.type == search_result_type::existingItem
+					 ? insert_result_type::existingItem
+					 : insert_result_type::newInsertion)
+			};
+
+			bucket_type insertBucket{.plsAndFingerprint = pack_bucket_psl(searchResult.unpackedPsl),
+			                         .index = valueIndexHint};
+
+			index_type currentIndex = result.index;
+			while (searchResult.type == search_result_type::swap)
+			{
+				swap(m_buckets[currentIndex], insertBucket);
+				psl_type insertPsl = unpack_bucket_psl(insertBucket);
+
+				index_type homeIndex = currentIndex - insertPsl.psl;
+
+				searchResult = find_next_available(homeIndex, insertPsl.psl + 1, insertPsl.fingerprint,
+				                                   m_values[insertBucket.index].key());
+				currentIndex = homeIndex + searchResult.unpackedPsl.psl;
+
+				rsl_assert_frequent(searchResult.type != insert_result_type::existingItem);
+			}
+
+			if (searchResult.type == insert_result_type::newInsertion)
+			{
+				if (currentIndex == m_buckets.size())
+				{
+					m_buckets.push_back(insertBucket);
+				}
+				else
+				{
+					m_buckets[currentIndex] = insertBucket;
+				}
+			}
+
+			return result;
+		}
+
+		template<typename... Args>
+		mapped_type& emplace(const key_type& key, Args&&... args)
+		{
+			insert_result insertResult = insert_key_internal(key, m_values.size());
+
+			if (insertResult.type == insert_result_type::newInsertion)
+			{
+				return m_values.emplace_back(*this, key, mapped_type(forward<Args>(args)...)).value();
+			}
+
+			return m_values[m_buckets[insertResult.index].index].value();
+		}
+
+		template<typename... Args>
+		mapped_type& emplace_or_replace(const key_type& key, Args&&... args)
+		{
+			insert_result insertResult = insert_key_internal(key, m_values.size());
+
+			if (insertResult.type == insert_result_type::newInsertion)
+			{
+				return m_values.emplace_back(*this, key, mapped_type(forward<Args>(args)...)).value();
+			}
+
+			mapped_type& value = m_values[m_buckets[insertResult.index].index].value();
+			value = move(mapped_type(forward<Args>(args)...));
+			return value;
+		}
+
 	private:
 		using data_pool = conditional_storage<!is_flat, memory_pool<value_type, allocator_t>>;
-        using value_container = dynamic_array<node_type, allocator_t, factory_t>;
-		using bucket_container = dynamic_array<bucket_type, allocator_t, typename MapInfo::template factory_t<bucket_type>>;
+		using value_container = dynamic_array<node_type, allocator_t, factory_t>;
+		using bucket_container =
+		dynamic_array<bucket_type, allocator_t, typename MapInfo::template factory_t<bucket_type>>;
 
-        value_container m_values;
+		value_container m_values;
 		bucket_container m_buckets;
 
 		hasher_type m_hasher;

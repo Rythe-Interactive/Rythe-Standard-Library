@@ -12,7 +12,7 @@
 
 namespace rsl
 {
-	enum class endian
+	enum class endian : uint8
 	{
 #if RYTHE_PLATFORM_WINDOWS
 		little = 0,

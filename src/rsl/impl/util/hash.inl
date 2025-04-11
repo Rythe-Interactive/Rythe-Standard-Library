@@ -111,7 +111,6 @@ namespace rsl
 				}
 				else
 				{
-
 					if (is_constant_evaluated())
 					{
 						return (
@@ -143,7 +142,6 @@ namespace rsl
 				}
 				else
 				{
-
 					if (is_constant_evaluated())
 					{
 						return (

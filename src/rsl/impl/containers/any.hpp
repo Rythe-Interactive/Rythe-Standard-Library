@@ -1,5 +1,4 @@
 #pragma once
-#include <typeinfo>
 
 #include "../util/assert.hpp"
 #include "../util/common.hpp"
@@ -7,57 +6,49 @@
 
 namespace rsl
 {
-	template <size_type maxSize>
+	template <size_type MaxSize>
 	class any
 	{
 	private:
-		unsigned char m_data[maxSize];
+		unsigned char m_data[MaxSize];
 
 	public:
-		constexpr any() noexcept {}
+		constexpr any() noexcept: m_data{} {}
 
 		any(const any& other) { memcpy(m_data, other.m_data, sizeof(other.m_data)); }
 
 		any(any&& other) noexcept
-			: m_data(std::move(other.m_data))
+			: m_data(move(other.m_data)) {}
+
+		template <
+			class ValueType>
+		explicit any(ValueType&& value)
+			requires (conjunction_v<
+				negation<is_same<decay_t<ValueType>, any>>,
+				negation<rsl::is_specialization<decay_t<ValueType>, in_place_type_signal_type>>,
+				is_copy_constructible<decay_t<ValueType>>>)
 		{
+			emplace<decay_t<ValueType>>(forward<ValueType>(value));
 		}
 
 		template <
-			class ValueType,
-			std::enable_if_t<
-				std::conjunction_v<
-					std::negation<std::is_same<std::decay_t<ValueType>, any>>,
-					std::negation<std::_Is_specialization<std::decay_t<ValueType>, std::in_place_type_t>>,
-					std::is_copy_constructible<std::decay_t<ValueType>>>,
-				int> = 0>
-		any(ValueType&& Value)
+			class ValueType, class... Types>
+		explicit any(in_place_type_signal_type<ValueType>, Types&&... args)
+			requires (conjunction_v<
+				is_constructible<decay_t<ValueType>, Types...>,
+				is_copy_constructible<decay_t<ValueType>>>)
 		{
-			_emplace<std::decay_t<ValueType>>(std::forward<ValueType>(Value));
+			emplace<decay_t<ValueType>>(forward<Types>(args)...);
 		}
 
 		template <
-			class ValueType, class... Types,
-			std::enable_if_t<
-				std::conjunction_v<
-					std::is_constructible<std::decay_t<ValueType>, Types...>,
-					std::is_copy_constructible<std::decay_t<ValueType>>>,
-				int> = 0>
-		explicit any(std::in_place_type_t<ValueType>, Types&&... Args)
+			class ValueType, class Elem, class... Types>
+		explicit any(in_place_type_signal_type<ValueType>, std::initializer_list<Elem> iList, Types&&... args)
+			requires (conjunction_v<
+				is_constructible<decay_t<ValueType>, std::initializer_list<Elem>&, Types...>,
+				is_copy_constructible<decay_t<ValueType>>>)
 		{
-			_emplace<std::decay_t<ValueType>>(std::forward<Types>(Args)...);
-		}
-
-		template <
-			class ValueType, class Elem, class... Types,
-			std::enable_if_t<
-				std::conjunction_v<
-					std::is_constructible<std::decay_t<ValueType>, std::initializer_list<Elem>&, Types...>,
-					std::is_copy_constructible<std::decay_t<ValueType>>>,
-				int> = 0>
-		explicit any(std::in_place_type_t<ValueType>, std::initializer_list<Elem> Ilist, Types&&... Args)
-		{
-			_emplace<std::decay_t<ValueType>>(Ilist, std::forward<Types>(Args)...);
+			emplace<decay_t<ValueType>>(iList, forward<Types>(args)...);
 		}
 
 		~any() noexcept { reset(); }
@@ -71,53 +62,49 @@ namespace rsl
 		any& operator=(any&& other) noexcept
 		{
 			reset();
-			m_data = std::move(other.m_data);
+			m_data = move(other.m_data);
 			return *this;
 		}
 
 		template <
-			class ValueType, std::enable_if_t<
-								 std::conjunction_v<
-									 std::negation<std::is_same<std::decay_t<ValueType>, any>>,
-									 std::is_copy_constructible<std::decay_t<ValueType>>>,
-								 int> = 0>
-		any& operator=(ValueType&& Value)
+			class ValueType>
+		any& operator=(ValueType&& value)
+			requires (conjunction_v<
+				negation<is_same<decay_t<ValueType>, any>>,
+				is_copy_constructible<decay_t<ValueType>>>)
 		{
-			*this = any{std::forward<ValueType>(Value)};
+			*this = any{forward<ValueType>(value)};
 			return *this;
 		}
 
 		template <
-			class ValueType, class... Types,
-			std::enable_if_t<
-				std::conjunction_v<
-					std::is_constructible<std::decay_t<ValueType>, Types...>,
-					std::is_copy_constructible<std::decay_t<ValueType>>>,
-				int> = 0>
-		std::decay_t<ValueType>& emplace(Types&&... Args)
+			class ValueType, class... Types>
+		decay_t<ValueType>& emplace(Types&&... args)
+			requires (conjunction_v<
+				is_constructible<decay_t<ValueType>, Types...>,
+				is_copy_constructible<decay_t<ValueType>>>)
 		{
 			reset();
-			return _emplace<std::decay_t<ValueType>>(std::forward<Types>(Args)...);
+			return emplace<decay_t<ValueType>>(forward<Types>(args)...);
 		}
 
 		template <
-			class ValueType, class Elem, class... Types,
-			std::enable_if_t<
-				std::conjunction_v<
-					std::is_constructible<std::decay_t<ValueType>, std::initializer_list<Elem>&, Types...>,
-					std::is_copy_constructible<std::decay_t<ValueType>>>,
-				int> = 0>
-		std::decay_t<ValueType>& emplace(std::initializer_list<Elem> Ilist, Types&&... Args)
+			class ValueType, class Elem, class... Types>
+		decay_t<ValueType>& emplace(std::initializer_list<Elem> iList, Types&&... args)
+			requires (conjunction_v<
+				is_constructible<decay_t<ValueType>, std::initializer_list<Elem>&, Types...>,
+				is_copy_constructible<decay_t<ValueType>>>)
 		{
 			reset();
-			return _emplace<std::decay_t<ValueType>>(Ilist, std::forward<Types>(Args)...);
+			return emplace<decay_t<ValueType>>(iList, forward<Types>(args)...);
 		}
+
 		void reset() noexcept
 		{
 			// delete m_data;
 		}
 
-		void swap(any& other) noexcept { other = std::exchange(*this, std::move(other)); }
+		void swap(any& other) noexcept { other = std::exchange(*this, move(other)); }
 
 		[[nodiscard]] bool has_value() const noexcept { return m_data != nullptr; }
 
@@ -135,10 +122,10 @@ namespace rsl
 
 	private:
 		template <class Decayed, class... Types>
-		Decayed& _emplace(Types&&... Args)
+		Decayed& emplace(Types&&... args)
 		{
 			auto& obj = reinterpret_cast<Decayed&>(m_data);
-			std::_Construct_in_place(obj, std::forward<Types>(Args)...);
+			construct_at(obj, forward<Types>(args)...);
 			return obj;
 		}
 	};
@@ -150,105 +137,104 @@ namespace rsl
 	}
 
 	template <
-		class ValueType, class... Types,
-		std::enable_if_t<
-			std::is_constructible_v<any<sizeof(ValueType)>, std::in_place_type_t<ValueType>, Types...>, int> = 0>
-	[[nodiscard]] any<sizeof(ValueType)> make_any(Types&&... Args)
+		class ValueType, class... Types>
+	[[nodiscard]] any<sizeof(ValueType)> make_any(Types&&... args)
+		requires (is_constructible_v<any<sizeof(ValueType)>, in_place_type_signal_type<ValueType>, Types...>)
 	{
-		return any<sizeof(ValueType)>{std::in_place_type<ValueType>, std::forward<Types>(Args)...};
+		return any<sizeof(ValueType)>{in_place_type_signal<ValueType>, forward<Types>(args)...};
 	}
 
 	template <
-		class ValueType, class Elem, class... Types,
-		std::enable_if_t<
-			std::is_constructible_v<
-				any<sizeof(ValueType)>, std::in_place_type_t<ValueType>, std::initializer_list<Elem>&, Types...>,
-			int> = 0>
-	[[nodiscard]] any<sizeof(ValueType)> make_any(std::initializer_list<Elem> Ilist, Types&&... Args)
+		class ValueType, class Elem, class... Types>
+	[[nodiscard]] any<sizeof(ValueType)> make_any(std::initializer_list<Elem> iList, Types&&... args)
+		requires (is_constructible_v<
+			any<sizeof(ValueType)>, in_place_type_signal_type<ValueType>, std::initializer_list<Elem>&, Types...>)
 	{
-		return any<sizeof(ValueType)>{std::in_place_type<ValueType>, Ilist, std::forward<Types>(Args)...};
+		return any<sizeof(ValueType)>{in_place_type_signal<ValueType>, iList, forward<Types>(args)...};
 	}
 
 	template <class ValueType>
-	[[nodiscard]] const ValueType* any_cast(const any<sizeof(ValueType)>* const Any) noexcept
+	[[nodiscard]] const ValueType* any_cast(const rsl::any<sizeof(ValueType)>* const any) noexcept
 	{
-		// retrieve a pointer to the ValueType contained in _Any, or null
-		static_assert(!std::is_void_v<ValueType>, "std::any cannot contain void.");
+		// retrieve a pointer to the ValueType contained in any, or null
+		static_assert(!is_void_v<ValueType>, "rsl::any cannot contain void.");
 
-		if constexpr (std::is_function_v<ValueType> || std::is_array_v<ValueType>)
+		if constexpr (is_function_v<ValueType> || is_array_v<ValueType>)
 		{
 			return nullptr;
 		}
 		else
 		{
-			if (!Any)
+			if (!any)
 			{
 				return nullptr;
 			}
 
-			return Any->cast<std::remove_cvref_t<ValueType>>();
+			return any->template cast<remove_cvr_t<ValueType>>();
 		}
 	}
-	template <class ValueType>
-	[[nodiscard]] ValueType* any_cast(any<sizeof(ValueType)>* const Any) noexcept
-	{
-		// retrieve a pointer to the _ValueType contained in _Any, or null
-		static_assert(!std::is_void_v<ValueType>, "std::any cannot contain void.");
 
-		if constexpr (std::is_function_v<ValueType> || std::is_array_v<ValueType>)
+	template <class ValueType>
+	[[nodiscard]] ValueType* any_cast(rsl::any<sizeof(ValueType)>* const any) noexcept
+	{
+		// retrieve a pointer to the ValueType contained in any, or null
+		static_assert(!is_void_v<ValueType>, "rsl::any cannot contain void.");
+
+		if constexpr (is_function_v<ValueType> || is_array_v<ValueType>)
 		{
 			return nullptr;
 		}
 		else
 		{
-			if (!Any)
+			if (!any)
 			{
 				return nullptr;
 			}
 
-			return Any->cast<std::remove_cvref_t<ValueType>>();
+			return any->template cast<remove_cvr_t<ValueType>>();
 		}
 	}
 
-	template <class Ty>
-	[[nodiscard]] std::remove_cv_t<Ty> any_cast(const any<sizeof(Ty)>& Any)
+	template <typename T>
+	[[nodiscard]] remove_cv_t<T> any_cast(const rsl::any<sizeof(T)>& any)
 	{
 		static_assert(
-			std::is_constructible_v<std::remove_cv_t<Ty>, const std::remove_cvref_t<Ty>&>,
+			is_constructible_v<remove_cv_t<T>, const remove_cvr_t<T>&>,
 			"any_cast<T>(const any&) requires remove_cv_t<T> to be constructible from "
 			"const remove_cv_t<remove_reference_t<T>>&"
 		);
 
-		const auto ptr = rsl::any_cast<std::remove_cvref_t<Ty>>(&Any);
+		const T* ptr = rsl::any_cast<remove_cvr_t<T>>(&any);
 		rsl_hard_assert(ptr);
 
-		return static_cast<std::remove_cv_t<Ty>>(*ptr);
+		return static_cast<remove_cv_t<T>>(*ptr);
 	}
 
-	template <class Ty>
-	[[nodiscard]] std::remove_cv_t<Ty> any_cast(any<sizeof(Ty)>& Any)
+	template <typename T>
+	[[nodiscard]] remove_cv_t<T> any_cast(rsl::any<sizeof(T)>& any)
 	{
 		static_assert(
-			std::is_constructible_v<std::remove_cv_t<Ty>, std::remove_cvref_t<Ty>&>,
+			is_constructible_v<remove_cv_t<T>, remove_cvr_t<T>&>,
 			"any_cast<T>(any&) requires remove_cv_t<T> to be constructible from remove_cv_t<remove_reference_t<T>>&"
 		);
 
-		const auto ptr = rsl::any_cast<std::remove_cvref_t<Ty>>(&Any);
+		const T* ptr = rsl::any_cast<remove_cvr_t<T>>(&any);
 		rsl_hard_assert(ptr);
 
-		return static_cast<std::remove_cv_t<Ty>>(*ptr);
+		return static_cast<remove_cv_t<T>>(*ptr);
 	}
-	template <class Ty>
-	[[nodiscard]] std::remove_cv_t<Ty> any_cast(any<sizeof(Ty)>&& Any)
+
+	template <typename T>
+	[[nodiscard]] remove_cv_t<T> any_cast(rsl::any<sizeof(T)>&& any) // NOLINT(cppcoreguidelines*)
 	{
 		static_assert(
-			std::is_constructible_v<std::remove_cv_t<Ty>, std::remove_cvref_t<Ty>>,
+			is_constructible_v<remove_cv_t<T>, remove_cvr_t<T>>,
 			"any_cast<T>(any&&) requires remove_cv_t<T> to be constructible from remove_cv_t<remove_reference_t<T>>"
 		);
 
-		const auto ptr = rsl::any_cast<std::remove_cvref_t<Ty>>(&Any);
+		const T* ptr = rsl::any_cast<remove_cvr_t<T>>(&any);
 		rsl_hard_assert(ptr);
 
-		return static_cast<std::remove_cv_t<Ty>>(std::move(*ptr));
+		return static_cast<remove_cv_t<T>>(move(*ptr));
 	}
 } // namespace rsl
