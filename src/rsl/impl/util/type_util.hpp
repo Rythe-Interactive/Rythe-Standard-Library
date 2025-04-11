@@ -26,20 +26,6 @@ namespace rsl
 	template <template <typename> typename Compare, typename T, T A, T B>
 	inline constexpr bool do_compare_v = do_compare<Compare, T, A, B>::value;
 
-	template <rsl::size_type I, typename Type, typename... Types>
-	struct element_at : element_at<I - 1, Types...>
-	{
-	};
-
-	template <typename Type, typename... Types>
-	struct element_at<0, Type, Types...>
-	{
-		using type = Type;
-	};
-
-	template <rsl::size_type I, typename Type, typename... Types>
-	using element_at_t = typename element_at<I, Type, Types...>::type;
-
 	template <typename T, typename... Args>
 	struct is_brace_constructible
 	{
