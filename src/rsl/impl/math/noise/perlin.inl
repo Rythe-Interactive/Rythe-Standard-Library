@@ -169,11 +169,11 @@ namespace rsl::math
 		}
 		else if constexpr (dimensions == 2)
 		{
-			return internal::_perlin_2d_impl_(::std::forward<VectorType>(value));
+			return internal::_perlin_2d_impl_(forward<VectorType>(value));
 		}
 		else if constexpr (dimensions == 3)
 		{
-			return internal::_perlin_3d_impl_(::std::forward<VectorType>(value));
+			return internal::_perlin_3d_impl_(forward<VectorType>(value));
 		}
 		else
 		{
@@ -199,11 +199,11 @@ namespace rsl::math
 		}
 		else if constexpr (dimensions == 2)
 		{
-			return internal::_perlin_2d_impl_(::std::forward<VectorType>(value), derivative);
+			return internal::_perlin_2d_impl_(forward<VectorType>(value), derivative);
 		}
 		else if constexpr (dimensions == 3)
 		{
-			return internal::_perlin_3d_impl_(::std::forward<VectorType>(value), derivative);
+			return internal::_perlin_3d_impl_(forward<VectorType>(value), derivative);
 		}
 		else
 		{

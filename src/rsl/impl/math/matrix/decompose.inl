@@ -1,5 +1,5 @@
-#include "decompose.hpp"
 #pragma once
+#include "decompose.hpp"
 
 namespace rsl::math
 {

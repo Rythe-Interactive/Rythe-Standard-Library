@@ -170,11 +170,11 @@ namespace rsl::math::noise
 		}
 		else if constexpr (dimensions == 2)
 		{
-			return internal::_value_2d_impl_(seed, ::std::forward<VectorType>(value));
+			return internal::_value_2d_impl_(seed, forward<VectorType>(value));
 		}
 		else if constexpr (dimensions == 3)
 		{
-			return internal::_value_3d_impl_(seed, ::std::forward<VectorType>(value));
+			return internal::_value_3d_impl_(seed, forward<VectorType>(value));
 		}
 		else
 		{
@@ -198,11 +198,11 @@ namespace rsl::math::noise
 		}
 		else if constexpr (dimensions == 2)
 		{
-			return internal::_value_2d_impl_(seed, ::std::forward<VectorType>(value), derivative);
+			return internal::_value_2d_impl_(seed, forward<VectorType>(value), derivative);
 		}
 		else if constexpr (dimensions == 3)
 		{
-			return internal::_value_3d_impl_(seed, ::std::forward<VectorType>(value), derivative);
+			return internal::_value_3d_impl_(seed, forward<VectorType>(value), derivative);
 		}
 		else
 		{

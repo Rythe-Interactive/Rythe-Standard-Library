@@ -16,8 +16,8 @@ namespace rsl::math
 
 		using col_type = vector<scalar, row_count, Mode>;
 
-		template <size_type idx>
-		using row_type = row<scalar, row_count, col_count, idx, Mode>;
+		template <size_type Idx>
+		using row_type = row<scalar, row_count, col_count, Idx, Mode>;
 
 		union
 		{
@@ -47,10 +47,10 @@ namespace rsl::math
 		template <arithmetic_type Scal, math::storage_mode M>
 		[[rythe_always_inline]] explicit constexpr matrix(const quaternion<Scal, M>& orientation) noexcept;
 
-		template <typename mat_type>
-			requires not_same_as<Scalar, typename mat_type::scalar> || (mat_type::row_count != 2) ||
-					 (mat_type::col_count != 2)
-		[[rythe_always_inline]] constexpr matrix(const mat_type& other) noexcept;
+		template <typename MatType>
+			requires not_same_as<Scalar, typename MatType::scalar> || (MatType::row_count != 2) ||
+					 (MatType::col_count != 2)
+		[[rythe_always_inline]] constexpr matrix(const MatType& other) noexcept;
 
 		[[rythe_always_inline]] constexpr matrix& operator=(const matrix&) noexcept = default;
 
@@ -58,6 +58,7 @@ namespace rsl::math
 		[[nodiscard]] [[rythe_always_inline]] constexpr const col_type& operator[](size_type i) const noexcept;
 	};
 
+	using bool2x2 = matrix<bool, 2, 2>;
 	using float2x2 = matrix<float32, 2, 2>;
 	using double2x2 = matrix<float64, 2, 2>;
 } // namespace rsl::math

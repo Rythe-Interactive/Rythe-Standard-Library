@@ -15,21 +15,21 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<Type>)
 		{
-			return internal::compute_cos<quaternion<typename Type::scalar>>::compute(::std::forward<T>(value));
+			return internal::compute_cos<quaternion<typename Type::scalar>>::compute(forward<T>(value));
 		}
 		if constexpr (is_matrix_v<Type>)
 		{
 			return internal::compute_cos<matrix<typename Type::scalar, Type::row_count, Type::col_count>>::compute(
-				::std::forward<T>(value)
+				forward<T>(value)
 			);
 		}
 		if constexpr (is_vector_v<Type>)
 		{
-			return internal::compute_cos<vector<typename Type::scalar, Type::size>>::compute(::std::forward<T>(value));
+			return internal::compute_cos<vector<typename Type::scalar, Type::size>>::compute(forward<T>(value));
 		}
 		else
 		{
-			return ::std::cos(::std::forward<T>(value));
+			return ::std::cos(forward<T>(value));
 		}
 	}
 
@@ -41,22 +41,20 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<Type>)
 		{
-			return internal::compute_cos<quaternion<typename Type::scalar>>::compute_inverse(::std::forward<T>(value));
+			return internal::compute_cos<quaternion<typename Type::scalar>>::compute_inverse(forward<T>(value));
 		}
 		if constexpr (is_matrix_v<Type>)
 		{
-			return internal::compute_cos<matrix<typename Type::scalar, Type::row_count, Type::col_count>>::
-				compute_inverse(::std::forward<T>(value));
+			return internal::compute_cos<
+				matrix<typename Type::scalar, Type::row_count, Type::col_count>>::compute_inverse(forward<T>(value));
 		}
 		if constexpr (is_vector_v<Type>)
 		{
-			return internal::compute_cos<vector<typename Type::scalar, Type::size>>::compute_inverse(
-				::std::forward<T>(value)
-			);
+			return internal::compute_cos<vector<typename Type::scalar, Type::size>>::compute_inverse(forward<T>(value));
 		}
 		else
 		{
-			return ::std::acos(::std::forward<T>(value));
+			return ::std::acos(forward<T>(value));
 		}
 	}
 } // namespace rsl::math

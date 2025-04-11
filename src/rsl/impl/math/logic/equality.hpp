@@ -1,80 +1,44 @@
 #pragma once
-#include "../../util/primitives.hpp"
 #include "../util/close_enough.hpp"
-#include "../vector/vector.hpp"
-#include "invert.hpp"
+#include "../util/type_util.hpp"
 
 namespace rsl::math
 {
 	namespace internal
 	{
-		template <vector_type vec_type>
-		struct compute_equality
-		{
-			using result_type = vector<bool, vec_type::size, vec_type::mode>;
+		template <typename A, typename B>
+		concept equal_comparable_vector =
+			(vector_type<A> && vector_type<B>) ||
+			(vector_type<A> && same_as<typename remove_cvr_t<A>::scalar, remove_cvr_t<B>>) ||
+			(vector_type<B> && same_as<typename remove_cvr_t<B>::scalar, remove_cvr_t<A>>);
 
-			[[nodiscard]] [[rythe_always_inline]] constexpr static result_type
-			compute(const vec_type& a, const vec_type& b) noexcept
-			{
-				result_type result;
-				for (size_type i = 0; i < vec_type::size; i++)
-				{
-					result[i] = close_enough(a[i], b[i]);
-				}
-				return result;
-			}
+		template <typename A, typename B>
+		concept equal_comparable_matrix =
+			(matrix_type<A> && matrix_type<B> && remove_cvr_t<A>::row_count == remove_cvr_t<B>::row_count &&
+			 remove_cvr_t<A>::col_count == remove_cvr_t<B>::col_count) ||
+			(matrix_type<A> && vector_type<B> && remove_cvr_t<A>::row_count == remove_cvr_t<B>::size) ||
+			(matrix_type<A> && same_as<typename remove_cvr_t<A>::scalar, remove_cvr_t<B>>) ||
+			(matrix_type<B> && same_as<typename remove_cvr_t<B>::scalar, remove_cvr_t<A>>);
 
-			[[nodiscard]] [[rythe_always_inline]] constexpr static result_type
-			compute(const vec_type& a, typename vec_type::scalar b) noexcept
-			{
-				result_type result;
-				for (size_type i = 0; i < vec_type::size; i++)
-				{
-					result[i] = close_enough(a[i], b);
-				}
-				return result;
-			}
-		};
+		template <typename A, typename B>
+		concept equal_comparable_quaternion = quat_type<A> && quat_type<B>;
 
-		template <arithmetic_type Scalar, storage_mode Mode>
-		struct compute_equality<vector<Scalar, 1, Mode>>
-		{
-			[[nodiscard]] [[rythe_always_inline]] constexpr static bool compute(Scalar a, Scalar b) noexcept
-			{
-				return close_enough(a, b);
-			}
-		};
+		template <typename A, typename B>
+		concept equal_comparable =
+			equal_comparable_vector<A, B> || equal_comparable_matrix<A, B> || equal_comparable_quaternion<A, B>;
 	} // namespace internal
 
-	template <vector_type vec_type0, vector_type vec_type1>
-	[[nodiscard]] constexpr auto equals(const vec_type0& a, const vec_type1& b) noexcept
-	{
-		return internal::compute_equality<elevated_t<vec_type0, vec_type1>>::compute(a, b);
-	}
+	template <typename A, typename B>
+		requires internal::equal_comparable<A, B>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto equal(A&& a, B&& b) noexcept;
 
-	template <vector_type vec_type0, vector_type vec_type1>
-	[[nodiscard]] constexpr auto operator==(const vec_type0& a, const vec_type1& b) noexcept
-	{
-		return internal::compute_equality<elevated_t<vec_type0, vec_type1>>::compute(a, b);
-	}
+	template <typename A, typename B>
+		requires internal::equal_comparable<A, B>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto operator==(A&& a, B&& b) noexcept;
 
-	template <vector_type vec_type0, vector_type vec_type1>
-	[[nodiscard]] constexpr auto operator!=(const vec_type0& a, const vec_type1& b) noexcept
-	{
-		return !internal::compute_equality<elevated_t<vec_type0, vec_type1>>::compute(a, b);
-	}
-
-	template <vector_type vec_type>
-	[[nodiscard]] constexpr auto equals(const vec_type& a, typename vec_type::scalar b) noexcept
-	{
-		return internal::compute_equality<vec_type>::compute(a, b);
-	}
-
-	template <vector_type vec_type>
-	[[nodiscard]] constexpr vector<bool, vec_type::size, vec_type::mode>
-	operator!=(const vec_type& a, typename vec_type::scalar b) noexcept
-	{
-		auto result = internal::compute_equality<vec_type>::compute(a, b);
-		return !result;
-	}
+	template <typename A, typename B>
+		requires internal::equal_comparable<A, B>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto operator!=(A&& a, B&& b) noexcept;
 } // namespace rsl::math
+
+#include "equality.inl"

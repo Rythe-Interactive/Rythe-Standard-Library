@@ -61,6 +61,7 @@ namespace rsl::math
 		[[nodiscard]] [[rythe_always_inline]] constexpr const col_type& operator[](size_type i) const noexcept;
 	};
 
+	using bool3x3 = matrix<bool, 3, 3>;
 	using float3x3 = matrix<float32, 3, 3>;
 	using double3x3 = matrix<float64, 3, 3>;
 } // namespace rsl::math

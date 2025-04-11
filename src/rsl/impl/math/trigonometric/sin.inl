@@ -15,21 +15,21 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<Type>)
 		{
-			return internal::compute_sin<quaternion<typename Type::scalar>>::compute(::std::forward<T>(value));
+			return internal::compute_sin<quaternion<typename Type::scalar>>::compute(forward<T>(value));
 		}
 		if constexpr (is_matrix_v<Type>)
 		{
 			return internal::compute_sin<matrix<typename Type::scalar, Type::row_count, Type::col_count>>::compute(
-				::std::forward<T>(value)
+				forward<T>(value)
 			);
 		}
 		if constexpr (is_vector_v<Type>)
 		{
-			return internal::compute_sin<vector<typename Type::scalar, Type::size>>::compute(::std::forward<T>(value));
+			return internal::compute_sin<vector<typename Type::scalar, Type::size>>::compute(forward<T>(value));
 		}
 		else
 		{
-			return ::std::sin(::std::forward<T>(value));
+			return ::std::sin(forward<T>(value));
 		}
 	}
 
@@ -41,22 +41,20 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<Type>)
 		{
-			return internal::compute_sin<quaternion<typename Type::scalar>>::compute_inverse(::std::forward<T>(value));
+			return internal::compute_sin<quaternion<typename Type::scalar>>::compute_inverse(forward<T>(value));
 		}
 		if constexpr (is_matrix_v<Type>)
 		{
-			return internal::compute_sin<matrix<typename Type::scalar, Type::row_count, Type::col_count>>::
-				compute_inverse(::std::forward<T>(value));
+			return internal::compute_sin<
+				matrix<typename Type::scalar, Type::row_count, Type::col_count>>::compute_inverse(forward<T>(value));
 		}
 		if constexpr (is_vector_v<Type>)
 		{
-			return internal::compute_sin<vector<typename Type::scalar, Type::size>>::compute_inverse(
-				::std::forward<T>(value)
-			);
+			return internal::compute_sin<vector<typename Type::scalar, Type::size>>::compute_inverse(forward<T>(value));
 		}
 		else
 		{
-			return ::std::asin(::std::forward<T>(value));
+			return ::std::asin(forward<T>(value));
 		}
 	}
 } // namespace rsl::math

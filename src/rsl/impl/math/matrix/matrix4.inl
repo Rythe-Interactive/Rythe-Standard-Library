@@ -3,9 +3,15 @@
 
 #define ROW_COUNT_SPECIALIZATION 4
 #define COL_COUNT_SPECIALIZATION 4
-#define SCALAR_SPECIALIZATION Scalar
-#define MATRIX_TEMPLATE template <arithmetic_type Scalar, storage_mode Mode>
+#define MATRIX_TEMPLATE template <arithmetic_type SCALAR_SPECIALIZATION, storage_mode MODE_SPECIALIZATION>
 
+#include "matrix_shared.inl"
+
+
+#define SCALAR_SPECIALIZATION bool
+#define ROW_COUNT_SPECIALIZATION 4
+#define COL_COUNT_SPECIALIZATION 4
+#define MATRIX_TEMPLATE template <storage_mode MODE_SPECIALIZATION>
 #include "matrix_shared.inl"
 
 namespace rsl::math

@@ -9,21 +9,21 @@ TEST_CASE("vectors", "[math]")
 	using namespace rsl;
 	using namespace rsl::math;
 
-	constexpr float32 CONST0 = 123.456f;
-	constexpr float32 CONST1 = 234.567f;
-	constexpr float32 CONST2 = 345.678f;
-	constexpr float32 CONST3 = 456.789f;
-	constexpr float32 CONST4 = 567.891f;
-	constexpr float32 CONST5 = 678.912f;
+	constexpr float32 const0 = 123.456f;
+	constexpr float32 const1 = 234.567f;
+	constexpr float32 const2 = 345.678f;
+	constexpr float32 const3 = 456.789f;
+	constexpr float32 const4 = 567.891f;
+	constexpr float32 const5 = 678.912f;
 
 	SECTION("vector 1")
 	{
-		constexpr float1 vec0(CONST0);
+		constexpr float1 vec0(const0);
 
-		REQUIRE(vec0.x == CONST0);
-		REQUIRE(vec0.xx == float2(CONST0, CONST0));
-		REQUIRE(vec0.xxx == float3(CONST0, CONST0, CONST0));
-		REQUIRE(vec0.xxxx == float4(CONST0, CONST0, CONST0, CONST0));
+		REQUIRE(vec0.x == const0);
+		REQUIRE(vec0.xx == float2(const0, const0));
+		REQUIRE(vec0.xxx == float3(const0, const0, const0));
+		REQUIRE(vec0.xxxx == float4(const0, const0, const0, const0));
 
 		REQUIRE(vec0.x == vec0.u);
 		REQUIRE(vec0.x == vec0.r);
@@ -38,31 +38,31 @@ TEST_CASE("vectors", "[math]")
 		REQUIRE(vec0.xxxx == vec0.rrrr);
 		REQUIRE(vec0.xxxx == vec0.ssss);
 
-		constexpr float1 vec1(CONST1);
+		constexpr float1 vec1(const1);
 
-		REQUIRE(vec1 != CONST0);
+		REQUIRE(vec1 != const0);
 		REQUIRE(vec0.x != vec1.x);
 		REQUIRE(vec0 != vec1);
 
 		{
 			constexpr float1 result = vec0 + vec1;
-			REQUIRE(result.x == (CONST0 + CONST1));
+			REQUIRE(result.x == (const0 + const1));
 		}
 		{
 			constexpr float1 result = vec0 - vec1;
-			REQUIRE(result.x == (CONST0 - CONST1));
+			REQUIRE(result.x == (const0 - const1));
 		}
 		{
 			constexpr float1 result = vec0 * vec1;
-			REQUIRE(result.x == (CONST0 * CONST1));
+			REQUIRE(result.x == (const0 * const1));
 		}
 		{
 			constexpr float1 result = vec0 / vec1;
-			REQUIRE(result.x == (CONST0 / CONST1));
+			REQUIRE(result.x == (const0 / const1));
 		}
 		{
 			constexpr float1 result = -vec0;
-			REQUIRE(result.x == (-CONST0));
+			REQUIRE(result.x == (-const0));
 		}
 		{
 			constexpr bool1 result = vec0 > vec1;
@@ -80,19 +80,19 @@ TEST_CASE("vectors", "[math]")
 
 	SECTION("vector 2")
 	{
-		REQUIRE(float2(CONST0, CONST0) == float2(CONST0));
+		REQUIRE(float2(const0, const0) == float2(const0));
 
-		constexpr float2 vec0(CONST0, CONST3);
+		constexpr float2 vec0(const0, const3);
 
-		REQUIRE(vec0.x == CONST0);
-		REQUIRE(vec0.xx == float2(CONST0, CONST0));
-		REQUIRE(vec0.xxx == float3(CONST0, CONST0, CONST0));
-		REQUIRE(vec0.xxxx == float4(CONST0, CONST0, CONST0, CONST0));
+		REQUIRE(vec0.x == const0);
+		REQUIRE(vec0.xx == float2(const0, const0));
+		REQUIRE(vec0.xxx == float3(const0, const0, const0));
+		REQUIRE(vec0.xxxx == float4(const0, const0, const0, const0));
 
-		REQUIRE(vec0.y == CONST3);
-		REQUIRE(vec0.yy == float2(CONST3, CONST3));
-		REQUIRE(vec0.yyy == float3(CONST3, CONST3, CONST3));
-		REQUIRE(vec0.yyyy == float4(CONST3, CONST3, CONST3, CONST3));
+		REQUIRE(vec0.y == const3);
+		REQUIRE(vec0.yy == float2(const3, const3));
+		REQUIRE(vec0.yyy == float3(const3, const3, const3));
+		REQUIRE(vec0.yyyy == float4(const3, const3, const3, const3));
 
 		REQUIRE(vec0.x == vec0.u);
 		REQUIRE(vec0.x == vec0.r);
@@ -120,72 +120,72 @@ TEST_CASE("vectors", "[math]")
 		REQUIRE(vec0.yyyy == vec0.gggg);
 		REQUIRE(vec0.yyyy == vec0.tttt);
 
-		REQUIRE(vec0.xyyx == float4(CONST0, CONST3, CONST3, CONST0));
-		REQUIRE(vec0.xyxy == float4(CONST0, CONST3, CONST0, CONST3));
-		REQUIRE(vec0.yxxy == float4(CONST3, CONST0, CONST0, CONST3));
-		REQUIRE(vec0.yxyx == float4(CONST3, CONST0, CONST3, CONST0));
+		REQUIRE(vec0.xyyx == float4(const0, const3, const3, const0));
+		REQUIRE(vec0.xyxy == float4(const0, const3, const0, const3));
+		REQUIRE(vec0.yxxy == float4(const3, const0, const0, const3));
+		REQUIRE(vec0.yxyx == float4(const3, const0, const3, const0));
 
-		REQUIRE(any(vec0 != CONST0));
-		REQUIRE(!all(vec0 != CONST0));
-		REQUIRE(all(vec0 != CONST2));
+		REQUIRE(any(vec0 != const0));
+		REQUIRE(!all(vec0 != const0));
+		REQUIRE(all(vec0 != const2));
 
-		constexpr float2 vec1(CONST2);
+		constexpr float2 vec1(const2);
 
-		REQUIRE(vec1 != CONST0);
+		REQUIRE(vec1 != const0);
 		REQUIRE(vec0.x != vec1.x);
 		REQUIRE(vec0.y != vec1.y);
 		REQUIRE(vec0 != vec1);
 
-		constexpr float2 vec2(CONST0, CONST4);
+		constexpr float2 vec2(const0, const4);
 
 		{
 
 			constexpr float2 result = vec0 + vec1;
 
-			REQUIRE(result.x == (CONST0 + CONST2));
-			REQUIRE(result.y == (CONST3 + CONST2));
+			REQUIRE(result.x == (const0 + const2));
+			REQUIRE(result.y == (const3 + const2));
 		}
 		{
 
-			constexpr float2 result = vec0 + CONST1;
+			constexpr float2 result = vec0 + const1;
 
-			REQUIRE(result.x == (CONST0 + CONST1));
-			REQUIRE(result.y == (CONST3 + CONST1));
+			REQUIRE(result.x == (const0 + const1));
+			REQUIRE(result.y == (const3 + const1));
 		}
 		{
 			constexpr float2 result = vec0 - vec1;
-			REQUIRE(result.x == (CONST0 - CONST2));
-			REQUIRE(result.y == (CONST3 - CONST2));
+			REQUIRE(result.x == (const0 - const2));
+			REQUIRE(result.y == (const3 - const2));
 		}
 		{
-			constexpr float2 result = vec0 - CONST1;
-			REQUIRE(result.x == (CONST0 - CONST1));
-			REQUIRE(result.y == (CONST3 - CONST1));
+			constexpr float2 result = vec0 - const1;
+			REQUIRE(result.x == (const0 - const1));
+			REQUIRE(result.y == (const3 - const1));
 		}
 		{
 			constexpr float2 result = vec0 * vec1;
-			REQUIRE(result.x == (CONST0 * CONST2));
-			REQUIRE(result.y == (CONST3 * CONST2));
+			REQUIRE(result.x == (const0 * const2));
+			REQUIRE(result.y == (const3 * const2));
 		}
 		{
-			constexpr float2 result = vec0 * CONST1;
-			REQUIRE(result.x == (CONST0 * CONST1));
-			REQUIRE(result.y == (CONST3 * CONST1));
+			constexpr float2 result = vec0 * const1;
+			REQUIRE(result.x == (const0 * const1));
+			REQUIRE(result.y == (const3 * const1));
 		}
 		{
 			constexpr float2 result = vec0 / vec1;
-			REQUIRE(result.x == (CONST0 / CONST2));
-			REQUIRE(result.y == (CONST3 / CONST2));
+			REQUIRE(result.x == (const0 / const2));
+			REQUIRE(result.y == (const3 / const2));
 		}
 		{
-			constexpr float2 result = vec0 / CONST1;
-			REQUIRE(result.x == (CONST0 / CONST1));
-			REQUIRE(result.y == (CONST3 / CONST1));
+			constexpr float2 result = vec0 / const1;
+			REQUIRE(result.x == (const0 / const1));
+			REQUIRE(result.y == (const3 / const1));
 		}
 		{
 			constexpr float2 result = -vec0;
-			REQUIRE(result.x == (-CONST0));
-			REQUIRE(result.y == (-CONST3));
+			REQUIRE(result.x == (-const0));
+			REQUIRE(result.y == (-const3));
 		}
 		{
 			constexpr bool2 result = vec0 > vec1;
@@ -194,7 +194,7 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(result.y);
 		}
 		{
-			constexpr bool2 result = vec0 > CONST1;
+			constexpr bool2 result = vec0 > const1;
 			REQUIRE(!bool(result));
 			REQUIRE(!result.x);
 			REQUIRE(result.y);
@@ -206,7 +206,7 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(!result.y);
 		}
 		{
-			constexpr bool2 result = vec0 < CONST1;
+			constexpr bool2 result = vec0 < const1;
 			REQUIRE(!bool(result));
 			REQUIRE(result.x);
 			REQUIRE(!result.y);
@@ -218,7 +218,7 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(!result.y);
 		}
 		{
-			constexpr bool2 result = vec0 >= CONST3;
+			constexpr bool2 result = vec0 >= const3;
 			REQUIRE(!bool(result));
 			REQUIRE(!result.x);
 			REQUIRE(result.y);
@@ -230,7 +230,7 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(result.y);
 		}
 		{
-			constexpr bool2 result = vec0 <= CONST0;
+			constexpr bool2 result = vec0 <= const0;
 			REQUIRE(!bool(result));
 			REQUIRE(result.x);
 			REQUIRE(!result.y);
@@ -246,24 +246,24 @@ TEST_CASE("vectors", "[math]")
 
 	SECTION("vector 3")
 	{
-		REQUIRE(float3(CONST0, CONST0, CONST0) == float3(CONST0));
+		REQUIRE(float3(const0, const0, const0) == float3(const0));
 
-		constexpr float3 vec0(CONST0, CONST3, CONST1);
+		constexpr float3 vec0(const0, const3, const1);
 
-		REQUIRE(vec0.x == CONST0);
-		REQUIRE(vec0.xx == float2(CONST0, CONST0));
-		REQUIRE(vec0.xxx == float3(CONST0, CONST0, CONST0));
-		REQUIRE(vec0.xxxx == float4(CONST0, CONST0, CONST0, CONST0));
+		REQUIRE(vec0.x == const0);
+		REQUIRE(vec0.xx == float2(const0, const0));
+		REQUIRE(vec0.xxx == float3(const0, const0, const0));
+		REQUIRE(vec0.xxxx == float4(const0, const0, const0, const0));
 
-		REQUIRE(vec0.y == CONST3);
-		REQUIRE(vec0.yy == float2(CONST3, CONST3));
-		REQUIRE(vec0.yyy == float3(CONST3, CONST3, CONST3));
-		REQUIRE(vec0.yyyy == float4(CONST3, CONST3, CONST3, CONST3));
+		REQUIRE(vec0.y == const3);
+		REQUIRE(vec0.yy == float2(const3, const3));
+		REQUIRE(vec0.yyy == float3(const3, const3, const3));
+		REQUIRE(vec0.yyyy == float4(const3, const3, const3, const3));
 
-		REQUIRE(vec0.z == CONST1);
-		REQUIRE(vec0.zz == float2(CONST1, CONST1));
-		REQUIRE(vec0.zzz == float3(CONST1, CONST1, CONST1));
-		REQUIRE(vec0.zzzz == float4(CONST1, CONST1, CONST1, CONST1));
+		REQUIRE(vec0.z == const1);
+		REQUIRE(vec0.zz == float2(const1, const1));
+		REQUIRE(vec0.zzz == float3(const1, const1, const1));
+		REQUIRE(vec0.zzzz == float4(const1, const1, const1, const1));
 
 		REQUIRE(vec0.x == vec0.u);
 		REQUIRE(vec0.x == vec0.r);
@@ -304,97 +304,97 @@ TEST_CASE("vectors", "[math]")
 		REQUIRE(vec0.zzzz == vec0.bbbb);
 		REQUIRE(vec0.zzzz == vec0.pppp);
 
-		REQUIRE(vec0.xyyx == float4(CONST0, CONST3, CONST3, CONST0));
-		REQUIRE(vec0.xyxy == float4(CONST0, CONST3, CONST0, CONST3));
-		REQUIRE(vec0.yxxy == float4(CONST3, CONST0, CONST0, CONST3));
-		REQUIRE(vec0.yxyx == float4(CONST3, CONST0, CONST3, CONST0));
+		REQUIRE(vec0.xyyx == float4(const0, const3, const3, const0));
+		REQUIRE(vec0.xyxy == float4(const0, const3, const0, const3));
+		REQUIRE(vec0.yxxy == float4(const3, const0, const0, const3));
+		REQUIRE(vec0.yxyx == float4(const3, const0, const3, const0));
 
-		REQUIRE(vec0.xzzx == float4(CONST0, CONST1, CONST1, CONST0));
-		REQUIRE(vec0.xzxz == float4(CONST0, CONST1, CONST0, CONST1));
-		REQUIRE(vec0.zxxz == float4(CONST1, CONST0, CONST0, CONST1));
-		REQUIRE(vec0.zxzx == float4(CONST1, CONST0, CONST1, CONST0));
+		REQUIRE(vec0.xzzx == float4(const0, const1, const1, const0));
+		REQUIRE(vec0.xzxz == float4(const0, const1, const0, const1));
+		REQUIRE(vec0.zxxz == float4(const1, const0, const0, const1));
+		REQUIRE(vec0.zxzx == float4(const1, const0, const1, const0));
 
-		REQUIRE(vec0.zyyz == float4(CONST1, CONST3, CONST3, CONST1));
-		REQUIRE(vec0.zyzy == float4(CONST1, CONST3, CONST1, CONST3));
-		REQUIRE(vec0.yzzy == float4(CONST3, CONST1, CONST1, CONST3));
-		REQUIRE(vec0.yzyz == float4(CONST3, CONST1, CONST3, CONST1));
+		REQUIRE(vec0.zyyz == float4(const1, const3, const3, const1));
+		REQUIRE(vec0.zyzy == float4(const1, const3, const1, const3));
+		REQUIRE(vec0.yzzy == float4(const3, const1, const1, const3));
+		REQUIRE(vec0.yzyz == float4(const3, const1, const3, const1));
 
-		REQUIRE(vec0.zyxz == float4(CONST1, CONST3, CONST0, CONST1));
-		REQUIRE(vec0.zxzy == float4(CONST1, CONST0, CONST1, CONST3));
-		REQUIRE(vec0.yzzx == float4(CONST3, CONST1, CONST1, CONST0));
-		REQUIRE(vec0.yzxz == float4(CONST3, CONST1, CONST0, CONST1));
+		REQUIRE(vec0.zyxz == float4(const1, const3, const0, const1));
+		REQUIRE(vec0.zxzy == float4(const1, const0, const1, const3));
+		REQUIRE(vec0.yzzx == float4(const3, const1, const1, const0));
+		REQUIRE(vec0.yzxz == float4(const3, const1, const0, const1));
 
-		REQUIRE(any(vec0 != CONST0));
-		REQUIRE(!all(vec0 != CONST0));
-		REQUIRE(all(vec0 != CONST2));
+		REQUIRE(any(vec0 != const0));
+		REQUIRE(!all(vec0 != const0));
+		REQUIRE(all(vec0 != const2));
 
-		constexpr float3 vec1(CONST2);
+		constexpr float3 vec1(const2);
 
-		REQUIRE(vec1 != CONST0);
+		REQUIRE(vec1 != const0);
 		REQUIRE(vec0.x != vec1.x);
 		REQUIRE(vec0.y != vec1.y);
 		REQUIRE(vec0.z != vec1.z);
 		REQUIRE(vec0 != vec1);
 
-		constexpr float3 vec2(CONST0, CONST4, CONST1);
+		constexpr float3 vec2(const0, const4, const1);
 
 		{
 
 			constexpr float3 result = vec0 + vec1;
 
-			REQUIRE(result.x == (CONST0 + CONST2));
-			REQUIRE(result.y == (CONST3 + CONST2));
-			REQUIRE(result.z == (CONST1 + CONST2));
+			REQUIRE(result.x == (const0 + const2));
+			REQUIRE(result.y == (const3 + const2));
+			REQUIRE(result.z == (const1 + const2));
 		}
 		{
 
-			constexpr float3 result = vec0 + CONST1;
+			constexpr float3 result = vec0 + const1;
 
-			REQUIRE(result.x == (CONST0 + CONST1));
-			REQUIRE(result.y == (CONST3 + CONST1));
-			REQUIRE(result.z == (CONST1 + CONST1));
+			REQUIRE(result.x == (const0 + const1));
+			REQUIRE(result.y == (const3 + const1));
+			REQUIRE(result.z == (const1 + const1));
 		}
 		{
 			constexpr float3 result = vec0 - vec1;
-			REQUIRE(result.x == (CONST0 - CONST2));
-			REQUIRE(result.y == (CONST3 - CONST2));
-			REQUIRE(result.z == (CONST1 - CONST2));
+			REQUIRE(result.x == (const0 - const2));
+			REQUIRE(result.y == (const3 - const2));
+			REQUIRE(result.z == (const1 - const2));
 		}
 		{
-			constexpr float3 result = vec0 - CONST1;
-			REQUIRE(result.x == (CONST0 - CONST1));
-			REQUIRE(result.y == (CONST3 - CONST1));
-			REQUIRE(result.z == (CONST1 - CONST1));
+			constexpr float3 result = vec0 - const1;
+			REQUIRE(result.x == (const0 - const1));
+			REQUIRE(result.y == (const3 - const1));
+			REQUIRE(result.z == (const1 - const1));
 		}
 		{
 			constexpr float3 result = vec0 * vec1;
-			REQUIRE(result.x == (CONST0 * CONST2));
-			REQUIRE(result.y == (CONST3 * CONST2));
-			REQUIRE(result.z == (CONST1 * CONST2));
+			REQUIRE(result.x == (const0 * const2));
+			REQUIRE(result.y == (const3 * const2));
+			REQUIRE(result.z == (const1 * const2));
 		}
 		{
-			constexpr float3 result = vec0 * CONST1;
-			REQUIRE(result.x == (CONST0 * CONST1));
-			REQUIRE(result.y == (CONST3 * CONST1));
-			REQUIRE(result.z == (CONST1 * CONST1));
+			constexpr float3 result = vec0 * const1;
+			REQUIRE(result.x == (const0 * const1));
+			REQUIRE(result.y == (const3 * const1));
+			REQUIRE(result.z == (const1 * const1));
 		}
 		{
 			constexpr float3 result = vec0 / vec1;
-			REQUIRE(result.x == (CONST0 / CONST2));
-			REQUIRE(result.y == (CONST3 / CONST2));
-			REQUIRE(result.z == (CONST1 / CONST2));
+			REQUIRE(result.x == (const0 / const2));
+			REQUIRE(result.y == (const3 / const2));
+			REQUIRE(result.z == (const1 / const2));
 		}
 		{
-			constexpr float3 result = vec0 / CONST1;
-			REQUIRE(result.x == (CONST0 / CONST1));
-			REQUIRE(result.y == (CONST3 / CONST1));
-			REQUIRE(result.z == (CONST1 / CONST1));
+			constexpr float3 result = vec0 / const1;
+			REQUIRE(result.x == (const0 / const1));
+			REQUIRE(result.y == (const3 / const1));
+			REQUIRE(result.z == (const1 / const1));
 		}
 		{
 			constexpr float3 result = -vec0;
-			REQUIRE(result.x == (-CONST0));
-			REQUIRE(result.y == (-CONST3));
-			REQUIRE(result.z == (-CONST1));
+			REQUIRE(result.x == (-const0));
+			REQUIRE(result.y == (-const3));
+			REQUIRE(result.z == (-const1));
 		}
 		{
 			constexpr bool3 result = vec0 > vec1;
@@ -404,7 +404,7 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(!result.z);
 		}
 		{
-			constexpr bool3 result = vec0 > CONST1;
+			constexpr bool3 result = vec0 > const1;
 			REQUIRE(!bool(result));
 			REQUIRE(!result.x);
 			REQUIRE(result.y);
@@ -418,7 +418,7 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(result.z);
 		}
 		{
-			constexpr bool3 result = vec0 < CONST1;
+			constexpr bool3 result = vec0 < const1;
 			REQUIRE(!bool(result));
 			REQUIRE(result.x);
 			REQUIRE(!result.y);
@@ -432,7 +432,7 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(result.z);
 		}
 		{
-			constexpr bool3 result = vec0 >= CONST3;
+			constexpr bool3 result = vec0 >= const3;
 			REQUIRE(!bool(result));
 			REQUIRE(!result.x);
 			REQUIRE(result.y);
@@ -446,7 +446,7 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(result.z);
 		}
 		{
-			constexpr bool3 result = vec0 <= CONST0;
+			constexpr bool3 result = vec0 <= const0;
 			REQUIRE(!bool(result));
 			REQUIRE(result.x);
 			REQUIRE(!result.y);
@@ -464,24 +464,24 @@ TEST_CASE("vectors", "[math]")
 
 	SECTION("vector 4")
 	{
-		REQUIRE(float4(CONST0, CONST0, CONST0, CONST0) == float4(CONST0));
+		REQUIRE(float4(const0, const0, const0, const0) == float4(const0));
 
-		constexpr float4 vec0(CONST0, CONST3, CONST1, CONST5);
+		constexpr float4 vec0(const0, const3, const1, const5);
 
-		REQUIRE(vec0.x == CONST0);
-		REQUIRE(vec0.xx == float2(CONST0, CONST0));
-		REQUIRE(vec0.xxx == float3(CONST0, CONST0, CONST0));
-		REQUIRE(vec0.xxxx == float4(CONST0, CONST0, CONST0, CONST0));
+		REQUIRE(vec0.x == const0);
+		REQUIRE(vec0.xx == float2(const0, const0));
+		REQUIRE(vec0.xxx == float3(const0, const0, const0));
+		REQUIRE(vec0.xxxx == float4(const0, const0, const0, const0));
 
-		REQUIRE(vec0.y == CONST3);
-		REQUIRE(vec0.yy == float2(CONST3, CONST3));
-		REQUIRE(vec0.yyy == float3(CONST3, CONST3, CONST3));
-		REQUIRE(vec0.yyyy == float4(CONST3, CONST3, CONST3, CONST3));
+		REQUIRE(vec0.y == const3);
+		REQUIRE(vec0.yy == float2(const3, const3));
+		REQUIRE(vec0.yyy == float3(const3, const3, const3));
+		REQUIRE(vec0.yyyy == float4(const3, const3, const3, const3));
 
-		REQUIRE(vec0.z == CONST1);
-		REQUIRE(vec0.zz == float2(CONST1, CONST1));
-		REQUIRE(vec0.zzz == float3(CONST1, CONST1, CONST1));
-		REQUIRE(vec0.zzzz == float4(CONST1, CONST1, CONST1, CONST1));
+		REQUIRE(vec0.z == const1);
+		REQUIRE(vec0.zz == float2(const1, const1));
+		REQUIRE(vec0.zzz == float3(const1, const1, const1));
+		REQUIRE(vec0.zzzz == float4(const1, const1, const1, const1));
 
 		REQUIRE(vec0.x == vec0.r);
 		REQUIRE(vec0.x == vec0.s);
@@ -519,122 +519,122 @@ TEST_CASE("vectors", "[math]")
 		REQUIRE(vec0.wwww == vec0.aaaa);
 		REQUIRE(vec0.wwww == vec0.qqqq);
 
-		REQUIRE(vec0.xyyx == float4(CONST0, CONST3, CONST3, CONST0));
-		REQUIRE(vec0.xyxy == float4(CONST0, CONST3, CONST0, CONST3));
-		REQUIRE(vec0.yxxy == float4(CONST3, CONST0, CONST0, CONST3));
-		REQUIRE(vec0.yxyx == float4(CONST3, CONST0, CONST3, CONST0));
+		REQUIRE(vec0.xyyx == float4(const0, const3, const3, const0));
+		REQUIRE(vec0.xyxy == float4(const0, const3, const0, const3));
+		REQUIRE(vec0.yxxy == float4(const3, const0, const0, const3));
+		REQUIRE(vec0.yxyx == float4(const3, const0, const3, const0));
 
-		REQUIRE(vec0.xzzx == float4(CONST0, CONST1, CONST1, CONST0));
-		REQUIRE(vec0.xzxz == float4(CONST0, CONST1, CONST0, CONST1));
-		REQUIRE(vec0.zxxz == float4(CONST1, CONST0, CONST0, CONST1));
-		REQUIRE(vec0.zxzx == float4(CONST1, CONST0, CONST1, CONST0));
+		REQUIRE(vec0.xzzx == float4(const0, const1, const1, const0));
+		REQUIRE(vec0.xzxz == float4(const0, const1, const0, const1));
+		REQUIRE(vec0.zxxz == float4(const1, const0, const0, const1));
+		REQUIRE(vec0.zxzx == float4(const1, const0, const1, const0));
 
-		REQUIRE(vec0.zyyz == float4(CONST1, CONST3, CONST3, CONST1));
-		REQUIRE(vec0.zyzy == float4(CONST1, CONST3, CONST1, CONST3));
-		REQUIRE(vec0.yzzy == float4(CONST3, CONST1, CONST1, CONST3));
-		REQUIRE(vec0.yzyz == float4(CONST3, CONST1, CONST3, CONST1));
+		REQUIRE(vec0.zyyz == float4(const1, const3, const3, const1));
+		REQUIRE(vec0.zyzy == float4(const1, const3, const1, const3));
+		REQUIRE(vec0.yzzy == float4(const3, const1, const1, const3));
+		REQUIRE(vec0.yzyz == float4(const3, const1, const3, const1));
 
-		REQUIRE(vec0.xwwx == float4(CONST0, CONST5, CONST5, CONST0));
-		REQUIRE(vec0.xwxw == float4(CONST0, CONST5, CONST0, CONST5));
-		REQUIRE(vec0.wxxw == float4(CONST5, CONST0, CONST0, CONST5));
-		REQUIRE(vec0.wxwx == float4(CONST5, CONST0, CONST5, CONST0));
+		REQUIRE(vec0.xwwx == float4(const0, const5, const5, const0));
+		REQUIRE(vec0.xwxw == float4(const0, const5, const0, const5));
+		REQUIRE(vec0.wxxw == float4(const5, const0, const0, const5));
+		REQUIRE(vec0.wxwx == float4(const5, const0, const5, const0));
 
-		REQUIRE(vec0.wzzw == float4(CONST5, CONST1, CONST1, CONST5));
-		REQUIRE(vec0.wzwz == float4(CONST5, CONST1, CONST5, CONST1));
-		REQUIRE(vec0.zwwz == float4(CONST1, CONST5, CONST5, CONST1));
-		REQUIRE(vec0.zwzw == float4(CONST1, CONST5, CONST1, CONST5));
+		REQUIRE(vec0.wzzw == float4(const5, const1, const1, const5));
+		REQUIRE(vec0.wzwz == float4(const5, const1, const5, const1));
+		REQUIRE(vec0.zwwz == float4(const1, const5, const5, const1));
+		REQUIRE(vec0.zwzw == float4(const1, const5, const1, const5));
 
-		REQUIRE(vec0.zyxz == float4(CONST1, CONST3, CONST0, CONST1));
-		REQUIRE(vec0.zxzy == float4(CONST1, CONST0, CONST1, CONST3));
-		REQUIRE(vec0.yzzx == float4(CONST3, CONST1, CONST1, CONST0));
-		REQUIRE(vec0.yzxz == float4(CONST3, CONST1, CONST0, CONST1));
+		REQUIRE(vec0.zyxz == float4(const1, const3, const0, const1));
+		REQUIRE(vec0.zxzy == float4(const1, const0, const1, const3));
+		REQUIRE(vec0.yzzx == float4(const3, const1, const1, const0));
+		REQUIRE(vec0.yzxz == float4(const3, const1, const0, const1));
 
-		REQUIRE(vec0.wyxz == float4(CONST5, CONST3, CONST0, CONST1));
-		REQUIRE(vec0.zxwy == float4(CONST1, CONST0, CONST5, CONST3));
-		REQUIRE(vec0.ywzx == float4(CONST3, CONST5, CONST1, CONST0));
-		REQUIRE(vec0.yzxw == float4(CONST3, CONST1, CONST0, CONST5));
+		REQUIRE(vec0.wyxz == float4(const5, const3, const0, const1));
+		REQUIRE(vec0.zxwy == float4(const1, const0, const5, const3));
+		REQUIRE(vec0.ywzx == float4(const3, const5, const1, const0));
+		REQUIRE(vec0.yzxw == float4(const3, const1, const0, const5));
 
-		REQUIRE(any(vec0 != CONST0));
-		REQUIRE(!all(vec0 != CONST0));
-		REQUIRE(all(vec0 != CONST2));
+		REQUIRE(any(vec0 != const0));
+		REQUIRE(!all(vec0 != const0));
+		REQUIRE(all(vec0 != const2));
 
-		constexpr float4 vec1(CONST2);
+		constexpr float4 vec1(const2);
 
-		REQUIRE(vec1 != CONST0);
+		REQUIRE(vec1 != const0);
 		REQUIRE(vec0.x != vec1.x);
 		REQUIRE(vec0.y != vec1.y);
 		REQUIRE(vec0.z != vec1.z);
 		REQUIRE(vec0.w != vec1.w);
 		REQUIRE(vec0 != vec1);
 
-		constexpr float4 vec2(CONST0, CONST4, CONST1, CONST5);
+		constexpr float4 vec2(const0, const4, const1, const5);
 
 		{
 
 			constexpr float4 result = vec0 + vec1;
 
-			REQUIRE(result.x == (CONST0 + CONST2));
-			REQUIRE(result.y == (CONST3 + CONST2));
-			REQUIRE(result.z == (CONST1 + CONST2));
-			REQUIRE(result.w == (CONST5 + CONST2));
+			REQUIRE(result.x == (const0 + const2));
+			REQUIRE(result.y == (const3 + const2));
+			REQUIRE(result.z == (const1 + const2));
+			REQUIRE(result.w == (const5 + const2));
 		}
 		{
 
-			constexpr float4 result = vec0 + CONST1;
+			constexpr float4 result = vec0 + const1;
 
-			REQUIRE(result.x == (CONST0 + CONST1));
-			REQUIRE(result.y == (CONST3 + CONST1));
-			REQUIRE(result.z == (CONST1 + CONST1));
-			REQUIRE(result.w == (CONST5 + CONST1));
+			REQUIRE(result.x == (const0 + const1));
+			REQUIRE(result.y == (const3 + const1));
+			REQUIRE(result.z == (const1 + const1));
+			REQUIRE(result.w == (const5 + const1));
 		}
 		{
 			constexpr float4 result = vec0 - vec1;
-			REQUIRE(result.x == (CONST0 - CONST2));
-			REQUIRE(result.y == (CONST3 - CONST2));
-			REQUIRE(result.z == (CONST1 - CONST2));
-			REQUIRE(result.w == (CONST5 - CONST2));
+			REQUIRE(result.x == (const0 - const2));
+			REQUIRE(result.y == (const3 - const2));
+			REQUIRE(result.z == (const1 - const2));
+			REQUIRE(result.w == (const5 - const2));
 		}
 		{
-			constexpr float4 result = vec0 - CONST1;
-			REQUIRE(result.x == (CONST0 - CONST1));
-			REQUIRE(result.y == (CONST3 - CONST1));
-			REQUIRE(result.z == (CONST1 - CONST1));
-			REQUIRE(result.w == (CONST5 - CONST1));
+			constexpr float4 result = vec0 - const1;
+			REQUIRE(result.x == (const0 - const1));
+			REQUIRE(result.y == (const3 - const1));
+			REQUIRE(result.z == (const1 - const1));
+			REQUIRE(result.w == (const5 - const1));
 		}
 		{
 			constexpr float4 result = vec0 * vec1;
-			REQUIRE(result.x == (CONST0 * CONST2));
-			REQUIRE(result.y == (CONST3 * CONST2));
-			REQUIRE(result.z == (CONST1 * CONST2));
-			REQUIRE(result.w == (CONST5 * CONST2));
+			REQUIRE(result.x == (const0 * const2));
+			REQUIRE(result.y == (const3 * const2));
+			REQUIRE(result.z == (const1 * const2));
+			REQUIRE(result.w == (const5 * const2));
 		}
 		{
-			constexpr float4 result = vec0 * CONST1;
-			REQUIRE(result.x == (CONST0 * CONST1));
-			REQUIRE(result.y == (CONST3 * CONST1));
-			REQUIRE(result.z == (CONST1 * CONST1));
-			REQUIRE(result.w == (CONST5 * CONST1));
+			constexpr float4 result = vec0 * const1;
+			REQUIRE(result.x == (const0 * const1));
+			REQUIRE(result.y == (const3 * const1));
+			REQUIRE(result.z == (const1 * const1));
+			REQUIRE(result.w == (const5 * const1));
 		}
 		{
 			constexpr float4 result = vec0 / vec1;
-			REQUIRE(result.x == (CONST0 / CONST2));
-			REQUIRE(result.y == (CONST3 / CONST2));
-			REQUIRE(result.z == (CONST1 / CONST2));
-			REQUIRE(result.w == (CONST5 / CONST2));
+			REQUIRE(result.x == (const0 / const2));
+			REQUIRE(result.y == (const3 / const2));
+			REQUIRE(result.z == (const1 / const2));
+			REQUIRE(result.w == (const5 / const2));
 		}
 		{
-			constexpr float4 result = vec0 / CONST1;
-			REQUIRE(result.x == (CONST0 / CONST1));
-			REQUIRE(result.y == (CONST3 / CONST1));
-			REQUIRE(result.z == (CONST1 / CONST1));
-			REQUIRE(result.w == (CONST5 / CONST1));
+			constexpr float4 result = vec0 / const1;
+			REQUIRE(result.x == (const0 / const1));
+			REQUIRE(result.y == (const3 / const1));
+			REQUIRE(result.z == (const1 / const1));
+			REQUIRE(result.w == (const5 / const1));
 		}
 		{
 			constexpr float4 result = -vec0;
-			REQUIRE(result.x == (-CONST0));
-			REQUIRE(result.y == (-CONST3));
-			REQUIRE(result.z == (-CONST1));
-			REQUIRE(result.w == (-CONST5));
+			REQUIRE(result.x == (-const0));
+			REQUIRE(result.y == (-const3));
+			REQUIRE(result.z == (-const1));
+			REQUIRE(result.w == (-const5));
 		}
 		{
 			constexpr bool4 result = vec0 > vec1;
@@ -645,7 +645,7 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(result.w);
 		}
 		{
-			constexpr bool4 result = vec0 > CONST1;
+			constexpr bool4 result = vec0 > const1;
 			REQUIRE(!bool(result));
 			REQUIRE(!result.x);
 			REQUIRE(result.y);
@@ -661,7 +661,7 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(!result.w);
 		}
 		{
-			constexpr bool4 result = vec0 < CONST1;
+			constexpr bool4 result = vec0 < const1;
 			REQUIRE(!bool(result));
 			REQUIRE(result.x);
 			REQUIRE(!result.y);
@@ -677,7 +677,7 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(result.w);
 		}
 		{
-			constexpr bool4 result = vec0 >= CONST3;
+			constexpr bool4 result = vec0 >= const3;
 			REQUIRE(!bool(result));
 			REQUIRE(!result.x);
 			REQUIRE(result.y);
@@ -694,7 +694,7 @@ TEST_CASE("vectors", "[math]")
 			REQUIRE(!any(!result));
 		}
 		{
-			constexpr bool4 result = vec0 <= CONST0;
+			constexpr bool4 result = vec0 <= const0;
 			REQUIRE(!bool(result));
 			REQUIRE(result.x);
 			REQUIRE(!result.y);
@@ -722,11 +722,34 @@ TEST_CASE("vectors", "[math]")
 
 TEST_CASE("matrices", "[math]")
 {
+	using namespace rsl;
+	using namespace rsl::math;
+
 	SECTION("matrix1x1") {}
 	SECTION("matrix2x2") {}
 	SECTION("matrix3x3") {}
 	SECTION("matrix4x4") {}
-	SECTION("matrix decompose") {}
+
+	SECTION("matrix decompose")
+	{
+		constexpr float4x4 matrix{};
+
+		float3 scale;
+		quat orientation;
+		float3 translation;
+
+		decompose(matrix, scale, orientation, translation);
+
+		float4x4 out = compose(scale, orientation, translation);
+
+		bool4x4 r = matrix == out;
+
+		REQUIRE(r);
+		REQUIRE(scale == float3::one);
+		REQUIRE(orientation == quat::identity);
+		REQUIRE(translation == float3::zero);
+	}
+
 	SECTION("matrix determinant") {}
 	SECTION("matrix adjoint") {}
 	SECTION("matrix inverse") {}

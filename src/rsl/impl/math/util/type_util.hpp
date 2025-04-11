@@ -186,7 +186,7 @@ namespace rsl::math
 			}
 			else
 			{
-				static_assert(always_false_v<T>, "Type cannot be made into a quaternion.");
+				static_assert(always_false_v<T>, "Type cannot be made into a matrix.");
 			}
 		}
 	} // namespace internal
@@ -467,6 +467,17 @@ namespace rsl::math
 	template <typename TypeA, typename TypeB>
 	using select_vector_type_t = typename select_vector_type<TypeA, TypeB>::type;
 
+	template <typename TypeA, typename TypeB>
+	struct select_matrix_type
+	{
+		using type = make_matrix_t<
+			conditional_t<is_matrix_v<TypeA> || !is_matrix_v<TypeB>, remove_cvr_t<TypeA>, remove_cvr_t<TypeB>>>;
+	};
+
+	template <typename TypeA, typename TypeB>
+	using select_matrix_type_t = typename select_matrix_type<TypeA, TypeB>::type;
+
+
 	template <typename T>
 	struct make_signed : ::std::make_signed<T>
 	{
@@ -553,6 +564,23 @@ namespace rsl::math
 			using type = vector<
 				typename _elevated_impl<typename A::scalar, typename B::scalar>::type,
 				(A::size < B::size ? A::size : B::size), (A::mode < B::mode ? A::mode : B::mode)>;
+		};
+
+		template <matrix_type A, matrix_type B>
+		struct _elevated_impl<A, B>
+		{
+			using type = matrix<
+				typename _elevated_impl<typename A::scalar, typename B::scalar>::type,
+				(A::row_count < B::row_count ? A::row_count : B::row_count),
+				(A::col_count < B::col_count ? A::col_count : B::col_count), (A::mode < B::mode ? A::mode : B::mode)>;
+		};
+
+		template <quat_type A, quat_type B>
+		struct _elevated_impl<A, B>
+		{
+			using type = quaternion<
+				typename _elevated_impl<typename A::scalar, typename B::scalar>::type,
+				(A::mode < B::mode ? A::mode : B::mode)>;
 		};
 
 		template <integral_type A, integral_type B>

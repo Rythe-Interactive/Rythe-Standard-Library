@@ -6,7 +6,7 @@ namespace rsl::math
 	template <typename T, typename... Args, std::enable_if_t<std::is_base_of_v<random_number_engine_base, T>, bool>>
 	inline void RandomNumberGenerator::setRNGEngine(Args&&... args)
 	{
-		engine = std::make_unique<T>(std::forward<Args>(args)...);
+		engine = std::make_unique<T>(forward<Args>(args)...);
 	}
 
 	template <typename Integer>

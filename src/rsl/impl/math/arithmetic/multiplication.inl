@@ -70,13 +70,13 @@ namespace rsl::math
 		else if constexpr (is_quat_v<A> && is_arithmetic_v<B>)
 		{
 			return internal::compute_multiplication<quaternion<elevated_t<typename A::scalar, B>>>::compute(
-				std::forward<TypeA>(a), std::forward<TypeB>(b)
+				forward<TypeA>(a), forward<TypeB>(b)
 			);
 		}
 		else if constexpr (is_arithmetic_v<A> && is_quat_v<B>)
 		{
 			return internal::compute_multiplication<quaternion<elevated_t<A, typename B::scalar>>>::compute(
-				std::forward<TypeB>(b), std::forward<TypeA>(a)
+				forward<TypeB>(b), forward<TypeA>(a)
 			);
 		}
 		else
