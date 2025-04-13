@@ -51,11 +51,14 @@ namespace rsl::math
 		[[rythe_always_inline]] explicit constexpr quaternion(const VecType& other) noexcept;
 
 		template <math::storage_mode M>
-		[[rythe_always_inline]] explicit constexpr quaternion(const matrix<scalar, 3, 3, M>& m) noexcept;
+		[[rythe_always_inline]] explicit quaternion(const matrix<scalar, 3, 3, M>& m) noexcept;
 		template <math::storage_mode M>
-		[[rythe_always_inline]] explicit constexpr quaternion(const matrix<scalar, 4, 4, M>& m) noexcept;
+		[[rythe_always_inline]] explicit quaternion(const matrix<scalar, 4, 4, M>& m) noexcept;
 
 		static const quaternion identity;
+		static const quaternion rotate_x_45;
+		static const quaternion rotate_y_45;
+		static const quaternion rotate_z_45;
 		static const quaternion rotate_x_90;
 		static const quaternion rotate_y_90;
 		static const quaternion rotate_z_90;

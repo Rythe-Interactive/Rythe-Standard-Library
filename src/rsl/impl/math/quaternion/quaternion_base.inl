@@ -170,12 +170,26 @@ namespace rsl::math
 		return vector<Scalar, 4>(quat.i, quat.j, quat.k, quat.w);
 	}
 
+#define SIN22_5 0.3826834323650897717284599840304L
+#define COS22_5 0.92387953251128675612818318939679L
 #define SIN45 0.70710678118654752440084436210485L
 #define COS45 0.70710678118654752440084436210485L
 
 	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::identity(
 		static_cast<Scalar>(1), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(0)
+	);
+	template <arithmetic_type Scalar, storage_mode Mode>
+	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_x_45(
+		static_cast<Scalar>(COS22_5), static_cast<Scalar>(SIN22_5), static_cast<Scalar>(0), static_cast<Scalar>(0)
+	);
+	template <arithmetic_type Scalar, storage_mode Mode>
+	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_y_45(
+		static_cast<Scalar>(COS22_5), static_cast<Scalar>(0), static_cast<Scalar>(SIN22_5), static_cast<Scalar>(0)
+	);
+	template <arithmetic_type Scalar, storage_mode Mode>
+	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_z_45(
+		static_cast<Scalar>(COS22_5), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(SIN22_5)
 	);
 	template <arithmetic_type Scalar, storage_mode Mode>
 	const quaternion<Scalar, Mode> quaternion<Scalar, Mode>::rotate_x_90(
@@ -202,6 +216,8 @@ namespace rsl::math
 		static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(0), static_cast<Scalar>(1)
 	);
 
+#undef SIN22_5
+#undef COS22_5
 #undef SIN45
 #undef COS45
 } // namespace rsl::math

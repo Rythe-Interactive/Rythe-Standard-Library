@@ -8,7 +8,7 @@
 namespace rsl::math
 {
 #ifndef RSL_DEFAULT_ALIGNED_MATH
-	#define RSL_DEFAULT_ALIGNED_MATH true
+	#define RSL_DEFAULT_ALIGNED_MATH false
 #endif
 
 #ifndef RSL_DEFAULT_MATH_MODE

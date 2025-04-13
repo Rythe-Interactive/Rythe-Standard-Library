@@ -66,22 +66,48 @@ namespace rsl::math
 	}
 
 	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> transpose(matrix<Scalar, 4, 4> mat) noexcept
+	constexpr matrix<Scalar, 4, 4> transpose(const matrix<Scalar, 4, 4>& mat) noexcept
 	{
-		matrix<Scalar, 4, 4> result(1);
-		result.row0 = mat.col0;
-		result.row1 = mat.col1;
-		result.row2 = mat.col2;
-		result.row3 = mat.col3;
-		return result;
+		if (is_constant_evaluated())
+		{
+			matrix<Scalar, 4, 4> result{};
+			for (size_t i = 0; i < 4; ++i)
+			{
+				for (size_t j = 0; j < 4; ++j)
+				{
+					result[j][i] = mat[i][j];
+				}
+			}
+			return result;
+		}
+		else
+		{
+			matrix<Scalar, 4, 4> result(1);
+			result.row0 = mat.col0;
+			result.row1 = mat.col1;
+			result.row2 = mat.col2;
+			result.row3 = mat.col3;
+			return result;
+		}
 	}
 
 	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> translate(matrix<Scalar, 4, 4> mat, vector<Scalar, 3> pos) noexcept
+	matrix<Scalar, 4, 4> constexpr translate(const matrix<Scalar, 4, 4>& mat, const vector<Scalar, 3>& pos) noexcept
 	{
-		matrix<Scalar, 4, 4> result(mat);
-		result[3].xyz = pos;
-		return result;
+		if (is_constant_evaluated())
+		{
+			matrix<Scalar, 4, 4> result(mat);
+			result[3][0] += pos[0];
+			result[3][1] += pos[1];
+			result[3][2] += pos[2];
+			return result;
+		}
+		else
+		{
+			matrix<Scalar, 4, 4> result(mat);
+			result[3].xyz += pos;
+			return result;
+		}
 	}
 
 	// template<typename Scalar>
@@ -91,8 +117,8 @@ namespace rsl::math
 	//}
 
 	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4>
-	rotate(matrix<Scalar, 4, 4> mat, radians<Scalar> angle, vector<Scalar, 3> _axis) noexcept
+	matrix<Scalar, 4, 4>
+	rotate(const matrix<Scalar, 4, 4>& mat, radians<Scalar> angle, const vector<Scalar, 3>& _axis) noexcept
 	{
 		Scalar const a = angle;
 		Scalar const c = cos(a);
@@ -123,7 +149,7 @@ namespace rsl::math
 	}
 
 	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> scale(matrix<Scalar, 4, 4> mat, vector<Scalar, 3> scale) noexcept
+	constexpr matrix<Scalar, 4, 4> scale(const matrix<Scalar, 4, 4>& mat, const vector<Scalar, 3>& scale) noexcept
 	{
 		matrix<Scalar, 4, 4> result;
 		result[0] = mat[0] * scale[0];

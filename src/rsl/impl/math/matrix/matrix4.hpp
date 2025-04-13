@@ -52,7 +52,8 @@ namespace rsl::math
 		template <
 			arithmetic_type Scal0, math::storage_mode M0, arithmetic_type Scal1 = Scalar, math::storage_mode M1 = Mode>
 		[[rythe_always_inline]] explicit constexpr matrix(
-			const quaternion<Scal0, M0>& orientation, const vector<Scal1, 3, M1>& position = vector<Scal1, 3, M1>::zero
+			const quaternion<Scal0, M0>& orientation,
+			const vector<Scal1, 3, M1>& position = vector<Scal1, 3, M1>{0, 0, 0}
 		) noexcept;
 
 		template <typename mat_type>

@@ -4,6 +4,7 @@
 
 #include <rsl/math>
 
+
 TEST_CASE("vectors", "[math]")
 {
 	using namespace rsl;
@@ -730,6 +731,58 @@ TEST_CASE("matrices", "[math]")
 	SECTION("matrix3x3") {}
 	SECTION("matrix4x4") {}
 
+	SECTION("matrix translate rotate scale")
+	{
+		{
+			constexpr float3 translation0{1, 2, 3};
+			constexpr float3 translation1{6, 4, 2};
+			constexpr float4x4 matrix0 = translate(float4x4{}, translation0);
+			constexpr float4x4 matrix1 = translate(matrix0, translation1);
+
+			REQUIRE(matrix0[0] == float4::right);
+			REQUIRE(matrix0[1] == float4::up);
+			REQUIRE(matrix0[2] == float4::forward);
+			REQUIRE(matrix0[3].xyz == translation0);
+			REQUIRE(matrix0[3].w == 1.f);
+
+			REQUIRE(matrix1[0] == float4::right);
+			REQUIRE(matrix1[1] == float4::up);
+			REQUIRE(matrix1[2] == float4::forward);
+			REQUIRE(matrix1[3].xyz == translation0 + translation1);
+			REQUIRE(matrix1[3].w == 1.f);
+		}
+		{
+			constexpr float3 scale0{1, 2, 3};
+			constexpr float3 scale1{6, 4, 2.5f};
+			constexpr float4x4 matrix0 = scale(float4x4{}, scale0);
+			constexpr float4x4 matrix1 = scale(matrix0, scale1);
+
+			REQUIRE(matrix0[0] == float4::right * scale0.x);
+			REQUIRE(matrix0[1] == float4::up * scale0.y);
+			REQUIRE(matrix0[2] == float4::forward * scale0.z);
+			REQUIRE(matrix0[3] == float4::positiveW);
+
+			REQUIRE(matrix1[0] == float4::right * scale0.x * scale1.x);
+			REQUIRE(matrix1[1] == float4::up * scale0.y * scale1.y);
+			REQUIRE(matrix1[2] == float4::forward * scale0.z * scale1.z);
+			REQUIRE(matrix1[3] == float4::positiveW);
+		}
+		{
+			const float4x4 matrix0 = rotate(float4x4{}, radians32::deg90, float3::up);
+			const float4x4 matrix1 = rotate(matrix0, radians32::deg90, float3::right);
+
+			REQUIRE(matrix0[0] == float4::backward);
+			REQUIRE(matrix0[1] == float4::up);
+			REQUIRE(matrix0[2] == float4::right);
+			REQUIRE(matrix0[3] == float4::positiveW);
+
+			REQUIRE(matrix1[0] == float4::backward);
+			REQUIRE(matrix1[1] == float4::right);
+			REQUIRE(matrix1[2] == float4::down);
+			REQUIRE(matrix1[3] == float4::positiveW);
+		}
+	}
+
 	SECTION("matrix decompose")
 	{
 		{
@@ -750,13 +803,13 @@ TEST_CASE("matrices", "[math]")
 		}
 		{
 
-			constexpr float3 pos(2.0f);
-			constexpr float3 scal(2.0f);
+			constexpr float3 pos(1.0f);
+			constexpr float3 scal(1.0f);
 			constexpr float3 axis(1.f, 2.f, 3.f);
-			constexpr radians32 angle{0.123456f};
+			constexpr radians32 angle{2.3456f};
 			const quat expectedRotation = quat::angle_axis(angle, axis);
 
-			float4x4 matrix = rotate(translate(scale(float4x4{}, scal), pos), angle, axis);
+			float4x4 matrix = translate(rotate(scale(float4x4{}, scal), angle, axis), pos);
 
 			float3 scale(3);
 			quat orientation;
@@ -776,12 +829,262 @@ TEST_CASE("matrices", "[math]")
 	SECTION("matrix determinant") {}
 	SECTION("matrix adjoint") {}
 	SECTION("matrix inverse") {}
+
+	SECTION("matrix transpose")
+	{
+		{
+			constexpr float4x4 matrix{};
+			constexpr float4x4 transposed = transpose(matrix);
+
+			REQUIRE(transposed == matrix);
+		}
+
+		{
+			float4x4 matrix{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+			float4x4 transposed = transpose(matrix);
+			constexpr float4x4 expected{1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16};
+
+			REQUIRE(transposed == expected);
+		}
+	}
+
+	SECTION("matrix multiplication") {}
+
+	SECTION("matrix quaternion conversion")
+	{
+		{
+			constexpr float4x4 matrix{};
+			quat quaternion{matrix};
+
+			REQUIRE(quaternion == quat::identity);
+		}
+		{
+			constexpr float3x3 matrix{};
+			quat quaternion{matrix};
+
+			REQUIRE(quaternion == quat::identity);
+		}
+		{
+			const float4x4 matrix{
+				float4::right * 2.f, float4::up * 3.5f, float4::forward * 6.4f, float4{2.f, 2.5f, 3.2f, 1.f}
+			};
+			quat quaternion{matrix};
+
+			REQUIRE(quaternion == quat::identity);
+		}
+		{
+			const float3x3 matrix{float3::right * 3.12f, float3::up * 8.45f, float3::forward * 0.23f};
+			quat quaternion{matrix};
+
+			REQUIRE(quaternion == quat::identity);
+		}
+		{
+			const float4x4 matrix{float4::right, float4::forward, float4::down, float4::positiveW};
+			quat quaternion{matrix};
+
+			REQUIRE(quaternion == quat::rotate_x_90);
+		}
+		{
+			const float3x3 matrix{float3::right, float3::forward, float3::down};
+			quat quaternion{matrix};
+
+			REQUIRE(quaternion == quat::rotate_x_90);
+		}
+		{
+			const float4x4 matrix{
+				float4::right, normalize(float4::up + float4::forward), normalize(float4::forward + float4::down),
+				float4::positiveW
+			};
+			const quat quaternion{matrix};
+
+			REQUIRE(quaternion == quat::rotate_x_45);
+		}
+		{
+			const float3x3 matrix{
+				float3::right * 5.2125f, (float3::up + float3::forward) * 4.4647f,
+				(float3::forward + float3::down) * 3.21654f
+			};
+			const quat quaternion{matrix};
+
+			REQUIRE(quaternion == quat::rotate_x_45);
+		}
+		{
+			const float4x4 matrix{
+				float4::right * 0.52165f, (float4::up + float4::forward) * 0.154668f,
+				(float4::forward + float4::down) * 11.7567f, float4{4868.f, 1543.125f, 124.155f, 1.f}
+			};
+			const quat quaternion{matrix};
+
+			REQUIRE(quaternion == quat::rotate_x_45);
+		}
+		{
+			const float3x3 matrix{
+				float3::right, normalize(float3::up + float3::forward), normalize(float3::forward + float3::down)
+			};
+			const quat quaternion{matrix};
+
+			REQUIRE(quaternion == quat::rotate_x_45);
+		}
+	}
 }
 
 TEST_CASE("quaternions", "[math]")
 {
-	SECTION("quaternion") {}
-	SECTION("quaternion matrix conversion") {}
+	using namespace rsl;
+	using namespace rsl::math;
+
+	constexpr static float32 sin22_5 = 0.3826834323650897717284599840304f;
+	constexpr static float32 cos22_5 = 0.92387953251128675612818318939679f;
+	constexpr static float32 sin45 = 0.70710678118654752440084436210485f;
+	constexpr static float32 cos45 = 0.70710678118654752440084436210485f;
+
+	constexpr static quat identity(1.f, 0.f, 0.f, 0.f);
+	constexpr static quat rotate_x_45(cos22_5, sin22_5, 0.f, 0.f);
+	constexpr static quat rotate_y_45(cos22_5, 0.f, sin22_5, 0.f);
+	constexpr static quat rotate_z_45(cos22_5, 0.f, 0.f, sin22_5);
+	constexpr static quat rotate_x_90(cos45, sin45, 0.f, 0.f);
+	constexpr static quat rotate_y_90(cos45, 0.f, sin45, 0.f);
+	constexpr static quat rotate_z_90(cos45, 0.f, 0.f, sin45);
+
+	SECTION("quaternion")
+	{
+		{
+			const quat quaternion = quat::angle_axis(radians32::deg45, float3::right);
+			REQUIRE(quaternion == quat::rotate_x_45);
+		}
+		{
+			const quat quaternion = quat::angle_axis(radians32::deg45, float3::up);
+			REQUIRE(quaternion == quat::rotate_y_45);
+		}
+		{
+			const quat quaternion = quat::angle_axis(radians32::deg45, float3::forward);
+			REQUIRE(quaternion == quat::rotate_z_45);
+		}
+	}
+
+	SECTION("quaternion matrix conversion")
+	{
+		{
+			constexpr quat quaternion = identity;
+			constexpr float4x4 matrix{quaternion};
+
+			REQUIRE(matrix[0] == float4::right);
+			REQUIRE(matrix[1] == float4::up);
+			REQUIRE(matrix[2] == float4::forward);
+			REQUIRE(matrix[3] == float4::positiveW);
+		}
+		{
+			constexpr quat quaternion = identity;
+			constexpr float3x3 matrix{quaternion};
+
+			REQUIRE(matrix[0] == float3::right);
+			REQUIRE(matrix[1] == float3::up);
+			REQUIRE(matrix[2] == float3::forward);
+		}
+		{
+			constexpr quat quaternion = rotate_x_90;
+			constexpr float4x4 matrix{quaternion};
+
+			REQUIRE(matrix[0] == float4::right);
+			REQUIRE(matrix[1] == float4::forward);
+			REQUIRE(matrix[2] == float4::down);
+			REQUIRE(matrix[3] == float4::positiveW);
+		}
+		{
+			constexpr quat quaternion = rotate_x_90;
+			constexpr float3x3 matrix{quaternion};
+
+			REQUIRE(matrix[0] == float3::right);
+			REQUIRE(matrix[1] == float3::forward);
+			REQUIRE(matrix[2] == float3::down);
+		}
+		{
+			constexpr quat quaternion = rotate_y_90;
+			constexpr float4x4 matrix{quaternion};
+
+			REQUIRE(matrix[0] == float4::backward);
+			REQUIRE(matrix[1] == float4::up);
+			REQUIRE(matrix[2] == float4::right);
+			REQUIRE(matrix[3] == float4::positiveW);
+		}
+		{
+			constexpr quat quaternion = rotate_y_90;
+			constexpr float3x3 matrix{quaternion};
+
+			REQUIRE(matrix[0] == float3::backward);
+			REQUIRE(matrix[1] == float3::up);
+			REQUIRE(matrix[2] == float3::right);
+		}
+		{
+			constexpr quat quaternion = rotate_z_90;
+			constexpr float4x4 matrix{quaternion};
+
+			REQUIRE(matrix[0] == float4::up);
+			REQUIRE(matrix[1] == float4::left);
+			REQUIRE(matrix[2] == float4::forward);
+			REQUIRE(matrix[3] == float4::positiveW);
+		}
+		{
+			constexpr quat quaternion = rotate_z_90;
+			constexpr float3x3 matrix{quaternion};
+
+			REQUIRE(matrix[0] == float3::up);
+			REQUIRE(matrix[1] == float3::left);
+			REQUIRE(matrix[2] == float3::forward);
+		}
+
+		{
+			constexpr quat quaternion = rotate_x_45;
+			constexpr float4x4 matrix{quaternion};
+
+			REQUIRE(matrix[0] == float4::right);
+			REQUIRE(matrix[1] == normalize(float4::up + float4::forward));
+			REQUIRE(matrix[2] == normalize(float4::forward + float4::down));
+			REQUIRE(matrix[3] == float4::positiveW);
+		}
+		{
+			constexpr quat quaternion = rotate_x_45;
+			constexpr float3x3 matrix{quaternion};
+
+			REQUIRE(matrix[0] == float3::right);
+			REQUIRE(matrix[1] == normalize(float3::up + float3::forward));
+			REQUIRE(matrix[2] == normalize(float3::forward + float3::down));
+		}
+		{
+			constexpr quat quaternion = rotate_y_45;
+			constexpr float4x4 matrix{quaternion};
+
+			REQUIRE(matrix[0] == normalize(float4::right + float4::backward));
+			REQUIRE(matrix[1] == float4::up);
+			REQUIRE(matrix[2] == normalize(float4::forward + float4::right));
+			REQUIRE(matrix[3] == float4::positiveW);
+		}
+		{
+			constexpr quat quaternion = rotate_y_45;
+			constexpr float3x3 matrix{quaternion};
+
+			REQUIRE(matrix[0] == normalize(float3::right + float3::backward));
+			REQUIRE(matrix[1] == float3::up);
+			REQUIRE(matrix[2] == normalize(float3::forward + float3::right));
+		}
+		{
+			constexpr quat quaternion = rotate_z_45;
+			constexpr float4x4 matrix{quaternion};
+
+			REQUIRE(matrix[0] == normalize(float4::right + float4::up));
+			REQUIRE(matrix[1] == normalize(float4::up + float4::left));
+			REQUIRE(matrix[2] == float4::forward);
+			REQUIRE(matrix[3] == float4::positiveW);
+		}
+		{
+			constexpr quat quaternion = rotate_z_45;
+			constexpr float3x3 matrix{quaternion};
+
+			REQUIRE(matrix[0] == normalize(float3::right + float3::up));
+			REQUIRE(matrix[1] == normalize(float3::up + float3::left));
+			REQUIRE(matrix[2] == float3::forward);
+		}
+	}
 	SECTION("quaternion length") {}
 	SECTION("quaternion inverse") {}
 }
