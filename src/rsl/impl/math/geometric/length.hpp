@@ -9,23 +9,23 @@
 
 namespace rsl::math
 {
-	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>, bool> = true>
-	[[nodiscard]] [[rythe_always_inline]] auto length(const vec_type& v) noexcept;
+	template <vector_type VecType>
+	[[nodiscard]] [[rythe_always_inline]] auto length(const VecType& v) noexcept;
 
-	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>, bool> = true>
-	[[nodiscard]] [[rythe_always_inline]] constexpr auto length2(const vec_type& v) noexcept;
+	template <vector_type VecType>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto length2(const VecType& v) noexcept;
 
-	template <typename quat_type, ::std::enable_if_t<is_quat_v<quat_type>, bool> = true>
-	[[nodiscard]] [[rythe_always_inline]] auto length(const quat_type& q) noexcept;
+	template <quat_type QuatType>
+	[[nodiscard]] [[rythe_always_inline]] auto length(const QuatType& q) noexcept;
 
-	template <typename quat_type, ::std::enable_if_t<is_quat_v<quat_type>, bool> = true>
-	[[nodiscard]] [[rythe_always_inline]] constexpr auto length2(const quat_type& q) noexcept;
+	template <quat_type QuatType>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto length2(const QuatType& q) noexcept;
 
-	template <typename mat_type, ::std::enable_if_t<is_matrix_v<mat_type>, bool> = true>
-	[[nodiscard]] [[rythe_always_inline]] auto length(const mat_type& m) noexcept;
+	template <matrix_type MatType>
+	[[nodiscard]] [[rythe_always_inline]] auto length(const MatType& m) noexcept;
 
-	template <typename mat_type, ::std::enable_if_t<is_matrix_v<mat_type>, bool> = true>
-	[[nodiscard]] [[rythe_always_inline]] constexpr auto length2(const mat_type& m) noexcept;
+	template <matrix_type MatType>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto length2(const MatType& m) noexcept;
 } // namespace rsl::math
 
 #include "length.inl"

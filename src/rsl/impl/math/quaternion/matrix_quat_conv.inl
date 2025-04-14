@@ -90,9 +90,10 @@ namespace rsl::math
 	template <storage_mode M>
 	quaternion<Scalar, Mode>::quaternion(const matrix<scalar, 3, 3, M>& m) noexcept
 	{
-		const scalar& m00 = m[0][0];
-		const scalar& m11 = m[1][1];
-		const scalar& m22 = m[2][2];
+		const vector<Scalar, 3, Mode> invScale{1.f / length(m[0]), 1.f / length(m[1]), 1.f / length(m[2])};
+		const scalar& m00 = m[0][0] * invScale[0];
+		const scalar& m11 = m[1][1] * invScale[1];
+		const scalar& m22 = m[2][2] * invScale[2];
 
 		const scalar qwijk[] = {m00 + m11 + m22, m00 - m11 - m22, m11 - m00 - m22, m22 - m00 - m11};
 
@@ -110,7 +111,7 @@ namespace rsl::math
 		qMax = ::std::sqrt(qMax + static_cast<scalar>(1)) * static_cast<scalar>(0.5);
 		scalar mult = static_cast<scalar>(0.25) / qMax;
 
-		scalar qPerms[] = {qMax, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult};
+		scalar qPerms[] = {qMax, (m[1][2] * invScale[1] - m[2][1] * invScale[2]) * mult, (m[2][0] * invScale[2] - m[0][2] * invScale[0]) * mult, (m[0][1] * invScale[0] - m[1][0] * invScale[1]) * mult};
 
 		size_type invIdx = 3 - idx;
 
@@ -118,17 +119,16 @@ namespace rsl::math
 		i = qPerms[(invIdx + 2) % 4];
 		j = qPerms[(idx + 2) % 4];
 		k = qPerms[invIdx];
-
-		*this = normalize(*this);
 	}
 
 	template <arithmetic_type Scalar, storage_mode Mode>
 	template <storage_mode M>
 	quaternion<Scalar, Mode>::quaternion(const matrix<scalar, 4, 4, M>& m) noexcept
 	{
-		const scalar& m00 = m[0][0];
-		const scalar& m11 = m[1][1];
-		const scalar& m22 = m[2][2];
+		const vector<Scalar, 3, Mode> invScale{1.f / length(m[0]), 1.f / length(m[1]), 1.f / length(m[2])};
+		const scalar& m00 = m[0][0] * invScale[0];
+		const scalar& m11 = m[1][1] * invScale[1];
+		const scalar& m22 = m[2][2] * invScale[2];
 
 		const scalar qwijk[] = {m00 + m11 + m22, m00 - m11 - m22, m11 - m00 - m22, m22 - m00 - m11};
 
@@ -146,7 +146,7 @@ namespace rsl::math
 		qMax = ::std::sqrt(qMax + static_cast<scalar>(1)) * static_cast<scalar>(0.5);
 		scalar mult = static_cast<scalar>(0.25) / qMax;
 
-		scalar qPerms[] = {qMax, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult};
+		scalar qPerms[] = {qMax, (m[1][2] * invScale[1] - m[2][1] * invScale[2]) * mult, (m[2][0] * invScale[2] - m[0][2] * invScale[0]) * mult, (m[0][1] * invScale[0] - m[1][0] * invScale[1]) * mult};
 
 		size_type invIdx = 3 - idx;
 
@@ -154,7 +154,5 @@ namespace rsl::math
 		i = qPerms[(invIdx + 2) % 4];
 		j = qPerms[(idx + 2) % 4];
 		k = qPerms[invIdx];
-
-		*this = normalize(*this);
 	}
 } // namespace rsl::math

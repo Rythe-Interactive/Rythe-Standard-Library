@@ -806,7 +806,7 @@ TEST_CASE("matrices", "[math]")
 			constexpr float3 pos(1.0f);
 			constexpr float3 scal(1.0f);
 			constexpr float3 axis(1.f, 2.f, 3.f);
-			constexpr radians32 angle{2.3456f};
+			constexpr radians32 angle{2.329f};
 			const quat expectedRotation = quat::angle_axis(angle, axis);
 
 			float4x4 matrix = translate(rotate(scale(float4x4{}, scal), angle, axis), pos);

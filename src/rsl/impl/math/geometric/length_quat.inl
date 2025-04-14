@@ -1,5 +1,4 @@
 #pragma once
-#include "length.hpp"
 
 namespace rsl::math::internal
 {

@@ -1,43 +1,43 @@
-#include "length.hpp"
 #pragma once
+#include "length.hpp"
 
 #include "length_quat.inl"
 #include "length_vector.inl"
 
 namespace rsl::math
 {
-	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>, bool>>
-	[[nodiscard]] auto length(const vec_type& v) noexcept
+	template <vector_type VecType>
+	auto length(const VecType& v) noexcept
 	{
-		return internal::compute_length<vec_type>::compute(v);
+		return internal::compute_length<VecType>::compute(v);
 	}
 
-	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>, bool>>
-	[[nodiscard]] constexpr auto length2(const vec_type& v) noexcept
+	template <vector_type VecType>
+	constexpr auto length2(const VecType& v) noexcept
 	{
-		return internal::compute_length<vec_type>::compute2(v);
+		return internal::compute_length<VecType>::compute2(v);
 	}
 
-	template <typename quat_type, ::std::enable_if_t<is_quat_v<quat_type>, bool>>
-	[[nodiscard]] auto length(const quat_type& q) noexcept
+	template <quat_type QuatType>
+	auto length(const QuatType& q) noexcept
 	{
-		return internal::compute_length<quat_type>::compute(q);
+		return internal::compute_length<QuatType>::compute(q);
 	}
 
-	template <typename quat_type, ::std::enable_if_t<is_quat_v<quat_type>, bool>>
-	[[nodiscard]] constexpr auto length2(const quat_type& q) noexcept
+	template <quat_type QuatType>
+	constexpr auto length2(const QuatType& q) noexcept
 	{
-		return internal::compute_length<quat_type>::compute2(q);
+		return internal::compute_length<QuatType>::compute2(q);
 	}
 
-	template <typename mat_type, ::std::enable_if_t<is_matrix_v<mat_type>, bool>>
-	[[nodiscard]] auto length(const mat_type& m) noexcept
+	template <matrix_type MatType>
+	auto length(const MatType& m) noexcept
 	{
 		return determinant(m);
 	}
 
-	template <typename mat_type, ::std::enable_if_t<is_matrix_v<mat_type>, bool>>
-	[[nodiscard]] constexpr auto length2(const mat_type& m) noexcept
+	template <matrix_type MatType>
+	constexpr auto length2(const MatType& m) noexcept
 	{
 		auto det = determinant(m);
 		return det * det;
