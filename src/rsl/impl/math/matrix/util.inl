@@ -45,7 +45,7 @@ namespace rsl::math
 
 	template <arithmetic_type Scalar, storage_mode ModeEye, storage_mode ModeCenter, storage_mode ModeUp>
 	[[nodiscard]] matrix<Scalar, 4, 4, elevated_storage_mode_v<ModeEye, elevated_storage_mode_v<ModeCenter, ModeUp>>>
-	look_at(vector<Scalar, 3> eye, vector<Scalar, 3> center, vector<Scalar, 3> up) noexcept
+	look_at(vector<Scalar, 3, ModeEye> eye, vector<Scalar, 3, ModeCenter> center, vector<Scalar, 3, ModeUp> up) noexcept
 	{
 		constexpr storage_mode mode =
 			elevated_storage_mode_v<ModeEye, elevated_storage_mode_v<ModeCenter, ModeUp>>;
