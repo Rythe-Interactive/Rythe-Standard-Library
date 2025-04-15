@@ -936,6 +936,18 @@ TEST_CASE("matrices", "[math]")
 			REQUIRE(quaternion == quat::rotate_x_45);
 		}
 	}
+
+	SECTION("matrix look_at")
+	{
+		{
+			const float4x4 matrix = look_at(float3::forward * 3.f, float3::zero, float3::up);
+
+			REQUIRE(matrix[0] == float4::left);
+			REQUIRE(matrix[1] == float4::up);
+			REQUIRE(matrix[2] == float4::backward);
+			REQUIRE(matrix[3] == float4(0.f, 0.f, 3.f, 1.f));
+		}
+	}
 }
 
 TEST_CASE("quaternions", "[math]")

@@ -50,20 +50,20 @@ namespace rsl::math
 		constexpr storage_mode mode =
 			elevated_storage_mode_v<ModeEye, elevated_storage_mode_v<ModeCenter, ModeUp>>;
 		const vector<Scalar, 4, mode> f(normalize(center - eye));
-		const vector<Scalar, 4, mode> r(normalize(cross(up, f)));
-		const vector<Scalar, 4, mode> u(cross(f, r)
-		); // Length of u is 1 because the angle between f and r is 90 degrees
+		const vector<Scalar, 4, mode> r(normalize(cross(up, f.xyz)));
+		// Length of u is 1 because the angle between f and r is 90 degrees
+		const vector<Scalar, 4, mode> u(cross(f.xyz, r.xyz));
 
 		matrix<Scalar, 4, 4, mode> result(static_cast<Scalar>(1));
-		result.col0 = r;
-		result.col1 = u;
-		result.col2 = f;
+		result[0] = r;
+		result[1] = u;
+		result[2] = f;
 
 		vector<Scalar, 3, mode> x{r.x, u.x, f.x};
 		vector<Scalar, 3, mode> y{r.y, u.y, f.y};
 		vector<Scalar, 3, mode> z{r.z, u.z, f.z};
 
-		result.col3 = -(x * eye.xxx + y * eye.yyy + z * eye.zzz);
+		result[3].xyz = -(x * eye.xxx + y * eye.yyy + z * eye.zzz);
 
 		return result;
 	}
