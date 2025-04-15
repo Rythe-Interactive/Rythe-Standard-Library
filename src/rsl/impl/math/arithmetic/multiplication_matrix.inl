@@ -6,11 +6,11 @@ namespace rsl::math::internal
 	template <typename T>
 	struct compute_multiplication;
 
-	template <typename Scalar, size_type RowCount, size_type ColCount>
-	struct compute_multiplication<matrix<Scalar, RowCount, ColCount>>
+	template <typename Scalar, size_type RowCount, size_type ColCount, storage_mode Mode>
+	struct compute_multiplication<matrix<Scalar, RowCount, ColCount, Mode>>
 	{
-		using mat_type = matrix<Scalar, RowCount, ColCount>;
-		using vec_type = typename mat_type::row_type;
+		using mat_type = matrix<Scalar, RowCount, ColCount, Mode>;
+		using vec_type = typename mat_type::col_type;
 
 		template <matrix_type OtherType>
 		[[nodiscard]] constexpr static auto compute(const mat_type& a, const OtherType& b) noexcept

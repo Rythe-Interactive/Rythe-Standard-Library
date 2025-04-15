@@ -848,7 +848,17 @@ TEST_CASE("matrices", "[math]")
 		}
 	}
 
-	SECTION("matrix multiplication") {}
+	SECTION("matrix multiplication")
+	{
+		{
+			float4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+			float4x4 trans = float4x4(1.0f);
+			trans = translate(trans, float3(1.0f, 1.0f, 0.0f));
+			vec = trans * vec;
+
+			REQUIRE(vec == float4(2.0f, 1.0f, 0.0f, 1.0f));
+		}
+	}
 
 	SECTION("matrix quaternion conversion")
 	{

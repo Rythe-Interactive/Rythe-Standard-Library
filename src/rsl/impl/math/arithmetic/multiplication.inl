@@ -1,6 +1,5 @@
-#include "multiplication.hpp"
 #pragma once
-#include <immintrin.h>
+#include "multiplication.hpp"
 
 #include "multiplication_matrix.inl"
 #include "multiplication_quaternion.inl"

@@ -10,10 +10,10 @@ namespace rsl::math::internal
 	template <typename T>
 	struct compute_multiplication;
 
-	template <typename Scalar>
-	struct compute_multiplication<quaternion<Scalar>>
+	template <arithmetic_type Scalar, storage_mode Mode>
+	struct compute_multiplication<quaternion<Scalar, Mode>>
 	{
-		using value_type = quaternion<Scalar>;
+		using value_type = quaternion<Scalar, Mode>;
 
 		template <quat_type AType, quat_type BType>
 		[[nodiscard]] constexpr static auto compute(AType&& a, BType&& b) noexcept
