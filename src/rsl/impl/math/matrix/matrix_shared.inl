@@ -108,7 +108,7 @@ namespace rsl::math
 			{
 				for (size_type j = 0; j < min_col; j++)
 				{
-					columns[j][i] = static_cast<scalar>(other.mx[j][i]);
+					columns[j][i] = static_cast<scalar>(other[j][i]);
 				}
 			}
 		}

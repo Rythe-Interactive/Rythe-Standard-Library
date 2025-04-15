@@ -4,7 +4,8 @@
 namespace rsl::math
 {
 	template <arithmetic_type Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> perspective(radians<Scalar> fovY, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
+	[[nodiscard]] matrix<Scalar, 4, 4>
+	perspective(radians<Scalar> fovY, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
 	{
 		Scalar const tanHalfFovY = tan(fovY.value * static_cast<Scalar>(0.5));
 		Scalar inverseFrustumDepth = static_cast<Scalar>(1) / (farZ - nearZ);
@@ -47,8 +48,7 @@ namespace rsl::math
 	[[nodiscard]] matrix<Scalar, 4, 4, elevated_storage_mode_v<ModeEye, elevated_storage_mode_v<ModeCenter, ModeUp>>>
 	look_at(vector<Scalar, 3, ModeEye> eye, vector<Scalar, 3, ModeCenter> center, vector<Scalar, 3, ModeUp> up) noexcept
 	{
-		constexpr storage_mode mode =
-			elevated_storage_mode_v<ModeEye, elevated_storage_mode_v<ModeCenter, ModeUp>>;
+		constexpr storage_mode mode = elevated_storage_mode_v<ModeEye, elevated_storage_mode_v<ModeCenter, ModeUp>>;
 		const vector<Scalar, 4, mode> f(normalize(center - eye));
 		const vector<Scalar, 4, mode> r(normalize(cross(up, f.xyz)));
 		// Length of u is 1 because the angle between f and r is 90 degrees
@@ -68,29 +68,60 @@ namespace rsl::math
 		return result;
 	}
 
-	template <arithmetic_type Scalar, storage_mode Mode>
-	constexpr matrix<Scalar, 4, 4, Mode> transpose(const matrix<Scalar, 4, 4, Mode>& mat) noexcept
+	namespace internal
 	{
-		if (is_constant_evaluated())
+		template <arithmetic_type Scalar, size_type Size, storage_mode Mode>
+		constexpr matrix<Scalar, Size, Size, Mode> transpose_impl(const matrix<Scalar, Size, Size, Mode>& mat) noexcept
 		{
-			matrix<Scalar, 4, 4, Mode> result{};
-			for (size_t i = 0; i < 4; ++i)
+			matrix<Scalar, Size, Size, Mode> result{};
+			for (size_t i = 0; i < Size; ++i)
 			{
-				for (size_t j = 0; j < 4; ++j)
+				for (size_t j = 0; j < Size; ++j)
 				{
 					result[j][i] = mat[i][j];
 				}
 			}
 			return result;
 		}
+	} // namespace internal
+
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode>
+	constexpr matrix<Scalar, Size, Size, Mode> transpose(const matrix<Scalar, Size, Size, Mode>& mat) noexcept
+	{
+		if constexpr (Size == 4)
+		{
+			if (is_constant_evaluated())
+			{
+				return internal::transpose_impl(mat);
+			}
+			else
+			{
+				matrix<Scalar, 4, 4, Mode> result(1);
+				result.row0 = mat.col0;
+				result.row1 = mat.col1;
+				result.row2 = mat.col2;
+				result.row3 = mat.col3;
+				return result;
+			}
+		}
+		else if constexpr (Size == 3)
+		{
+			if (is_constant_evaluated())
+			{
+				return internal::transpose_impl(mat);
+			}
+			else
+			{
+				matrix<Scalar, 3, 3, Mode> result(1);
+				result.row0 = mat.col0;
+				result.row1 = mat.col1;
+				result.row2 = mat.col2;
+				return result;
+			}
+		}
 		else
 		{
-			matrix<Scalar, 4, 4, Mode> result(1);
-			result.row0 = mat.col0;
-			result.row1 = mat.col1;
-			result.row2 = mat.col2;
-			result.row3 = mat.col3;
-			return result;
+			return internal::transpose_impl(mat);
 		}
 	}
 

@@ -7,48 +7,69 @@ namespace rsl::math
 {
 	namespace internal
 	{
-		template <typename Scalar, size_type Size>
-		struct compute_negate
-		{
-			static constexpr size_type size = Size;
-			using value_type = vector<Scalar, size>;
+		template <typename T>
+		struct compute_negate;
 
-			[[nodiscard]] constexpr static value_type compute(const value_type& a) noexcept
+		template <linear_algebraic_construct ConstructType>
+		struct compute_negate<ConstructType>
+		{
+			static constexpr size_type size = ConstructType::size;
+			using value_type = ConstructType;
+
+			[[nodiscard]] [[rythe_always_inline]] constexpr static value_type compute(const value_type& a) noexcept
 			{
 				value_type result;
 				for (size_type i = 0; i < size; i++)
 				{
-					result[i] = -a[i];
+					result.data[i] = -a.data[i];
 				}
 				return result;
 			}
 		};
 
-		template <typename Scalar>
-		struct compute_negate<Scalar, 1u>
+		template <arithmetic_type Scalar, storage_mode Mode>
+		struct compute_negate<vector<Scalar, 1u, Mode>>
 		{
 			static constexpr size_type size = 1u;
-			using value_type = vector<Scalar, size>;
+			using value_type = vector<Scalar, size, Mode>;
 
-			[[nodiscard]] constexpr static Scalar compute(Scalar a) noexcept { return -a; }
+			[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute(Scalar a) noexcept { return -a; }
 		};
 	} // namespace internal
 
-	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
-	[[nodiscard]] constexpr auto negate(const vec_type& a) noexcept
+	template <vector_type VecType>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto negate(const VecType& a) noexcept
 	{
-		return internal::compute_negate<typename vec_type::scalar, vec_type::size>::compute(a);
+		return internal::compute_negate<VecType>::compute(a);
 	}
 
-	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
-	[[nodiscard]] constexpr auto operator-(const vec_type& a)
+	template <vector_type VecType>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto operator-(const VecType& a)
 	{
-		return internal::compute_negate<typename vec_type::scalar, vec_type::size>::compute(a);
+		return internal::compute_negate<VecType>::compute(a);
 	}
 
-	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
-	constexpr vec_type& negate_assign(vec_type& a) noexcept
+	template <vector_type VecType>
+	[[rythe_always_inline]] constexpr VecType& negate_assign(VecType& a) noexcept
 	{
-		return a = internal::compute_negate<typename vec_type::scalar, vec_type::size>::compute(a);
+		return a = internal::compute_negate<VecType>::compute(a);
+	}
+
+	template <quat_type QuatType>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto negate(const QuatType& a) noexcept
+	{
+		return internal::compute_negate<QuatType>::compute(a);
+	}
+
+	template <quat_type QuatType>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto operator-(const QuatType& a)
+	{
+		return internal::compute_negate<QuatType>::compute(a);
+	}
+
+	template <quat_type QuatType>
+	[[rythe_always_inline]] constexpr QuatType& negate_assign(QuatType& a) noexcept
+	{
+		return a = internal::compute_negate<QuatType>::compute(a);
 	}
 } // namespace rsl::math

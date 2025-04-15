@@ -9,74 +9,67 @@ namespace rsl::math
 {
 	// mul
 	template <typename TypeA, typename TypeB>
-	[[nodiscard]] constexpr auto mul(TypeA&& a, TypeB&& b) noexcept
+		requires(
+			(linear_algebraic_construct<TypeA> || arithmetic_type<TypeA>) &&
+			(linear_algebraic_construct<TypeB> || arithmetic_type<TypeB>)
+		)
+	[[nodiscard]] constexpr auto mul(const TypeA& a, const TypeB& b) noexcept
 	{
-		using A = remove_cvr_t<TypeA>;
-		using B = remove_cvr_t<TypeB>;
-
-		if constexpr (is_quat_v<A> && is_quat_v<B>)
+		if constexpr (is_quat_v<TypeA> && is_quat_v<TypeB>)
 		{
-			return internal::compute_multiplication<elevated_t<A, B>>::compute(forward<TypeA>(a), forward<TypeB>(b));
+			return internal::compute_multiplication<elevated_t<TypeA, TypeB>>::compute(a, b);
 		}
-		else if constexpr (is_vector_v<A> && is_quat_v<B>)
+		else if constexpr (is_vector_v<TypeA> && is_quat_v<TypeB>)
 		{
-			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
-			constexpr storage_mode mode = elevated_storage_mode_v<A::mode, B::mode>;
-			return internal::compute_multiplication<quaternion<scalar, mode>>::compute(
-				forward<TypeA>(a), forward<TypeB>(b)
+			using scalar = elevated_t<typename TypeA::scalar, typename TypeB::scalar>;
+			constexpr storage_mode mode = elevated_storage_mode_v<TypeA::mode, TypeB::mode>;
+			return internal::compute_multiplication<quaternion<scalar, mode>>::compute(a, b);
+		}
+		else if constexpr (is_quat_v<TypeA> && is_vector_v<TypeB>)
+		{
+			using scalar = elevated_t<typename TypeA::scalar, typename TypeB::scalar>;
+			constexpr storage_mode mode = elevated_storage_mode_v<TypeA::mode, TypeB::mode>;
+			return internal::compute_multiplication<quaternion<scalar, mode>>::compute(b, a);
+		}
+		else if constexpr (is_matrix_v<TypeA> && is_matrix_v<TypeB>)
+		{
+			return internal::compute_multiplication<elevated_t<TypeA, TypeB>>::compute(a, b);
+		}
+		else if constexpr (is_matrix_v<TypeA> && is_vector_v<TypeB>)
+		{
+			using scalar = elevated_t<typename TypeA::scalar, typename TypeB::scalar>;
+			constexpr storage_mode mode = elevated_storage_mode_v<TypeA::mode, TypeB::mode>;
+			return internal::compute_multiplication<matrix<scalar, TypeA::row_count, TypeA::col_count, mode>>::compute(
+				b, a
 			);
 		}
-		else if constexpr (is_quat_v<A> && is_vector_v<B>)
+		else if constexpr (is_vector_v<TypeA> && is_matrix_v<TypeB>)
 		{
-			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
-			constexpr storage_mode mode = elevated_storage_mode_v<A::mode, B::mode>;
-			return internal::compute_multiplication<quaternion<scalar, mode>>::compute(
-				forward<TypeB>(b), forward<TypeA>(a)
+			using scalar = elevated_t<typename TypeA::scalar, typename TypeB::scalar>;
+			constexpr storage_mode mode = elevated_storage_mode_v<TypeA::mode, TypeB::mode>;
+			return internal::compute_multiplication<matrix<scalar, TypeB::row_count, TypeB::col_count, mode>>::compute(
+				a, b
 			);
 		}
-		else if constexpr (is_matrix_v<A> && is_matrix_v<B>)
+		else if constexpr (is_vector_v<TypeA> && is_vector_v<TypeB>)
 		{
-			return internal::compute_multiplication<elevated_t<A, B>>::compute(forward<TypeA>(a), forward<TypeB>(b));
+			return internal::compute_multiplication<elevated_t<TypeA, TypeB>>::compute(a, b);
 		}
-		else if constexpr (is_matrix_v<A> && is_vector_v<B>)
+		else if constexpr (is_vector_v<TypeA> || is_vector_v<TypeB>)
 		{
-			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
-			constexpr storage_mode mode = elevated_storage_mode_v<A::mode, B::mode>;
-			return internal::compute_multiplication<matrix<scalar, A::row_count, A::col_count, mode>>::compute(
-				forward<TypeB>(b), forward<TypeA>(a)
-			);
+			using vec_type = select_vector_type_t<TypeA, TypeB>;
+			using scalar = elevated_t<typename vec_type::scalar, select_floating_type_t<TypeA, TypeB>>;
+			return internal::compute_multiplication<vector<scalar, vec_type::size, vec_type::mode>>::compute(a, b);
 		}
-		else if constexpr (is_vector_v<A> && is_matrix_v<B>)
+		else if constexpr (is_quat_v<TypeA> && is_arithmetic_v<TypeB>)
 		{
-			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
-			constexpr storage_mode mode = elevated_storage_mode_v<A::mode, B::mode>;
-			return internal::compute_multiplication<matrix<scalar, B::row_count, B::col_count, mode>>::compute(
-				forward<TypeA>(a), forward<TypeB>(b)
-			);
+			return internal::compute_multiplication<
+				quaternion<elevated_t<typename TypeA::scalar, TypeB>, TypeA::mode>>::compute(a, b);
 		}
-		else if constexpr (is_vector_v<A> && is_vector_v<B>)
+		else if constexpr (is_arithmetic_v<TypeA> && is_quat_v<TypeB>)
 		{
-			return internal::compute_multiplication<elevated_t<A, B>>::compute(forward<TypeA>(a), forward<TypeB>(b));
-		}
-		else if constexpr (is_vector_v<A> || is_vector_v<B>)
-		{
-			using vec_type = select_vector_type_t<A, B>;
-			using scalar = elevated_t<typename vec_type::scalar, select_floating_type_t<A, B>>;
-			return internal::compute_multiplication<vector<scalar, vec_type::size, vec_type::mode>>::compute(
-				forward<TypeA>(a), forward<TypeB>(b)
-			);
-		}
-		else if constexpr (is_quat_v<A> && is_arithmetic_v<B>)
-		{
-			return internal::compute_multiplication<quaternion<elevated_t<typename A::scalar, B>, A::mode>>::compute(
-				forward<TypeA>(a), forward<TypeB>(b)
-			);
-		}
-		else if constexpr (is_arithmetic_v<A> && is_quat_v<B>)
-		{
-			return internal::compute_multiplication<quaternion<elevated_t<A, typename B::scalar>, B::mode>>::compute(
-				forward<TypeB>(b), forward<TypeA>(a)
-			);
+			return internal::compute_multiplication<
+				quaternion<elevated_t<TypeA, typename TypeB::scalar>, TypeB::mode>>::compute(b, a);
 		}
 		else
 		{
@@ -85,43 +78,49 @@ namespace rsl::math
 	}
 
 	template <linear_algebraic_construct TypeA, linear_algebraic_construct TypeB>
-	[[nodiscard]] constexpr auto operator*(TypeA&& a, TypeB&& b) noexcept
+	[[nodiscard]] constexpr auto operator*(const TypeA& a, const TypeB& b) noexcept
 	{
-		return mul(forward<TypeA>(a), forward<TypeB>(b));
+		return mul(a, b);
 	}
 
 	template <typename TypeA, typename TypeB>
-		requires(linear_algebraic_construct<TypeA> && arithmetic_type<TypeB>) ||
-				(linear_algebraic_construct<TypeB> && arithmetic_type<TypeA>)
-	constexpr auto operator*(TypeA&& a, TypeB&& b) noexcept
+		requires(
+			(linear_algebraic_construct<TypeA> && arithmetic_type<TypeB>) ||
+			(linear_algebraic_construct<TypeB> && arithmetic_type<TypeA>)
+		)
+	constexpr auto operator*(const TypeA& a, const TypeB& b) noexcept
 	{
-		return mul(forward<TypeA>(a), forward<TypeB>(b));
+		return mul(a, b);
 	}
 
 	template <linear_algebraic_construct TypeA, linear_algebraic_construct TypeB>
-	constexpr TypeA& mul_assign(TypeA& a, TypeB&& b) noexcept
+	constexpr TypeA& mul_assign(TypeA& a, const TypeB& b) noexcept
 	{
 		return a = a * b;
 	}
 
 	template <typename TypeA, typename TypeB>
-		requires(linear_algebraic_construct<TypeA> && arithmetic_type<TypeB>) ||
-				(linear_algebraic_construct<TypeB> && arithmetic_type<TypeA>)
-	constexpr TypeA& mul_assign(TypeA& a, TypeB&& b) noexcept
+		requires(
+			(linear_algebraic_construct<TypeA> && arithmetic_type<TypeB>) ||
+			(linear_algebraic_construct<TypeB> && arithmetic_type<TypeA>)
+		)
+	constexpr TypeA& mul_assign(TypeA& a, const TypeB& b) noexcept
 	{
 		return a = a * b;
 	}
 
 	template <linear_algebraic_construct TypeA, linear_algebraic_construct TypeB>
-	constexpr TypeA& operator*=(TypeA& a, TypeB&& b) noexcept
+	constexpr TypeA& operator*=(TypeA& a, const TypeB& b) noexcept
 	{
 		return a = a * b;
 	}
 
 	template <typename TypeA, typename TypeB>
-		requires(linear_algebraic_construct<TypeA> && arithmetic_type<TypeB>) ||
-				(linear_algebraic_construct<TypeB> && arithmetic_type<TypeA>)
-	constexpr TypeA& operator*=(TypeA& a, TypeB&& b) noexcept
+		requires(
+			(linear_algebraic_construct<TypeA> && arithmetic_type<TypeB>) ||
+			(linear_algebraic_construct<TypeB> && arithmetic_type<TypeA>)
+		)
+	constexpr TypeA& operator*=(TypeA& a, const TypeB& b) noexcept
 	{
 		return a = a * b;
 	}

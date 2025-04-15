@@ -39,10 +39,13 @@ namespace rsl
 				c += static_cast<uint64>(lo < t);
 				uint64 hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
 
-				if constexpr (Mode == hash_mode::fast_hash) {
+				if constexpr (Mode == hash_mode::fast_hash)
+				{
 					*a = lo;
 					*b = hi;
-				} else {
+				}
+				else
+				{
 					*a ^= lo;
 					*b ^= hi;
 				}
@@ -287,7 +290,7 @@ namespace rsl
 	RSL_HASH_INT(long);
 	RSL_HASH_INT(unsigned long);
 #endif
-	
+
 	RSL_HASH_INT(char16_t);
 	RSL_HASH_INT(char32_t);
 	RSL_HASH_INT(wchar_t);

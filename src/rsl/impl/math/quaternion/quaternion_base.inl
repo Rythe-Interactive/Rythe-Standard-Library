@@ -84,7 +84,8 @@ namespace rsl::math
 
 	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr vector<Scalar, 3, Mode> quaternion<Scalar, Mode>::euler_angles() const noexcept
-	{ // TODO(Glyn): Optimize
+	{
+		// TODO(Glyn): Optimize
 		vector<Scalar, 3> angles;
 
 		Scalar sinRCosP = static_cast<Scalar>(2) * (w * i + j * k);
@@ -113,14 +114,14 @@ namespace rsl::math
 	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr quaternion<Scalar, Mode>
 	quaternion<Scalar, Mode>::look_at(const vec_type& pos, const vec_type& center, const vec_type& _up) noexcept
-	{ // TODO(Glyn): Optimize
+	{
 		vec_type const forward(normalize(center - pos));
 		vec_type const right(normalize(cross(_up, forward)));
 		vec_type const up(cross(forward, right));
 
 		const scalar qwijk[] = {
-			right.x - up.y - forward.z, up.y - right.x - forward.z, forward.z - right.x - up.y,
-			right.x + up.y + forward.z
+			right.x + up.y + forward.z, right.x - up.y - forward.z, up.y - right.x - forward.z,
+			forward.z - right.x - up.y
 		};
 
 		size_type idx = 0;
@@ -137,10 +138,38 @@ namespace rsl::math
 		qMax = sqrt(qMax + static_cast<scalar>(1)) * static_cast<scalar>(0.5);
 		scalar mult = static_cast<scalar>(0.25) / qMax;
 
-		scalar qPerms[] = {qMax, (forward.y - up.z) * mult, (right.z - forward.x) * mult, (up.x - right.y) * mult};
-
-		size_type invIdx = 3 - idx;
-		return quaternion(qPerms[idx], qPerms[(invIdx + 2) % 4], qPerms[(idx + 2) % 4], qPerms[invIdx]);
+		switch (idx)
+		{
+			case 0:
+			{
+				return quaternion<Scalar, Mode>(
+					qMax, (up[2] - forward[1]) * mult, (forward[0] - right[2]) * mult, (right[1] - up[0]) * mult
+				);
+			}
+			case 1:
+			{
+				return quaternion<Scalar, Mode>(
+					(up[2] - forward[1]) * mult, qMax, (right[1] + up[0]) * mult, (forward[0] + right[2]) * mult
+				);
+			}
+			case 2:
+			{
+				return quaternion<Scalar, Mode>(
+					(forward[0] - right[2]) * mult, (right[1] + up[0]) * mult, qMax, (up[2] + forward[1]) * mult
+				);
+			}
+			case 3:
+			{
+				return quaternion<Scalar, Mode>(
+					(right[1] - up[0]) * mult, (forward[0] + right[2]) * mult, (up[2] + forward[1]) * mult, qMax
+				);
+			}
+			default:
+			{
+				rsl_assert_unreachable();
+				return quaternion<Scalar, Mode>::identity;
+			}
+		}
 	}
 
 	template <arithmetic_type Scalar, storage_mode Mode>
@@ -152,7 +181,8 @@ namespace rsl::math
 
 	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr quaternion<Scalar, Mode> quaternion<Scalar, Mode>::from_euler(const vec_type& euler) noexcept
-	{ // TODO(Glyn): Optimize
+	{
+		// TODO(Glyn): Optimize
 		vector<Scalar, 3> c = cos(euler * static_cast<Scalar>(0.5));
 		vector<Scalar, 3> s = sin(euler * static_cast<Scalar>(0.5));
 

@@ -323,9 +323,24 @@ namespace rsl::math
 	namespace internal
 	{
 		template <typename FPType>
-		struct _epsilon_fp_impl
+		struct _epsilon_fp_impl;
+
+		template <>
+		struct _epsilon_fp_impl<float32>
 		{
-			static constexpr auto value = ::std::numeric_limits<FPType>::epsilon();
+			static constexpr float32 value = 0.000001f;
+		};
+
+		template <>
+		struct _epsilon_fp_impl<float64>
+		{
+			static constexpr float64 value = 0.0000001;
+		};
+
+		template <>
+		struct _epsilon_fp_impl<float_max>
+		{
+			static constexpr float_max value = 0.00000009L;
 		};
 
 		template <typename IntType>

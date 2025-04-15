@@ -43,7 +43,7 @@ namespace rsl::math
 		scale.y = length(mat[1].xyz);
 		scale.z = length(mat[2].xyz);
 		translation = mat[3].xyz;
-		orientation = quaternion<Scalar>{mat};
+		orientation = quaternion<Scalar>(mat);
 	}
 
 	template <typename Scalar>

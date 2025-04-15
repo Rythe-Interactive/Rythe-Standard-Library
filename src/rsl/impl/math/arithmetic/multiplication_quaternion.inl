@@ -3,8 +3,6 @@
 #include "../geometric/dot.hpp"
 #include "addition.hpp"
 
-#include "multiplication.hpp"
-
 namespace rsl::math::internal
 {
 	template <typename T>
@@ -15,8 +13,7 @@ namespace rsl::math::internal
 	{
 		using value_type = quaternion<Scalar, Mode>;
 
-		template <quat_type AType, quat_type BType>
-		[[nodiscard]] constexpr static auto compute(AType&& a, BType&& b) noexcept
+		[[nodiscard]] constexpr static auto compute(const value_type& a, const value_type& b) noexcept
 		{
 			value_type result;
 			result.vec = a.w * b.vec + static_cast<Scalar>(b.w) * a.vec + cross(a.vec, b.vec);
@@ -24,19 +21,18 @@ namespace rsl::math::internal
 			return result;
 		}
 
-		template <vector_type AType, quat_type BType>
-		[[nodiscard]] constexpr static auto compute(AType&& a, BType&& b) noexcept
+		template <vector_type VecType>
+		[[nodiscard]] constexpr static auto compute(const VecType& a, const value_type& b) noexcept
 		{
-			using vec_type = remove_cvr_t<AType>;
-			if constexpr (vec_type::size == 3)
+			if constexpr (VecType::size == 3)
 			{
 				return static_cast<Scalar>(2) * dot(b.vec, a) * b.vec +
 					   (static_cast<Scalar>(b.w) * static_cast<Scalar>(b.w) - dot(b.vec, b.vec)) * a +
 					   static_cast<Scalar>(2) * static_cast<Scalar>(b.w) * cross(b.vec, a);
 			}
-			else if constexpr (vec_type::size == 4)
+			else if constexpr (VecType::size == 4)
 			{
-				return vec_type(
+				return VecType(
 					static_cast<Scalar>(2) * dot(b.vec, a.xyz) * b.vec +
 					(static_cast<Scalar>(b.w) * static_cast<Scalar>(b.w) - dot(b.vec, b.vec)) * a.xyz +
 					static_cast<Scalar>(2) * static_cast<Scalar>(b.w) * cross(b.vec, a.xyz)
@@ -44,8 +40,8 @@ namespace rsl::math::internal
 			}
 			else
 			{
-				vector<Scalar, 3> a3 = a;
-				return vec_type(
+				vector<Scalar, 3, Mode> a3 = a;
+				return vector<Scalar, 3, Mode>(
 					static_cast<Scalar>(2) * dot(b.vec, a3) * b.vec +
 					(static_cast<Scalar>(b.w) * static_cast<Scalar>(b.w) - dot(b.vec, b.vec)) * a3 +
 					static_cast<Scalar>(2) * static_cast<Scalar>(b.w) * cross(b.vec, a3)
@@ -53,8 +49,8 @@ namespace rsl::math::internal
 			}
 		}
 
-		template <quat_type AType, arithmetic_type BType>
-		[[nodiscard]] constexpr static auto compute(AType&& a, BType&& b) noexcept
+		template <arithmetic_type ScalarType>
+		[[nodiscard]] constexpr static auto compute(const value_type& a, ScalarType b) noexcept
 		{
 			value_type result;
 			result.i = a.i * b;
