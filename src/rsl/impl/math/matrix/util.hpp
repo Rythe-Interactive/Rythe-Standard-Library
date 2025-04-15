@@ -5,7 +5,7 @@
 namespace rsl::math
 {
 	template <arithmetic_type Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar fovY, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept;
+	[[nodiscard]] matrix<Scalar, 4, 4> perspective(radians<Scalar> fovY, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept;
 
 	template <arithmetic_type Scalar>
 	[[nodiscard]] matrix<Scalar, 4, 4>

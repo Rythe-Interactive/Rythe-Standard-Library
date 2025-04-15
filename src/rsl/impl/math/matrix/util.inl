@@ -4,9 +4,9 @@
 namespace rsl::math
 {
 	template <arithmetic_type Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar fovY, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
+	[[nodiscard]] matrix<Scalar, 4, 4> perspective(radians<Scalar> fovY, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
 	{
-		Scalar const tanHalfFovY = tan(fovY * static_cast<Scalar>(0.5));
+		Scalar const tanHalfFovY = tan(fovY.value * static_cast<Scalar>(0.5));
 		Scalar inverseFrustumDepth = static_cast<Scalar>(1) / (farZ - nearZ);
 
 		matrix<Scalar, 4, 4> result(static_cast<Scalar>(0));
