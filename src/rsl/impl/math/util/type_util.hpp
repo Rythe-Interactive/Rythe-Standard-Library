@@ -477,7 +477,6 @@ namespace rsl::math
 	template <typename TypeA, typename TypeB>
 	using select_matrix_type_t = typename select_matrix_type<TypeA, TypeB>::type;
 
-
 	template <typename T>
 	struct make_signed : ::std::make_signed<T>
 	{
@@ -503,7 +502,6 @@ namespace rsl::math
 
 	template <typename T>
 	using make_signed_t = typename make_signed<T>::type;
-
 
 	template <typename T>
 	struct make_unsigned : ::std::make_unsigned<T>
@@ -547,6 +545,9 @@ namespace rsl::math
 	template <typename A, typename B>
 	using smallest_t = typename smallest<A, B>::type;
 
+	template<storage_mode ModeA, storage_mode ModeB>
+	constexpr storage_mode elevated_storage_mode_v = ModeA < ModeB ? ModeA : ModeB;
+
 	namespace internal
 	{
 		template <typename A, typename B>
@@ -563,7 +564,7 @@ namespace rsl::math
 		{
 			using type = vector<
 				typename _elevated_impl<typename A::scalar, typename B::scalar>::type,
-				(A::size < B::size ? A::size : B::size), (A::mode < B::mode ? A::mode : B::mode)>;
+				(A::size < B::size ? A::size : B::size), elevated_storage_mode_v<A::mode, B::mode>>;
 		};
 
 		template <matrix_type A, matrix_type B>
@@ -572,7 +573,7 @@ namespace rsl::math
 			using type = matrix<
 				typename _elevated_impl<typename A::scalar, typename B::scalar>::type,
 				(A::row_count < B::row_count ? A::row_count : B::row_count),
-				(A::col_count < B::col_count ? A::col_count : B::col_count), (A::mode < B::mode ? A::mode : B::mode)>;
+				(A::col_count < B::col_count ? A::col_count : B::col_count), elevated_storage_mode_v<A::mode, B::mode>>;
 		};
 
 		template <quat_type A, quat_type B>
@@ -580,13 +581,13 @@ namespace rsl::math
 		{
 			using type = quaternion<
 				typename _elevated_impl<typename A::scalar, typename B::scalar>::type,
-				(A::mode < B::mode ? A::mode : B::mode)>;
+				elevated_storage_mode_v<A::mode, B::mode>>;
 		};
 
 		template <integral_type A, integral_type B>
 		struct _elevated_impl<A, B> :
 			conditional_t<
-				::std::is_signed_v<A> || ::std::is_signed_v<B>, make_signed<largest_t<A, B>>,
+				is_signed_v<A> || is_signed_v<B>, make_signed<largest_t<A, B>>,
 				make_unsigned<largest_t<A, B>>>
 		{
 		};

@@ -17,45 +17,45 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<A> && is_quat_v<B>)
 		{
-			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
-			return internal::compute_multiplication<quaternion<scalar>>::compute(forward<TypeA>(a), forward<TypeB>(b));
+			return internal::compute_multiplication<elevated_t<A, B>>::compute(forward<TypeA>(a), forward<TypeB>(b));
 		}
 		else if constexpr (is_vector_v<A> && is_quat_v<B>)
 		{
 			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
-			return internal::compute_multiplication<quaternion<scalar>>::compute(forward<TypeA>(a), forward<TypeB>(b));
+			constexpr storage_mode mode = elevated_storage_mode_v<A::mode, B::mode>;
+			return internal::compute_multiplication<quaternion<scalar, mode>>::compute(forward<TypeA>(a), forward<TypeB>(b));
 		}
 		else if constexpr (is_quat_v<A> && is_vector_v<B>)
 		{
 			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
-			return internal::compute_multiplication<quaternion<scalar>>::compute(forward<TypeB>(b), forward<TypeA>(a));
+			constexpr storage_mode mode = elevated_storage_mode_v<A::mode, B::mode>;
+			return internal::compute_multiplication<quaternion<scalar, mode>>::compute(forward<TypeB>(b), forward<TypeA>(a));
 		}
 		else if constexpr (is_matrix_v<A> && is_matrix_v<B>)
 		{
-			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
-			return internal::compute_multiplication<matrix<scalar, A::row_count, A::col_count>>::compute(
+			return internal::compute_multiplication<elevated_t<A, B>>::compute(
 				forward<TypeA>(a), forward<TypeB>(b)
 			);
 		}
 		else if constexpr (is_matrix_v<A> && is_vector_v<B>)
 		{
 			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
-			return internal::compute_multiplication<matrix<scalar, A::row_count, A::col_count>>::compute(
+			constexpr storage_mode mode = elevated_storage_mode_v<A::mode, B::mode>;
+			return internal::compute_multiplication<matrix<scalar, A::row_count, A::col_count, mode>>::compute(
 				forward<TypeB>(b), forward<TypeA>(a)
 			);
 		}
 		else if constexpr (is_vector_v<A> && is_matrix_v<B>)
 		{
 			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
-			return internal::compute_multiplication<matrix<scalar, B::row_count, B::col_count>>::compute(
+			constexpr storage_mode mode = elevated_storage_mode_v<A::mode, B::mode>;
+			return internal::compute_multiplication<matrix<scalar, B::row_count, B::col_count, mode>>::compute(
 				forward<TypeA>(a), forward<TypeB>(b)
 			);
 		}
 		else if constexpr (is_vector_v<A> && is_vector_v<B>)
 		{
-			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
-			constexpr size_type size = min(A::size, B::size);
-			return internal::compute_multiplication<vector<scalar, size>>::compute(
+			return internal::compute_multiplication<elevated_t<A, B>>::compute(
 				forward<TypeA>(a), forward<TypeB>(b)
 			);
 		}
@@ -63,19 +63,19 @@ namespace rsl::math
 		{
 			using vec_type = select_vector_type_t<A, B>;
 			using scalar = elevated_t<typename vec_type::scalar, select_floating_type_t<A, B>>;
-			return internal::compute_multiplication<vector<scalar, vec_type::size>>::compute(
+			return internal::compute_multiplication<vector<scalar, vec_type::size, vec_type::mode>>::compute(
 				forward<TypeA>(a), forward<TypeB>(b)
 			);
 		}
 		else if constexpr (is_quat_v<A> && is_arithmetic_v<B>)
 		{
-			return internal::compute_multiplication<quaternion<elevated_t<typename A::scalar, B>>>::compute(
+			return internal::compute_multiplication<quaternion<elevated_t<typename A::scalar, B>, A::mode>>::compute(
 				forward<TypeA>(a), forward<TypeB>(b)
 			);
 		}
 		else if constexpr (is_arithmetic_v<A> && is_quat_v<B>)
 		{
-			return internal::compute_multiplication<quaternion<elevated_t<A, typename B::scalar>>>::compute(
+			return internal::compute_multiplication<quaternion<elevated_t<A, typename B::scalar>, B::mode>>::compute(
 				forward<TypeB>(b), forward<TypeA>(a)
 			);
 		}

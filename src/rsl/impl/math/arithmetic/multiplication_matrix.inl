@@ -12,24 +12,24 @@ namespace rsl::math::internal
 		using mat_type = matrix<Scalar, RowCount, ColCount>;
 		using vec_type = typename mat_type::row_type;
 
-		template <typename other_type, std::enable_if_t<is_matrix_v<other_type>, bool> = true>
-		[[nodiscard]] constexpr static auto compute(const mat_type& a, const other_type& b) noexcept
+		template <matrix_type OtherType>
+		[[nodiscard]] constexpr static auto compute(const mat_type& a, const OtherType& b) noexcept
 		{
 			static_assert(
-				ColCount == other_type::row_count, "Matrix/matrix multiplication requires the column count of the "
+				ColCount == OtherType::row_count, "Matrix/matrix multiplication requires the column count of the "
 												   "first to be the same as the row count of the second."
 			);
 
-			using scalar = lowest_precision_t<Scalar, typename other_type::scalar>;
-			using result_type = matrix<scalar, RowCount, other_type::col_count>;
+			using scalar = lowest_precision_t<Scalar, typename OtherType::scalar>;
+			using result_type = matrix<scalar, RowCount, OtherType::col_count>;
 
 			result_type result = result_type::zero;
 
 			for (size_type i = 0; i < RowCount; i++)
 			{
-				for (size_type j = 0; j < other_type::col_count; j++)
+				for (size_type j = 0; j < OtherType::col_count; j++)
 				{
-					for (size_type k = 0; k < other_type::row_count; k++)
+					for (size_type k = 0; k < OtherType::row_count; k++)
 					{
 						result[i][j] += a[i][k] * b[k][j];
 					}
