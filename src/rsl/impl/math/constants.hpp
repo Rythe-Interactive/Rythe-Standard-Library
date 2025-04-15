@@ -135,21 +135,8 @@ namespace rsl::math
 	}
 
 	template <arithmetic_type T>
-	constexpr T rad2deg(T v)
-	{
-		return rad2deg<T>() * v;
-	}
-
-
-	template <arithmetic_type T>
 	constexpr T deg2rad()
 	{
 		return pi<T>() / T(180);
-	}
-
-	template <arithmetic_type T>
-	constexpr T deg2rad(T v)
-	{
-		return deg2rad<T>() * v;
 	}
 } // namespace rsl::math

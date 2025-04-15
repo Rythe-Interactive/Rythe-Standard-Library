@@ -56,10 +56,10 @@ namespace rsl::math
 			const vector<Scal1, 3, M1>& position = vector<Scal1, 3, M1>{0, 0, 0}
 		) noexcept;
 
-		template <typename mat_type>
-			requires not_same_as<Scalar, typename mat_type::scalar> || (mat_type::row_count != 4) ||
-					 (mat_type::col_count != 4)
-		[[rythe_always_inline]] constexpr matrix(const mat_type& other) noexcept;
+		template <typename MatType>
+			requires not_same_as<Scalar, typename MatType::scalar> || (MatType::row_count != 4) ||
+					 (MatType::col_count != 4)
+		[[rythe_always_inline]] constexpr matrix(const MatType& other) noexcept;
 
 		[[rythe_always_inline]] constexpr matrix& operator=(const matrix&) noexcept = default;
 
@@ -116,10 +116,10 @@ namespace rsl::math
 			const quaternion<Scal0, M0>& orientation, const vector<Scal1, 3, M1>& position = vector<Scal1, 3, M1>::zero
 		) noexcept;
 
-		template <typename mat_type>
-			requires not_same_as<bool, typename mat_type::scalar> || (mat_type::row_count != 4) ||
-					 (mat_type::col_count != 4)
-		[[rythe_always_inline]] constexpr matrix(const mat_type& other) noexcept;
+		template <typename MatType>
+			requires not_same_as<bool, typename MatType::scalar> || (MatType::row_count != 4) ||
+					 (MatType::col_count != 4)
+		[[rythe_always_inline]] constexpr matrix(const MatType& other) noexcept;
 
 		[[rythe_always_inline]] constexpr matrix& operator=(const matrix&) noexcept = default;
 

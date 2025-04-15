@@ -545,7 +545,7 @@ namespace rsl::math
 	template <typename A, typename B>
 	using smallest_t = typename smallest<A, B>::type;
 
-	template<storage_mode ModeA, storage_mode ModeB>
+	template <storage_mode ModeA, storage_mode ModeB>
 	constexpr storage_mode elevated_storage_mode_v = ModeA < ModeB ? ModeA : ModeB;
 
 	namespace internal
@@ -587,8 +587,7 @@ namespace rsl::math
 		template <integral_type A, integral_type B>
 		struct _elevated_impl<A, B> :
 			conditional_t<
-				is_signed_v<A> || is_signed_v<B>, make_signed<largest_t<A, B>>,
-				make_unsigned<largest_t<A, B>>>
+				is_signed_v<A> || is_signed_v<B>, make_signed<largest_t<A, B>>, make_unsigned<largest_t<A, B>>>
 		{
 		};
 	} // namespace internal

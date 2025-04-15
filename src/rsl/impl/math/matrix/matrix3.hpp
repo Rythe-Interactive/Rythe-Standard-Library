@@ -50,10 +50,10 @@ namespace rsl::math
 		template <arithmetic_type Scal, math::storage_mode M>
 		[[rythe_always_inline]] explicit constexpr matrix(const quaternion<Scal, M>& orientation) noexcept;
 
-		template <typename mat_type>
-			requires not_same_as<Scalar, typename mat_type::scalar> || (mat_type::row_count != 3) ||
-					 (mat_type::col_count != 3)
-		[[rythe_always_inline]] constexpr matrix(const mat_type& other) noexcept;
+		template <typename MatType>
+			requires not_same_as<Scalar, typename MatType::scalar> || (MatType::row_count != 3) ||
+					 (MatType::col_count != 3)
+		[[rythe_always_inline]] constexpr matrix(const MatType& other) noexcept;
 
 		[[rythe_always_inline]] constexpr matrix& operator=(const matrix&) noexcept = default;
 

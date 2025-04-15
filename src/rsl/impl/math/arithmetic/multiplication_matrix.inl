@@ -17,7 +17,7 @@ namespace rsl::math::internal
 		{
 			static_assert(
 				ColCount == OtherType::row_count, "Matrix/matrix multiplication requires the column count of the "
-												   "first to be the same as the row count of the second."
+												  "first to be the same as the row count of the second."
 			);
 
 			using scalar = lowest_precision_t<Scalar, typename OtherType::scalar>;

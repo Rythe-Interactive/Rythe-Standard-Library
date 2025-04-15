@@ -95,7 +95,9 @@ namespace rsl::math
 		const vector<Scalar, 3, Mode> m1 = m[1] * invScale[1];
 		const vector<Scalar, 3, Mode> m2 = m[2] * invScale[2];
 
-		const scalar qwijk[] = {m0[0] + m1[1] + m2[2], m0[0] - m1[1] - m2[2], m1[1] - m0[0] - m2[2], m2[2] - m0[0] - m1[1]};
+		const scalar qwijk[] = {
+			m0[0] + m1[1] + m2[2], m0[0] - m1[1] - m2[2], m1[1] - m0[0] - m2[2], m2[2] - m0[0] - m1[1]
+		};
 
 		size_type idx = 0;
 		scalar qMax = qwijk[0];
@@ -130,7 +132,9 @@ namespace rsl::math
 		const vector<Scalar, 3, Mode> m1 = m[1] * invScale[1];
 		const vector<Scalar, 3, Mode> m2 = m[2] * invScale[2];
 
-		const scalar qwijk[] = {m0[0] + m1[1] + m2[2], m0[0] - m1[1] - m2[2], m1[1] - m0[0] - m2[2], m2[2] - m0[0] - m1[1]};
+		const scalar qwijk[] = {
+			m0[0] + m1[1] + m2[2], m0[0] - m1[1] - m2[2], m1[1] - m0[0] - m2[2], m2[2] - m0[0] - m1[1]
+		};
 
 		size_type idx = 0;
 		scalar qMax = qwijk[0];
