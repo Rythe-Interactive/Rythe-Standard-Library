@@ -1,22 +1,16 @@
 #pragma once
 #include "predefined.hpp"
 
+RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4201) // anonymous struct
+
 namespace rsl::math
 {
-	struct uniform_matrix_signal
-	{
-	};
-	struct identity_matrix_signal
-	{
-	};
-
-	template <
-		arithmetic_type Scalar, size_type RowCount, size_type ColCount, storage_mode Mode = storage_mode::defaultp>
-	struct matrix
+	template <arithmetic_type Scalar, storage_mode Mode>
+	struct matrix<Scalar, 1, 1, Mode>
 	{
 		using scalar = Scalar;
-		static constexpr size_type row_count = RowCount;
-		static constexpr size_type col_count = ColCount;
+		static constexpr size_type row_count = 1;
+		static constexpr size_type col_count = 1;
 		static constexpr size_type size = row_count * col_count;
 		static constexpr storage_mode mode = Mode;
 
@@ -39,22 +33,24 @@ namespace rsl::math
 		[[rythe_always_inline]] explicit constexpr matrix(scalar s, identity_matrix_signal) noexcept;
 
 		template <typename MatType>
-			requires not_same_as<Scalar, typename MatType::scalar> || (MatType::row_count != RowCount) ||
-					 (MatType::col_count != ColCount)
+			requires not_same_as<Scalar, typename MatType::scalar> || (MatType::row_count != 1) ||
+					 (MatType::col_count != 1)
 		[[rythe_always_inline]] constexpr matrix(const MatType& other) noexcept;
 
 		[[rythe_always_inline]] constexpr matrix& operator=(const matrix&) noexcept = default;
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr col_type& operator[](size_type i) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const col_type& operator[](size_type i) const noexcept;
+
+		[[rythe_always_inline]] constexpr operator scalar() const noexcept { return data[0]; }
 	};
 
-	template <size_type RowCount, size_type ColCount, storage_mode Mode>
-	struct matrix<bool, RowCount, ColCount, Mode>
+	template <storage_mode Mode>
+	struct matrix<bool, 1, 1, Mode>
 	{
 		using scalar = bool;
-		static constexpr size_type row_count = RowCount;
-		static constexpr size_type col_count = ColCount;
+		static constexpr size_type row_count = 1;
+		static constexpr size_type col_count = 1;
 		static constexpr size_type size = row_count * col_count;
 		static constexpr storage_mode mode = Mode;
 
@@ -77,8 +73,8 @@ namespace rsl::math
 		[[rythe_always_inline]] explicit constexpr matrix(scalar s, identity_matrix_signal) noexcept;
 
 		template <typename MatType>
-			requires not_same_as<bool, typename MatType::scalar> || (MatType::row_count != RowCount) ||
-					 (MatType::col_count != ColCount)
+			requires not_same_as<Scalar, typename MatType::scalar> || (MatType::row_count != 1) ||
+					 (MatType::col_count != 1)
 		[[rythe_always_inline]] constexpr matrix(const MatType& other) noexcept;
 
 		[[rythe_always_inline]] constexpr matrix& operator=(const matrix&) noexcept = default;
@@ -86,14 +82,12 @@ namespace rsl::math
 		[[nodiscard]] [[rythe_always_inline]] constexpr col_type& operator[](size_type i) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const col_type& operator[](size_type i) const noexcept;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr operator bool() const noexcept
-		{
-			bool result = true;
-			for (size_type i = 0; i < size; ++i)
-			{
-				result &= data[i];
-			}
-			return result;
-		}
+		[[rythe_always_inline]] constexpr operator scalar() const noexcept { return data[0]; }
 	};
+
+	using bool1x1 = matrix<bool, 1, 1>;
+	using float1x1 = matrix<float32, 1, 1>;
+	using double1x1 = matrix<float64, 1, 1>;
 } // namespace rsl::math
+
+RYTHE_MSVC_SUPPRESS_WARNING_POP

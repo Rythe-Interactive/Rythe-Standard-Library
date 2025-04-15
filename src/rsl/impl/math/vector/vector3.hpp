@@ -110,8 +110,8 @@ namespace rsl::math
 
 	using float3 = vector<float32, 3>;
 	using double3 = vector<float64, 3>;
-	using int3 = vector<int, 3>;
-	using uint3 = vector<uint, 3>;
+	using int3 = vector<int32, 3>;
+	using uint3 = vector<uint32, 3>;
 	using bool3 = vector<bool, 3>;
 } // namespace rsl::math
 

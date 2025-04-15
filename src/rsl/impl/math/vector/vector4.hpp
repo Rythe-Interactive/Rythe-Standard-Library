@@ -157,8 +157,8 @@ namespace rsl::math
 
 	using float4 = vector<float32, 4>;
 	using double4 = vector<float64, 4>;
-	using int4 = vector<int, 4>;
-	using uint4 = vector<uint, 4>;
+	using int4 = vector<int32, 4>;
+	using uint4 = vector<uint32, 4>;
 	using bool4 = vector<bool, 4>;
 } // namespace rsl::math
 

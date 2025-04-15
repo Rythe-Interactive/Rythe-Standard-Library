@@ -80,8 +80,8 @@ namespace rsl::math
 
 	using float1 = vector<float32, 1>;
 	using double1 = vector<float64, 1>;
-	using int1 = vector<int, 1>;
-	using uint1 = vector<uint, 1>;
+	using int1 = vector<int32, 1>;
+	using uint1 = vector<uint32, 1>;
 	using bool1 = vector<bool, 1>;
 } // namespace rsl::math
 

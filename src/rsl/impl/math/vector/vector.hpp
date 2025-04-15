@@ -22,26 +22,26 @@ namespace rsl::math
 {
 	template struct vector<float32, 1>;
 	template struct vector<float64, 1>;
-	template struct vector<int, 1>;
-	template struct vector<uint, 1>;
+	template struct vector<int32, 1>;
+	template struct vector<uint32, 1>;
 	template struct vector<bool, 1>;
 
 	template struct vector<float32, 2>;
 	template struct vector<float64, 2>;
-	template struct vector<int, 2>;
-	template struct vector<uint, 2>;
+	template struct vector<int32, 2>;
+	template struct vector<uint32, 2>;
 	template struct vector<bool, 2>;
 
 	template struct vector<float32, 3>;
 	template struct vector<float64, 3>;
-	template struct vector<int, 3>;
-	template struct vector<uint, 3>;
+	template struct vector<int32, 3>;
+	template struct vector<uint32, 3>;
 	template struct vector<bool, 3>;
 
 	template struct vector<float32, 4>;
 	template struct vector<float64, 4>;
-	template struct vector<int, 4>;
-	template struct vector<uint, 4>;
+	template struct vector<int32, 4>;
+	template struct vector<uint32, 4>;
 	template struct vector<bool, 4>;
 } // namespace rsl::math
 #endif
