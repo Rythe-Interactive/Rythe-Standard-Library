@@ -21,6 +21,34 @@ namespace rsl
 			constexpr uint64 default_secret[3] = {0x2d358dccaa6c78a5ull, 0x8bb84b93962eacc9ull, 0x4b33a62ed433d4a3ull};
 
 			template <hash_mode Mode>
+			constexpr void manual_mum(uint64* a, uint64* b) noexcept
+			{
+				uint64 ha = *a >> 32;
+				uint64 hb = *b >> 32;
+				uint64 la = static_cast<uint32>(*a);
+				uint64 lb = static_cast<uint32>(*b);
+
+				uint64 rh = ha * hb;
+				uint64 rm0 = ha * lb;
+				uint64 rm1 = hb * la;
+				uint64 rl = la * lb;
+				uint64 t = rl + (rm0 << 32);
+				uint64 c = static_cast<uint64>(t < rl);
+
+				uint64 lo = t + (rm1 << 32);
+				c += static_cast<uint64>(lo < t);
+				uint64 hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
+
+				if constexpr (Mode == hash_mode::fast_hash) {
+					*a = lo;
+					*b = hi;
+				} else {
+					*a ^= lo;
+					*b ^= hi;
+				}
+			}
+
+			template <hash_mode Mode>
 			constexpr void mum(uint64* a, uint64* b) noexcept
 			{
 #if defined(RYTHE_HAS_INT128)
@@ -38,39 +66,9 @@ namespace rsl
 				}
 #else
 	#if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
-				constexpr bool forceManual = false;
-	#else
-				constexpr bool forceManual = true;
-	#endif
-
-				if (is_constant_evaluated() || forceManual)
+				if (is_constant_evaluated())
 				{
-					uint64 ha = *a >> 32;
-					uint64 hb = *b >> 32;
-					uint64 la = static_cast<uint32>(*a);
-					uint64 lb = static_cast<uint32>(*b);
-
-					uint64 rh = ha * hb;
-					uint64 rm0 = ha * lb;
-					uint64 rm1 = hb * la;
-					uint64 rl = la * lb;
-					uint64 t = rl + (rm0 << 32);
-					uint64 c = static_cast<uint64>(t < rl);
-
-					uint64 lo = t + (rm1 << 32);
-					c += static_cast<uint64>(lo < t);
-					uint64 hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
-
-					if constexpr (Mode == hash_mode::fast_hash)
-					{
-						*a = lo;
-						*b = hi;
-					}
-					else
-					{
-						*a ^= lo;
-						*b ^= hi;
-					}
+					manual_mum<Mode>(a, b);
 				}
 				else
 				{
@@ -86,6 +84,9 @@ namespace rsl
 						*b ^= tmpB;
 					}
 				}
+	#else
+				manual_mum<Mode>(a, b);
+	#endif
 #endif
 			}
 
@@ -281,8 +282,12 @@ namespace rsl
 	RSL_HASH_INT(int64);
 	RSL_HASH_INT(bool);
 	RSL_HASH_INT(char);
+
+#if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
 	RSL_HASH_INT(long);
 	RSL_HASH_INT(unsigned long);
+#endif
+	
 	RSL_HASH_INT(char16_t);
 	RSL_HASH_INT(char32_t);
 	RSL_HASH_INT(wchar_t);

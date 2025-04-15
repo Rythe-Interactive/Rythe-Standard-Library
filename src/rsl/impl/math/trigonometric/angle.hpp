@@ -90,17 +90,17 @@ namespace rsl::math
 	}
 
 	template <arithmetic_type Precision>
-	const angle<Precision> angle<Precision>::zero = rsl::math::degrees<Precision>{0};
+	const angle<Precision> angle<Precision>::zero = angle(rsl::math::degrees<Precision>{0});
 	template <arithmetic_type Precision>
-	const angle<Precision> angle<Precision>::deg45 = rsl::math::degrees<Precision>{45};
+	const angle<Precision> angle<Precision>::deg45 = angle(rsl::math::degrees<Precision>{45});
 	template <arithmetic_type Precision>
-	const angle<Precision> angle<Precision>::deg60 = rsl::math::degrees<Precision>{60};
+	const angle<Precision> angle<Precision>::deg60 = angle(rsl::math::degrees<Precision>{60});
 	template <arithmetic_type Precision>
-	const angle<Precision> angle<Precision>::deg90 = rsl::math::degrees<Precision>{90};
+	const angle<Precision> angle<Precision>::deg90 = angle(rsl::math::degrees<Precision>{90});
 	template <arithmetic_type Precision>
-	const angle<Precision> angle<Precision>::deg120 = rsl::math::degrees<Precision>{120};
+	const angle<Precision> angle<Precision>::deg120 = angle(rsl::math::degrees<Precision>{120});
 	template <arithmetic_type Precision>
-	const angle<Precision> angle<Precision>::deg180 = rsl::math::degrees<Precision>{180};
+	const angle<Precision> angle<Precision>::deg180 = angle(rsl::math::degrees<Precision>{180});
 
 	using angle32 = angle<float32>;
 	using angle64 = angle<float64>;
