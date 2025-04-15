@@ -3,6 +3,7 @@
 
 RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(5046)
 #include <bit>
+#include <cstring>
 #include <functional>
 #include <ratio>
 #include <type_traits>
