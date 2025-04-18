@@ -34,7 +34,7 @@ namespace rsl::math
 		m_seed = seed64(seed);
 	};
 
-	void rythe_default_engine::seed(const std::seed_seq& seq) noexcept
+	void rythe_default_engine::seed(std::seed_seq& seq) noexcept
 	{
 		if (seq.size() == 0)
 		{

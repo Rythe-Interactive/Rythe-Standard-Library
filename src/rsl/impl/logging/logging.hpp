@@ -3,6 +3,8 @@
 #include <sstream>
 #include <thread>
 
+#include "../util/primitives.hpp"
+
 #include "spdlog_include.hpp"
 
 namespace rsl::log

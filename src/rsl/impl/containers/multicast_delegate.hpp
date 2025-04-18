@@ -73,13 +73,7 @@ namespace rsl
 		template <typename T>
 		struct invocation_result
 		{
-			using type = std::vector<T, Allocator<T>>;
-		};
-
-		template <>
-		struct invocation_result<void>
-		{
-			using type = void;
+			using type = conditional_t<is_same_v<T, void>, void, std::vector<T, Allocator<T>>>;
 		};
 
 		template <typename T>
