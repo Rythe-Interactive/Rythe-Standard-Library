@@ -1,0 +1,42 @@
+#pragma once
+#include "rcp.hpp"
+#include <xmmintrin.h>
+#include <emmintrin.h>
+
+namespace rsl::math
+{
+	namespace internal
+	{
+		[[nodiscard]] [[rythe_always_inline]] inline float32 sse_rcp(float32 value) noexcept
+		{
+			_mm_store_ss(&value, _mm_rcp_ss(_mm_set_ss(value)));
+			return value;
+		}
+
+		[[nodiscard]] [[rythe_always_inline]] inline float64 sse_rcp(float64 value) noexcept
+		{
+			_mm_store_sd(&value, _mm_rcp14_pd(_mm_set_sd(value)));
+			return value;
+		}
+	}
+
+	template <floating_point_type Scalar>
+	constexpr Scalar rcp(Scalar value) noexcept
+	{
+		if (is_constant_evaluated())
+		{
+			return Scalar(1) / value;
+		}
+		else
+		{
+			if constexpr (sizeof(Scalar) > sizeof(float64))
+			{
+				return Scalar(1) / value;
+			}
+			else
+			{
+				return internal::sse_rcp(value);
+			}
+		}
+	}
+}

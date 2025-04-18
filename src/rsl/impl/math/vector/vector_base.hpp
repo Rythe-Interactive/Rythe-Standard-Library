@@ -3,7 +3,7 @@
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, size_type Size, storage_mode Mode = storage_mode::defaultp>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode = storage_mode::defaultStorage>
 	struct vector
 	{
 		using scalar = Scalar;

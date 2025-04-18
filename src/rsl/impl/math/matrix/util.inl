@@ -59,11 +59,11 @@ namespace rsl::math
 		result[1] = u;
 		result[2] = f;
 
-		vector<Scalar, 3, mode> x{r.x, u.x, f.x};
-		vector<Scalar, 3, mode> y{r.y, u.y, f.y};
-		vector<Scalar, 3, mode> z{r.z, u.z, f.z};
+		vector<Scalar, 3, mode> xxx{r.x, u.x, f.x};
+		vector<Scalar, 3, mode> yyy{r.y, u.y, f.y};
+		vector<Scalar, 3, mode> zzz{r.z, u.z, f.z};
 
-		result[3].xyz = -(x * eye.xxx + y * eye.yyy + z * eye.zzz);
+		result[3].xyz = -(xxx * eye.xxx + yyy * eye.yyy + zzz * eye.zzz);
 
 		return result;
 	}

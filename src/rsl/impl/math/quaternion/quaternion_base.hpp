@@ -1,6 +1,4 @@
 #pragma once
-#include <immintrin.h>
-
 #include "../../util/primitives.hpp"
 
 #include "../trigonometric/angle.hpp"
@@ -14,7 +12,7 @@ namespace rsl::math
 	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, storage_mode Mode>
 	struct matrix;
 
-	template <arithmetic_type Scalar, storage_mode Mode = storage_mode::defaultp>
+	template <arithmetic_type Scalar, storage_mode Mode = storage_mode::defaultStorage>
 	struct quaternion
 	{
 		using scalar = Scalar;

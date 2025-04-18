@@ -7,9 +7,15 @@
 namespace rsl::math
 {
 	template <vector_type VecType>
-	auto length(const VecType& v) noexcept
+	constexpr auto length(const VecType& v) noexcept
 	{
 		return internal::compute_length<VecType>::compute(v);
+	}
+
+	template <vector_type VecType>
+	constexpr auto rcp_length(const VecType& v) noexcept
+	{
+		return internal::compute_length<VecType>::compute_rcp(v);
 	}
 
 	template <vector_type VecType>
@@ -19,9 +25,15 @@ namespace rsl::math
 	}
 
 	template <quat_type QuatType>
-	auto length(const QuatType& q) noexcept
+	constexpr auto length(const QuatType& q) noexcept
 	{
 		return internal::compute_length<QuatType>::compute(q);
+	}
+
+	template <quat_type QuatType>
+	constexpr auto rcp_length(const QuatType& q) noexcept
+	{
+		return internal::compute_length<QuatType>::compute_rcp(q);
 	}
 
 	template <quat_type QuatType>
@@ -31,9 +43,15 @@ namespace rsl::math
 	}
 
 	template <matrix_type MatType>
-	auto length(const MatType& m) noexcept
+	constexpr auto length(const MatType& m) noexcept
 	{
 		return determinant(m);
+	}
+
+	template <matrix_type MatType>
+	constexpr auto rcp_length(const MatType& m) noexcept
+	{
+		return rpc(determinant(m));
 	}
 
 	template <matrix_type MatType>

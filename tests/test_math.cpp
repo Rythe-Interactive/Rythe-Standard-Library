@@ -37,6 +37,13 @@ TEST_CASE("vectors", "[math]")
 	{
 		constexpr float1 vec0(const0);
 
+		constexpr float1 normalized = normalize(vec0);
+		constexpr float32 vecLength = length(vec0);
+
+		CHECK(close_enough(vecLength, const0));
+		CHECK(close_enough(normalized[0], 1.f));
+		CHECK(close_enough(length(normalized), 1.f));
+
 		CHECK(close_enough(vec0.x, const0));
 		CHECK(vec0.xx == float2(const0, const0));
 		CHECK(vec0.xxx == float3(const0, const0, const0));
@@ -100,6 +107,14 @@ TEST_CASE("vectors", "[math]")
 		CHECK(float2(const0, const0) == float2(const0));
 
 		constexpr float2 vec0(const0, const3);
+
+		constexpr float2 normalized = normalize(vec0);
+		constexpr float32 vecLength = length(vec0);
+
+		CHECK(close_enough(vecLength, sqrt(const0 * const0 + const3 * const3)));
+		CHECK(close_enough(normalized[0], vec0[0] / vecLength));
+		CHECK(close_enough(normalized[1], vec0[1] / vecLength));
+		CHECK(close_enough(length(normalized), 1.f));
 
 		CHECK(close_enough(vec0.x, const0));
 		CHECK(vec0.xx == float2(const0, const0));
@@ -266,6 +281,15 @@ TEST_CASE("vectors", "[math]")
 		CHECK(float3(const0, const0, const0) == float3(const0));
 
 		constexpr float3 vec0(const0, const3, const1);
+
+		constexpr float3 normalized = normalize(vec0);
+		constexpr float32 vecLength = length(vec0);
+
+		CHECK(close_enough(vecLength, sqrt(const0 * const0 + const3 * const3 + const1 * const1)));
+		CHECK(close_enough(normalized[0], vec0[0] / vecLength));
+		CHECK(close_enough(normalized[1], vec0[1] / vecLength));
+		CHECK(close_enough(normalized[2], vec0[2] / vecLength));
+		CHECK(close_enough(length(normalized), 1.f));
 
 		CHECK(close_enough(vec0.x, const0));
 		CHECK(vec0.xx == float2(const0, const0));
@@ -484,6 +508,16 @@ TEST_CASE("vectors", "[math]")
 		CHECK(float4(const0, const0, const0, const0) == float4(const0));
 
 		constexpr float4 vec0(const0, const3, const1, const5);
+
+		constexpr float4 normalized = normalize(vec0);
+		constexpr float32 vecLength = length(vec0);
+
+		CHECK(close_enough(vecLength, sqrt(const0 * const0 + const3 * const3 + const1 * const1 + const5 * const5)));
+		CHECK(close_enough(normalized[0], vec0[0] / vecLength));
+		CHECK(close_enough(normalized[1], vec0[1] / vecLength));
+		CHECK(close_enough(normalized[2], vec0[2] / vecLength));
+		CHECK(close_enough(normalized[3], vec0[3] / vecLength));
+		CHECK(close_enough(length(normalized), 1.f));
 
 		CHECK(close_enough(vec0.x, const0));
 		CHECK(vec0.xx == float2(const0, const0));

@@ -11,7 +11,7 @@ namespace rsl::math
 	};
 
 	template <
-		arithmetic_type Scalar, size_type RowCount, size_type ColCount, storage_mode Mode = storage_mode::defaultp>
+		arithmetic_type Scalar, size_type RowCount, size_type ColCount, storage_mode Mode = storage_mode::defaultStorage>
 	struct matrix
 	{
 		using scalar = Scalar;

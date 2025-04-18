@@ -221,6 +221,10 @@ namespace rsl
 	#define RYTHE_COMPILER_ERROR(desc) _Pragma(RYTHE_STRINGIFY(GCC error desc))
 #endif
 
+#if defined(__FMA__) || defined(__AVX2__) || defined(__AVX__) || defined(__FMA4__)
+#define RYTHE_FMA_ENABLED
+#endif
+
 #pragma endregion
 
 #pragma region ////////////////////////////////// Language convention ///////////////////////////////////
