@@ -72,7 +72,7 @@ namespace rsl::math
 		[[nodiscard]] [[rythe_always_inline]] inline float64 sse_rsqrtf(float64 value) noexcept
 		{
 			const __m128d x = _mm_set_sd(value);
-			const __m128d nr = _mm_rsqrt14_pd(x);
+			const __m128d nr = _mm_castps_pd(_mm_rsqrt_ss(_mm_castpd_ps(x)));		// avoid _mm_rsqrt14_pd
 			const __m128d xnr = _mm_mul_sd(x, nr);								// dep on nr
 			const __m128d halfNr = _mm_mul_sd(_mm_set_sd(0.5f), nr);			// dep on nr
 			const __m128d muls = _mm_mul_sd(xnr, nr);							// dep on xnr
