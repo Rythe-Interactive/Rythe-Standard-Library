@@ -12,12 +12,12 @@
 
 namespace std
 {
-	template <typename Scalar, std::size_t Size, rsl::math::storage_mode Mode, std::size_t... args>
-	struct std::hash<rsl::math::swizzle<Scalar, Size, Mode, args...>>
+	template <typename Scalar, std::size_t Size, rsl::math::storage_mode Mode, std::size_t... Args>
+	struct hash<rsl::math::swizzle<Scalar, Size, Mode, Args...>>
 	{
-		std::size_t operator()(const rsl::math::swizzle<Scalar, Size, Mode, args...>& vec) const noexcept
+		std::size_t operator()(const rsl::math::swizzle<Scalar, Size, Mode, Args...>& vec) const noexcept
 		{
-			return rsl::hash_value(typename rsl::math::swizzle<Scalar, Size, Mode, args...>::conv_type(vec));
+			return rsl::hash_value(typename rsl::math::swizzle<Scalar, Size, Mode, Args...>::conv_type(vec));
 		}
 	};
 } // namespace std
