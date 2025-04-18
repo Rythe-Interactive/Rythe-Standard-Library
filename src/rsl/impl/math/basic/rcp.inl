@@ -15,7 +15,7 @@ namespace rsl::math
 
 		[[nodiscard]] [[rythe_always_inline]] inline float64 sse_rcp(float64 value) noexcept
 		{
-			_mm_store_sd(&value, _mm_rcp14_pd(_mm_set_sd(value)));
+			_mm_store_sd(&value, _mm_div_sd (_mm_set_sd(1.0), _mm_set_sd(value))); // avoid _mm_rcp14_pd
 			return value;
 		}
 	}
