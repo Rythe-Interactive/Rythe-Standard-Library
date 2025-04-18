@@ -12,13 +12,13 @@ namespace rsl::math
 	namespace internal
 	{
 		template <typename T>
-		[[nodiscard]] [[rythe_always_inline]] static auto _abs_impl_(T val)
+		[[nodiscard]] [[rythe_always_inline]] constexpr auto _abs_impl_(T val)
 		{
-			using value_type = ::std::remove_cvref_t<T>;
-			if constexpr (::std::is_floating_point_v<value_type>)
+			using value_type = remove_cvr_t<T>;
+			if constexpr (is_floating_point_v<value_type>)
 			{
 				value_type copy = val;
-				byte* significantByte = reinterpret_cast<byte*>(&copy);
+				byte* significantByte = bit_cast<byte*>(&copy);
 
 				if constexpr (endian::native == endian::little)
 				{
@@ -41,9 +41,9 @@ namespace rsl::math
 			static constexpr size_type size = Size;
 			using value_type = vector<Scalar, size>;
 
-			[[nodiscard]] static value_type compute(const value_type& val) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr value_type compute(const value_type& val) noexcept
 			{
-				if constexpr (!::std::is_signed_v<Scalar>)
+				if constexpr (!is_signed_v<Scalar>)
 				{
 					return val;
 				}
@@ -65,9 +65,9 @@ namespace rsl::math
 			static constexpr size_type size = 1u;
 			using value_type = vector<Scalar, size>;
 
-			[[nodiscard]] static Scalar compute(Scalar val) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr Scalar compute(Scalar val) noexcept
 			{
-				if constexpr (!::std::is_signed_v<Scalar>)
+				if constexpr (!is_signed_v<Scalar>)
 				{
 					return val;
 				}
@@ -80,14 +80,14 @@ namespace rsl::math
 	} // namespace internal
 
 	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] static auto abs(T val)
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto abs(T val)
 	{
-		using value_type = ::std::remove_cvref_t<T>;
+		using value_type = remove_cvr_t<T>;
 		if constexpr (is_vector_v<value_type>)
 		{
 			return internal::compute_abs<typename value_type::scalar, value_type::size>::compute(val);
 		}
-		else if constexpr (!::std::is_signed_v<value_type>)
+		else if constexpr (!is_signed_v<value_type>)
 		{
 			return val;
 		}
