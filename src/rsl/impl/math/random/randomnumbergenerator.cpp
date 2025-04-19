@@ -15,7 +15,7 @@ namespace rsl::math
 		engine->seed(seed);
 	}
 
-	void RandomNumberGenerator::setSeed(const std::seed_seq& seeds) noexcept
+	void RandomNumberGenerator::setSeed(std::seed_seq& seeds) noexcept
 	{
 		engine->seed(seeds);
 	}

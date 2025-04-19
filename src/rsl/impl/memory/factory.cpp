@@ -1,5 +1,7 @@
 #include "factory.hpp"
 
+#include "../util/assert.hpp"
+
 namespace rsl
 {
 	void* type_erased_factory::construct(void* ptr, size_type count) const

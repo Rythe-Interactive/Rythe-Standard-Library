@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 
-#include "../../util/common.hpp"
 #include "../../util/primitives.hpp"
 
 #include "random_number_engine.hpp"
@@ -22,7 +21,7 @@ namespace rsl::math
 
 		static void setSeed(size_type seed) noexcept;
 
-		static void setSeed(const std::seed_seq& seeds) noexcept;
+		static void setSeed(std::seed_seq& seeds) noexcept;
 
 		static void discard(size_type n) noexcept;
 

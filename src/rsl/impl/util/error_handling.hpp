@@ -1,12 +1,13 @@
 #pragma once
 
 #include <string_view>
+#include <limits>
 
 #include "../containers/buffered_list.hpp"
 #include "../containers/buffered_string.hpp"
 #include "../defines.hpp"
 #include "../util/assert.hpp"
-#include "../util/concepts.hpp"
+#include "../util/type_util.hpp"
 #include "../util/primitives.hpp"
 
 namespace rsl

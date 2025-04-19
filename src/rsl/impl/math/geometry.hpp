@@ -1,6 +1,7 @@
 #pragma once
 #include "geometric/geometric.hpp"
 #include "vector/vector.hpp"
+#include "basic/abs.hpp"
 
 /**
  * @file geometry.hpp
