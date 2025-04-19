@@ -287,7 +287,11 @@ namespace rsl
 	#define rythe_always_inline
 #else
 	#if defined(RYTHE_GCC)
-		#define rythe_always_inline gnu::always_inline
+		// GCC can't inline unless marked with the keyword inline,
+		// which in C++ means that the definition is on the same line as the declaration
+		// or local to the translation unit.
+		// Crucially this is not the same as compiler optimization inlining behaviour.
+		#define rythe_always_inline
 	#elif defined(RYTHE_CLANG)
 		#define rythe_always_inline clang::always_inline
 	#elif defined(RYTHE_MSVC)
@@ -298,7 +302,7 @@ namespace rsl
 #endif
 
 #if defined(RYTHE_GCC)
-	#define rythe_allocating gnu::allocating
+	#define rythe_allocating
 #elif defined(RYTHE_CLANG)
 	#define rythe_allocating
 #elif defined(RYTHE_MSVC)
