@@ -166,7 +166,7 @@ namespace rsl
 #if !defined(rythe_debugbreak_instruction)
 	#if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
 		#define rythe_debugbreak_instruction __debugbreak
-	#elif defined(RYTHE_CLANG) && __has_builtin(__builtin_debugtrap))
+	#elif defined(RYTHE_CLANG) && __has_builtin(__builtin_debugtrap)
 		#define rythe_debugbreak_instruction __builtin_debugtrap
 	#else
 		#include <signal.h>
