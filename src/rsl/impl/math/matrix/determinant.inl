@@ -5,7 +5,7 @@ namespace rsl::math
 {
 	namespace internal
 	{
-		template <typename MatType>
+		template <matrix_type MatType>
 		[[nodiscard]] [[rythe_always_inline]] constexpr auto
 		extract_sub_mat(const MatType& m, const size_type rowIdx, const size_type colIdx)
 		{
@@ -38,7 +38,7 @@ namespace rsl::math
 			return result;
 		}
 
-		template <typename T>
+		template <matrix_type T>
 		struct compute_determinant;
 
 		template <typename Scalar, size_type RowCount, size_type ColCount>
@@ -84,7 +84,7 @@ namespace rsl::math
 		};
 	} // namespace internal
 
-	template <typename MatType, ::std::enable_if_t<is_matrix_v<MatType>, bool>>
+	template <matrix_type MatType>
 	[[nodiscard]] constexpr auto determinant(const MatType& mat) noexcept
 	{
 		return internal::compute_determinant<MatType>::compute(mat);
