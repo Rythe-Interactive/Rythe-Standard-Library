@@ -170,7 +170,11 @@ namespace rsl
 		#define rythe_debugbreak_instruction __builtin_debugtrap
 	#else
 		#include <signal.h>
-		#define rythe_debugbreak_instruction() raise(SIGTRAP)
+		#if defined(SIGTRAP)
+			#define rythe_debugbreak_instruction() raise(SIGTRAP)
+		#else
+			#define rythe_debugbreak_instruction() raise(SIGABRT)
+		#endif
 	#endif
 #endif
 
