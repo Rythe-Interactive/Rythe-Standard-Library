@@ -17,7 +17,7 @@ namespace rsl::asserts
 				"Assertion failed:\t{}\nExpected:\t\t{}\nSource:\t\t\t{}, line {}", message, expression, file, line
 			);
 
-			__debugbreak();
+			rythe_debugbreak_instruction();
 
 			if (!soft)
 			{

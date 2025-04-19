@@ -163,6 +163,17 @@ namespace rsl
 	#endif
 #endif
 
+#if !defined(rythe_debugbreak_instruction)
+	#if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
+		#define rythe_debugbreak_instruction __debugbreak
+	#elif defined(RYTHE_CLANG) && __has_builtin(__builtin_debugtrap))
+		#define rythe_debugbreak_instruction __builtin_debugtrap
+	#else
+		#include <signal.h>
+		#define rythe_debugbreak_instruction() raise(SIGTRAP)
+	#endif
+#endif
+
 #if !defined(__RYTHE_FULL_FUNC__)
 	#if defined(RYTHE_CLANG) || defined(RYTHE_GCC)
 		#define __RYTHE_FULL_FUNC__ __PRETTY_FUNCTION__
