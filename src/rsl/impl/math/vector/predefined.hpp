@@ -25,7 +25,9 @@ namespace rsl::math
 	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
 	struct swizzle<bool, Size, Mode, s0, s1, s2>;
 
-	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
+	template <
+		arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2,
+		size_type s3>
 	struct swizzle<Scalar, Size, Mode, s0, s1, s2, s3>;
 
 	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>

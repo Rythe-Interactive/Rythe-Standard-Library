@@ -13,40 +13,41 @@ namespace rsl
 		unsigned char m_data[MaxSize];
 
 	public:
-		constexpr any() noexcept: m_data{} {}
+		constexpr any() noexcept
+			: m_data{}
+		{
+		}
 
 		any(const any& other) { memcpy(m_data, other.m_data, sizeof(other.m_data)); }
 
 		any(any&& other) noexcept
-			: m_data(move(other.m_data)) {}
+			: m_data(move(other.m_data))
+		{
+		}
 
-		template <
-			class ValueType>
+		template <class ValueType>
 		explicit any(ValueType&& value)
-			requires (conjunction_v<
-				negation<is_same<decay_t<ValueType>, any>>,
-				negation<rsl::is_specialization<decay_t<ValueType>, in_place_type_signal_type>>,
-				is_copy_constructible<decay_t<ValueType>>>)
+			requires(conjunction_v<
+					 negation<is_same<decay_t<ValueType>, any>>,
+					 negation<rsl::is_specialization<decay_t<ValueType>, in_place_type_signal_type>>,
+					 is_copy_constructible<decay_t<ValueType>>>)
 		{
 			emplace<decay_t<ValueType>>(forward<ValueType>(value));
 		}
 
-		template <
-			class ValueType, class... Types>
+		template <class ValueType, class... Types>
 		explicit any(in_place_type_signal_type<ValueType>, Types&&... args)
-			requires (conjunction_v<
-				is_constructible<decay_t<ValueType>, Types...>,
-				is_copy_constructible<decay_t<ValueType>>>)
+			requires(conjunction_v<
+					 is_constructible<decay_t<ValueType>, Types...>, is_copy_constructible<decay_t<ValueType>>>)
 		{
 			emplace<decay_t<ValueType>>(forward<Types>(args)...);
 		}
 
-		template <
-			class ValueType, class Elem, class... Types>
+		template <class ValueType, class Elem, class... Types>
 		explicit any(in_place_type_signal_type<ValueType>, std::initializer_list<Elem> iList, Types&&... args)
-			requires (conjunction_v<
-				is_constructible<decay_t<ValueType>, std::initializer_list<Elem>&, Types...>,
-				is_copy_constructible<decay_t<ValueType>>>)
+			requires(conjunction_v<
+					 is_constructible<decay_t<ValueType>, std::initializer_list<Elem>&, Types...>,
+					 is_copy_constructible<decay_t<ValueType>>>)
 		{
 			emplace<decay_t<ValueType>>(iList, forward<Types>(args)...);
 		}
@@ -66,34 +67,29 @@ namespace rsl
 			return *this;
 		}
 
-		template <
-			class ValueType>
+		template <class ValueType>
 		any& operator=(ValueType&& value)
-			requires (conjunction_v<
-				negation<is_same<decay_t<ValueType>, any>>,
-				is_copy_constructible<decay_t<ValueType>>>)
+			requires(conjunction_v<
+					 negation<is_same<decay_t<ValueType>, any>>, is_copy_constructible<decay_t<ValueType>>>)
 		{
 			*this = any{forward<ValueType>(value)};
 			return *this;
 		}
 
-		template <
-			class ValueType, class... Types>
+		template <class ValueType, class... Types>
 		decay_t<ValueType>& emplace(Types&&... args)
-			requires (conjunction_v<
-				is_constructible<decay_t<ValueType>, Types...>,
-				is_copy_constructible<decay_t<ValueType>>>)
+			requires(conjunction_v<
+					 is_constructible<decay_t<ValueType>, Types...>, is_copy_constructible<decay_t<ValueType>>>)
 		{
 			reset();
 			return emplace<decay_t<ValueType>>(forward<Types>(args)...);
 		}
 
-		template <
-			class ValueType, class Elem, class... Types>
+		template <class ValueType, class Elem, class... Types>
 		decay_t<ValueType>& emplace(std::initializer_list<Elem> iList, Types&&... args)
-			requires (conjunction_v<
-				is_constructible<decay_t<ValueType>, std::initializer_list<Elem>&, Types...>,
-				is_copy_constructible<decay_t<ValueType>>>)
+			requires(conjunction_v<
+					 is_constructible<decay_t<ValueType>, std::initializer_list<Elem>&, Types...>,
+					 is_copy_constructible<decay_t<ValueType>>>)
 		{
 			reset();
 			return emplace<decay_t<ValueType>>(iList, forward<Types>(args)...);
@@ -136,19 +132,17 @@ namespace rsl
 		left.swap(right);
 	}
 
-	template <
-		class ValueType, class... Types>
+	template <class ValueType, class... Types>
 	[[nodiscard]] any<sizeof(ValueType)> make_any(Types&&... args)
-		requires (is_constructible_v<any<sizeof(ValueType)>, in_place_type_signal_type<ValueType>, Types...>)
+		requires(is_constructible_v<any<sizeof(ValueType)>, in_place_type_signal_type<ValueType>, Types...>)
 	{
 		return any<sizeof(ValueType)>{in_place_type_signal<ValueType>, forward<Types>(args)...};
 	}
 
-	template <
-		class ValueType, class Elem, class... Types>
+	template <class ValueType, class Elem, class... Types>
 	[[nodiscard]] any<sizeof(ValueType)> make_any(std::initializer_list<Elem> iList, Types&&... args)
-		requires (is_constructible_v<
-			any<sizeof(ValueType)>, in_place_type_signal_type<ValueType>, std::initializer_list<Elem>&, Types...>)
+		requires(is_constructible_v<
+				 any<sizeof(ValueType)>, in_place_type_signal_type<ValueType>, std::initializer_list<Elem>&, Types...>)
 	{
 		return any<sizeof(ValueType)>{in_place_type_signal<ValueType>, iList, forward<Types>(args)...};
 	}

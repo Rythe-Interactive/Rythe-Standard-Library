@@ -283,7 +283,8 @@ namespace rsl::math
 		};
 
 		template <
-			arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode, size_type v>
+			arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode,
+			size_type v>
 		struct _uniform_value_impl_<column<Scalar, RowCount, ColCount, ColIdx, Mode>, v>
 		{
 			constexpr static auto value = vector<Scalar, RowCount, Mode>(static_cast<Scalar>(v));

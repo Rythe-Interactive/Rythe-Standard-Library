@@ -2,9 +2,9 @@
 
 #include "../containers/span.hpp"
 #include "../containers/string_view.hpp"
-#include "utilities.hpp"
 #include "string_util.hpp"
 #include "type_util.hpp"
+#include "utilities.hpp"
 
 #ifndef RSL_DEFAULT_HASH_MODE
 	#define RSL_DEFAULT_HASH_MODE fast_hash

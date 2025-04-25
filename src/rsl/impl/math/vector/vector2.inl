@@ -19,7 +19,7 @@ namespace rsl::math
 	constexpr vector<Scalar, 2, Mode>::vector(scalar _x, scalar _y) noexcept
 		: data{
 			  {_x, _y}
-	}
+    }
 	{
 	}
 
@@ -27,7 +27,7 @@ namespace rsl::math
 	constexpr vector<bool, 2, Mode>::vector(scalar _x, scalar _y) noexcept
 		: data{
 			  {_x, _y}
-	}
+    }
 	{
 	}
 } // namespace rsl::math
