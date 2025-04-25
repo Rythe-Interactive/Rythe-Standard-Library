@@ -342,7 +342,7 @@ namespace rsl
 
 		if constexpr (sizeof...(HashTypes) != 0)
 		{
-			return combine_hash(seed, hashes...);
+			return combine_hash<Mode>(seed, hashes...);
 		}
 		else
 		{
@@ -351,7 +351,7 @@ namespace rsl
 	}
 
 	template <same_as<id_type>... HashTypes>
-	constexpr id_type combine_hash(id_type seed, id_type hash, HashTypes... hashes) noexcept
+	constexpr id_type combine_hash(id_type seed, const id_type hash, const HashTypes... hashes) noexcept
 	{
 		return combine_hash<hash_mode::default_hash>(seed, hash, hashes...);
 	}

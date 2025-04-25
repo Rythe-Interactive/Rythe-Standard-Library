@@ -991,7 +991,7 @@ namespace rsl
 	template <typename T, typename... Types>
 	struct is_nothrow_in_place_constructable
 	{
-		constexpr bool value = is_nothrow_in_place_constructable_v<T, Types...>;
+		constexpr static bool value = is_nothrow_in_place_constructable_v<T, Types...>;
 	};
 
 	template <typename T, typename... Types>
