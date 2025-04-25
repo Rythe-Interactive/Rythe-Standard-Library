@@ -965,36 +965,28 @@ TEST_CASE("matrices", "[math]")
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_x_90));
 		}
 		{
-			constexpr float4x4 matrix{
-				right4, normalize(up4 + forward4), normalize(forward4 + -up4),
-				posW4
-			};
+			constexpr float4x4 matrix{right4, normalize(up4 + forward4), normalize(forward4 + -up4), posW4};
 			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_x_45));
 		}
 		{
-			constexpr float3x3 matrix{
-				right3 * 5.2125f, (up3 + forward3) * 4.4647f,
-				(forward3 + -up3) * 3.21654f
-			};
+			constexpr float3x3 matrix{right3 * 5.2125f, (up3 + forward3) * 4.4647f, (forward3 + -up3) * 3.21654f};
 			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_x_45));
 		}
 		{
 			constexpr float4x4 matrix{
-				right4 * 0.52165f, (up4 + forward4) * 0.154668f,
-				(forward4 + -up4) * 11.7567f, float4{4868.f, 1543.125f, 124.155f, 1.f}
+				right4 * 0.52165f, (up4 + forward4) * 0.154668f, (forward4 + -up4) * 11.7567f,
+				float4{4868.f, 1543.125f, 124.155f, 1.f}
 			};
 			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_x_45));
 		}
 		{
-			constexpr float3x3 matrix{
-				right3, normalize(up3 + forward3), normalize(forward3 + -up3)
-			};
+			constexpr float3x3 matrix{right3, normalize(up3 + forward3), normalize(forward3 + -up3)};
 			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_x_45));
@@ -1060,8 +1052,8 @@ TEST_CASE("quaternions", "[math]")
 		{
 			constexpr quat a = quat::angle_axis(degrees(90.f).radians(), right3);
 			constexpr quat b = quat::angle_axis(degrees(90.f).radians(), up3) *
-			                   quat::angle_axis(degrees(90.f).radians(), forward3) *
-			                   quat::angle_axis(-degrees(90.f).radians(), up3);
+							   quat::angle_axis(degrees(90.f).radians(), forward3) *
+							   quat::angle_axis(-degrees(90.f).radians(), up3);
 			CHECK(quat_absolute_equal(a, b));
 		}
 		{

@@ -106,8 +106,7 @@ namespace rsl
 				return (static_cast<uint64>(data[0]) << 56) | (static_cast<uint64>(data[k >> 1]) << 32) | data[k - 1];
 			}
 
-			[[nodiscard]] [[rythe_always_inline]] constexpr uint64
-			load32(const byte* data) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load32(const byte* data) noexcept
 			{
 				return static_cast<uint64>(unaligned_load<uint32>(data));
 			}
@@ -152,21 +151,39 @@ namespace rsl
 
 						while (i >= 96) [[likely]]
 						{
-							seed = mix<Mode>(unaligned_load<uint64>(data) ^ secret[0], unaligned_load<uint64>(data + 8) ^ seed);
-							seed1 = mix<Mode>(unaligned_load<uint64>(data + 16) ^ secret[1], unaligned_load<uint64>(data + 24) ^ seed1);
-							seed2 = mix<Mode>(unaligned_load<uint64>(data + 32) ^ secret[2], unaligned_load<uint64>(data + 40) ^ seed2);
-							seed = mix<Mode>(unaligned_load<uint64>(data + 48) ^ secret[0], unaligned_load<uint64>(data + 56) ^ seed);
-							seed1 = mix<Mode>(unaligned_load<uint64>(data + 64) ^ secret[1], unaligned_load<uint64>(data + 72) ^ seed1);
-							seed2 = mix<Mode>(unaligned_load<uint64>(data + 80) ^ secret[2], unaligned_load<uint64>(data + 88) ^ seed2);
+							seed = mix<Mode>(
+								unaligned_load<uint64>(data) ^ secret[0], unaligned_load<uint64>(data + 8) ^ seed
+							);
+							seed1 = mix<Mode>(
+								unaligned_load<uint64>(data + 16) ^ secret[1], unaligned_load<uint64>(data + 24) ^ seed1
+							);
+							seed2 = mix<Mode>(
+								unaligned_load<uint64>(data + 32) ^ secret[2], unaligned_load<uint64>(data + 40) ^ seed2
+							);
+							seed = mix<Mode>(
+								unaligned_load<uint64>(data + 48) ^ secret[0], unaligned_load<uint64>(data + 56) ^ seed
+							);
+							seed1 = mix<Mode>(
+								unaligned_load<uint64>(data + 64) ^ secret[1], unaligned_load<uint64>(data + 72) ^ seed1
+							);
+							seed2 = mix<Mode>(
+								unaligned_load<uint64>(data + 80) ^ secret[2], unaligned_load<uint64>(data + 88) ^ seed2
+							);
 							data += 96;
 							i -= 96;
 						}
 
 						if (i >= 48) [[unlikely]]
 						{
-							seed = mix<Mode>(unaligned_load<uint64>(data) ^ secret[0], unaligned_load<uint64>(data + 8) ^ seed);
-							seed1 = mix<Mode>(unaligned_load<uint64>(data + 16) ^ secret[1], unaligned_load<uint64>(data + 24) ^ seed1);
-							seed2 = mix<Mode>(unaligned_load<uint64>(data + 32) ^ secret[2], unaligned_load<uint64>(data + 40) ^ seed2);
+							seed = mix<Mode>(
+								unaligned_load<uint64>(data) ^ secret[0], unaligned_load<uint64>(data + 8) ^ seed
+							);
+							seed1 = mix<Mode>(
+								unaligned_load<uint64>(data + 16) ^ secret[1], unaligned_load<uint64>(data + 24) ^ seed1
+							);
+							seed2 = mix<Mode>(
+								unaligned_load<uint64>(data + 32) ^ secret[2], unaligned_load<uint64>(data + 40) ^ seed2
+							);
 							data += 48;
 							i -= 48;
 						}
@@ -176,10 +193,15 @@ namespace rsl
 
 					if (i > 16)
 					{
-						seed = mix<Mode>(unaligned_load<uint64>(data) ^ secret[2], unaligned_load<uint64>(data + 8) ^ seed ^ secret[1]);
+						seed = mix<Mode>(
+							unaligned_load<uint64>(data) ^ secret[2],
+							unaligned_load<uint64>(data + 8) ^ seed ^ secret[1]
+						);
 						if (i > 32)
 						{
-							seed = mix<Mode>(unaligned_load<uint64>(data + 16) ^ secret[2], unaligned_load<uint64>(data + 24) ^ seed);
+							seed = mix<Mode>(
+								unaligned_load<uint64>(data + 16) ^ secret[2], unaligned_load<uint64>(data + 24) ^ seed
+							);
 						}
 					}
 

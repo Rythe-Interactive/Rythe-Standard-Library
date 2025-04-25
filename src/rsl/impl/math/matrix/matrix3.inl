@@ -24,8 +24,8 @@ namespace rsl::math
 		: columns()
 	{
 		columns[0] = col_type(s00, s10, s20);
-        columns[1] = col_type(s01, s11, s21);
-        columns[2] = col_type(s02, s12, s22);
+		columns[1] = col_type(s01, s11, s21);
+		columns[2] = col_type(s02, s12, s22);
 	}
 
 	template <arithmetic_type Scalar, storage_mode Mode>

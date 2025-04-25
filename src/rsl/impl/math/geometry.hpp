@@ -1,7 +1,7 @@
 #pragma once
+#include "basic/abs.hpp"
 #include "geometric/geometric.hpp"
 #include "vector/vector.hpp"
-#include "basic/abs.hpp"
 
 /**
  * @file geometry.hpp
@@ -12,7 +12,8 @@ namespace rsl::math
 	/**
 	 * @brief Calculates shortest distance from point to line segment
 	 */
-	[[nodiscard]] constexpr float32 point_to_line_segment_2d(const float2& point, const float2& lineOrigin, const float2& lineEnd)
+	[[nodiscard]] constexpr float32
+	point_to_line_segment_2d(const float2& point, const float2& lineOrigin, const float2& lineEnd)
 	{
 		if (point == lineOrigin || point == lineEnd)
 		{
@@ -46,7 +47,8 @@ namespace rsl::math
 	/**
 	 * @brief Calculate the shortest distance from point to infinite line
 	 */
-	[[nodiscard]] constexpr float32 point_to_line_2d(const float2& point, const float2& lineOrigin, const float2& lineEnd)
+	[[nodiscard]] constexpr float32
+	point_to_line_2d(const float2& point, const float2& lineOrigin, const float2& lineEnd)
 	{
 		if (point == lineOrigin || point == lineEnd)
 		{
@@ -63,7 +65,8 @@ namespace rsl::math
 	 * @param lineOrigin - The origin of the line
 	 * @param lineEnd - The end of the line
 	 */
-	[[nodiscard]] constexpr float32 point_to_line_segment(const float3& point, const float3& lineOrigin, const float3& lineEnd)
+	[[nodiscard]] constexpr float32
+	point_to_line_segment(const float3& point, const float3& lineOrigin, const float3& lineEnd)
 	{
 		// Check if the point is equal to the start or end of the line
 		if (point == lineOrigin || point == lineEnd)
@@ -160,7 +163,8 @@ namespace rsl::math
 	 */
 	[[nodiscard]] constexpr float32 point_to_triangle(
 		const float3& p, const float3& triPoint0, const float3& triPoint1, const float3& triPoint2,
-		const float3& triNormal)
+		const float3& triNormal
+	)
 	{
 		if (p == triPoint0 || p == triPoint1 || p == triPoint2)
 		{
@@ -286,12 +290,13 @@ namespace rsl::math
 			normal = normalize(cross(p1 - p0, p2 - p0));
 		}
 
-		triangle(const float3 p0, const float3 p1, const float3 p2, const float3 normal) :
-			normal(normalize(normal))
+		triangle(const float3 p0, const float3 p1, const float3 p2, const float3 normal)
+			: normal(normalize(normal))
 		{
 			points[0] = p0;
 			points[1] = p1;
-			points[2] = p2;;
+			points[2] = p2;
+			;
 		}
 
 		// The three points of the triangle
@@ -371,12 +376,14 @@ namespace rsl::math
 	 * @param planePosition - A point on the plane
 	 * @param planeNormal - The plane normal
 	 */
-	[[nodiscard]] constexpr float32 point_to_plane(const float3& point, const float3& planePosition, const float3& planeNormal)
+	[[nodiscard]] constexpr float32
+	point_to_plane(const float3& point, const float3& planePosition, const float3& planeNormal)
 	{
 		return dot(normalize(planeNormal), point - planePosition);
 	}
 
-	[[nodiscard]] constexpr float32 angle_to_plane(const float3& point, const float3& planePosition, const float3& planeNormal)
+	[[nodiscard]] constexpr float32
+	angle_to_plane(const float3& point, const float3& planePosition, const float3& planeNormal)
 	{
 		return normalize_dot(planeNormal, point - planePosition);
 	}
@@ -387,7 +394,8 @@ namespace rsl::math
 	struct plane
 	{
 		plane(const float3 position, const float3 normal)
-			: position(position), normal(normalize(normal))
+			: position(position),
+			  normal(normalize(normal))
 		{
 		}
 

@@ -17,20 +17,30 @@ namespace rsl::math
 	namespace internal
 	{
 		template <typename T>
-		struct is_vector_impl : false_type {};
+		struct is_vector_impl : false_type
+		{
+		};
 
 		template <typename Scalar, size_type Size, storage_mode Mode>
-		struct is_vector_impl<vector<Scalar, Size, Mode>> : true_type {};
+		struct is_vector_impl<vector<Scalar, Size, Mode>> : true_type
+		{
+		};
 
 		template <typename Scalar, size_type Size, storage_mode Mode, size_type... Args>
-		struct is_vector_impl<swizzle<Scalar, Size, Mode, Args...>> : true_type {};
+		struct is_vector_impl<swizzle<Scalar, Size, Mode, Args...>> : true_type
+		{
+		};
 
 		template <typename Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode>
-		struct is_vector_impl<row<Scalar, RowCount, ColCount, ColIdx, Mode>> : true_type {};
+		struct is_vector_impl<row<Scalar, RowCount, ColCount, ColIdx, Mode>> : true_type
+		{
+		};
 	} // namespace internal
 
 	template <typename T>
-	struct is_vector : internal::is_vector_impl<remove_cvr_t<T>> {};
+	struct is_vector : internal::is_vector_impl<remove_cvr_t<T>>
+	{
+	};
 
 	template <typename T>
 	constexpr static bool is_vector_v = is_vector<T>::value;
@@ -140,14 +150,20 @@ namespace rsl::math
 	namespace internal
 	{
 		template <typename T>
-		struct is_matrix_impl : false_type {};
+		struct is_matrix_impl : false_type
+		{
+		};
 
 		template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, storage_mode Mode>
-		struct is_matrix_impl<matrix<Scalar, RowCount, ColCount, Mode>> : true_type {};
+		struct is_matrix_impl<matrix<Scalar, RowCount, ColCount, Mode>> : true_type
+		{
+		};
 	} // namespace internal
 
 	template <typename T>
-	struct is_matrix : internal::is_matrix_impl<remove_cvr_t<T>> {};
+	struct is_matrix : internal::is_matrix_impl<remove_cvr_t<T>>
+	{
+	};
 
 	template <typename T>
 	constexpr static bool is_matrix_v = is_matrix<T>::value;
@@ -187,14 +203,20 @@ namespace rsl::math
 	namespace internal
 	{
 		template <typename T>
-		struct is_quat_impl : false_type {};
+		struct is_quat_impl : false_type
+		{
+		};
 
 		template <arithmetic_type Scalar, storage_mode Mode>
-		struct is_quat_impl<quaternion<Scalar, Mode>> : true_type {};
+		struct is_quat_impl<quaternion<Scalar, Mode>> : true_type
+		{
+		};
 	} // namespace internal
 
 	template <typename T>
-	struct is_quat : internal::is_quat_impl<remove_cvr_t<T>> {};
+	struct is_quat : internal::is_quat_impl<remove_cvr_t<T>>
+	{
+	};
 
 	template <typename T>
 	constexpr static bool is_quat_v = is_quat<T>::value;
@@ -262,7 +284,7 @@ namespace rsl::math
 
 		template <
 			arithmetic_type Scalar, size_type RowCount, size_type ColCount, size_type ColIdx, storage_mode Mode,
-			                        size_type V>
+			size_type V>
 		struct uniform_value_impl_<row<Scalar, RowCount, ColCount, ColIdx, Mode>, V>
 		{
 			constexpr static auto value = vector<Scalar, RowCount, Mode>(static_cast<Scalar>(V));
@@ -285,7 +307,9 @@ namespace rsl::math
 	} // namespace internal
 
 	template <linear_algebraic_construct T, size_type V>
-	struct uniform_value : internal::uniform_value_impl_<remove_cvr_t<T>, V> {};
+	struct uniform_value : internal::uniform_value_impl_<remove_cvr_t<T>, V>
+	{
+	};
 
 	template <arithmetic_type T>
 	constexpr auto zero = uniform_value<T, 0>::value;
@@ -320,15 +344,21 @@ namespace rsl::math
 		};
 
 		template <typename IntType>
-		struct epsilon_int_impl : integral_constant<IntType, 1> {};
+		struct epsilon_int_impl : integral_constant<IntType, 1>
+		{
+		};
 
 		template <arithmetic_type FpType>
 		struct epsilon_impl :
-			conditional_t<is_floating_point_v<FpType>, epsilon_fp_impl<FpType>, epsilon_int_impl<FpType>> {};
+			conditional_t<is_floating_point_v<FpType>, epsilon_fp_impl<FpType>, epsilon_int_impl<FpType>>
+		{
+		};
 	} // namespace internal
 
 	template <arithmetic_type FpType>
-	struct epsilon : internal::epsilon_impl<remove_cvr_t<FpType>> {};
+	struct epsilon : internal::epsilon_impl<remove_cvr_t<FpType>>
+	{
+	};
 
 	template <arithmetic_type FpType>
 	constexpr auto epsilon_v = epsilon<FpType>::value;
@@ -435,8 +465,9 @@ namespace rsl::math
 
 	template <typename TypeA, typename TypeB>
 	struct select_floating_type :
-		conditional<is_floating_point_v<TypeA> || !is_floating_point_v<TypeB>, remove_cvr_t<TypeA>, remove_cvr_t<
-			            TypeB>> {};
+		conditional<is_floating_point_v<TypeA> || !is_floating_point_v<TypeB>, remove_cvr_t<TypeA>, remove_cvr_t<TypeB>>
+	{
+	};
 
 	template <typename TypeA, typename TypeB>
 	using select_floating_type_t = typename select_floating_type<TypeA, TypeB>::type;
@@ -489,10 +520,12 @@ namespace rsl::math
 		{
 			using type = long long;
 		};
-	}
+	} // namespace internal
 
 	template <typename T>
-	struct make_signed : internal::make_signed_impl<T, sizeof(T)> {};
+	struct make_signed : internal::make_signed_impl<T, sizeof(T)>
+	{
+	};
 
 	template <>
 	struct make_signed<float>
@@ -543,10 +576,12 @@ namespace rsl::math
 		{
 			using type = unsigned long long;
 		};
-	}
+	} // namespace internal
 
 	template <typename T>
-	struct make_unsigned : internal::make_unsigned_impl<T, sizeof(T)> {};
+	struct make_unsigned : internal::make_unsigned_impl<T, sizeof(T)>
+	{
+	};
 
 	template <>
 	struct make_unsigned<float>
@@ -569,26 +604,34 @@ namespace rsl::math
 	template <typename T>
 	using make_unsigned_t = typename make_unsigned<T>::type;
 
-	template<size_type N>
-	struct unsigned_integer_of_size : internal::make_unsigned_impl<void, N> {};
+	template <size_type N>
+	struct unsigned_integer_of_size : internal::make_unsigned_impl<void, N>
+	{
+	};
 
-	template<size_type N>
+	template <size_type N>
 	using unsigned_integer_of_size_t = typename unsigned_integer_of_size<N>::type;
 
-	template<size_type N>
-	struct signed_integer_of_size : internal::make_signed_impl<void, N> {};
+	template <size_type N>
+	struct signed_integer_of_size : internal::make_signed_impl<void, N>
+	{
+	};
 
-	template<size_type N>
+	template <size_type N>
 	using signed_integer_of_size_t = typename signed_integer_of_size<N>::type;
 
 	template <typename A, typename B>
-	struct largest : conditional<(sizeof(A) > sizeof(B)), A, B> {};
+	struct largest : conditional<(sizeof(A) > sizeof(B)), A, B>
+	{
+	};
 
 	template <typename A, typename B>
 	using largest_t = typename largest<A, B>::type;
 
 	template <typename A, typename B>
-	struct smallest : conditional<(sizeof(A) < sizeof(B)), A, B> {};
+	struct smallest : conditional<(sizeof(A) < sizeof(B)), A, B>
+	{
+	};
 
 	template <typename A, typename B>
 	using smallest_t = typename smallest<A, B>::type;
@@ -603,7 +646,9 @@ namespace rsl::math
 
 		template <arithmetic_type A, arithmetic_type B>
 			requires floating_point_type<A> || floating_point_type<B>
-		struct elevated_impl<A, B> : highest_precision<A, B> {};
+		struct elevated_impl<A, B> : highest_precision<A, B>
+		{
+		};
 
 		template <vector_type A, vector_type B>
 		struct elevated_impl<A, B>
@@ -633,11 +678,15 @@ namespace rsl::math
 		template <integral_type A, integral_type B>
 		struct elevated_impl<A, B> :
 			conditional_t<
-				is_signed_v<A> || is_signed_v<B>, make_signed<largest_t<A, B>>, make_unsigned<largest_t<A, B>>> {};
+				is_signed_v<A> || is_signed_v<B>, make_signed<largest_t<A, B>>, make_unsigned<largest_t<A, B>>>
+		{
+		};
 	} // namespace internal
 
 	template <typename A, typename B>
-	struct elevated : internal::elevated_impl<remove_cvr_t<A>, remove_cvr_t<B>> {};
+	struct elevated : internal::elevated_impl<remove_cvr_t<A>, remove_cvr_t<B>>
+	{
+	};
 
 	template <typename A, typename B>
 	using elevated_t = typename elevated<A, B>::type;

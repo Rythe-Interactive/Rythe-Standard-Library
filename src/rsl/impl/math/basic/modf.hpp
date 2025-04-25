@@ -54,14 +54,17 @@ namespace rsl::math
 	{
 		if constexpr (is_linear_algebraic_construct_v<T>)
 		{
-			static_assert(is_floating_point_v<typename T::scalar>,
-			              "Value must be floating point in order to use modf. (Did you mean fmod?)");
+			static_assert(
+				is_floating_point_v<typename T::scalar>,
+				"Value must be floating point in order to use modf. (Did you mean fmod?)"
+			);
 			return internal::compute_modf<T>::compute(val, integer);
 		}
 		else
 		{
-			static_assert(is_floating_point_v<T>,
-			              "Value must be floating point in order to use modf. (Did you mean fmod?)");
+			static_assert(
+				is_floating_point_v<T>, "Value must be floating point in order to use modf. (Did you mean fmod?)"
+			);
 			return ::std::modf(val, &integer);
 		}
 	}

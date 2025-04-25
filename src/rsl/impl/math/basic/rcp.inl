@@ -1,7 +1,7 @@
 #pragma once
 #include "rcp.hpp"
-#include <xmmintrin.h>
 #include <emmintrin.h>
+#include <xmmintrin.h>
 
 namespace rsl::math
 {
@@ -15,10 +15,10 @@ namespace rsl::math
 
 		[[nodiscard]] [[rythe_always_inline]] inline float64 sse_rcp(float64 value) noexcept
 		{
-			_mm_store_sd(&value, _mm_div_sd (_mm_set_sd(1.0), _mm_set_sd(value))); // avoid _mm_rcp14_pd
+			_mm_store_sd(&value, _mm_div_sd(_mm_set_sd(1.0), _mm_set_sd(value))); // avoid _mm_rcp14_pd
 			return value;
 		}
-	}
+	} // namespace internal
 
 	template <floating_point_type Scalar>
 	constexpr Scalar rcp(Scalar value) noexcept
@@ -39,4 +39,4 @@ namespace rsl::math
 			}
 		}
 	}
-}
+} // namespace rsl::math

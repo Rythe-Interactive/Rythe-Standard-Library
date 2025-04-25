@@ -20,8 +20,7 @@ namespace rsl::math
 				"Somehow the size of the unsigned version is not the same as the original integer type?"
 			);
 
-			Unsigned raw =
-				static_cast<Unsigned>(generate() % static_cast<size_type>(limits<Unsigned>::max));
+			Unsigned raw = static_cast<Unsigned>(generate() % static_cast<size_type>(limits<Unsigned>::max));
 			return *reinterpret_cast<Integer*>(&raw);
 		}
 		else

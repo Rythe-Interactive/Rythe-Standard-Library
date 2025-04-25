@@ -1,9 +1,9 @@
 #pragma once
-#include "tan.hpp"
+#include "../basic/abs.hpp"
 #include "../basic/is_nan.hpp"
 #include "../basic/round.hpp"
-#include "../basic/abs.hpp"
 #include "../util/limits.hpp"
+#include "tan.hpp"
 
 #include "tan_vector.inl"
 // #include "tan_matrix.inl"
@@ -80,15 +80,11 @@ namespace rsl::math
 		constexpr Scalar tan_series_exp_long(const Scalar z) noexcept
 		{
 			// this is valued on a fourth-order expansion of tan(z) using Bernoulli numbers
-			return static_cast<Scalar>(-1) / z + (
-				z / static_cast<Scalar>(3) + (
-					exp_by_squaring(z, 3) / static_cast<Scalar>(45) + (
-						static_cast<Scalar>(2) * exp_by_squaring(z, 5) /
-						static_cast<Scalar>(945) + exp_by_squaring(z, 7) /
-						static_cast<Scalar>(4725)
-					)
-				)
-			);
+			return static_cast<Scalar>(-1) / z +
+				   (z / static_cast<Scalar>(3) +
+					(exp_by_squaring(z, 3) / static_cast<Scalar>(45) +
+					 (static_cast<Scalar>(2) * exp_by_squaring(z, 5) / static_cast<Scalar>(945) +
+					  exp_by_squaring(z, 7) / static_cast<Scalar>(4725))));
 		}
 
 		template <floating_point_type Scalar>
@@ -189,7 +185,7 @@ namespace rsl::math
 
 			return x;
 		}
-	}
+	} // namespace internal
 
 	// tan
 	template <typename T>
@@ -251,7 +247,7 @@ namespace rsl::math
 			}
 			else
 			{
-			return ::std::atan2(forward<X>(x), forward<Y>(y));
+				return ::std::atan2(forward<X>(x), forward<Y>(y));
 			}
 		}
 	}

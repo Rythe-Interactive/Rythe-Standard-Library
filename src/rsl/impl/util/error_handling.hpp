@@ -5,10 +5,10 @@
 #include "../containers/buffered_list.hpp"
 #include "../containers/buffered_string.hpp"
 #include "../defines.hpp"
-#include "../util/assert.hpp"
-#include "../util/type_util.hpp"
-#include "../util/primitives.hpp"
 #include "../math/util/limits.hpp"
+#include "../util/assert.hpp"
+#include "../util/primitives.hpp"
+#include "../util/type_util.hpp"
 
 namespace rsl
 {

@@ -237,7 +237,7 @@ namespace rsl
 #endif
 
 #if defined(__FMA__) || defined(__AVX2__) || defined(__AVX__) || defined(__FMA4__)
-#define RYTHE_FMA_ENABLED
+	#define RYTHE_FMA_ENABLED
 #endif
 
 #pragma endregion
@@ -287,7 +287,7 @@ namespace rsl
 	#define rythe_always_inline
 #else
 	#if defined(RYTHE_GCC)
-		// GCC can't inline unless marked with the keyword inline,
+  // GCC can't inline unless marked with the keyword inline,
 		// which in C++ means that the definition is on the same line as the declaration
 		// or local to the translation unit.
 		// Crucially this is not the same as compiler optimization inlining behaviour.

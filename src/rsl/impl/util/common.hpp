@@ -286,8 +286,8 @@ namespace rsl
 
 	template <typename T>
 	inline constexpr bool is_integral_v = is_any_of_v<
-		remove_cv_t<T>, bool, char, signed char, unsigned char, wchar_t, char8_t, char16_t, char32_t, short, unsigned short,
-		int, unsigned int, long, unsigned long, long long, unsigned long long>;
+		remove_cv_t<T>, bool, char, signed char, unsigned char, wchar_t, char8_t, char16_t, char32_t, short,
+		unsigned short, int, unsigned int, long, unsigned long, long long, unsigned long long>;
 
 	template <typename T>
 	struct is_integral : bool_constant<is_integral_v<T>>
@@ -681,7 +681,8 @@ namespace rsl
 		// Requires that the size of To is equal or larger to the size of From
 		// Might still break on some compilers if From is byte and To is unsigned long long
 		template <typename To, typename From>
-			requires is_trivially_copyable_v<To> && is_trivially_constructible_v<To> && is_trivially_copyable_v<From> && (sizeof(To) >= sizeof(From))
+			requires is_trivially_copyable_v<To> && is_trivially_constructible_v<To> && is_trivially_copyable_v<From> &&
+					 (sizeof(To) >= sizeof(From))
 		constexpr void constexpr_memcpy_impl(To* dst, const From* src, const size_type count)
 		{
 			const size_type itemCount = count / sizeof(To);
@@ -768,8 +769,7 @@ namespace rsl
 
 	// Assumes buffer size of src is larger or equal to the size of To
 	template <typename To, typename From>
-		requires is_trivially_copyable_v<To> && is_trivially_copyable_v<From> &&
-				 is_trivially_constructible_v<To>
+		requires is_trivially_copyable_v<To> && is_trivially_copyable_v<From> && is_trivially_constructible_v<To>
 	[[nodiscard]] constexpr To unaligned_load(const From* src) noexcept
 	{
 		To dst{};

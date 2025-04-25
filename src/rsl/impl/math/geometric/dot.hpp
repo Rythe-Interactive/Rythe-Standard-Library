@@ -15,8 +15,8 @@ namespace rsl::math
 			static constexpr size_type size = Size;
 			using value_type = vector<Scalar, size, Mode>;
 
-			[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute(
-				const value_type& a, const value_type& b) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar
+			compute(const value_type& a, const value_type& b) noexcept
 			{
 				Scalar result = 0;
 				for (size_type i = 0; i < size; i++)

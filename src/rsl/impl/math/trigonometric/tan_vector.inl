@@ -32,7 +32,8 @@ namespace rsl::math::internal
 			return result;
 		}
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr static vec_type compute_inverse2(const vec_type& x, const vec_type& y) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static vec_type
+		compute_inverse2(const vec_type& x, const vec_type& y) noexcept
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)

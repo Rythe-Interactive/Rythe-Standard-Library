@@ -4,8 +4,7 @@
 namespace rsl::math
 {
 	template <arithmetic_type Scalar>
-	constexpr matrix<Scalar, 4, 4>
-	perspective(radians<Scalar> fovY, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
+	constexpr matrix<Scalar, 4, 4> perspective(radians<Scalar> fovY, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
 	{
 		Scalar const tanHalfFovY = tan(fovY.value * static_cast<Scalar>(0.5));
 		Scalar inverseFrustumDepth = static_cast<Scalar>(1) / (farZ - nearZ);
@@ -126,9 +125,8 @@ namespace rsl::math
 	}
 
 	template <arithmetic_type Scalar, storage_mode MatMode, storage_mode VecMode>
-	constexpr matrix<Scalar, 4, 4, elevated_storage_mode_v<MatMode, VecMode>> translate(
-		const matrix<Scalar, 4, 4, MatMode>& mat, const vector<Scalar, 3, VecMode>& pos
-	) noexcept
+	constexpr matrix<Scalar, 4, 4, elevated_storage_mode_v<MatMode, VecMode>>
+	translate(const matrix<Scalar, 4, 4, MatMode>& mat, const vector<Scalar, 3, VecMode>& pos) noexcept
 	{
 		constexpr storage_mode mode = elevated_storage_mode_v<MatMode, VecMode>;
 		if (is_constant_evaluated())

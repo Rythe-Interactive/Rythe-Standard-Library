@@ -1,8 +1,8 @@
 #pragma once
-#include "sin.hpp"
-#include "tan.hpp"
 #include "../basic/is_nan.hpp"
 #include "../constants.hpp"
+#include "sin.hpp"
+#include "tan.hpp"
 
 #include "sin_vector.inl"
 
@@ -57,7 +57,7 @@ namespace rsl::math
 		{
 			return value;
 		}
-	}
+	} // namespace internal
 
 	// sin
 	template <typename Scalar>
