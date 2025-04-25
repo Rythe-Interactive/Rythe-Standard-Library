@@ -6,51 +6,48 @@ namespace rsl::math::internal
 	template <typename T>
 	struct compute_cos;
 
-	template <typename Scalar, size_type Size>
-	struct compute_cos<vector<Scalar, Size>>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode>
+	struct compute_cos<vector<Scalar, Size, Mode>>
 	{
-		using vec_type = vector<Scalar, Size>;
+		using vec_type = vector<Scalar, Size, Mode>;
 
-		template <typename ValueType>
-		[[nodiscard]] static auto compute(ValueType&& value) noexcept
+		[[nodiscard]] [[rythe_always_inline]] static constexpr auto compute(const vec_type& value) noexcept
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
 			{
-				result[i] = ::std::cos(value[i]);
+				result[i] = cos(value[i]);
 			}
 
 			return result;
 		}
 
 		template <typename ValueType>
-		[[nodiscard]] static auto compute_inverse(ValueType&& value) noexcept
+		[[nodiscard]] [[rythe_always_inline]] static constexpr auto compute_inverse(const vec_type& value) noexcept
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
 			{
-				result[i] = ::std::acos(value[i]);
+				result[i] = acos(value[i]);
 			}
 
 			return result;
 		}
 	};
 
-	template <typename Scalar>
-	struct compute_cos<vector<Scalar, 1u>>
+	template <arithmetic_type Scalar, storage_mode Mode>
+	struct compute_cos<vector<Scalar, 1ull, Mode>>
 	{
-		using vec_type = vector<Scalar, 1u>;
+		using vec_type = vector<Scalar, 1ull, Mode>;
 
-		template <typename ValueType>
-		[[nodiscard]] static auto compute(ValueType&& value) noexcept
+		[[nodiscard]] [[rythe_always_inline]] static constexpr auto compute(Scalar value) noexcept
 		{
-			return ::std::cos(value[0]);
+			return cos(value[0]);
 		}
 
-		template <typename ValueType>
-		[[nodiscard]] static auto compute_inverse(ValueType&& value) noexcept
+		[[nodiscard]] [[rythe_always_inline]] static constexpr auto compute_inverse(Scalar value) noexcept
 		{
-			return ::std::acos(value[0]);
+			return acos(value[0]);
 		}
 	};
 } // namespace rsl::math::internal

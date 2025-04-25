@@ -24,7 +24,7 @@ namespace rsl::math
 		};
 	}
 
-	template <floating_point_type T>
+	template <arithmetic_type T>
 	using bit_rep = typename internal::bit_rep_impl<T>::type;
 
 	template<signed_type T>

@@ -33,9 +33,9 @@ namespace rsl::math
 		requires(VecType::size == 3)
 	constexpr quaternion<Scalar, Mode>::quaternion(typename VecType::scalar s, const VecType& v) noexcept
 		: w(static_cast<scalar>(s)),
-		  i(static_cast<scalar>(v.x)),
-		  j(static_cast<scalar>(v.y)),
-		  k(static_cast<scalar>(v.z))
+		  i(static_cast<scalar>(v[0])),
+		  j(static_cast<scalar>(v[1])),
+		  k(static_cast<scalar>(v[2]))
 	{
 	}
 
@@ -43,10 +43,10 @@ namespace rsl::math
 	template <vector_type VecType>
 		requires(VecType::size == 4)
 	constexpr quaternion<Scalar, Mode>::quaternion(const VecType& other) noexcept
-		: w(static_cast<scalar>(other.w)),
-		  i(static_cast<scalar>(other.x)),
-		  j(static_cast<scalar>(other.y)),
-		  k(static_cast<scalar>(other.z))
+		: w(static_cast<scalar>(other[3])),
+		  i(static_cast<scalar>(other[0])),
+		  j(static_cast<scalar>(other[1])),
+		  k(static_cast<scalar>(other[2]))
 	{
 	}
 
@@ -113,15 +113,15 @@ namespace rsl::math
 
 	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr quaternion<Scalar, Mode>
-	quaternion<Scalar, Mode>::look_at(const vec_type& pos, const vec_type& center, const vec_type& _up) noexcept
+	quaternion<Scalar, Mode>::look_at(const vec_type& pos, const vec_type& center, const vec_type& up) noexcept
 	{
 		vec_type const forward(normalize(center - pos));
-		vec_type const right(normalize(cross(_up, forward)));
-		vec_type const up(cross(forward, right));
+		vec_type const right(normalize(cross(up, forward)));
+		vec_type const tempUp(cross(forward, right));
 
 		const scalar qwijk[] = {
-			right.x + up.y + forward.z, right.x - up.y - forward.z, up.y - right.x - forward.z,
-			forward.z - right.x - up.y
+			right.x + tempUp.y + forward.z, right.x - tempUp.y - forward.z, tempUp.y - right.x - forward.z,
+			forward.z - right.x - tempUp.y
 		};
 
 		size_type idx = 0;
@@ -143,25 +143,25 @@ namespace rsl::math
 			case 0:
 			{
 				return quaternion<Scalar, Mode>(
-					qMax, (up[2] - forward[1]) * mult, (forward[0] - right[2]) * mult, (right[1] - up[0]) * mult
+					qMax, (tempUp[2] - forward[1]) * mult, (forward[0] - right[2]) * mult, (right[1] - tempUp[0]) * mult
 				);
 			}
 			case 1:
 			{
 				return quaternion<Scalar, Mode>(
-					(up[2] - forward[1]) * mult, qMax, (right[1] + up[0]) * mult, (forward[0] + right[2]) * mult
+					(tempUp[2] - forward[1]) * mult, qMax, (right[1] + tempUp[0]) * mult, (forward[0] + right[2]) * mult
 				);
 			}
 			case 2:
 			{
 				return quaternion<Scalar, Mode>(
-					(forward[0] - right[2]) * mult, (right[1] + up[0]) * mult, qMax, (up[2] + forward[1]) * mult
+					(forward[0] - right[2]) * mult, (right[1] + tempUp[0]) * mult, qMax, (tempUp[2] + forward[1]) * mult
 				);
 			}
 			case 3:
 			{
 				return quaternion<Scalar, Mode>(
-					(right[1] - up[0]) * mult, (forward[0] + right[2]) * mult, (up[2] + forward[1]) * mult, qMax
+					(right[1] - tempUp[0]) * mult, (forward[0] + right[2]) * mult, (tempUp[2] + forward[1]) * mult, qMax
 				);
 			}
 			default:

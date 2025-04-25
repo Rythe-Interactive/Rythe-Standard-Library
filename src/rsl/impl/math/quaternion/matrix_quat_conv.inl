@@ -1,6 +1,4 @@
 #pragma once
-#include <cmath>
-
 #include "quaternion.hpp"
 
 namespace rsl::math
@@ -88,7 +86,7 @@ namespace rsl::math
 
 	template <arithmetic_type Scalar, storage_mode Mode>
 	template <storage_mode M>
-	quaternion<Scalar, Mode>::quaternion(const matrix<Scalar, 3, 3, M>& m) noexcept
+	constexpr quaternion<Scalar, Mode>::quaternion(const matrix<Scalar, 3, 3, M>& m) noexcept
 	{
 		const vector<Scalar, 3, Mode> invScale{1.f / length(m[0]), 1.f / length(m[1]), 1.f / length(m[2])};
 		const vector<Scalar, 3, Mode> m0 = m[0] * invScale[0];
@@ -110,7 +108,7 @@ namespace rsl::math
 			}
 		}
 
-		qMax = ::std::sqrt(qMax + static_cast<Scalar>(1)) * static_cast<Scalar>(0.5);
+		qMax = sqrt(qMax + static_cast<Scalar>(1)) * static_cast<Scalar>(0.5);
 		Scalar mult = static_cast<Scalar>(0.25) / qMax;
 
 		switch (idx)
@@ -153,12 +151,17 @@ namespace rsl::math
 
 	template <arithmetic_type Scalar, storage_mode Mode>
 	template <storage_mode M>
-	quaternion<Scalar, Mode>::quaternion(const matrix<Scalar, 4, 4, M>& m) noexcept
+	constexpr quaternion<Scalar, Mode>::quaternion(const matrix<Scalar, 4, 4, M>& m) noexcept
 	{
-		const vector<Scalar, 3, Mode> invScale{1.f / length(m[0].xyz), 1.f / length(m[1].xyz), 1.f / length(m[2].xyz)};
-		const vector<Scalar, 3, Mode> m0 = m[0].xyz * invScale[0];
-		const vector<Scalar, 3, Mode> m1 = m[1].xyz * invScale[1];
-		const vector<Scalar, 3, Mode> m2 = m[2].xyz * invScale[2];
+		vector<Scalar, 3, Mode> m0(m[0]);
+		vector<Scalar, 3, Mode> m1(m[1]);
+		vector<Scalar, 3, Mode> m2(m[2]);
+
+		const vector<Scalar, 3, Mode> invScale{1.f / length(m0), 1.f / length(m1), 1.f / length(m2)};
+
+		m0 *= invScale[0];
+		m1 *= invScale[1];
+		m2 *= invScale[2];
 
 		const Scalar qwijk[] = {
 			m0[0] + m1[1] + m2[2], m0[0] - m1[1] - m2[2], m1[1] - m0[0] - m2[2], m2[2] - m0[0] - m1[1]
@@ -175,7 +178,7 @@ namespace rsl::math
 			}
 		}
 
-		qMax = ::std::sqrt(qMax + static_cast<Scalar>(1)) * static_cast<Scalar>(0.5);
+		qMax = sqrt(qMax + static_cast<Scalar>(1)) * static_cast<Scalar>(0.5);
 		Scalar mult = static_cast<Scalar>(0.25) / qMax;
 
 		switch (idx)

@@ -1,56 +1,51 @@
 #pragma once
-#include "../interpolation/map.hpp"
 
 namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_sin;
 
-	template <typename Scalar, size_type Size>
-	struct compute_sin<vector<Scalar, Size>>
+	template <typename Scalar, size_type Size, storage_mode Mode>
+	struct compute_sin<vector<Scalar, Size, Mode>>
 	{
-		using vec_type = vector<Scalar, Size>;
+		using vec_type = vector<Scalar, Size, Mode>;
 
-		template <typename ValueType>
-		[[nodiscard]] static auto compute(ValueType&& value) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static vec_type compute(const vec_type& value) noexcept
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
 			{
-				result[i] = ::std::sin(value[i]);
+				result[i] = sin(value[i]);
 			}
 
 			return result;
 		}
 
-		template <typename ValueType>
-		[[nodiscard]] static auto compute_inverse(ValueType&& value) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static vec_type compute_inverse(const vec_type& value) noexcept
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
 			{
-				result[i] = ::std::asin(value[i]);
+				result[i] = asin(value[i]);
 			}
 
 			return result;
 		}
 	};
 
-	template <typename Scalar>
-	struct compute_sin<vector<Scalar, 1u>>
+	template <typename Scalar, storage_mode Mode>
+	struct compute_sin<vector<Scalar, 1u, Mode>>
 	{
-		using vec_type = vector<Scalar, 1u>;
+		using vec_type = vector<Scalar, 1u, Mode>;
 
-		template <typename ValueType>
-		[[nodiscard]] static auto compute(ValueType&& value) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute(Scalar value) noexcept
 		{
-			return ::std::sin(value[0]);
+			return sin(value);
 		}
 
-		template <typename ValueType>
-		[[nodiscard]] static auto compute_inverse(ValueType&& value) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute_inverse(Scalar value) noexcept
 		{
-			return ::std::asin(value[0]);
+			return asin(value);
 		}
 	};
 } // namespace rsl::math::internal

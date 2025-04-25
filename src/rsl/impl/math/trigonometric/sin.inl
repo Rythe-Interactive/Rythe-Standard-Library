@@ -1,60 +1,109 @@
-#include "sin.hpp"
 #pragma once
+#include "sin.hpp"
+#include "tan.hpp"
+#include "../basic/is_nan.hpp"
+#include "../constants.hpp"
 
 #include "sin_vector.inl"
-// #include "sin_matrix.inl"
-// #include "sin_quaternion.inl"
 
 namespace rsl::math
 {
-	// sin
-	template <typename T>
-	[[nodiscard]] auto sin(T&& value) noexcept
+	namespace internal
 	{
-		using Type = ::std::remove_cvref_t<T>;
+		template <floating_point_type Scalar>
+		[[nodiscard]] [[rythe_always_inline]] constexpr Scalar constexpr_sin_impl(const Scalar value) noexcept
+		{
+			return (static_cast<Scalar>(2) * value) / (static_cast<Scalar>(1) + value * value);
+		}
 
-		if constexpr (is_quat_v<Type>)
+		template <floating_point_type Scalar>
+		[[nodiscard]] [[rythe_always_inline]] constexpr Scalar constexpr_sin(const Scalar value) noexcept
 		{
-			return internal::compute_sin<quaternion<typename Type::scalar>>::compute(forward<T>(value));
+			if (is_nan(value))
+			{
+				return limits<Scalar>::quiet_nan;
+			}
+
+			if (limits<Scalar>::min > abs(value))
+			{
+				return static_cast<Scalar>(0);
+			}
+
+			if (limits<Scalar>::min > abs(value - half_pi<Scalar>))
+			{
+				return static_cast<Scalar>(1);
+			}
+
+			if (limits<Scalar>::min > abs(value + half_pi<Scalar>))
+			{
+				return -static_cast<Scalar>(1);
+			}
+
+			if (limits<Scalar>::min > abs(value - pi<Scalar>))
+			{
+				return static_cast<Scalar>(0);
+			}
+
+			if (limits<Scalar>::min > abs(value + pi<Scalar>))
+			{
+				return -static_cast<Scalar>(0);
+			}
+
+			return constexpr_sin_impl(tan(value / static_cast<Scalar>(2)));
 		}
-		if constexpr (is_matrix_v<Type>)
+
+		template <arithmetic_type Scalar>
+		[[nodiscard]] [[rythe_always_inline]] constexpr Scalar constexpr_asin(const Scalar value) noexcept
 		{
-			return internal::compute_sin<matrix<typename Type::scalar, Type::row_count, Type::col_count>>::compute(
-				forward<T>(value)
-			);
+			return value;
 		}
-		if constexpr (is_vector_v<Type>)
+	}
+
+	// sin
+	template <typename Scalar>
+		requires floating_point_type<Scalar> || linear_algebraic_construct<Scalar>
+	constexpr auto sin(Scalar&& value) noexcept
+	{
+		using type = remove_cvr_t<Scalar>;
+
+		if constexpr (is_linear_algebraic_construct_v<type>)
 		{
-			return internal::compute_sin<vector<typename Type::scalar, Type::size>>::compute(forward<T>(value));
+			return internal::compute_sin<type>::compute(forward<Scalar>(value));
 		}
 		else
 		{
-			return ::std::sin(forward<T>(value));
+			if (is_constant_evaluated())
+			{
+				return internal::constexpr_sin<type>(value);
+			}
+			else
+			{
+				return ::std::sin(forward<Scalar>(value));
+			}
 		}
 	}
 
 	// asin
-	template <typename T>
-	[[nodiscard]] auto asin(T&& value) noexcept
+	template <typename Scalar>
+		requires floating_point_type<Scalar> || linear_algebraic_construct<Scalar>
+	constexpr auto asin(Scalar&& value) noexcept
 	{
-		using Type = ::std::remove_cvref_t<T>;
+		using type = remove_cvr_t<Scalar>;
 
-		if constexpr (is_quat_v<Type>)
+		if constexpr (is_linear_algebraic_construct_v<type>)
 		{
-			return internal::compute_sin<quaternion<typename Type::scalar>>::compute_inverse(forward<T>(value));
-		}
-		if constexpr (is_matrix_v<Type>)
-		{
-			return internal::compute_sin<
-				matrix<typename Type::scalar, Type::row_count, Type::col_count>>::compute_inverse(forward<T>(value));
-		}
-		if constexpr (is_vector_v<Type>)
-		{
-			return internal::compute_sin<vector<typename Type::scalar, Type::size>>::compute_inverse(forward<T>(value));
+			return internal::compute_sin<type>::compute_inverse(forward<Scalar>(value));
 		}
 		else
 		{
-			return ::std::asin(forward<T>(value));
+			if (is_constant_evaluated())
+			{
+				return internal::constexpr_asin<type>(value);
+			}
+			else
+			{
+				return ::std::asin(forward<Scalar>(value));
+			}
 		}
 	}
 } // namespace rsl::math

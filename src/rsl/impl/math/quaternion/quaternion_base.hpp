@@ -49,9 +49,9 @@ namespace rsl::math
 		[[rythe_always_inline]] explicit constexpr quaternion(const VecType& other) noexcept;
 
 		template <math::storage_mode M>
-		[[rythe_always_inline]] explicit quaternion(const matrix<scalar, 3, 3, M>& m) noexcept;
+		[[rythe_always_inline]] explicit constexpr quaternion(const matrix<scalar, 3, 3, M>& m) noexcept;
 		template <math::storage_mode M>
-		[[rythe_always_inline]] explicit quaternion(const matrix<scalar, 4, 4, M>& m) noexcept;
+		[[rythe_always_inline]] explicit constexpr quaternion(const matrix<scalar, 4, 4, M>& m) noexcept;
 
 		static const quaternion identity;
 		static const quaternion rotate_x_45;
@@ -66,8 +66,8 @@ namespace rsl::math
 
 		constexpr quaternion& operator=(const quaternion&) noexcept = default;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr scalar& operator[](size_type index) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const scalar& operator[](size_type index) const noexcept;
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr vec_type right() const noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr vec_type forward() const noexcept;

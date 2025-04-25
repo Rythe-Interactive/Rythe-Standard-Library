@@ -776,6 +776,15 @@ TEST_CASE("matrices", "[math]")
 	using namespace rsl;
 	using namespace rsl::math;
 
+	constexpr float3 right3{1.f, 0.f, 0.f};
+	constexpr float3 up3{0.f, 1.f, 0.f};
+	constexpr float3 forward3{0.f, 0.f, 1.f};
+
+	constexpr float4 right4{1.f, 0.f, 0.f, 0.f};
+	constexpr float4 up4{0.f, 1.f, 0.f, 0.f};
+	constexpr float4 forward4{0.f, 0.f, 1.f, 0.f};
+	constexpr float4 posW4{0.f, 0.f, 0.f, 1.f};
+
 	SECTION("matrix1x1") {}
 	SECTION("matrix2x2") {}
 	SECTION("matrix3x3") {}
@@ -818,8 +827,8 @@ TEST_CASE("matrices", "[math]")
 			CHECK(matrix1[3] == float4::positiveW);
 		}
 		{
-			const float4x4 matrix0 = rotate(float4x4{}, radians32::deg90, float3::up);
-			const float4x4 matrix1 = rotate(matrix0, radians32::deg90, float3::right);
+			constexpr float4x4 matrix0 = rotate(float4x4{}, degrees(90.f).radians(), up3);
+			constexpr float4x4 matrix1 = rotate(matrix0, degrees(90.f).radians(), right3);
 
 			CHECK(matrix0[0] == float4::backward);
 			CHECK(matrix0[1] == float4::up);
@@ -859,9 +868,9 @@ TEST_CASE("matrices", "[math]")
 			constexpr float3 scal(1.f);
 			constexpr float3 axis(1.f, 2.f, 3.f);
 			constexpr radians32 angle{2.329f};
-			const quat expectedRotation = quat::angle_axis(angle, axis);
+			constexpr quat expectedRotation = quat::angle_axis(angle, axis);
 
-			float4x4 matrix = translate(rotate(scale(float4x4{}, scal), angle, axis), pos);
+			constexpr float4x4 matrix = translate(rotate(scale(float4x4{}, scal), angle, axis), pos);
 
 			REQUIRE(mat_is_orthogonal(matrix));
 
@@ -897,8 +906,8 @@ TEST_CASE("matrices", "[math]")
 		}
 
 		{
-			float4x4 matrix{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-			float4x4 transposed = transpose(matrix);
+			constexpr float4x4 matrix{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+			constexpr float4x4 transposed = transpose(matrix);
 			constexpr float4x4 expected{1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16};
 
 			CHECK(transposed == expected);
@@ -908,10 +917,8 @@ TEST_CASE("matrices", "[math]")
 	SECTION("matrix multiplication")
 	{
 		{
-			float4 vec(1.f, 0.f, 0.f, 1.f);
-			float4x4 trans = float4x4(1.f);
-			trans = translate(trans, float3(1.f, 1.f, 0.f));
-			vec = trans * vec;
+			constexpr float4x4 trans = translate(float4x4(1.f), float3(1.f, 1.f, 0.f));
+			constexpr float4 vec = trans * float4(1.f, 0.f, 0.f, 1.f);
 
 			CHECK(vec == float4(2.f, 1.f, 0.f, 1.f));
 		}
@@ -921,86 +928,86 @@ TEST_CASE("matrices", "[math]")
 	{
 		{
 			constexpr float4x4 matrix{};
-			quat quaternion{matrix};
+			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::identity));
 		}
 		{
 			constexpr float3x3 matrix{};
-			quat quaternion{matrix};
+			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::identity));
 		}
 		{
-			const float4x4 matrix{
-				float4::right * 2.f, float4::up * 3.5f, float4::forward * 6.4f, float4{2.f, 2.5f, 3.2f, 1.f}
+			constexpr float4x4 matrix{
+				right4 * 2.f, up4 * 3.5f, forward4 * 6.4f, float4{2.f, 2.5f, 3.2f, 1.f}
 			};
-			quat quaternion{matrix};
+			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::identity));
 		}
 		{
-			const float3x3 matrix{float3::right * 3.12f, float3::up * 8.45f, float3::forward * 0.23f};
-			quat quaternion{matrix};
+			constexpr float3x3 matrix{right3 * 3.12f, up3 * 8.45f, forward3 * 0.23f};
+			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::identity));
 		}
 		{
-			const float4x4 matrix{float4::right, float4::forward, float4::down, float4::positiveW};
-			quat quaternion{matrix};
+			constexpr float4x4 matrix{right4, forward4, -up4, posW4};
+			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_x_90));
 		}
 		{
-			const float3x3 matrix{float3::right, float3::forward, float3::down};
-			quat quaternion{matrix};
+			constexpr float3x3 matrix{right3, forward3, -up3};
+			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_x_90));
 		}
 		{
-			const float4x4 matrix{
-				float4::right, normalize(float4::up + float4::forward), normalize(float4::forward + float4::down),
-				float4::positiveW
+			constexpr float4x4 matrix{
+				right4, normalize(up4 + forward4), normalize(forward4 + -up4),
+				posW4
 			};
-			const quat quaternion{matrix};
+			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_x_45));
 		}
 		{
-			const float3x3 matrix{
-				float3::right * 5.2125f, (float3::up + float3::forward) * 4.4647f,
-				(float3::forward + float3::down) * 3.21654f
+			constexpr float3x3 matrix{
+				right3 * 5.2125f, (up3 + forward3) * 4.4647f,
+				(forward3 + -up3) * 3.21654f
 			};
-			const quat quaternion{matrix};
+			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_x_45));
 		}
 		{
-			const float4x4 matrix{
-				float4::right * 0.52165f, (float4::up + float4::forward) * 0.154668f,
-				(float4::forward + float4::down) * 11.7567f, float4{4868.f, 1543.125f, 124.155f, 1.f}
+			constexpr float4x4 matrix{
+				right4 * 0.52165f, (up4 + forward4) * 0.154668f,
+				(forward4 + -up4) * 11.7567f, float4{4868.f, 1543.125f, 124.155f, 1.f}
 			};
-			const quat quaternion{matrix};
+			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_x_45));
 		}
 		{
-			const float3x3 matrix{
-				float3::right, normalize(float3::up + float3::forward), normalize(float3::forward + float3::down)
+			constexpr float3x3 matrix{
+				right3, normalize(up3 + forward3), normalize(forward3 + -up3)
 			};
-			const quat quaternion{matrix};
+			constexpr quat quaternion{matrix};
 
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_x_45));
 		}
 		{
 			constexpr float3 axis(1.f, 2.f, 3.f);
 			constexpr radians32 angle{2.329f};
-			const quat expectedRotation = quat::angle_axis(angle, axis);
+			constexpr quat expectedRotation = quat::angle_axis(angle, axis);
 
 			REQUIRE(close_enough(length(expectedRotation), 1.f));
 
-			float4x4 matrix = float4x4(expectedRotation);
-			quat orientation = quat(matrix);
+			constexpr float4x4 matrix = float4x4(expectedRotation);
+			constexpr quat orientation = quat(matrix);
 
 			CHECK(close_enough(length(orientation), 1.f));
 			CHECK(close_enough(length(orientation), 1.f));
@@ -1011,7 +1018,7 @@ TEST_CASE("matrices", "[math]")
 	SECTION("matrix look_at")
 	{
 		{
-			const float4x4 matrix = look_at(float3::forward * 3.f, float3::zero, float3::up);
+			constexpr float4x4 matrix = look_at(forward3 * 3.f, float3{}, up3);
 
 			CHECK(matrix[0] == float4::left);
 			CHECK(matrix[1] == float4::up);
@@ -1026,10 +1033,15 @@ TEST_CASE("quaternions", "[math]")
 	using namespace rsl;
 	using namespace rsl::math;
 
-	constexpr static float32 sin22_5 = 0.3826834323650897717284599840304f;
-	constexpr static float32 cos22_5 = 0.92387953251128675612818318939679f;
-	constexpr static float32 sin45 = 0.70710678118654752440084436210485f;
-	constexpr static float32 cos45 = 0.70710678118654752440084436210485f;
+	constexpr static float32 sin22_5 = math::sin(degrees(22.5f).radians().value);
+	constexpr static float32 cos22_5 = math::cos(degrees(22.5f).radians().value);
+	constexpr static float32 sin45 = math::sin(degrees(45.f).radians().value);
+	constexpr static float32 cos45 = math::cos(degrees(45.f).radians().value);
+
+	REQUIRE(close_enough(sin22_5, 0.3826834323650897717284599840304f));
+	REQUIRE(close_enough(cos22_5, 0.92387953251128675612818318939679f));
+	REQUIRE(close_enough(sin45, 0.70710678118654752440084436210485f));
+	REQUIRE(close_enough(cos45, 0.70710678118654752440084436210485f));
 
 	constexpr static quat identity(1.f, 0.f, 0.f, 0.f);
 	constexpr static quat rotate_x_45(cos22_5, sin22_5, 0.f, 0.f);
@@ -1039,25 +1051,29 @@ TEST_CASE("quaternions", "[math]")
 	constexpr static quat rotate_y_90(cos45, 0.f, sin45, 0.f);
 	constexpr static quat rotate_z_90(cos45, 0.f, 0.f, sin45);
 
+	constexpr float3 right3 = float3(1.f, 0.f, 0.f);
+	constexpr float3 up3 = float3(0.f, 1.f, 0.f);
+	constexpr float3 forward3 = float3(0.f, 0.f, 1.f);
+
 	SECTION("quaternion")
 	{
 		{
-			const quat a = quat::angle_axis(radians32::deg90, float3::right);
-			const quat b = quat::angle_axis(radians32::deg90, float3::up) *
-						   quat::angle_axis(radians32::deg90, float3::forward) *
-						   quat::angle_axis(-radians32::deg90, float3::up);
+			constexpr quat a = quat::angle_axis(degrees(90.f).radians(), right3);
+			constexpr quat b = quat::angle_axis(degrees(90.f).radians(), up3) *
+			                   quat::angle_axis(degrees(90.f).radians(), forward3) *
+			                   quat::angle_axis(-degrees(90.f).radians(), up3);
 			CHECK(quat_absolute_equal(a, b));
 		}
 		{
-			const quat quaternion = quat::angle_axis(radians32::deg45, float3::right);
+			constexpr quat quaternion = quat::angle_axis(degrees(45.f).radians(), right3);
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_x_45));
 		}
 		{
-			const quat quaternion = quat::angle_axis(radians32::deg45, float3::up);
+			constexpr quat quaternion = quat::angle_axis(degrees(45.f).radians(), up3);
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_y_45));
 		}
 		{
-			const quat quaternion = quat::angle_axis(radians32::deg45, float3::forward);
+			constexpr quat quaternion = quat::angle_axis(degrees(45.f).radians(), forward3);
 			CHECK(quat_absolute_equal(quaternion, quat::rotate_z_45));
 		}
 	}

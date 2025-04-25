@@ -21,35 +21,39 @@ namespace rsl::math
 	constexpr matrix<Scalar, 3, 3, Mode>::matrix(
 		scalar s00, scalar s01, scalar s02, scalar s10, scalar s11, scalar s12, scalar s20, scalar s21, scalar s22
 	) noexcept
-		: col0(s00, s10, s20),
-		  col1(s01, s11, s21),
-		  col2(s02, s12, s22)
+		: columns()
 	{
+		columns[0] = col_type(s00, s10, s20);
+        columns[1] = col_type(s01, s11, s21);
+        columns[2] = col_type(s02, s12, s22);
 	}
 
 	template <arithmetic_type Scalar, storage_mode Mode>
 	constexpr matrix<Scalar, 3, 3, Mode>::matrix(col_type c0, col_type c1, col_type c2) noexcept
-		: col0(c0),
-		  col1(c1),
-		  col2(c2)
+		: columns()
 	{
+		columns[0] = c0;
+		columns[1] = c1;
+		columns[2] = c2;
 	}
 
 	template <storage_mode Mode>
 	constexpr matrix<bool, 3, 3, Mode>::matrix(
 		scalar s00, scalar s01, scalar s02, scalar s10, scalar s11, scalar s12, scalar s20, scalar s21, scalar s22
 	) noexcept
-		: col0(s00, s10, s20),
-		  col1(s01, s11, s21),
-		  col2(s02, s12, s22)
+		: columns()
 	{
+		columns[0] = col_type(s00, s10, s20);
+		columns[1] = col_type(s01, s11, s21);
+		columns[2] = col_type(s02, s12, s22);
 	}
 
 	template <storage_mode Mode>
 	constexpr matrix<bool, 3, 3, Mode>::matrix(col_type c0, col_type c1, col_type c2) noexcept
-		: col0(c0),
-		  col1(c1),
-		  col2(c2)
+		: columns()
 	{
+		columns[0] = c0;
+		columns[1] = c1;
+		columns[2] = c2;
 	}
 } // namespace rsl::math

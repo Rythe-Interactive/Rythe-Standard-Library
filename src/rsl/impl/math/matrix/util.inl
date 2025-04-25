@@ -4,7 +4,7 @@
 namespace rsl::math
 {
 	template <arithmetic_type Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4>
+	constexpr matrix<Scalar, 4, 4>
 	perspective(radians<Scalar> fovY, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
 	{
 		Scalar const tanHalfFovY = tan(fovY.value * static_cast<Scalar>(0.5));
@@ -23,7 +23,7 @@ namespace rsl::math
 	}
 
 	template <arithmetic_type Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4>
+	constexpr matrix<Scalar, 4, 4>
 	orthographic(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar nearZ, Scalar farZ) noexcept
 	{
 		vector<Scalar, 3> frustumSize = vector<Scalar, 3>(right, top, farZ) - vector<Scalar, 3>(left, bottom, nearZ);
@@ -45,25 +45,25 @@ namespace rsl::math
 	}
 
 	template <arithmetic_type Scalar, storage_mode ModeEye, storage_mode ModeCenter, storage_mode ModeUp>
-	[[nodiscard]] matrix<Scalar, 4, 4, elevated_storage_mode_v<ModeEye, elevated_storage_mode_v<ModeCenter, ModeUp>>>
+	constexpr matrix<Scalar, 4, 4, elevated_storage_mode_v<ModeEye, elevated_storage_mode_v<ModeCenter, ModeUp>>>
 	look_at(vector<Scalar, 3, ModeEye> eye, vector<Scalar, 3, ModeCenter> center, vector<Scalar, 3, ModeUp> up) noexcept
 	{
 		constexpr storage_mode mode = elevated_storage_mode_v<ModeEye, elevated_storage_mode_v<ModeCenter, ModeUp>>;
 		const vector<Scalar, 4, mode> f(normalize(center - eye));
-		const vector<Scalar, 4, mode> r(normalize(cross(up, f.xyz)));
+		const vector<Scalar, 4, mode> r(normalize(cross(up, vector<Scalar, 3, mode>(f))));
 		// Length of u is 1 because the angle between f and r is 90 degrees
-		const vector<Scalar, 4, mode> u(cross(f.xyz, r.xyz));
+		const vector<Scalar, 4, mode> u(cross(vector<Scalar, 3, mode>(f), vector<Scalar, 3, mode>(r)));
 
 		matrix<Scalar, 4, 4, mode> result(static_cast<Scalar>(1));
 		result[0] = r;
 		result[1] = u;
 		result[2] = f;
 
-		vector<Scalar, 3, mode> xxx{r.x, u.x, f.x};
-		vector<Scalar, 3, mode> yyy{r.y, u.y, f.y};
-		vector<Scalar, 3, mode> zzz{r.z, u.z, f.z};
+		vector<Scalar, 3, mode> xxx{r[0], u[0], f[0]};
+		vector<Scalar, 3, mode> yyy{r[1], u[1], f[1]};
+		vector<Scalar, 3, mode> zzz{r[2], u[2], f[2]};
 
-		result[3].xyz = -(xxx * eye.xxx + yyy * eye.yyy + zzz * eye.zzz);
+		result[3] = vector<Scalar, 4, mode>(-(xxx * eye[0] + yyy * eye[1] + zzz * eye[2]), static_cast<Scalar>(1));
 
 		return result;
 	}
@@ -126,7 +126,7 @@ namespace rsl::math
 	}
 
 	template <arithmetic_type Scalar, storage_mode MatMode, storage_mode VecMode>
-	matrix<Scalar, 4, 4, elevated_storage_mode_v<MatMode, VecMode>> constexpr translate(
+	constexpr matrix<Scalar, 4, 4, elevated_storage_mode_v<MatMode, VecMode>> translate(
 		const matrix<Scalar, 4, 4, MatMode>& mat, const vector<Scalar, 3, VecMode>& pos
 	) noexcept
 	{
@@ -154,7 +154,7 @@ namespace rsl::math
 	//}
 
 	template <arithmetic_type Scalar, storage_mode MatMode, storage_mode VecMode>
-	matrix<Scalar, 4, 4, elevated_storage_mode_v<MatMode, VecMode>> rotate(
+	constexpr matrix<Scalar, 4, 4, elevated_storage_mode_v<MatMode, VecMode>> rotate(
 		const matrix<Scalar, 4, 4, MatMode>& mat, radians<Scalar> angle, const vector<Scalar, 3, VecMode>& _axis
 	) noexcept
 	{

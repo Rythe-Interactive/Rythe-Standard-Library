@@ -1,76 +1,67 @@
 #pragma once
-#include "../interpolation/map.hpp"
 
 namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_tan;
 
-	template <typename Scalar, size_type Size>
-	struct compute_tan<vector<Scalar, Size>>
+	template <typename Scalar, size_type Size, storage_mode Mode>
+	struct compute_tan<vector<Scalar, Size, Mode>>
 	{
-		using vec_type = vector<Scalar, Size>;
+		using vec_type = vector<Scalar, Size, Mode>;
 
-		template <typename ValueType>
-		[[nodiscard]] static auto compute(ValueType&& value) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static vec_type compute(const vec_type& value) noexcept
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
 			{
-				result[i] = ::std::tan(value[i]);
+				result[i] = tan(value[i]);
 			}
 
 			return result;
 		}
 
-		template <typename ValueType>
-		[[nodiscard]] static auto compute_inverse(ValueType&& value) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static vec_type compute_inverse(const vec_type& value) noexcept
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
 			{
-				result[i] = ::std::atan(value[i]);
+				result[i] = atan(value[i]);
 			}
 
 			return result;
 		}
 
-		template <typename X, typename Y>
-			requires same_as<remove_cvr_t<X>, remove_cvr_t<Y>>
-		[[nodiscard]] static auto compute_inverse2(X&& x, Y&& y) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static vec_type compute_inverse2(const vec_type& x, const vec_type& y) noexcept
 		{
 			vec_type result;
 			for (size_type i = 0; i < Size; i++)
 			{
-				result[i] = ::std::atan2(y[i], x[i]);
+				result[i] = atan2(y[i], x[i]);
 			}
 
 			return result;
 		}
 	};
 
-	template <typename Scalar>
-	struct compute_tan<vector<Scalar, 1u>>
+	template <typename Scalar, storage_mode Mode>
+	struct compute_tan<vector<Scalar, 1u, Mode>>
 	{
-		using vec_type = vector<Scalar, 1u>;
+		using vec_type = vector<Scalar, 1u, Mode>;
 
-		template <typename ValueType>
-		[[nodiscard]] static auto compute(ValueType&& value) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute(Scalar value) noexcept
 		{
-			return ::std::tan(value[0]);
+			return tan(value[0]);
 		}
 
-		template <typename ValueType>
-		[[nodiscard]] static auto compute_inverse(ValueType&& value) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute_inverse(Scalar value) noexcept
 		{
-			return ::std::atan(value[0]);
+			return atan(value[0]);
 		}
 
-		template <typename X, typename Y>
-			requires same_as<remove_cvr_t<X>, remove_cvr_t<Y>>
-		[[nodiscard]] static auto compute_inverse2(X&& x, Y&& y) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute_inverse2(Scalar x, Scalar y) noexcept
 		{
-			return ::std::atan2(x[0], y[0]);
+			return atan2(x[0], y[0]);
 		}
 	};
 } // namespace rsl::math::internal

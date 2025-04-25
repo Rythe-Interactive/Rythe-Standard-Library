@@ -23,7 +23,7 @@ namespace rsl::math::internal
 			using scalar = lowest_precision_t<Scalar, typename OtherType::scalar>;
 			using result_type = matrix<scalar, RowCount, OtherType::col_count>;
 
-			result_type result = result_type::zero;
+			result_type result{0};
 
 			for (size_type i = 0; i < RowCount; i++)
 			{
@@ -49,13 +49,13 @@ namespace rsl::math::internal
 				lowest_precision_t<::std::remove_cvref_t<Scalar>, ::std::remove_cvref_t<typename vec_type::scalar>>;
 			using result_type = vector<scalar, RowCount>;
 
-			result_type result = result_type::zero;
+			result_type result{0};
 
 			for (size_type i = 0; i < RowCount; i++)
 			{
 				for (size_type j = 0; j < ColCount; j++)
 				{
-					result[i] += (b[j][i] * a[j]);
+					result[i] += b[j][i] * a[j];
 				}
 			}
 

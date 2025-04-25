@@ -12,11 +12,13 @@ namespace rsl::math
 {
 	// cos
 	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] auto cos(T&& v) noexcept;
+		requires floating_point_type<T> || linear_algebraic_construct<T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto cos(T&& value) noexcept;
 
 	// acos
 	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] auto acos(T&& v) noexcept;
+		requires floating_point_type<T> || linear_algebraic_construct<T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto acos(T&& value) noexcept;
 } // namespace rsl::math
 
 #include "cos.inl"

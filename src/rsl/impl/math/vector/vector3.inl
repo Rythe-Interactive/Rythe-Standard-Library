@@ -18,14 +18,14 @@ namespace rsl::math
 	template <arithmetic_type Scalar, storage_mode Mode>
 	template <math::storage_mode OtherMode>
 	constexpr vector<Scalar, 3, Mode>::vector(const vector<scalar, 2, OtherMode>& v, scalar s) noexcept
-		: vector(v.x, v.y, s)
+		: vector(v[0], v[1], s)
 	{
 	}
 
 	template <arithmetic_type Scalar, storage_mode Mode>
 	template <math::storage_mode OtherMode>
 	constexpr vector<Scalar, 3, Mode>::vector(scalar s, const vector<scalar, 2, OtherMode>& v) noexcept
-		: vector(s, v.x, v.y)
+		: vector(s, v[0], v[1])
 	{
 	}
 
@@ -40,14 +40,14 @@ namespace rsl::math
 	template <storage_mode Mode>
 	template <math::storage_mode OtherMode>
 	constexpr vector<bool, 3, Mode>::vector(const vector<scalar, 2, OtherMode>& v, scalar s) noexcept
-		: vector(v.x, v.y, s)
+		: vector(v[0], v[1], s)
 	{
 	}
 
 	template <storage_mode Mode>
 	template <math::storage_mode OtherMode>
 	constexpr vector<bool, 3, Mode>::vector(scalar s, const vector<scalar, 2, OtherMode>& v) noexcept
-		: vector(s, v.x, v.y)
+		: vector(s, v[0], v[1])
 	{
 	}
 
