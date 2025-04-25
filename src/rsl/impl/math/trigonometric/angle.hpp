@@ -69,6 +69,8 @@ namespace rsl::math
 		explicit constexpr degrees(angle<scalar> rad) noexcept;
 
 		scalar value;
+
+		constexpr radians<scalar> radians() const noexcept { return { deg2rad<scalar> * value }; }
 	};
 
 	template <arithmetic_type Precision>

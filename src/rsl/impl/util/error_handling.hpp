@@ -8,6 +8,7 @@
 #include "../util/assert.hpp"
 #include "../util/type_util.hpp"
 #include "../util/primitives.hpp"
+#include "../math/util/limits.hpp"
 
 namespace rsl
 {
@@ -33,7 +34,7 @@ namespace rsl
 
 	using errid = RSL_ERR_ID_UNDERLYING;
 
-#define RSL_ERR_MAX_COUNT std::numeric_limits<errid>::max()
+#define RSL_ERR_MAX_COUNT rsl::math::limits<errid>::max
 
 	constexpr errid invalid_err_id = RSL_ERR_MAX_COUNT;
 

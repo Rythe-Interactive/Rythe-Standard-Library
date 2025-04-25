@@ -6,6 +6,7 @@ RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(4267)
 RYTHE_MSVC_SUPPRESS_WARNING_POP
 
 #include "../../util/primitives.hpp"
+#include "../util/limits.hpp"
 
 namespace rsl::math
 {

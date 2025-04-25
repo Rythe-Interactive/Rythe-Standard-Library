@@ -1,5 +1,5 @@
-#include "randomnumbergenerator.hpp"
 #pragma once
+#include "randomnumbergenerator.hpp"
 
 namespace rsl::math
 {
