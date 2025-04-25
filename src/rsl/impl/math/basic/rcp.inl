@@ -25,13 +25,13 @@ namespace rsl::math
 	{
 		if (is_constant_evaluated())
 		{
-			return Scalar(1) / value;
+			return static_cast<Scalar>(1) / value;
 		}
 		else
 		{
 			if constexpr (sizeof(Scalar) > sizeof(float64))
 			{
-				return Scalar(1) / value;
+				return static_cast<Scalar>(1) / value;
 			}
 			else
 			{

@@ -1,10 +1,10 @@
 #pragma once
 #include "../../defines.hpp"
+#include "../util/limits.hpp"
 
 #include "sqrt.hpp"
 #include <xmmintrin.h>
 #include <emmintrin.h>
-#include <immintrin.h>
 
 namespace rsl::math
 {
@@ -74,9 +74,9 @@ namespace rsl::math
 			const __m128d x = _mm_set_sd(value);
 			const __m128d nr = _mm_castps_pd(_mm_rsqrt_ss(_mm_castpd_ps(x)));	// avoid _mm_rsqrt14_pd
 			const __m128d xnr = _mm_mul_sd(x, nr);								// dep on nr
-			const __m128d halfNr = _mm_mul_sd(_mm_set_sd(0.5f), nr);			// dep on nr
+			const __m128d halfNr = _mm_mul_sd(_mm_set_sd(0.5), nr);			// dep on nr
 			const __m128d muls = _mm_mul_sd(xnr, nr);							// dep on xnr
-			const __m128d threeMinusMuls = _mm_sub_sd(_mm_set_sd(3.f), muls);	// dep on muls
+			const __m128d threeMinusMuls = _mm_sub_sd(_mm_set_sd(3.0), muls);	// dep on muls
 			const __m128d result = _mm_mul_sd(halfNr, threeMinusMuls);			// dep on threeMinusMuls
 			_mm_store_sd(&value, result);
 
@@ -97,7 +97,7 @@ namespace rsl::math
 
 			if (value / mid < mid)
 			{
-				return constexpr_sqrt_impl(value, lo, mid - Integer(1));
+				return constexpr_sqrt_impl(value, lo, mid - static_cast<Integer>(1));
 			}
 			else
 			{
@@ -112,24 +112,24 @@ namespace rsl::math
 			return static_cast<Integer>(constexpr_sqrt_impl<unsigned_integer>(value, 0, value / 2 + 1));
 		}
 
-		template <floating_point_type FpType>
-		[[nodiscard]] constexpr FpType sqrt_newton_raphson(const FpType value, const FpType curr, const FpType prev)
+		template <floating_point_type Scalar>
+		[[nodiscard]] constexpr Scalar sqrt_newton_raphson(const Scalar value, const Scalar curr, const Scalar prev)
 		{
-			return curr == prev ? curr : sqrt_newton_raphson(value, FpType(0.5) * (curr + value / curr), curr);
+			return curr == prev ? curr : sqrt_newton_raphson(value, static_cast<Scalar>(0.5) * (curr + value / curr), curr);
 		}
 
-		template <floating_point_type FpType>
-		[[nodiscard]] constexpr FpType constexpr_sqrtf(const FpType value)
+		template <floating_point_type Scalar>
+		[[nodiscard]] constexpr Scalar constexpr_sqrtf(const Scalar value)
 		{
-			return value >= 0 && value < std::numeric_limits<FpType>::infinity()
-				       ? sqrt_newton_raphson(value, value, FpType(0))
-				       : std::numeric_limits<FpType>::quiet_NaN();
+			return value >= 0 && value < limits<Scalar>::infinity
+				       ? sqrt_newton_raphson(value, value, Scalar(0))
+				       : limits<Scalar>::quiet_nan;
 		}
 
-		template <floating_point_type FpType>
-		[[nodiscard]] constexpr FpType constexpr_rsqrtf(const FpType value)
+		template <floating_point_type Scalar>
+		[[nodiscard]] constexpr Scalar constexpr_rsqrtf(const Scalar value)
 		{
-			return FpType(1) / constexpr_sqrtf(value);
+			return static_cast<Scalar>(1) / constexpr_sqrtf(value);
 		}
 	} // namespace internal
 
