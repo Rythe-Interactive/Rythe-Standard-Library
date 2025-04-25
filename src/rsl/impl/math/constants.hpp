@@ -6,7 +6,6 @@ namespace rsl::math
 {
 	namespace internal
 	{
-
 		// note that this is in fact way more digits than even float_max can usually handle
 
 		constexpr static float_max very_precise_e = 2.71828182845904523536028747135266249775724709369995957496l;
@@ -27,116 +26,60 @@ namespace rsl::math
 	} // namespace internal
 
 	template <arithmetic_type T = float32>
-	constexpr T euler()
-	{
-		return static_cast<T>(internal::very_precise_e);
-	}
+	constexpr T euler = static_cast<T>(internal::very_precise_e);
 
 	template <arithmetic_type T = float32>
-	constexpr T inv_euler()
-	{
-		return T(1) / euler<T>();
-	}
+	constexpr T inv_euler = static_cast<T>(1) / euler<T>();
 
 	template <arithmetic_type T = float32>
-	constexpr T log2e()
-	{
-		return static_cast<T>(internal::very_precise_log2e);
-	}
+	constexpr T log2e = static_cast<T>(internal::very_precise_log2e);
 
 	template <arithmetic_type T = float32>
-	constexpr T log10e()
-	{
-		return static_cast<T>(internal::very_precise_log10e);
-	}
+	constexpr T log10e = static_cast<T>(internal::very_precise_log10e);
 
 	template <arithmetic_type T = float32>
-	constexpr T pi()
-	{
-		return static_cast<T>(internal::very_precise_pi);
-	}
+	constexpr T pi = static_cast<T>(internal::very_precise_pi);
 
 	template <arithmetic_type T = float32>
-	constexpr T half_pi()
-	{
-		return pi<T>() * T(0.5);
-	}
+	constexpr T half_pi = pi<T> * static_cast<T>(0.5);
 
 	template <arithmetic_type T = float32>
-	constexpr T quarter_pi()
-	{
-		return pi<T>() * T(0.25);
-	}
+	constexpr T quarter_pi = pi<T> * static_cast<T>(0.25);
 
 	template <arithmetic_type T = float32>
-	constexpr T tau()
-	{
-		return static_cast<T>(internal::very_precise_tau);
-	}
+	constexpr T tau = static_cast<T>(internal::very_precise_tau);
 
 	template <arithmetic_type T = float32>
-	constexpr T pau()
-	{
-		return pi<T>() * T(1.5);
-	}
+	constexpr T pau = pi<T> * static_cast<T>(1.5);
 
 	template <arithmetic_type T = float32>
-	constexpr T inv_pi()
-	{
-		return T(1) / pi<T>();
-	}
+	constexpr T inv_pi = static_cast<T>(1) / pi<T>;
 
 	template <arithmetic_type T = float32>
-	constexpr T sqrt2()
-	{
-		return static_cast<T>(internal::very_precise_sqrt2);
-	}
+	constexpr T sqrt2 = static_cast<T>(internal::very_precise_sqrt2);
 
 	template <arithmetic_type T = float32>
-	constexpr T inv_sqrt2()
-	{
-		return T(1) / sqrt2<T>();
-	}
+	constexpr T inv_sqrt2 = T(1) / sqrt2<T>();
 
 	template <arithmetic_type T = float32>
-	constexpr T sqrt3()
-	{
-		return static_cast<T>(internal::very_precise_sqrt3);
-	}
+	constexpr T sqrt3 = static_cast<T>(internal::very_precise_sqrt3);
 
 	template <arithmetic_type T = float32>
-	constexpr T inv_sqrt3()
-	{
-		return T(1) / sqrt3<T>();
-	}
+	constexpr T inv_sqrt3 = static_cast<T>(1) / sqrt3<T>;
 
 	template <arithmetic_type T = float32>
-	constexpr T egamma()
-	{
-		return static_cast<T>(internal::very_precise_egamma);
-	}
+	constexpr T egamma = static_cast<T>(internal::very_precise_egamma);
 
 	template <arithmetic_type T = float32>
-	constexpr T phi()
-	{
-		return static_cast<T>(internal::very_precise_phi);
-	}
+	constexpr T phi = static_cast<T>(internal::very_precise_phi);
 
 	template <arithmetic_type T = float32>
-	constexpr T feigenbaum()
-	{
-		return static_cast<T>(internal::vp_feigenbaum);
-	}
+	constexpr T feigenbaum = static_cast<T>(internal::vp_feigenbaum);
 
 	template <arithmetic_type T>
-	constexpr T rad2deg()
-	{
-		return T(180) / pi<T>();
-	}
+	constexpr T rad2deg = static_cast<T>(180) / pi<T>;
 
 	template <arithmetic_type T>
-	constexpr T deg2rad()
-	{
-		return pi<T>() / T(180);
-	}
+	constexpr T deg2rad = pi<T> / static_cast<T>(180);
+
 } // namespace rsl::math

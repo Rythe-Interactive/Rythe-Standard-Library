@@ -13,6 +13,8 @@ namespace rsl
 		{
 			constexpr_string ret = name;
 
+			constexpr_string anonymousNamespacefilter = "(anonymous namespace)::";
+			ret = ret.filter(anonymousNamespacefilter);
 			constexpr_string cxxfilter = "__cxx11::";
 			ret = ret.filter(cxxfilter);
 			constexpr_string classFilter = "class ";

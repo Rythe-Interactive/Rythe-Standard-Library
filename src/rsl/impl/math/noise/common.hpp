@@ -39,7 +39,7 @@ namespace rsl::math::noise
 
 			hash *= hash * static_cast<int_scalar>(0x27d4eb2d);
 			return static_cast<vector<scalar, sizeof...(ints) + 1>>(hash) *
-				   (static_cast<scalar>(1) / static_cast<scalar>(std::numeric_limits<int_scalar>::max()));
+				   (static_cast<scalar>(1) / static_cast<scalar>(limits<int_scalar>::max));
 		}
 	} // namespace internal
 } // namespace rsl::math::noise

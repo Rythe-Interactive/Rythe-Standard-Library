@@ -12,6 +12,7 @@ namespace rsl
 		char buffer[N];
 
 		consteval constexpr_string() noexcept = default;
+
 		consteval constexpr_string(const char (&arr)[N]) noexcept
 		{
 			for (size_type i = 0; i < N; ++i)
@@ -21,8 +22,9 @@ namespace rsl
 		}
 
 		[[nodiscard]] consteval size_type capacity() const noexcept { return N; }
-		[[nodiscard]] consteval size_type size() const noexcept;
-		[[nodiscard]] consteval bool empty() const noexcept { return size() == 0; }
+		// Uses strlen
+		[[nodiscard]] constexpr size_type size() const noexcept;
+		[[nodiscard]] constexpr bool empty() const noexcept { return size() == 0; }
 
 		constexpr char& operator[](size_type i) noexcept { return buffer[i]; }
 		constexpr const char& operator[](size_type i) const noexcept { return buffer[i]; }
@@ -58,7 +60,15 @@ namespace rsl
 		find(const constexpr_string<OtherN>& str, size_type offset = 0) const noexcept;
 
 		consteval void copy_from(string_view str) noexcept;
+
+		explicit constexpr operator string_view() const noexcept { return string_view(buffer, size()); }
 	};
+
+	template <size_type N>
+	[[nodiscard]] constexpr bool operator==(constexpr_string<N> lhs, const char* rhs)
+	{
+		return string_view(lhs) == rhs;
+	}
 
 	template <size_type A, size_type B>
 	[[nodiscard]] consteval auto operator+(constexpr_string<A> lhs, constexpr_string<B> rhs) noexcept
@@ -144,7 +154,7 @@ namespace rsl
 			return *this;
 		}
 
-		constexpr_string<N> result = filter_range(start, start + str.size());
+		constexpr_string<N> result = filter_range(start, start + str.size() - 1);
 		if (result.find(str) == npos)
 		{
 			return result;
@@ -293,7 +303,7 @@ namespace rsl
 	}
 
 	template <size_type N>
-	inline consteval size_type constexpr_string<N>::size() const noexcept
+	inline constexpr size_type constexpr_string<N>::size() const noexcept
 	{
 		size_type s = 0ull;
 		while (s + 1 < N && buffer[s])

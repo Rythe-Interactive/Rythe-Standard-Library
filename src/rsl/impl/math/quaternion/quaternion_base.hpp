@@ -88,12 +88,10 @@ namespace rsl::math
 
 	using quat = quaternion<float32>;
 	using quat64 = quaternion<float64>;
-	using quat_max = quaternion<float_max>;
 
 #ifdef RYTHE_PCH
 	template struct quaternion<float32>;
 	template struct quaternion<float64>;
-	template struct quaternion<float_max>;
 #endif
 } // namespace rsl::math
 

@@ -46,6 +46,7 @@ namespace
 		{
 		}
 	};
+
 	struct test2
 	{
 		int value = CONST2;
@@ -78,7 +79,13 @@ namespace
 TEST_CASE("type_map", "[containers]")
 {
 	using namespace rsl;
+	{
+		constexpr auto name = type_name<test1>();
+		REQUIRE(name == "test1");
 
+		constexpr id_type id = type_id<test1>();
+		REQUIRE(id != 0u);
+	}
 	SECTION("construction")
 	{
 		{

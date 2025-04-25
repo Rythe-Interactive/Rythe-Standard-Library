@@ -569,6 +569,18 @@ namespace rsl::math
 	template <typename T>
 	using make_unsigned_t = typename make_unsigned<T>::type;
 
+	template<size_type N>
+	struct unsigned_integer_of_size : internal::make_unsigned_impl<void, N> {};
+
+	template<size_type N>
+	using unsigned_integer_of_size_t = typename unsigned_integer_of_size<N>::type;
+
+	template<size_type N>
+	struct signed_integer_of_size : internal::make_signed_impl<void, N> {};
+
+	template<size_type N>
+	using signed_integer_of_size_t = typename signed_integer_of_size<N>::type;
+
 	template <typename A, typename B>
 	struct largest : conditional<(sizeof(A) > sizeof(B)), A, B> {};
 

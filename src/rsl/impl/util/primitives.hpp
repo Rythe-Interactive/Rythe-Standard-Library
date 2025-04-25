@@ -31,6 +31,7 @@ namespace rsl
 
 	using float32 = float;
 	using float64 = double;
+	// long double does not have good enough support on all compilers and platforms
 	using float_max = long double;
 
 	using u8 = uint8_t;

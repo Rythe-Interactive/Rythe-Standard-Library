@@ -21,12 +21,12 @@ namespace rsl::math
 			);
 
 			Unsigned raw =
-				static_cast<Unsigned>(generate() % static_cast<size_type>(::std::numeric_limits<Unsigned>::max()));
+				static_cast<Unsigned>(generate() % static_cast<size_type>(limits<Unsigned>::max));
 			return *reinterpret_cast<Integer*>(&raw);
 		}
 		else
 		{
-			return static_cast<Integer>(generate() % static_cast<size_type>(::std::numeric_limits<Integer>::max()));
+			return static_cast<Integer>(generate() % static_cast<size_type>(limits<Integer>::max));
 		}
 	}
 

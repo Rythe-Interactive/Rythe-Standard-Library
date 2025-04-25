@@ -1,6 +1,5 @@
 #pragma once
 #include <cmath>
-#include <limits>
 
 #include "../../util/primitives.hpp"
 #include "../util/type_util.hpp"
@@ -32,10 +31,10 @@ namespace rsl::math
 			static constexpr size_type size = 1u;
 			using value_type = vector<Scalar, size>;
 
-			template <typename RET>
-			[[rythe_always_inline]] static value_type compute(Scalar val, RET& integer) noexcept
+			template <typename Ret>
+			[[rythe_always_inline]] static value_type compute(Scalar val, Ret& integer) noexcept
 			{
-				if constexpr (is_vector_v<RET>)
+				if constexpr (is_vector_v<Ret>)
 				{
 					return ::std::modf(val, &integer[0]);
 				}
@@ -47,22 +46,19 @@ namespace rsl::math
 		};
 	} // namespace internal
 
-	template <typename T, typename RET>
-	[[rythe_always_inline]] static auto modf(const T& val, RET& integer)
+	template <typename T, typename Ret>
+	[[rythe_always_inline]] static auto modf(const T& val, Ret& integer)
 	{
 		if constexpr (is_vector_v<T>)
 		{
-			static_assert(
-				::std::is_floating_point_v<typename T::scalar>,
-				"Value must be floating point in order to use modf. (Did you mean fmod?)"
-			);
+			static_assert(is_floating_point_v<typename T::scalar>,
+			              "Value must be floating point in order to use modf. (Did you mean fmod?)");
 			return internal::compute_modf<typename T::scalar, T::size>::compute(val, integer);
 		}
 		else
 		{
-			static_assert(
-				::std::is_floating_point_v<T>, "Value must be floating point in order to use modf. (Did you mean fmod?)"
-			);
+			static_assert(is_floating_point_v<T>,
+			              "Value must be floating point in order to use modf. (Did you mean fmod?)");
 			return ::std::modf(val, &integer);
 		}
 	}

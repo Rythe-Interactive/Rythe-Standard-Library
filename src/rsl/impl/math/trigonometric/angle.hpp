@@ -47,7 +47,7 @@ namespace rsl::math
 	template <arithmetic_type Precision>
 	constexpr typename angle<Precision>::scalar angle<Precision>::degrees() const noexcept
 	{
-		return rad2deg<Precision>() * value;
+		return rad2deg<Precision> * value;
 	}
 
 	template <arithmetic_type Precision>
@@ -79,13 +79,13 @@ namespace rsl::math
 
 	template <arithmetic_type Precision>
 	constexpr angle<Precision>::angle(rsl::math::degrees<scalar> deg) noexcept
-		: value(deg2rad<scalar>() * deg.value)
+		: value(deg2rad<scalar> * deg.value)
 	{
 	}
 
 	template <arithmetic_type Precision>
 	constexpr degrees<Precision>::degrees(angle<scalar> rad) noexcept
-		: value(rad2deg<scalar>() * rad.value)
+		: value(rad2deg<scalar> * rad.value)
 	{
 	}
 
@@ -104,35 +104,18 @@ namespace rsl::math
 
 	using angle32 = angle<float32>;
 	using angle64 = angle<float64>;
-	using angle_max = angle<float_max>;
 
 	using radians32 = radians<float32>;
 	using radians64 = radians<float64>;
-	using radians_max = radians<float_max>;
 
 	using degrees32 = degrees<float32>;
 	using degrees64 = degrees<float64>;
-	using degrees_max = degrees<float_max>;
 
 #ifdef RYTHE_PCH
 	template struct angle<float32>;
 	template struct angle<float64>;
-	template struct angle<float_max>;
 
 	template struct degrees<float32>;
 	template struct degrees<float64>;
-	template struct degrees<float_max>;
 #endif
-
-	template <arithmetic_type T>
-	constexpr degrees<T> rad2deg(T v)
-	{
-		return {rad2deg<T>() * v};
-	}
-
-	template <arithmetic_type T>
-	constexpr radians<T> deg2rad(T v)
-	{
-		return {deg2rad<T>() * v};
-	}
 } // namespace rsl::math

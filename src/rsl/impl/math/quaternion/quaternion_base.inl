@@ -94,7 +94,7 @@ namespace rsl::math
 
 		Scalar sinP = sqrt(static_cast<Scalar>(1) + static_cast<Scalar>(2) * (w * j - i * k));
 		Scalar cosP = sqrt(static_cast<Scalar>(1) - static_cast<Scalar>(2) * (w * j - i * k));
-		angles.y = static_cast<Scalar>(2) * atan2(sinP, cosP) - pi() / static_cast<Scalar>(2);
+		angles.y = static_cast<Scalar>(2) * atan2(sinP, cosP) - pi<Scalar> / static_cast<Scalar>(2);
 
 		Scalar sinYCosP = static_cast<Scalar>(2) * (w * k + i * j);
 		Scalar cosYCosP = static_cast<Scalar>(1) - static_cast<Scalar>(2) * (j * j + k * k);

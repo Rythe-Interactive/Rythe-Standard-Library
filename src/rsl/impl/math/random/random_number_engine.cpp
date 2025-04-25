@@ -18,8 +18,7 @@ namespace rsl::math
 	{
 		if constexpr (sizeof(size_type) != sizeof(uint64))
 		{
-			constexpr auto convRate =
-				::std::numeric_limits<uint64>::max() / static_cast<float_max>(::std::numeric_limits<size_type>::max());
+			constexpr auto convRate = limits<uint64>::max / static_cast<float_max>(limits<size_type>::max);
 			return static_cast<uint64>(seed * convRate);
 		}
 		else

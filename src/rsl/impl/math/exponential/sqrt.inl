@@ -2,7 +2,6 @@
 #include "../../defines.hpp"
 
 #include "sqrt.hpp"
-#include <limits>
 #include <xmmintrin.h>
 #include <emmintrin.h>
 #include <immintrin.h>

@@ -286,7 +286,7 @@ namespace rsl
 
 	template <typename T>
 	inline constexpr bool is_integral_v = is_any_of_v<
-		remove_cv_t<T>, bool, char, char, unsigned char, wchar_t, char8_t, char16_t, char32_t, short, unsigned short,
+		remove_cv_t<T>, bool, char, signed char, unsigned char, wchar_t, char8_t, char16_t, char32_t, short, unsigned short,
 		int, unsigned int, long, unsigned long, long long, unsigned long long>;
 
 	template <typename T>
@@ -678,8 +678,10 @@ namespace rsl
 
 	namespace internal
 	{
+		// Requires that the size of To is equal or larger to the size of From
+		// Might still break on some compilers if From is byte and To is unsigned long long
 		template <typename To, typename From>
-			requires is_trivially_copyable_v<To> && is_trivially_copyable_v<From>
+			requires is_trivially_copyable_v<To> && is_trivially_constructible_v<To> && is_trivially_copyable_v<From> && (sizeof(To) >= sizeof(From))
 		constexpr void constexpr_memcpy_impl(To* dst, const From* src, const size_type count)
 		{
 			const size_type itemCount = count / sizeof(To);
@@ -701,25 +703,90 @@ namespace rsl
 				dst[i] = ::std::bit_cast<To>(conv);
 			}
 		}
+
+		// Has no size requirements, but not every compiler is happy with this implementation.
+		// TODO(Glyn): Needs more research
+		template <typename To, typename From>
+			requires is_trivially_copyable_v<To> && is_trivially_constructible_v<To> && is_trivially_copyable_v<From>
+		constexpr void constexpr_memcpy_impl_unrestricted(To* dst, const From* src, const size_type count)
+		{
+			size_type srcCount = count / sizeof(From);
+			if (srcCount * sizeof(From) != count)
+			{
+				++srcCount;
+			}
+
+			struct src_converter
+			{
+				byte from[sizeof(From)];
+			};
+
+			src_converter* srcData = new src_converter[srcCount];
+
+			for (size_type i = 0; i < srcCount; ++i)
+			{
+				srcData[i] = ::std::bit_cast<src_converter>(src[i]);
+			}
+
+			size_type dstCount = count / sizeof(From);
+			if (dstCount * sizeof(From) != count)
+			{
+				++dstCount;
+			}
+
+			struct dst_converter
+			{
+				byte to[sizeof(To)];
+			};
+
+			dst_converter* dstData = new dst_converter[dstCount];
+
+			for (size_type i = 0; i < count; ++i)
+			{
+				size_type srcIdx = i / sizeof(From);
+				size_type dstIdx = i / sizeof(To);
+				size_type srcByte = i % sizeof(From);
+				size_type dstByte = i % sizeof(To);
+
+				dstData[dstIdx].to[dstByte] = srcData[srcIdx].from[srcByte];
+			}
+
+			for (size_type i = 0; i < dstCount; ++i)
+			{
+				// This line is the one that causes troubles.
+				// on MSVC bit_cast from struct{From[]} is fine, but from struct{byte[]} is not...
+				dst[i] = ::std::bit_cast<To>(dstData[i]);
+			}
+
+			delete[] srcData;
+			delete[] dstData;
+		}
 	} // namespace internal
 
 	template <typename To, typename From>
+	constexpr void* constexpr_memcpy(To* dst, const From* src, const size_type count) noexcept;
+
+	// Assumes buffer size of src is larger or equal to the size of To
+	template <typename To, typename From>
 		requires is_trivially_copyable_v<To> && is_trivially_copyable_v<From> &&
-				 is_trivially_default_constructible_v<To>
+				 is_trivially_constructible_v<To>
 	[[nodiscard]] constexpr To unaligned_load(const From* src) noexcept
 	{
-		To dst;
-		internal::constexpr_memcpy_impl(&dst, src, sizeof(To));
+		To dst{};
+		constexpr_memcpy(&dst, src, sizeof(To));
 		return dst;
 	}
 
+	// Requires the size of To to be equal to the size of From
 	template <typename To, typename From>
-		requires(sizeof(To) == sizeof(From)) && is_trivially_copyable_v<To> && is_trivially_copyable_v<From>
+		requires is_trivially_copyable_v<To> && is_trivially_copyable_v<From> && (sizeof(To) == sizeof(From))
 	[[nodiscard]] constexpr To bit_cast(const From& value) noexcept
 	{
 		if (is_constant_evaluated())
 		{
-			return unaligned_load<To>(&value);
+			To dst{};
+			constexpr_memcpy(&dst, &value, sizeof(From));
+			return dst;
 		}
 		else
 		{
