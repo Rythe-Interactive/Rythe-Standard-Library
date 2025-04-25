@@ -5,11 +5,11 @@
 
 namespace rsl::math
 {
-	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type... args>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type... Args>
 	struct swizzle;
 
-	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type s0>
-	struct swizzle<Scalar, Size, Mode, s0>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0>
+	struct swizzle<Scalar, Size, Mode, S0>
 	{
 		using scalar = Scalar;
 		static constexpr size_type size = 1;
@@ -32,21 +32,21 @@ namespace rsl::math
 
 		[[rythe_always_inline]] constexpr swizzle& operator=(scalar value) noexcept;
 
-		[[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept
+		[[rythe_always_inline]] constexpr scalar& operator[](const size_type i) noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
-			return data[s0];
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
+			return data[S0];
 		}
 
-		[[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept
+		[[rythe_always_inline]] constexpr const scalar& operator[](const size_type i) const noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
-			return data[s0];
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
+			return data[S0];
 		}
 	};
 
-	template <size_type Size, storage_mode Mode, size_type s0>
-	struct swizzle<bool, Size, Mode, s0>
+	template <size_type Size, storage_mode Mode, size_type S0>
+	struct swizzle<bool, Size, Mode, S0>
 	{
 		using scalar = bool;
 		static constexpr size_type size = 1;
@@ -72,24 +72,24 @@ namespace rsl::math
 
 		[[rythe_always_inline]] constexpr swizzle& operator=(scalar value) noexcept;
 
-		[[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept
+		[[rythe_always_inline]] constexpr scalar& operator[](const size_type i) noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
-			return data[s0];
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
+			return data[S0];
 		}
 
-		[[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept
+		[[rythe_always_inline]] constexpr const scalar& operator[](const size_type i) const noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
-			return data[s0];
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
+			return data[S0];
 		}
 	};
 
-	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1>
-	struct swizzle<Scalar, Size, Mode, s0, s1>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0, size_type S1>
+	struct swizzle<Scalar, Size, Mode, S0, S1>
 	{
 	private:
-		constexpr static size_type lookup[] = {s0, s1};
+		constexpr static size_type lookup[] = {S0, S1};
 
 	public:
 		using scalar = Scalar;
@@ -109,24 +109,24 @@ namespace rsl::math
 
 		[[rythe_always_inline]] constexpr swizzle& operator=(const conv_type& other) noexcept;
 
-		[[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept
+		[[rythe_always_inline]] constexpr scalar& operator[](const size_type i) noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 			return data[lookup[i]];
 		}
 
-		[[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept
+		[[rythe_always_inline]] constexpr const scalar& operator[](const size_type i) const noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 			return data[lookup[i]];
 		}
 	};
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1>
-	struct swizzle<bool, Size, Mode, s0, s1>
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1>
+	struct swizzle<bool, Size, Mode, S0, S1>
 	{
 	private:
-		constexpr static size_type lookup[] = {s0, s1};
+		constexpr static size_type lookup[] = {S0, S1};
 
 	public:
 		using scalar = bool;
@@ -149,24 +149,24 @@ namespace rsl::math
 
 		[[rythe_always_inline]] constexpr swizzle& operator=(const conv_type& other) noexcept;
 
-		[[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept
+		[[rythe_always_inline]] constexpr scalar& operator[](const size_type i) noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 			return data[lookup[i]];
 		}
 
-		[[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept
+		[[rythe_always_inline]] constexpr const scalar& operator[](const size_type i) const noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 			return data[lookup[i]];
 		}
 	};
 
-	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
-	struct swizzle<Scalar, Size, Mode, s0, s1, s2>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2>
+	struct swizzle<Scalar, Size, Mode, S0, S1, S2>
 	{
 	private:
-		constexpr static size_type lookup[] = {s0, s1, s2};
+		constexpr static size_type lookup[] = {S0, S1, S2};
 
 	public:
 		using scalar = Scalar;
@@ -186,24 +186,24 @@ namespace rsl::math
 
 		[[rythe_always_inline]] constexpr swizzle& operator=(const conv_type& other) noexcept;
 
-		[[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept
+		[[rythe_always_inline]] constexpr scalar& operator[](const size_type i) noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 			return data[lookup[i]];
 		}
 
-		[[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept
+		[[rythe_always_inline]] constexpr const scalar& operator[](const size_type i) const noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 			return data[lookup[i]];
 		}
 	};
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2>
-	struct swizzle<bool, Size, Mode, s0, s1, s2>
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2>
+	struct swizzle<bool, Size, Mode, S0, S1, S2>
 	{
 	private:
-		constexpr static size_type lookup[] = {s0, s1, s2};
+		constexpr static size_type lookup[] = {S0, S1, S2};
 
 	public:
 		using scalar = bool;
@@ -226,26 +226,26 @@ namespace rsl::math
 
 		[[rythe_always_inline]] constexpr swizzle& operator=(const conv_type& other) noexcept;
 
-		[[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept
+		[[rythe_always_inline]] constexpr scalar& operator[](const size_type i) noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 			return data[lookup[i]];
 		}
 
-		[[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept
+		[[rythe_always_inline]] constexpr const scalar& operator[](const size_type i) const noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 			return data[lookup[i]];
 		}
 	};
 
 	template <
-		arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2,
-		size_type s3>
-	struct swizzle<Scalar, Size, Mode, s0, s1, s2, s3>
+		arithmetic_type Scalar, size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2,
+		size_type S3>
+	struct swizzle<Scalar, Size, Mode, S0, S1, S2, S3>
 	{
 	private:
-		constexpr static size_type lookup[] = {s0, s1, s2, s3};
+		constexpr static size_type lookup[] = {S0, S1, S2, S3};
 
 	public:
 		using scalar = Scalar;
@@ -265,24 +265,24 @@ namespace rsl::math
 
 		[[rythe_always_inline]] constexpr swizzle& operator=(const conv_type& other) noexcept;
 
-		[[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept
+		[[rythe_always_inline]] constexpr scalar& operator[](const size_type i) noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 			return data[lookup[i]];
 		}
 
-		[[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept
+		[[rythe_always_inline]] constexpr const scalar& operator[](const size_type i) const noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 			return data[lookup[i]];
 		}
 	};
 
-	template <size_type Size, storage_mode Mode, size_type s0, size_type s1, size_type s2, size_type s3>
-	struct swizzle<bool, Size, Mode, s0, s1, s2, s3>
+	template <size_type Size, storage_mode Mode, size_type S0, size_type S1, size_type S2, size_type S3>
+	struct swizzle<bool, Size, Mode, S0, S1, S2, S3>
 	{
 	private:
-		constexpr static size_type lookup[] = {s0, s1, s2, s3};
+		constexpr static size_type lookup[] = {S0, S1, S2, S3};
 
 	public:
 		using scalar = bool;
@@ -305,15 +305,15 @@ namespace rsl::math
 
 		[[rythe_always_inline]] constexpr swizzle& operator=(const conv_type& other) noexcept;
 
-		[[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept
+		[[rythe_always_inline]] constexpr scalar& operator[](const size_type i) noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 			return data[lookup[i]];
 		}
 
-		[[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept
+		[[rythe_always_inline]] constexpr const scalar& operator[](const size_type i) const noexcept
 		{
-			rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+			rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 			return data[lookup[i]];
 		}
 	};

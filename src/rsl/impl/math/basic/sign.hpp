@@ -1,6 +1,4 @@
 #pragma once
-#include <cmath>
-#include <limits>
 
 #include "../../defines.hpp"
 #include "../../util/primitives.hpp"

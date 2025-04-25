@@ -38,9 +38,9 @@ namespace rsl::math
 		[[rythe_always_inline]] constexpr vector(scalar s, const vector<scalar, 2, OtherMode>& v) noexcept;
 		[[rythe_always_inline]] constexpr vector(scalar _x, scalar _y, scalar _z = static_cast<scalar>(0)) noexcept;
 
-		template <typename vec_type>
-			requires not_same_as<Scalar, typename vec_type::scalar> || (vec_type::size != 3)
-		[[rythe_always_inline]] constexpr vector(const vec_type& other) noexcept;
+		template <typename VecType>
+			requires not_same_as<Scalar, typename VecType::scalar> || (VecType::size != 3)
+		[[rythe_always_inline]] constexpr vector(const VecType& other) noexcept;
 
 		[[rythe_always_inline]] constexpr vector& operator=(const vector&) noexcept = default;
 
@@ -79,9 +79,9 @@ namespace rsl::math
 		[[rythe_always_inline]] constexpr vector(scalar s, const vector<scalar, 2, OtherMode>& v) noexcept;
 		[[rythe_always_inline]] constexpr vector(scalar _x, scalar _y, scalar _z = static_cast<scalar>(0)) noexcept;
 
-		template <typename vec_type>
-			requires not_same_as<bool, typename vec_type::scalar> || (vec_type::size != 3)
-		[[rythe_always_inline]] constexpr vector(const vec_type& other) noexcept;
+		template <typename VecType>
+			requires not_same_as<bool, typename VecType::scalar> || (VecType::size != 3)
+		[[rythe_always_inline]] constexpr vector(const VecType& other) noexcept;
 
 		[[rythe_always_inline]] constexpr void set_mask(bitfield8 mask) noexcept
 		{
@@ -110,8 +110,8 @@ namespace rsl::math
 
 	using float3 = vector<float32, 3>;
 	using double3 = vector<float64, 3>;
-	using int3 = vector<int, 3>;
-	using uint3 = vector<uint, 3>;
+	using int3 = vector<int32, 3>;
+	using uint3 = vector<uint32, 3>;
 	using bool3 = vector<bool, 3>;
 } // namespace rsl::math
 

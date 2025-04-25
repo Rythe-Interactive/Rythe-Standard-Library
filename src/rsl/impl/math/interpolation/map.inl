@@ -38,8 +38,8 @@ namespace rsl::math
 						typename InMaxType::scalar,
 						elevated_t<typename OutMinType::scalar, typename OutMaxType::scalar>>>>;
 			return internal::compute_map<quaternion<scalar>>::compute(
-				::std::forward<T>(value), ::std::forward<InMin>(inMin), ::std::forward<InMax>(inMax),
-				::std::forward<OutMin>(outMin), ::std::forward<OutMax>(outMax)
+				forward<T>(value), forward<InMin>(inMin), forward<InMax>(inMax), forward<OutMin>(outMin),
+				forward<OutMax>(outMax)
 			);
 		}
 		else if constexpr (is_matrix_v<ValueType> && is_matrix_v<InMinType> && is_matrix_v<InMaxType> &&
@@ -53,8 +53,8 @@ namespace rsl::math
 						typename InMaxType::scalar,
 						elevated_t<typename OutMinType::scalar, typename OutMaxType::scalar>>>>;
 			return internal::compute_map<matrix<scalar, ValueType::row_count, ValueType::col_count>>::compute(
-				::std::forward<T>(value), ::std::forward<InMin>(inMin), ::std::forward<InMax>(inMax),
-				::std::forward<OutMin>(outMin), ::std::forward<OutMax>(outMax)
+				forward<T>(value), forward<InMin>(inMin), forward<InMax>(inMax), forward<OutMin>(outMin),
+				forward<OutMax>(outMax)
 			);
 		}
 		else if constexpr (is_vector_v<ValueType> && is_vector_v<InMinType> && is_vector_v<InMaxType> &&
@@ -71,15 +71,15 @@ namespace rsl::math
 				min(ValueType::size,
 					min(InMinType::size, min(InMaxType::size, min(OutMinType::size, OutMaxType::size))));
 			return internal::compute_map<vector<scalar, size>>::compute(
-				::std::forward<T>(value), ::std::forward<InMin>(inMin), ::std::forward<InMax>(inMax),
-				::std::forward<OutMin>(outMin), ::std::forward<OutMax>(outMax)
+				forward<T>(value), forward<InMin>(inMin), forward<InMax>(inMax), forward<OutMin>(outMin),
+				forward<OutMax>(outMax)
 			);
 		}
 		else
 		{
 			return internal::_map_impl_(
-				::std::forward<T>(value), ::std::forward<InMin>(inMin), ::std::forward<InMax>(inMax),
-				::std::forward<OutMin>(outMin), ::std::forward<OutMax>(outMax)
+				forward<T>(value), forward<InMin>(inMin), forward<InMax>(inMax), forward<OutMin>(outMin),
+				forward<OutMax>(outMax)
 			);
 		}
 	}
@@ -88,6 +88,6 @@ namespace rsl::math
 	template <typename T, typename InMin, typename InMax>
 	[[nodiscard]] constexpr auto map01(T&& value, InMin&& inMin, InMax&& inMax) noexcept
 	{
-		return map(::std::forward<T>(value), ::std::forward<InMin>(inMin), ::std::forward<InMax>(inMax), zero<T>, one<T>);
+		return map(forward<T>(value), forward<InMin>(inMin), forward<InMax>(inMax), zero<T>, one<T>);
 	}
 } // namespace rsl::math

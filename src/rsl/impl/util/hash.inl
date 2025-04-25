@@ -1,5 +1,5 @@
-#include "hash.hpp"
 #pragma once
+#include "hash.hpp"
 
 #if !defined(RYTHE_HAS_INT128) && (defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC))
 	#include <intrin.h>
@@ -23,6 +23,37 @@ namespace rsl
 			constexpr uint64 default_secret[3] = {0x2d358dccaa6c78a5ull, 0x8bb84b93962eacc9ull, 0x4b33a62ed433d4a3ull};
 
 			template <hash_mode Mode>
+			constexpr void manual_mum(uint64* a, uint64* b) noexcept
+			{
+				uint64 ha = *a >> 32;
+				uint64 hb = *b >> 32;
+				uint64 la = static_cast<uint32>(*a);
+				uint64 lb = static_cast<uint32>(*b);
+
+				uint64 rh = ha * hb;
+				uint64 rm0 = ha * lb;
+				uint64 rm1 = hb * la;
+				uint64 rl = la * lb;
+				uint64 t = rl + (rm0 << 32);
+				uint64 c = static_cast<uint64>(t < rl);
+
+				uint64 lo = t + (rm1 << 32);
+				c += static_cast<uint64>(lo < t);
+				uint64 hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
+
+				if constexpr (Mode == hash_mode::fast_hash)
+				{
+					*a = lo;
+					*b = hi;
+				}
+				else
+				{
+					*a ^= lo;
+					*b ^= hi;
+				}
+			}
+
+			template <hash_mode Mode>
 			constexpr void mum(uint64* a, uint64* b) noexcept
 			{
 #if defined(RYTHE_HAS_INT128)
@@ -40,41 +71,9 @@ namespace rsl
 				}
 #else
 	#if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
-				constexpr bool forceManual = false;
-	#else
-				constexpr bool forceManual = true;
-	#endif
-
-				if (is_constant_evaluated() || forceManual)
+				if (is_constant_evaluated())
 				{
-					uint64 ha = *a >> 32;
-					uint64 hb = *b >> 32;
-					uint64 la = static_cast<uint32>(*a);
-					uint64 lb = static_cast<uint32>(*b);
-					uint64 hi{};
-					uint64 lo{};
-
-					uint64 rh = ha * hb;
-					uint64 rm0 = ha * lb;
-					uint64 rm1 = hb * la;
-					uint64 rl = la * lb;
-					uint64 t = rl + (rm0 << 32);
-					uint64 c = static_cast<uint64>(t < rl);
-
-					lo = t + (rm1 << 32);
-					c += static_cast<uint64>(lo < t);
-					hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
-
-					if constexpr (Mode == hash_mode::fast_hash)
-					{
-						*a = lo;
-						*b = hi;
-					}
-					else
-					{
-						*a ^= lo;
-						*b ^= hi;
-					}
+					manual_mum<Mode>(a, b);
 				}
 				else
 				{
@@ -84,95 +83,44 @@ namespace rsl
 					}
 					else
 					{
-						uint64 a, b;
-						a = _umul128(*a, *b, &b);
-						*a ^= a;
-						*b ^= b;
+						uint64 tmpB;
+						const uint64 tmpA = _umul128(*a, *b, &tmpB);
+						*a ^= tmpA;
+						*b ^= tmpB;
 					}
 				}
+	#else
+				manual_mum<Mode>(a, b);
+	#endif
 #endif
 			}
 
 			template <hash_mode Mode>
-			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 mix(uint64 A, uint64 B) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 mix(uint64 a, uint64 b) noexcept
 			{
-				mum<Mode>(&A, &B);
-				return A ^ B;
+				mum<Mode>(&a, &b);
+				return a ^ b;
 			}
 
-			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load64(const byte* ptr) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr uint64
+			load_small(const byte* data, const size_type k) noexcept
 			{
-				uint64 v;
-				constexpr_memcpy(&v, ptr, sizeof(uint64));
-
-				if constexpr (endian::native == endian::little)
-				{
-					return v;
-				}
-				else
-				{
-					if (is_constant_evaluated())
-					{
-						return (
-							((v >> 56) & 0xff) | ((v >> 40) & 0xff00) | ((v >> 24) & 0xff0000) |
-							((v >> 8) & 0xff000000) | ((v << 8) & 0xff00000000) | ((v << 24) & 0xff0000000000) |
-							((v << 40) & 0xff000000000000) | ((v << 56) & 0xff00000000000000)
-						);
-					}
-					else
-					{
-#if defined(RYTHE_GCC) || defined(RYTHE_CLANG)
-						return __builtin_bswap64(v);
-
-#elif defined(RYTHE_MSVC)
-						return _byteswap_uint64(v);
-#endif
-					}
-				}
+				return (static_cast<uint64>(data[0]) << 56) | (static_cast<uint64>(data[k >> 1]) << 32) | data[k - 1];
 			}
 
-			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load32(const byte* ptr) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load32(const byte* data) noexcept
 			{
-				uint32 v;
-				constexpr_memcpy(&v, ptr, sizeof(uint32));
-
-				if constexpr (endian::native == endian::little)
-				{
-					return v;
-				}
-				else
-				{
-					if (is_constant_evaluated())
-					{
-						return (
-							((v >> 24) & 0xff) | ((v >> 8) & 0xff00) | ((v << 8) & 0xff0000) | ((v << 24) & 0xff000000)
-						);
-					}
-					else
-					{
-#if defined(RYTHE_GCC) || defined(RYTHE_CLANG)
-						return __builtin_bswap32(v);
-
-#elif defined(RYTHE_MSVC)
-						return _byteswap_ulong(v);
-#endif
-					}
-				}
-			}
-
-			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 load_small(const uint8* p, size_type k) noexcept
-			{
-				return (static_cast<uint64>(p[0]) << 56) | (static_cast<uint64>(p[k >> 1]) << 32) | p[k - 1];
+				return static_cast<uint64>(unaligned_load<uint32>(data));
 			}
 
 			template <hash_mode Mode>
 			[[nodiscard]] constexpr uint64
-			hash_bytes(span<const byte> bytes, uint64 seed, const uint64 (&secret)[3]) noexcept
+			hash_bytes(const span<const byte> bytes, uint64 seed, const uint64 (&secret)[3]) noexcept
 			{
 				const byte* data = bytes.data();
 				const size_type dataSize = bytes.size();
-				uint64 a{};
-				uint64 b{};
+				uint64 a;
+				uint64 b;
 
 				seed ^= mix<Mode>(seed ^ secret[0], secret[1]) ^ dataSize;
 
@@ -180,7 +128,7 @@ namespace rsl
 				{
 					if (dataSize >= 4) [[likely]]
 					{
-						const uint8* last = data + dataSize - 4;
+						const byte* last = data + dataSize - 4;
 						a = (load32(data) << 32) | load32(last);
 						const uint64 delta = ((dataSize & 24) >> (dataSize >> 3));
 						b = ((load32(data + delta) << 32) | load32(last - delta));
@@ -205,21 +153,39 @@ namespace rsl
 
 						while (i >= 96) [[likely]]
 						{
-							seed = mix<Mode>(load64(data) ^ secret[0], load64(data + 8) ^ seed);
-							seed1 = mix<Mode>(load64(data + 16) ^ secret[1], load64(data + 24) ^ seed1);
-							seed2 = mix<Mode>(load64(data + 32) ^ secret[2], load64(data + 40) ^ seed2);
-							seed = mix<Mode>(load64(data + 48) ^ secret[0], load64(data + 56) ^ seed);
-							seed1 = mix<Mode>(load64(data + 64) ^ secret[1], load64(data + 72) ^ seed1);
-							seed2 = mix<Mode>(load64(data + 80) ^ secret[2], load64(data + 88) ^ seed2);
+							seed = mix<Mode>(
+								unaligned_load<uint64>(data) ^ secret[0], unaligned_load<uint64>(data + 8) ^ seed
+							);
+							seed1 = mix<Mode>(
+								unaligned_load<uint64>(data + 16) ^ secret[1], unaligned_load<uint64>(data + 24) ^ seed1
+							);
+							seed2 = mix<Mode>(
+								unaligned_load<uint64>(data + 32) ^ secret[2], unaligned_load<uint64>(data + 40) ^ seed2
+							);
+							seed = mix<Mode>(
+								unaligned_load<uint64>(data + 48) ^ secret[0], unaligned_load<uint64>(data + 56) ^ seed
+							);
+							seed1 = mix<Mode>(
+								unaligned_load<uint64>(data + 64) ^ secret[1], unaligned_load<uint64>(data + 72) ^ seed1
+							);
+							seed2 = mix<Mode>(
+								unaligned_load<uint64>(data + 80) ^ secret[2], unaligned_load<uint64>(data + 88) ^ seed2
+							);
 							data += 96;
 							i -= 96;
 						}
 
 						if (i >= 48) [[unlikely]]
 						{
-							seed = mix<Mode>(load64(data) ^ secret[0], load64(data + 8) ^ seed);
-							seed1 = mix<Mode>(load64(data + 16) ^ secret[1], load64(data + 24) ^ seed1);
-							seed2 = mix<Mode>(load64(data + 32) ^ secret[2], load64(data + 40) ^ seed2);
+							seed = mix<Mode>(
+								unaligned_load<uint64>(data) ^ secret[0], unaligned_load<uint64>(data + 8) ^ seed
+							);
+							seed1 = mix<Mode>(
+								unaligned_load<uint64>(data + 16) ^ secret[1], unaligned_load<uint64>(data + 24) ^ seed1
+							);
+							seed2 = mix<Mode>(
+								unaligned_load<uint64>(data + 32) ^ secret[2], unaligned_load<uint64>(data + 40) ^ seed2
+							);
 							data += 48;
 							i -= 48;
 						}
@@ -229,15 +195,20 @@ namespace rsl
 
 					if (i > 16)
 					{
-						seed = mix<Mode>(load64(data) ^ secret[2], load64(data + 8) ^ seed ^ secret[1]);
+						seed = mix<Mode>(
+							unaligned_load<uint64>(data) ^ secret[2],
+							unaligned_load<uint64>(data + 8) ^ seed ^ secret[1]
+						);
 						if (i > 32)
 						{
-							seed = mix<Mode>(load64(data + 16) ^ secret[2], load64(data + 24) ^ seed);
+							seed = mix<Mode>(
+								unaligned_load<uint64>(data + 16) ^ secret[2], unaligned_load<uint64>(data + 24) ^ seed
+							);
 						}
 					}
 
-					a = load64(data + i - 16);
-					b = load64(data + i - 8);
+					a = unaligned_load<uint64>(data + i - 16);
+					b = unaligned_load<uint64>(data + i - 8);
 				}
 
 				a ^= secret[1];
@@ -248,7 +219,7 @@ namespace rsl
 			}
 
 			template <hash_mode Mode>
-			[[nodiscard]] constexpr uint64 hash_int(uint64 val)
+			[[nodiscard]] constexpr uint64 hash_int(const uint64 val)
 			{
 				return mix<Mode>(val, 0x9e3779b97f4a7c15ull);
 			}
@@ -284,8 +255,12 @@ namespace rsl
 	RSL_HASH_INT(int64);
 	RSL_HASH_INT(bool);
 	RSL_HASH_INT(char);
+
+#if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
 	RSL_HASH_INT(long);
 	RSL_HASH_INT(unsigned long);
+#endif
+
 	RSL_HASH_INT(char16_t);
 	RSL_HASH_INT(char32_t);
 	RSL_HASH_INT(wchar_t);
@@ -312,19 +287,19 @@ namespace rsl
 	};
 
 	template <hash_mode Mode>
-	constexpr id_type hash_bytes(span<const byte> bytes) noexcept
+	constexpr id_type hash_bytes(const span<const byte> bytes) noexcept
 	{
 		static_assert(internal::hash_static_assert_check<Mode>, "unknown hash mode.");
 		return internal::hash::hash_bytes<Mode>(bytes, internal::hash::default_seed, internal::hash::default_secret);
 	}
 
-	constexpr id_type hash_bytes(span<const byte> bytes) noexcept
+	constexpr id_type hash_bytes(const span<const byte> bytes) noexcept
 	{
 		return hash_bytes<hash_mode::default_hash>(bytes);
 	}
 
 	template <hash_mode Mode>
-	constexpr id_type hash_string(string_view str) noexcept
+	constexpr id_type hash_string(const string_view str) noexcept
 	{
 		if (is_constant_evaluated())
 		{
@@ -343,7 +318,7 @@ namespace rsl
 		}
 	}
 
-	constexpr id_type hash_string(string_view str) noexcept
+	constexpr id_type hash_string(const string_view str) noexcept
 	{
 		return hash_string<hash_mode::default_hash>(str);
 	}
@@ -360,12 +335,12 @@ namespace rsl
 		return hash_value<hash_mode::default_hash>(val);
 	}
 
-	template <hash_mode Mode, same_as<id_type>... hash_types>
-	constexpr id_type combine_hash(id_type seed, id_type hash, hash_types... hashes) noexcept
+	template <hash_mode Mode, same_as<id_type>... HashTypes>
+	constexpr id_type combine_hash(id_type seed, const id_type hash, const HashTypes... hashes) noexcept
 	{
 		seed = internal::hash::mix<Mode>(seed + hash, 0x9ddfea08eb382d69ull);
 
-		if constexpr (sizeof...(hash_types) != 0)
+		if constexpr (sizeof...(HashTypes) != 0)
 		{
 			return combine_hash(seed, hashes...);
 		}
@@ -375,8 +350,8 @@ namespace rsl
 		}
 	}
 
-	template <same_as<id_type>... hash_types>
-	constexpr id_type combine_hash(id_type seed, id_type hash, hash_types... hashes) noexcept
+	template <same_as<id_type>... HashTypes>
+	constexpr id_type combine_hash(id_type seed, id_type hash, HashTypes... hashes) noexcept
 	{
 		return combine_hash<hash_mode::default_hash>(seed, hash, hashes...);
 	}

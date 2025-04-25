@@ -1,22 +1,16 @@
 #pragma once
-#include "../../util/primitives.hpp"
-#include "../basic/constraint.hpp"
-#include "../matrix/matrix.hpp"
-#include "../quaternion/quaternion_base.hpp"
-#include "../util/type_util.hpp"
-#include "../vector/vector.hpp"
-
-#include <cmath>
 
 namespace rsl::math
 {
 	// sin
 	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] auto sin(T&& v) noexcept;
+		requires floating_point_type<T> || linear_algebraic_construct<T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto sin(T&& value) noexcept;
 
 	// asin
 	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] auto asin(T&& v) noexcept;
+		requires floating_point_type<T> || linear_algebraic_construct<T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto asin(T&& value) noexcept;
 } // namespace rsl::math
 
 #include "sin.inl"

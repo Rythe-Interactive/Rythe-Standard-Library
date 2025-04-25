@@ -1,13 +1,6 @@
 #pragma once
+#include "../quaternion/matrix_quat_conv.inl"
 #include "predefined.hpp"
-
-#include "../../util/primitives.hpp"
-
-#include "../geometric/length.hpp"
-#include "../geometric/normalize.hpp"
-
-#include "../util/close_enough.hpp"
-#include "../util/type_util.hpp"
 
 namespace rsl::math
 {

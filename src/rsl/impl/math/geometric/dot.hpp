@@ -6,13 +6,17 @@ namespace rsl::math
 {
 	namespace internal
 	{
-		template <typename Scalar, size_type Size>
-		struct compute_dot
+		template <typename T>
+		struct compute_dot;
+
+		template <typename Scalar, size_type Size, storage_mode Mode>
+		struct compute_dot<vector<Scalar, Size, Mode>>
 		{
 			static constexpr size_type size = Size;
-			using value_type = vector<Scalar, size>;
+			using value_type = vector<Scalar, size, Mode>;
 
-			constexpr static Scalar compute(const value_type& a, const value_type& b) noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar
+			compute(const value_type& a, const value_type& b) noexcept
 			{
 				Scalar result = 0;
 				for (size_type i = 0; i < size; i++)
@@ -24,11 +28,9 @@ namespace rsl::math
 		};
 	} // namespace internal
 
-	template <
-		typename vec_type0, typename vec_type1,
-		std::enable_if_t<is_vector_v<vec_type0> && is_vector_v<vec_type1>, bool> = true>
-	constexpr auto dot(const vec_type0& a, const vec_type1& b) noexcept
+	template <vector_type VecType0, vector_type VecType1>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto dot(const VecType0& a, const VecType1& b) noexcept
 	{
-		return internal::compute_dot<typename vec_type0::scalar, vec_type0::size>::compute(a, b);
+		return internal::compute_dot<elevated_t<VecType0, VecType1>>::compute(a, b);
 	}
 } // namespace rsl::math

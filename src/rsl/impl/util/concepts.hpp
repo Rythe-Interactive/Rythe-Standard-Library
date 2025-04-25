@@ -30,8 +30,8 @@ namespace rsl
 	template <typename Type, template <typename...> typename Template>
 	concept specialization_of = is_specialization_v<Type, Template>;
 
-	template <bool value>
-	concept invert = !value;
+	template <bool Value>
+	concept invert = !Value;
 
 	template <typename T>
 	concept integral_type = is_integral_v<remove_cvr_t<T>>;

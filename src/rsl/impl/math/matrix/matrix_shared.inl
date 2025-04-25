@@ -1,92 +1,98 @@
-#ifndef RowCountSpecialization
-	#define RowCountSpecialization RowCount
-#endif // !RowCountSpecialization
+#ifndef ROW_COUNT_SPECIALIZATION
+	#define ROW_COUNT_SPECIALIZATION RowCount
+#endif // !ROW_COUNT_SPECIALIZATION
 
-#ifndef ColCountSpecialization
-	#define ColCountSpecialization ColCount
-#endif // !ColCountSpecialization
+#ifndef COL_COUNT_SPECIALIZATION
+	#define COL_COUNT_SPECIALIZATION ColCount
+#endif // !COL_COUNT_SPECIALIZATION
 
-#ifndef ScalarSpecialization
-	#define ScalarSpecialization Scalar
-#endif // !ScalarSpecialization
+#ifndef SCALAR_SPECIALIZATION
+	#define SCALAR_SPECIALIZATION Scalar
+#endif // !SCALAR_SPECIALIZATION
 
-#ifndef ModeSpecialization
-	#define ModeSpecialization Mode
-#endif // !ModeSpecialization
+#ifndef MODE_SPECIALIZATION
+	#define MODE_SPECIALIZATION Mode
+#endif // !MODE_SPECIALIZATION
 
-#ifndef MatrixTemplate
-	#define MatrixTemplate                                                                                             \
+#ifndef MATRIX_TEMPLATE
+	#define MATRIX_TEMPLATE                                                                                            \
 		template <                                                                                                     \
-			arithmetic_type ScalarSpecialization, size_type RowCountSpecialization, size_type ColCountSpecialization,  \
-			storage_mode ModeSpecialization>
-#endif // !MatrixTemplate
+			arithmetic_type SCALAR_SPECIALIZATION, size_type ROW_COUNT_SPECIALIZATION,                                 \
+			size_type COL_COUNT_SPECIALIZATION, storage_mode MODE_SPECIALIZATION>
+#endif // !MATRIX_TEMPLATE
 
 namespace rsl::math
 {
-	MatrixTemplate const matrix<ScalarSpecialization, RowCountSpecialization, ColCountSpecialization, Mode>
-		matrix<ScalarSpecialization, RowCountSpecialization, ColCountSpecialization, Mode>::identity(
-			ScalarSpecialization(1)
+	MATRIX_TEMPLATE
+	const matrix<SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, Mode>
+		matrix<SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, Mode>::identity(
+			SCALAR_SPECIALIZATION(1)
 		);
 
-	MatrixTemplate const
-		matrix<ScalarSpecialization, RowCountSpecialization, ColCountSpecialization, ModeSpecialization>
-			matrix<ScalarSpecialization, RowCountSpecialization, ColCountSpecialization, ModeSpecialization>::zero(
-				ScalarSpecialization(0)
-			);
+	MATRIX_TEMPLATE
+	const matrix<SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, MODE_SPECIALIZATION>
+		matrix<SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, MODE_SPECIALIZATION>::zero(
+			SCALAR_SPECIALIZATION(0)
+		);
 
-	MatrixTemplate constexpr matrix<
-		ScalarSpecialization, RowCountSpecialization, ColCountSpecialization, ModeSpecialization>::matrix() noexcept
+	MATRIX_TEMPLATE
+	constexpr matrix<SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, MODE_SPECIALIZATION>::
+		matrix() noexcept
+		: columns{}
 	{
 		for (size_type i = 0; i < row_count; i++)
 		{
 			for (size_type j = 0; j < col_count; j++)
 			{
-				rows[i][j] = i == j ? static_cast<scalar>(1) : static_cast<scalar>(0);
+				columns[j][i] = i == j ? static_cast<scalar>(1) : static_cast<scalar>(0);
 			}
 		}
 	}
 
-	MatrixTemplate constexpr matrix<
-		ScalarSpecialization, RowCountSpecialization, ColCountSpecialization, ModeSpecialization>::matrix(scalar s
+	MATRIX_TEMPLATE
+	constexpr matrix<
+		SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, MODE_SPECIALIZATION>::matrix(scalar s
 	) noexcept
 		: matrix(s, identity_matrix_signal{})
 	{
 	}
 
-	MatrixTemplate constexpr matrix<
-		ScalarSpecialization, RowCountSpecialization, ColCountSpecialization,
-		ModeSpecialization>::matrix(scalar s, uniform_matrix_signal) noexcept
+	MATRIX_TEMPLATE
+	constexpr matrix<SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, MODE_SPECIALIZATION>::
+		matrix(scalar s, uniform_matrix_signal) noexcept
+		: columns{}
 	{
 		for (size_type i = 0; i < row_count; i++)
 		{
 			for (size_type j = 0; j < col_count; j++)
 			{
-				rows[i][j] = s;
+				columns[j][i] = s;
 			}
 		}
 	}
 
-	MatrixTemplate constexpr matrix<
-		ScalarSpecialization, RowCountSpecialization, ColCountSpecialization,
-		ModeSpecialization>::matrix(scalar s, identity_matrix_signal) noexcept
+	MATRIX_TEMPLATE
+	constexpr matrix<SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, MODE_SPECIALIZATION>::
+		matrix(scalar s, identity_matrix_signal) noexcept
+		: columns{}
 	{
 		for (size_type i = 0; i < row_count; i++)
 		{
 			for (size_type j = 0; j < col_count; j++)
 			{
-				rows[i][j] = i == j ? s : static_cast<scalar>(0);
+				columns[j][i] = i == j ? s : static_cast<scalar>(0);
 			}
 		}
 	}
 
-	MatrixTemplate template <typename mat_type>
-		requires not_same_as<ScalarSpecialization, typename mat_type::scalar> ||
-				 (mat_type::row_count != RowCountSpecialization) || (mat_type::col_count != ColCountSpecialization)
-	constexpr matrix<ScalarSpecialization, RowCountSpecialization, ColCountSpecialization, ModeSpecialization>::matrix(
-		const mat_type& other
-	) noexcept
+	MATRIX_TEMPLATE
+	template <typename MatType>
+		requires not_same_as<SCALAR_SPECIALIZATION, typename MatType::scalar> ||
+				 (MatType::row_count != ROW_COUNT_SPECIALIZATION) || (MatType::col_count != COL_COUNT_SPECIALIZATION)
+	constexpr matrix<SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, MODE_SPECIALIZATION>::
+		matrix(const MatType& other) noexcept
 	{
-		if constexpr (row_count == mat_type::row_count && col_count == mat_type::col_count)
+		if constexpr (row_count == MatType::row_count && col_count == MatType::col_count)
 		{
 			for (size_type i = 0; i < size; i++)
 			{
@@ -95,42 +101,44 @@ namespace rsl::math
 		}
 		else
 		{
-			constexpr size_type min_row = row_count < mat_type::row_count ? row_count : mat_type::row_count;
-			constexpr size_type min_col = col_count < mat_type::col_count ? col_count : mat_type::col_count;
+			constexpr size_type min_row = row_count < MatType::row_count ? row_count : MatType::row_count;
+			constexpr size_type min_col = col_count < MatType::col_count ? col_count : MatType::col_count;
 
 			for (size_type i = 0; i < min_row; i++)
 			{
 				for (size_type j = 0; j < min_col; j++)
 				{
-					rows[i][j] = static_cast<scalar>(other.mx[i][j]);
+					columns[j][i] = static_cast<scalar>(other[j][i]);
 				}
 			}
 		}
 	}
 
-	MatrixTemplate constexpr typename matrix<
-		ScalarSpecialization, RowCountSpecialization, ColCountSpecialization, ModeSpecialization>::row_type&
-	matrix<ScalarSpecialization, RowCountSpecialization, ColCountSpecialization, ModeSpecialization>::operator[](
+	MATRIX_TEMPLATE
+	constexpr typename matrix<
+		SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, MODE_SPECIALIZATION>::col_type&
+	matrix<SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, MODE_SPECIALIZATION>::operator[](
 		size_type i
 	) noexcept
 	{
-		rsl_assert_out_of_range_msg((i >= 0) && (i < row_count), "matrix subscript out of range");
-		return rows[i];
+		rsl_assert_out_of_range_msg(i < col_count, "matrix subscript out of range");
+		return columns[i];
 	}
 
-	MatrixTemplate constexpr const typename matrix<
-		ScalarSpecialization, RowCountSpecialization, ColCountSpecialization, ModeSpecialization>::row_type&
-	matrix<ScalarSpecialization, RowCountSpecialization, ColCountSpecialization, ModeSpecialization>::operator[](
+	MATRIX_TEMPLATE
+	constexpr const typename matrix<
+		SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, MODE_SPECIALIZATION>::col_type&
+	matrix<SCALAR_SPECIALIZATION, ROW_COUNT_SPECIALIZATION, COL_COUNT_SPECIALIZATION, MODE_SPECIALIZATION>::operator[](
 		size_type i
 	) const noexcept
 	{
-		rsl_assert_out_of_range_msg((i >= 0) && (i < row_count), "matrix subscript out of range");
-		return rows[i];
+		rsl_assert_out_of_range_msg(i < col_count, "matrix subscript out of range");
+		return columns[i];
 	}
 } // namespace rsl::math
 
-#undef RowCountSpecialization
-#undef ColCountSpecialization
-#undef ScalarSpecialization
-#undef ModeSpecialization
-#undef MatrixTemplate
+#undef ROW_COUNT_SPECIALIZATION
+#undef COL_COUNT_SPECIALIZATION
+#undef SCALAR_SPECIALIZATION
+#undef MODE_SPECIALIZATION
+#undef MATRIX_TEMPLATE

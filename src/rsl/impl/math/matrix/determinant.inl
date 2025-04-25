@@ -1,35 +1,35 @@
-#include "determinant.hpp"
 #pragma once
+#include "determinant.hpp"
 
 namespace rsl::math
 {
 	namespace internal
 	{
-		template <typename mat_type>
+		template <matrix_type MatType>
 		[[nodiscard]] [[rythe_always_inline]] constexpr auto
-		extract_sub_mat(const mat_type& m, size_type rowIdx, size_type colIdx)
+		extract_sub_mat(const MatType& m, const size_type rowIdx, const size_type colIdx)
 		{
-			using sub_mat_type = matrix<typename mat_type::scalar, mat_type::row_count - 1, mat_type::col_count - 1>;
+			using sub_mat_type = matrix<typename MatType::scalar, MatType::row_count - 1, MatType::col_count - 1>;
 
 			sub_mat_type result;
 			size_type resultRow = 0;
 			size_type resultCol = 0;
 
-			for (size_type srcRow = 0; srcRow < mat_type::row_count; srcRow++)
+			for (size_type srcCol = 0; srcCol < MatType::col_count; srcCol++)
 			{
-				if (srcRow != rowIdx)
+				if (srcCol != colIdx)
 				{
-					for (size_type srcCol = 0; srcCol < mat_type::col_count; srcCol++)
+					for (size_type srcRow = 0; srcRow < MatType::row_count; srcRow++)
 					{
-						if (srcCol != colIdx)
+						if (srcRow != rowIdx)
 						{
-							if (resultCol >= sub_mat_type::col_count)
+							if (resultRow >= sub_mat_type::row_count)
 							{
-								resultCol = 0;
-								resultRow++;
+								resultRow = 0;
+								resultCol++;
 							}
 
-							result[resultRow][resultCol++] = m[srcRow][srcCol];
+							result[resultCol][resultRow++] = m[srcCol][srcRow];
 						}
 					}
 				}
@@ -38,7 +38,7 @@ namespace rsl::math
 			return result;
 		}
 
-		template <typename T>
+		template <matrix_type T>
 		struct compute_determinant;
 
 		template <typename Scalar, size_type RowCount, size_type ColCount>
@@ -52,7 +52,7 @@ namespace rsl::math
 				static_assert(RowCount == ColCount, "Determinants can only be calculated of square matrices");
 
 				Scalar result = static_cast<Scalar>(0);
-				for (size_type i = 0; i < RowCount; i++)
+				for (size_type i = 0; i < ColCount; i++)
 				{
 					result += static_cast<Scalar>((i % 2) ? -1 : 1) * m[i][0] *
 							  compute_determinant<sub_mat_type>::compute(extract_sub_mat(m, i, 0));
@@ -84,9 +84,9 @@ namespace rsl::math
 		};
 	} // namespace internal
 
-	template <typename mat_type, ::std::enable_if_t<is_matrix_v<mat_type>, bool>>
-	[[nodiscard]] constexpr auto determinant(const mat_type& mat) noexcept
+	template <matrix_type MatType>
+	[[nodiscard]] constexpr auto determinant(const MatType& mat) noexcept
 	{
-		return internal::compute_determinant<mat_type>::compute(mat);
+		return internal::compute_determinant<MatType>::compute(mat);
 	}
 } // namespace rsl::math

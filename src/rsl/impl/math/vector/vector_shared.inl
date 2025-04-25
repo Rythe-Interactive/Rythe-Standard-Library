@@ -1,83 +1,90 @@
+#ifndef SIZE_SPECIALIZATION
+	#define SIZE_SPECIALIZATION Size
+#endif // !SIZE_SPECIALIZATION
 
-#ifndef SizeSpecialization
-	#define SizeSpecialization Size
-#endif // !SizeSpecialization
+#ifndef SCALAR_SPECIALIZATION
+	#define SCALAR_SPECIALIZATION Scalar
+#endif // !SCALAR_SPECIALIZATION
 
-#ifndef ScalarSpecialization
-	#define ScalarSpecialization Scalar
-#endif // !ScalarSpecialization
+#ifndef MODE_SPECIALIZATION
+	#define MODE_SPECIALIZATION Mode
+#endif // !MODE_SPECIALIZATION
 
-#ifndef VectorTemplate
-	#define VectorTemplate template <arithmetic_type Scalar, size_type Size, storage_mode Mode>
-#endif // !VectorTemplate
+#ifndef VECTOR_TEMPLATE
+	#define VECTOR_TEMPLATE                                                                                            \
+		template <                                                                                                     \
+			arithmetic_type SCALAR_SPECIALIZATION, size_type SIZE_SPECIALIZATION, storage_mode MODE_SPECIALIZATION>
+#endif // !VECTOR_TEMPLATE
 
 namespace rsl::math
 {
-	VectorTemplate const vector<ScalarSpecialization, SizeSpecialization, Mode>
-		vector<ScalarSpecialization, SizeSpecialization, Mode>::one(ScalarSpecialization(1));
+	VECTOR_TEMPLATE const vector<SCALAR_SPECIALIZATION, SIZE_SPECIALIZATION, MODE_SPECIALIZATION>
+		vector<SCALAR_SPECIALIZATION, SIZE_SPECIALIZATION, MODE_SPECIALIZATION>::one(SCALAR_SPECIALIZATION(1));
 
-	VectorTemplate const vector<ScalarSpecialization, SizeSpecialization, Mode>
-		vector<ScalarSpecialization, SizeSpecialization, Mode>::zero(ScalarSpecialization(0));
+	VECTOR_TEMPLATE const vector<SCALAR_SPECIALIZATION, SIZE_SPECIALIZATION, MODE_SPECIALIZATION>
+		vector<SCALAR_SPECIALIZATION, SIZE_SPECIALIZATION, MODE_SPECIALIZATION>::zero(SCALAR_SPECIALIZATION(0));
 
-	VectorTemplate constexpr vector<ScalarSpecialization, SizeSpecialization, Mode>::vector() noexcept
+	VECTOR_TEMPLATE constexpr vector<SCALAR_SPECIALIZATION, SIZE_SPECIALIZATION, MODE_SPECIALIZATION>::vector() noexcept
 		: data()
 	{
-		for (size_type i = 0; i < size; i++)
+		for (size_type i = 0; i < size; ++i)
 		{
 			data[i] = scalar(0);
 		}
 	}
 
-	VectorTemplate constexpr vector<ScalarSpecialization, SizeSpecialization, Mode>::vector(scalar s) noexcept
+	VECTOR_TEMPLATE constexpr vector<SCALAR_SPECIALIZATION, SIZE_SPECIALIZATION, MODE_SPECIALIZATION>::vector(scalar s
+	) noexcept
 		: data()
 	{
-		for (size_type i = 0; i < size; i++)
+		for (size_type i = 0; i < size; ++i)
 		{
 			data[i] = s;
 		}
 	}
 
-	VectorTemplate template <typename vec_type>
-		requires not_same_as<ScalarSpecialization, typename vec_type::scalar> || (vec_type::size != SizeSpecialization)
-	constexpr vector<ScalarSpecialization, SizeSpecialization, Mode>::vector(const vec_type& other) noexcept
+	VECTOR_TEMPLATE template <typename VecType>
+		requires not_same_as<SCALAR_SPECIALIZATION, typename VecType::scalar> || (VecType::size != SIZE_SPECIALIZATION)
+	constexpr vector<SCALAR_SPECIALIZATION, SIZE_SPECIALIZATION, MODE_SPECIALIZATION>::vector(const VecType& other
+	) noexcept
 		: data()
 	{
-		if constexpr (size > vec_type::size)
+		if constexpr (size > VecType::size)
 		{
-			for (size_type i = 0; i < vec_type::size; i++)
+			for (size_type i = 0; i < VecType::size; ++i)
 			{
 				data[i] = static_cast<scalar>(other.data[i]);
 			}
 
-			for (size_type i = vec_type::size; i < size; i++)
+			for (size_type i = VecType::size; i < size; ++i)
 			{
 				data[i] = static_cast<scalar>(0);
 			}
 		}
 		else
 		{
-			for (size_type i = 0; i < size; i++)
+			for (size_type i = 0; i < size; ++i)
 			{
 				data[i] = static_cast<scalar>(other.data[i]);
 			}
 		}
 	}
 
-	VectorTemplate constexpr ScalarSpecialization&
-	vector<ScalarSpecialization, SizeSpecialization, Mode>::operator[](size_type i) noexcept
+	VECTOR_TEMPLATE constexpr SCALAR_SPECIALIZATION&
+	vector<SCALAR_SPECIALIZATION, SIZE_SPECIALIZATION, MODE_SPECIALIZATION>::operator[](size_type i) noexcept
 	{
-		rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+		rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 		return data[i];
 	}
 
-	VectorTemplate constexpr const ScalarSpecialization&
-	vector<ScalarSpecialization, SizeSpecialization, Mode>::operator[](size_type i) const noexcept
+	VECTOR_TEMPLATE constexpr const SCALAR_SPECIALIZATION&
+	vector<SCALAR_SPECIALIZATION, SIZE_SPECIALIZATION, MODE_SPECIALIZATION>::operator[](size_type i) const noexcept
 	{
-		rsl_assert_out_of_range_msg((i >= 0) && (i < size), "vector subscript out of range");
+		rsl_assert_out_of_range_msg(i < size, "vector subscript out of range");
 		return data[i];
 	}
 } // namespace rsl::math
 
-#undef SizeSpecialization
-#undef ScalarSpecialization
-#undef VectorTemplate
+#undef SIZE_SPECIALIZATION
+#undef SCALAR_SPECIALIZATION
+#undef VECTOR_TEMPLATE

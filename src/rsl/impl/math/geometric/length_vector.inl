@@ -1,5 +1,4 @@
 #pragma once
-#include "length.hpp"
 
 namespace rsl::math::internal
 {
@@ -11,9 +10,14 @@ namespace rsl::math::internal
 	{
 		using vec_type = vector<Scalar, Size, Mode>;
 
-		[[nodiscard]] [[rythe_always_inline]] static Scalar compute(const vec_type& v) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute(const vec_type& v) noexcept
 		{
-			return ::std::sqrt(dot(v, v));
+			return rsl::math::sqrt(dot(v, v));
+		}
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute_rcp(const vec_type& v) noexcept
+		{
+			return rcp_sqrt(dot(v, v));
 		}
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute2(const vec_type& v) noexcept
@@ -27,25 +31,32 @@ namespace rsl::math::internal
 	{
 		using vec_type = vector<Scalar, 1u, Mode>;
 
-		[[nodiscard]] [[rythe_always_inline]] static Scalar compute(Scalar v) noexcept { return v; }
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute(Scalar v) noexcept { return v; }
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute_rcp(Scalar v) noexcept { return rcp(v); }
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute2(Scalar v) noexcept { return v * v; }
 	};
 
-	template <typename Scalar, size_type Size, storage_mode Mode, size_type... args>
-	struct compute_length<swizzle<Scalar, Size, Mode, args...>>
+	template <typename Scalar, size_type Size, storage_mode Mode, size_type... Args>
+	struct compute_length<swizzle<Scalar, Size, Mode, Args...>>
 	{
-		using swizzle_type = swizzle<Scalar, Size, Mode, args...>;
+		using swizzle_type = swizzle<Scalar, Size, Mode, Args...>;
 		using vec_type = typename swizzle_type::conv_type;
 
-		[[nodiscard]] [[rythe_always_inline]] static auto compute(const vec_type& v) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute(const vec_type& v) noexcept
 		{
 			return compute_length<vec_type>::compute(v);
 		}
 
-		[[nodiscard]] [[rythe_always_inline]] static auto compute2(const vec_type& v) noexcept
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute_rcp(const vec_type& v) noexcept
 		{
-			return compute_length<vec_type>::compute(v);
+			return compute_length<vec_type>::compute_rcp(v);
+		}
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr static Scalar compute2(const vec_type& v) noexcept
+		{
+			return compute_length<vec_type>::compute2(v);
 		}
 	};
 } // namespace rsl::math::internal

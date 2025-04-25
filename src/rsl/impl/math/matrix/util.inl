@@ -3,16 +3,16 @@
 
 namespace rsl::math
 {
-	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> perspective(Scalar rads, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
+	template <arithmetic_type Scalar>
+	constexpr matrix<Scalar, 4, 4> perspective(radians<Scalar> fovY, Scalar aspect, Scalar nearZ, Scalar farZ) noexcept
 	{
-		Scalar const tanHalfFovy = tan(rads * static_cast<Scalar>(0.5));
+		Scalar const tanHalfFovY = tan(fovY.value * static_cast<Scalar>(0.5));
 		Scalar inverseFrustumDepth = static_cast<Scalar>(1) / (farZ - nearZ);
 
 		matrix<Scalar, 4, 4> result(static_cast<Scalar>(0));
 
-		result[0][0] = static_cast<Scalar>(1) / (aspect * tanHalfFovy);
-		result[1][1] = static_cast<Scalar>(1) / (tanHalfFovy);
+		result[0][0] = static_cast<Scalar>(1) / (aspect * tanHalfFovY);
+		result[1][1] = static_cast<Scalar>(1) / (tanHalfFovY);
 		result[2][2] = (farZ + nearZ) * inverseFrustumDepth;
 
 		result[2][3] = static_cast<Scalar>(1);
@@ -21,8 +21,8 @@ namespace rsl::math
 		return result;
 	}
 
-	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4>
+	template <arithmetic_type Scalar>
+	constexpr matrix<Scalar, 4, 4>
 	orthographic(Scalar left, Scalar right, Scalar bottom, Scalar top, Scalar nearZ, Scalar farZ) noexcept
 	{
 		vector<Scalar, 3> frustumSize = vector<Scalar, 3>(right, top, farZ) - vector<Scalar, 3>(left, bottom, nearZ);
@@ -43,45 +43,106 @@ namespace rsl::math
 		return result;
 	}
 
-	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4>
-	look_at(vector<Scalar, 3> eye, vector<Scalar, 3> center, vector<Scalar, 3> up) noexcept
+	template <arithmetic_type Scalar, storage_mode ModeEye, storage_mode ModeCenter, storage_mode ModeUp>
+	constexpr matrix<Scalar, 4, 4, elevated_storage_mode_v<ModeEye, elevated_storage_mode_v<ModeCenter, ModeUp>>>
+	look_at(vector<Scalar, 3, ModeEye> eye, vector<Scalar, 3, ModeCenter> center, vector<Scalar, 3, ModeUp> up) noexcept
 	{
-		const vector<Scalar, 4> f(normalize(center - eye));
-		const vector<Scalar, 4> r(normalize(cross(up, f)));
-		const vector<Scalar, 4> u(cross(f, r)); // Length of u is 1 because the angle between f and r is 90 degrees
+		constexpr storage_mode mode = elevated_storage_mode_v<ModeEye, elevated_storage_mode_v<ModeCenter, ModeUp>>;
+		const vector<Scalar, 4, mode> f(normalize(center - eye));
+		const vector<Scalar, 4, mode> r(normalize(cross(up, vector<Scalar, 3, mode>(f))));
+		// Length of u is 1 because the angle between f and r is 90 degrees
+		const vector<Scalar, 4, mode> u(cross(vector<Scalar, 3, mode>(f), vector<Scalar, 3, mode>(r)));
 
-		matrix<Scalar, 4, 4> result(static_cast<Scalar>(1));
-		result.col0 = r;
-		result.col1 = u;
-		result.col2 = f;
+		matrix<Scalar, 4, 4, mode> result(static_cast<Scalar>(1));
+		result[0] = r;
+		result[1] = u;
+		result[2] = f;
 
-		vector<Scalar, 3> x{r.x, u.x, f.x};
-		vector<Scalar, 3> y{r.y, u.y, f.y};
-		vector<Scalar, 3> z{r.z, u.z, f.z};
+		vector<Scalar, 3, mode> xxx{r[0], u[0], f[0]};
+		vector<Scalar, 3, mode> yyy{r[1], u[1], f[1]};
+		vector<Scalar, 3, mode> zzz{r[2], u[2], f[2]};
 
-		result.col3 = -(x * eye.xxx + y * eye.yyy + z * eye.zzz);
+		result[3] = vector<Scalar, 4, mode>(-(xxx * eye[0] + yyy * eye[1] + zzz * eye[2]), static_cast<Scalar>(1));
 
 		return result;
 	}
 
-	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> transpose(matrix<Scalar, 4, 4> mat) noexcept
+	namespace internal
 	{
-		matrix<Scalar, 4, 4> result(1);
-		result.row0 = mat.col0;
-		result.row1 = mat.col1;
-		result.row2 = mat.col2;
-		result.row3 = mat.col3;
-		return result;
+		template <arithmetic_type Scalar, size_type Size, storage_mode Mode>
+		constexpr matrix<Scalar, Size, Size, Mode> transpose_impl(const matrix<Scalar, Size, Size, Mode>& mat) noexcept
+		{
+			matrix<Scalar, Size, Size, Mode> result{};
+			for (size_t i = 0; i < Size; ++i)
+			{
+				for (size_t j = 0; j < Size; ++j)
+				{
+					result[j][i] = mat[i][j];
+				}
+			}
+			return result;
+		}
+	} // namespace internal
+
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode>
+	constexpr matrix<Scalar, Size, Size, Mode> transpose(const matrix<Scalar, Size, Size, Mode>& mat) noexcept
+	{
+		if constexpr (Size == 4)
+		{
+			if (is_constant_evaluated())
+			{
+				return internal::transpose_impl(mat);
+			}
+			else
+			{
+				matrix<Scalar, 4, 4, Mode> result(1);
+				result.row0 = mat.col0;
+				result.row1 = mat.col1;
+				result.row2 = mat.col2;
+				result.row3 = mat.col3;
+				return result;
+			}
+		}
+		else if constexpr (Size == 3)
+		{
+			if (is_constant_evaluated())
+			{
+				return internal::transpose_impl(mat);
+			}
+			else
+			{
+				matrix<Scalar, 3, 3, Mode> result(1);
+				result.row0 = mat.col0;
+				result.row1 = mat.col1;
+				result.row2 = mat.col2;
+				return result;
+			}
+		}
+		else
+		{
+			return internal::transpose_impl(mat);
+		}
 	}
 
-	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> translate(matrix<Scalar, 4, 4> mat, vector<Scalar, 3> pos) noexcept
+	template <arithmetic_type Scalar, storage_mode MatMode, storage_mode VecMode>
+	constexpr matrix<Scalar, 4, 4, elevated_storage_mode_v<MatMode, VecMode>>
+	translate(const matrix<Scalar, 4, 4, MatMode>& mat, const vector<Scalar, 3, VecMode>& pos) noexcept
 	{
-		matrix<Scalar, 4, 4> result(mat);
-		result[3] = mat[0] * pos[0] + mat[1] * pos[1] + mat[2] * pos[2] + mat[3];
-		return result;
+		constexpr storage_mode mode = elevated_storage_mode_v<MatMode, VecMode>;
+		if (is_constant_evaluated())
+		{
+			matrix<Scalar, 4, 4, mode> result(mat);
+			result[3][0] += pos[0];
+			result[3][1] += pos[1];
+			result[3][2] += pos[2];
+			return result;
+		}
+		else
+		{
+			matrix<Scalar, 4, 4, mode> result(mat);
+			result[3].xyz += pos;
+			return result;
+		}
 	}
 
 	// template<typename Scalar>
@@ -90,30 +151,33 @@ namespace rsl::math
 
 	//}
 
-	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> rotate(matrix<Scalar, 4, 4> mat, Scalar rad, vector<Scalar, 3> axis) noexcept
+	template <arithmetic_type Scalar, storage_mode MatMode, storage_mode VecMode>
+	constexpr matrix<Scalar, 4, 4, elevated_storage_mode_v<MatMode, VecMode>> rotate(
+		const matrix<Scalar, 4, 4, MatMode>& mat, radians<Scalar> angle, const vector<Scalar, 3, VecMode>& _axis
+	) noexcept
 	{
-		Scalar const a = rad;
+		constexpr storage_mode mode = elevated_storage_mode_v<MatMode, VecMode>;
+		Scalar const a = angle;
 		Scalar const c = cos(a);
 		Scalar const s = sin(a);
 
-		vector<Scalar, 3> _axis(normalize(axis));
-		vector<Scalar, 3> temp((Scalar(1) - c) * _axis);
+		vector<Scalar, 3, mode> axis(normalize(_axis));
+		vector<Scalar, 3, mode> temp((Scalar(1) - c) * axis);
 
-		matrix<Scalar, 4, 4> rot;
-		rot[0][0] = c + temp[0] * _axis[0];
-		rot[0][1] = temp[0] * _axis[1] + s * _axis[2];
-		rot[0][2] = temp[0] * _axis[2] - s * _axis[1];
+		matrix<Scalar, 4, 4, mode> rot;
+		rot[0][0] = c + temp[0] * axis[0];
+		rot[0][1] = temp[0] * axis[1] + s * axis[2];
+		rot[0][2] = temp[0] * axis[2] - s * axis[1];
 
-		rot[1][0] = temp[1] * _axis[0] - s * _axis[2];
-		rot[1][1] = c + temp[1] * _axis[1];
-		rot[1][2] = temp[1] * _axis[2] + s * _axis[0];
+		rot[1][0] = temp[1] * axis[0] - s * axis[2];
+		rot[1][1] = c + temp[1] * axis[1];
+		rot[1][2] = temp[1] * axis[2] + s * axis[0];
 
-		rot[2][0] = temp[2] * _axis[0] + s * _axis[1];
-		rot[2][1] = temp[2] * _axis[1] - s * _axis[0];
-		rot[2][2] = c + temp[2] * _axis[2];
+		rot[2][0] = temp[2] * axis[0] + s * axis[1];
+		rot[2][1] = temp[2] * axis[1] - s * axis[0];
+		rot[2][2] = c + temp[2] * axis[2];
 
-		matrix<Scalar, 4, 4> result;
+		matrix<Scalar, 4, 4, mode> result;
 		result[0] = mat[0] * rot[0][0] + mat[1] * rot[0][1] + mat[2] * rot[0][2];
 		result[1] = mat[0] * rot[1][0] + mat[1] * rot[1][1] + mat[2] * rot[1][2];
 		result[2] = mat[0] * rot[2][0] + mat[1] * rot[2][1] + mat[2] * rot[2][2];
@@ -121,10 +185,12 @@ namespace rsl::math
 		return result;
 	}
 
-	template <typename Scalar>
-	[[nodiscard]] matrix<Scalar, 4, 4> scale(matrix<Scalar, 4, 4> mat, vector<Scalar, 3> scale) noexcept
+	template <arithmetic_type Scalar, storage_mode MatMode, storage_mode VecMode>
+	constexpr matrix<Scalar, 4, 4, elevated_storage_mode_v<MatMode, VecMode>>
+	scale(const matrix<Scalar, 4, 4, MatMode>& mat, const vector<Scalar, 3, VecMode>& scale) noexcept
 	{
-		matrix<Scalar, 4, 4> result;
+		constexpr storage_mode mode = elevated_storage_mode_v<MatMode, VecMode>;
+		matrix<Scalar, 4, 4, mode> result;
 		result[0] = mat[0] * scale[0];
 		result[1] = mat[1] * scale[1];
 		result[2] = mat[2] * scale[2];

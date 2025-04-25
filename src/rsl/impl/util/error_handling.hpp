@@ -5,9 +5,10 @@
 #include "../containers/buffered_list.hpp"
 #include "../containers/buffered_string.hpp"
 #include "../defines.hpp"
+#include "../math/util/limits.hpp"
 #include "../util/assert.hpp"
-#include "../util/concepts.hpp"
 #include "../util/primitives.hpp"
+#include "../util/type_util.hpp"
 
 namespace rsl
 {
@@ -33,7 +34,7 @@ namespace rsl
 
 	using errid = RSL_ERR_ID_UNDERLYING;
 
-#define RSL_ERR_MAX_COUNT std::numeric_limits<errid>::max()
+#define RSL_ERR_MAX_COUNT rsl::math::limits<errid>::max
 
 	constexpr errid invalid_err_id = RSL_ERR_MAX_COUNT;
 

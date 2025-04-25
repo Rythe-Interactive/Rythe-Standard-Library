@@ -1,5 +1,5 @@
-#include "inverse.hpp"
 #pragma once
+#include "inverse.hpp"
 
 #include "inverse_matrix.inl"
 #include "inverse_quat.inl"
@@ -7,21 +7,21 @@
 
 namespace rsl::math
 {
-	template <typename vec_type, ::std::enable_if_t<is_vector_v<vec_type>, bool>>
-	[[nodiscard]] auto inverse(const vec_type& v) noexcept
+	template <vector_type VecType>
+	[[nodiscard]] auto inverse(const VecType& v) noexcept
 	{
-		return internal::compute_inverse<vec_type>::compute(v);
+		return internal::compute_inverse<VecType>::compute(v);
 	}
 
-	template <typename quat_type, ::std::enable_if_t<is_quat_v<quat_type>, bool>>
-	[[nodiscard]] auto inverse(const quat_type& q) noexcept
+	template <quat_type QuatType>
+	[[nodiscard]] auto inverse(const QuatType& q) noexcept
 	{
-		return internal::compute_inverse<quat_type>::compute(q);
+		return internal::compute_inverse<QuatType>::compute(q);
 	}
 
-	template <typename mat_type, ::std::enable_if_t<is_matrix_v<mat_type>, bool>>
-	[[nodiscard]] auto inverse(const mat_type& m) noexcept
+	template <matrix_type MatType>
+	[[nodiscard]] auto inverse(const MatType& m) noexcept
 	{
-		return internal::compute_inverse<mat_type>::compute(m);
+		return internal::compute_inverse<MatType>::compute(m);
 	}
 } // namespace rsl::math

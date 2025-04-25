@@ -1,12 +1,11 @@
 #pragma once
-#include <cmath>
 
 #include "determinant.hpp"
 
 namespace rsl::math
 {
-	template <typename mat_type, ::std::enable_if_t<is_matrix_v<mat_type>, bool> = true>
-	[[nodiscard]] [[rythe_always_inline]] constexpr auto adjoint(const mat_type& mat) noexcept;
+	template <typename MatType, ::std::enable_if_t<is_matrix_v<MatType>, bool> = true>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto adjoint(const MatType& mat) noexcept;
 }
 
 #include "adjoint.inl"

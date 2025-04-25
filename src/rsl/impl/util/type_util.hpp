@@ -6,7 +6,7 @@ RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(5046)
 #include <utility>
 RYTHE_MSVC_SUPPRESS_WARNING_POP
 
-#include "common.hpp"
+#include "concepts.hpp"
 
 #include "string_util.hpp"
 

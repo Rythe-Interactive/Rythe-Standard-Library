@@ -69,67 +69,63 @@ namespace rsl::math
 		};
 	} // namespace internal
 
-	template <vector_type vec_type0, vector_type vec_type1>
-	[[nodiscard]] [[rythe_always_inline]] constexpr auto add(const vec_type0& a, const vec_type1& b) noexcept
+	template <vector_type VecType0, vector_type VecType1>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto add(const VecType0& a, const VecType1& b) noexcept
 	{
-		return internal::compute_addition<typename vec_type0::scalar, vec_type0::size, vec_type0::mode>::compute(a, b);
+		return internal::compute_addition<typename VecType0::scalar, VecType0::size, VecType0::mode>::compute(a, b);
 	}
 
-	template <vector_type vec_type0, vector_type vec_type1>
-	[[nodiscard]] [[rythe_always_inline]] constexpr auto operator+(const vec_type0& a, const vec_type1& b) noexcept
+	template <vector_type VecType0, vector_type VecType1>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto operator+(const VecType0& a, const VecType1& b) noexcept
 	{
-		return internal::compute_addition<typename vec_type0::scalar, vec_type0::size, vec_type0::mode>::compute(a, b);
+		return internal::compute_addition<typename VecType0::scalar, VecType0::size, VecType0::mode>::compute(a, b);
 	}
 
-	template <vector_type vec_type>
-	[[nodiscard]] [[rythe_always_inline]] constexpr auto add(const vec_type& a, typename vec_type::scalar b) noexcept
+	template <vector_type VecType>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto add(const VecType& a, typename VecType::scalar b) noexcept
 	{
-		return internal::compute_addition<typename vec_type::scalar, vec_type::size, vec_type::mode>::compute(a, b);
+		return internal::compute_addition<typename VecType::scalar, VecType::size, VecType::mode>::compute(a, b);
 	}
 
-	template <vector_type vec_type>
+	template <vector_type VecType>
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto
-	operator+(const vec_type& a, typename vec_type::scalar b) noexcept
+	operator+(const VecType& a, typename VecType::scalar b) noexcept
 	{
-		return internal::compute_addition<typename vec_type::scalar, vec_type::size, vec_type::mode>::compute(a, b);
+		return internal::compute_addition<typename VecType::scalar, VecType::size, VecType::mode>::compute(a, b);
 	}
 
-	template <quat_type quat_type0, quat_type quat_type1>
-	[[nodiscard]] [[rythe_always_inline]] constexpr auto add(const quat_type0& a, const quat_type1& b) noexcept
+	template <quat_type QuatType0, quat_type QuatType1>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto add(const QuatType0& a, const QuatType1& b) noexcept
 	{
-		return internal::compute_quat_addition<quat_type0>::compute(a, b);
+		return internal::compute_quat_addition<QuatType0>::compute(a, b);
 	}
-	template <quat_type quat_type0, quat_type quat_type1>
-	[[nodiscard]] [[rythe_always_inline]] constexpr auto operator+(const quat_type0& a, const quat_type1& b) noexcept
+	template <quat_type QuatType0, quat_type QuatType1>
+	[[nodiscard]] [[rythe_always_inline]] constexpr auto operator+(const QuatType0& a, const QuatType1& b) noexcept
 	{
-		return internal::compute_quat_addition<quat_type0>::compute(a, b);
-	}
-
-	template <vector_type vec_type0, vector_type vec_type1>
-	[[rythe_always_inline]] constexpr vec_type0& add_assign(vec_type0& a, const vec_type1& b) noexcept
-	{
-		return a = internal::compute_addition<typename vec_type0::scalar, vec_type0::size, vec_type0::mode>::compute(
-				   a, b
-			   );
+		return internal::compute_quat_addition<QuatType0>::compute(a, b);
 	}
 
-	template <vector_type vec_type0, vector_type vec_type1>
-	[[rythe_always_inline]] constexpr vec_type0& operator+=(vec_type0& a, const vec_type1& b) noexcept
+	template <vector_type VecType0, vector_type VecType1>
+	[[rythe_always_inline]] constexpr VecType0& add_assign(VecType0& a, const VecType1& b) noexcept
 	{
-		return a = internal::compute_addition<typename vec_type0::scalar, vec_type0::size, vec_type0::mode>::compute(
-				   a, b
-			   );
+		return a = internal::compute_addition<typename VecType0::scalar, VecType0::size, VecType0::mode>::compute(a, b);
 	}
 
-	template <vector_type vec_type>
-	[[rythe_always_inline]] constexpr vec_type& add_assign(vec_type& a, typename vec_type::scalar b) noexcept
+	template <vector_type VecType0, vector_type VecType1>
+	[[rythe_always_inline]] constexpr VecType0& operator+=(VecType0& a, const VecType1& b) noexcept
 	{
-		return a = internal::compute_addition<typename vec_type::scalar, vec_type::size, vec_type::mode>::compute(a, b);
+		return a = internal::compute_addition<typename VecType0::scalar, VecType0::size, VecType0::mode>::compute(a, b);
 	}
 
-	template <vector_type vec_type>
-	[[rythe_always_inline]] constexpr vec_type& operator+=(vec_type& a, typename vec_type::scalar b) noexcept
+	template <vector_type VecType>
+	[[rythe_always_inline]] constexpr VecType& add_assign(VecType& a, typename VecType::scalar b) noexcept
 	{
-		return a = internal::compute_addition<typename vec_type::scalar, vec_type::size, vec_type::mode>::compute(a, b);
+		return a = internal::compute_addition<typename VecType::scalar, VecType::size, VecType::mode>::compute(a, b);
+	}
+
+	template <vector_type VecType>
+	[[rythe_always_inline]] constexpr VecType& operator+=(VecType& a, typename VecType::scalar b) noexcept
+	{
+		return a = internal::compute_addition<typename VecType::scalar, VecType::size, VecType::mode>::compute(a, b);
 	}
 } // namespace rsl::math

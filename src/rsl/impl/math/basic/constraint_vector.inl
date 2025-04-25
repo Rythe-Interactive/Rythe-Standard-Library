@@ -1,5 +1,4 @@
 #pragma once
-#include "constraint.hpp"
 
 namespace rsl::math::internal
 {

@@ -27,14 +27,14 @@ namespace rsl::math
 		{
 			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
 			return internal::compute_lerp<quaternion<scalar>>::compute(
-				::std::forward<TypeA>(a), ::std::forward<TypeB>(b), ::std::forward<InterpType>(t)
+				forward<TypeA>(a), forward<TypeB>(b), forward<InterpType>(t)
 			);
 		}
 		else if constexpr (is_matrix_v<A> && is_matrix_v<B>)
 		{
 			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
 			return internal::compute_lerp<matrix<scalar, A::row_count, A::col_count>>::compute(
-				::std::forward<TypeA>(a), ::std::forward<TypeB>(b), ::std::forward<InterpType>(t)
+				forward<TypeA>(a), forward<TypeB>(b), forward<InterpType>(t)
 			);
 		}
 		else if constexpr (is_vector_v<A> && is_vector_v<B>)
@@ -42,14 +42,12 @@ namespace rsl::math
 			using scalar = elevated_t<typename A::scalar, typename B::scalar>;
 			constexpr size_type size = min(A::size, B::size);
 			return internal::compute_lerp<vector<scalar, size>>::compute(
-				::std::forward<TypeA>(a), ::std::forward<TypeB>(b), ::std::forward<InterpType>(t)
+				forward<TypeA>(a), forward<TypeB>(b), forward<InterpType>(t)
 			);
 		}
 		else
 		{
-			return internal::_lerp_impl_(
-				::std::forward<TypeA>(a), ::std::forward<TypeB>(b), ::std::forward<InterpType>(t)
-			);
+			return internal::_lerp_impl_(forward<TypeA>(a), forward<TypeB>(b), forward<InterpType>(t));
 		}
 	}
 } // namespace rsl::math

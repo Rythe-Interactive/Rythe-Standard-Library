@@ -6,10 +6,10 @@ namespace rsl::math::internal
 	template <typename T>
 	struct compute_multiplication;
 
-	template <typename Scalar, size_type Size>
-	struct compute_multiplication<vector<Scalar, Size>>
+	template <arithmetic_type Scalar, size_type Size, storage_mode Mode>
+	struct compute_multiplication<vector<Scalar, Size, Mode>>
 	{
-		using vec_type = vector<Scalar, Size>;
+		using vec_type = vector<Scalar, Size, Mode>;
 
 		template <typename AType, typename BType>
 		[[nodiscard]] constexpr static auto compute(AType&& a, BType&& b) noexcept
@@ -39,10 +39,10 @@ namespace rsl::math::internal
 		}
 	};
 
-	template <typename Scalar>
-	struct compute_multiplication<vector<Scalar, 1u>>
+	template <typename Scalar, storage_mode Mode>
+	struct compute_multiplication<vector<Scalar, 1u, Mode>>
 	{
-		using vec_type = vector<Scalar, 1u>;
+		using vec_type = vector<Scalar, 1u, Mode>;
 
 		template <typename AType, typename BType>
 		[[nodiscard]] constexpr static Scalar compute(AType&& a, BType&& b) noexcept

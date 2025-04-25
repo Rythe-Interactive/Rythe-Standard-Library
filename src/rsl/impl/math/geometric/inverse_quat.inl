@@ -1,15 +1,14 @@
 #pragma once
-#include "inverse.hpp"
 
 namespace rsl::math::internal
 {
 	template <typename T>
 	struct compute_inverse;
 
-	template <typename Scalar>
-	struct compute_inverse<quaternion<Scalar>>
+	template <arithmetic_type Scalar, storage_mode Mode>
+	struct compute_inverse<quaternion<Scalar, Mode>>
 	{
-		using quat_type = quaternion<Scalar>;
+		using quat_type = quaternion<Scalar, Mode>;
 
 		[[nodiscard]] [[rythe_always_inline]] static quat_type compute(const quat_type& q) noexcept
 		{

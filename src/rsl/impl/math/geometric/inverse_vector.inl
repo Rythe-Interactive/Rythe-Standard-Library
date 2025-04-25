@@ -1,5 +1,4 @@
 #pragma once
-#include "inverse.hpp"
 
 namespace rsl::math::internal
 {
@@ -28,10 +27,10 @@ namespace rsl::math::internal
 		}
 	};
 
-	template <typename Scalar, size_type Size, storage_mode Mode, size_type... args>
-	struct compute_inverse<swizzle<Scalar, Size, Mode, args...>>
+	template <typename Scalar, size_type Size, storage_mode Mode, size_type... Args>
+	struct compute_inverse<swizzle<Scalar, Size, Mode, Args...>>
 	{
-		using swizzle_type = swizzle<Scalar, Size, Mode, args...>;
+		using swizzle_type = swizzle<Scalar, Size, Mode, Args...>;
 		using vec_type = typename swizzle_type::conv_type;
 
 		[[nodiscard]] [[rythe_always_inline]] static auto compute(const vec_type& v) noexcept

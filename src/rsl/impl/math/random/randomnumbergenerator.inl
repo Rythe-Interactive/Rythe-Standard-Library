@@ -1,12 +1,12 @@
-#include "randomnumbergenerator.hpp"
 #pragma once
+#include "randomnumbergenerator.hpp"
 
 namespace rsl::math
 {
 	template <typename T, typename... Args, std::enable_if_t<std::is_base_of_v<random_number_engine_base, T>, bool>>
 	inline void RandomNumberGenerator::setRNGEngine(Args&&... args)
 	{
-		engine = std::make_unique<T>(std::forward<Args>(args)...);
+		engine = std::make_unique<T>(forward<Args>(args)...);
 	}
 
 	template <typename Integer>
@@ -20,13 +20,12 @@ namespace rsl::math
 				"Somehow the size of the unsigned version is not the same as the original integer type?"
 			);
 
-			Unsigned raw =
-				static_cast<Unsigned>(generate() % static_cast<size_type>(::std::numeric_limits<Unsigned>::max()));
+			Unsigned raw = static_cast<Unsigned>(generate() % static_cast<size_type>(limits<Unsigned>::max));
 			return *reinterpret_cast<Integer*>(&raw);
 		}
 		else
 		{
-			return static_cast<Integer>(generate() % static_cast<size_type>(::std::numeric_limits<Integer>::max()));
+			return static_cast<Integer>(generate() % static_cast<size_type>(limits<Integer>::max));
 		}
 	}
 

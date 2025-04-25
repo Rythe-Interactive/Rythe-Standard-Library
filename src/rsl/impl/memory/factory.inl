@@ -16,21 +16,21 @@ namespace rsl
 		};
 
 		template <typename T, typename... Args>
-		[[rythe_always_inline]] void* defaultConstruct(void* ptr, size_type count, Args&&... args)
+		[[rythe_always_inline]] void* default_construct(void* ptr, size_type count, Args&&... args)
 			noexcept(noexcept(default_factory<T>{}.construct(ptr, count, forward<Args>(args)...)))
 		{
 			return default_factory<T>{}.construct(ptr, count, forward<Args>(args)...);
 		}
 
 		template <typename T>
-		[[rythe_always_inline]] void* defaultMove(void* dst, void* src, size_type count)
+		[[rythe_always_inline]] void* default_move(void* dst, void* src, size_type count)
 			noexcept(noexcept(default_factory<T>{}.move(dst, static_cast<T*>(src), count)))
 		{
 			return default_factory<T>{}.move(dst, static_cast<T*>(src), count);
 		}
 
 		template <typename T>
-		[[rythe_always_inline]] void defaultDestroy(void* ptr, size_type count)
+		[[rythe_always_inline]] void default_destroy(void* ptr, size_type count)
 			noexcept(noexcept(default_factory<T>{}.destroy(static_cast<T*>(ptr), count)))
 		{
 			default_factory<T>{}.destroy(static_cast<T*>(ptr), count);
@@ -100,19 +100,19 @@ namespace rsl
 	template <typename T>
 	inline void* typed_polymorphic_factory<T>::construct(void* ptr, size_type count) const
 	{
-		return internal::defaultConstruct(ptr, count);
+		return internal::default_construct<T>(ptr, count);
 	}
 
 	template <typename T>
 	inline void* typed_polymorphic_factory<T>::move(void* dst, void* src, size_type count) const
 	{
-		return internal::defaultMove(dst, src, count);
+		return internal::default_move<T>(dst, src, count);
 	}
 
 	template <typename T>
 	inline void typed_polymorphic_factory<T>::destroy(void* ptr, size_type count) const noexcept
 	{
-		internal::defaultDestroy(ptr, count);
+		internal::default_destroy<T>(ptr, count);
 	}
 
 	template <typename T>
@@ -135,9 +135,9 @@ namespace rsl
 
 	template <typename T>
 	inline type_erased_factory::type_erased_factory(construct_type_signal_type<T>) noexcept
-		: m_constructFunc(&internal::defaultConstruct<T>),
-		  m_moveFunc(&internal::defaultMove<T>),
-		  m_destroyFunc(&internal::defaultDestroy<T>),
+		: m_constructFunc(&internal::default_construct<T>),
+		  m_moveFunc(&internal::default_move<T>),
+		  m_destroyFunc(&internal::default_destroy<T>),
 		  m_typeSize(sizeof(T)),
 		  m_triviallyCopyable(is_trivially_copyable_v<T>),
 		  m_typeId(type_id<T>())

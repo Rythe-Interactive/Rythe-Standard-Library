@@ -25,9 +25,9 @@ namespace rsl::math
 		[[rythe_always_inline]] constexpr vector(const vector&) noexcept = default;
 		[[rythe_always_inline]] constexpr vector(scalar s) noexcept;
 
-		template <typename vec_type>
-			requires not_same_as<Scalar, typename vec_type::scalar> || (vec_type::size != 1)
-		[[rythe_always_inline]] constexpr vector(const vec_type& other) noexcept;
+		template <typename VecType>
+			requires not_same_as<Scalar, typename VecType::scalar> || (VecType::size != 1)
+		[[rythe_always_inline]] constexpr vector(const VecType& other) noexcept;
 
 		static const vector one;
 		static const vector zero;
@@ -58,9 +58,9 @@ namespace rsl::math
 		[[rythe_always_inline]] constexpr vector(const vector&) noexcept = default;
 		[[rythe_always_inline]] constexpr vector(scalar s) noexcept;
 
-		template <typename vec_type>
-			requires not_same_as<bool, typename vec_type::scalar> || (vec_type::size != 1)
-		[[rythe_always_inline]] constexpr vector(const vec_type& other) noexcept;
+		template <typename VecType>
+			requires not_same_as<bool, typename VecType::scalar> || (VecType::size != 1)
+		[[rythe_always_inline]] constexpr vector(const VecType& other) noexcept;
 
 		static const vector one;
 		static const vector zero;
@@ -80,8 +80,8 @@ namespace rsl::math
 
 	using float1 = vector<float32, 1>;
 	using double1 = vector<float64, 1>;
-	using int1 = vector<int, 1>;
-	using uint1 = vector<uint, 1>;
+	using int1 = vector<int32, 1>;
+	using uint1 = vector<uint32, 1>;
 	using bool1 = vector<bool, 1>;
 } // namespace rsl::math
 

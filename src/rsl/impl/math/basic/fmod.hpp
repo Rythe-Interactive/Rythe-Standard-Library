@@ -1,6 +1,5 @@
 #pragma once
 #include <cmath>
-#include <limits>
 
 #include "../../util/primitives.hpp"
 #include "../util/type_util.hpp"
@@ -9,11 +8,14 @@ namespace rsl::math
 {
 	namespace internal
 	{
-		template <typename Scalar, size_type Size>
-		struct compute_mod
+		template <typename T>
+		struct compute_mod;
+
+		template <arithmetic_type Scalar, size_type Size, storage_mode Mode>
+		struct compute_mod<vector<Scalar, Size, Mode>>
 		{
 			static constexpr size_type size = Size;
-			using value_type = vector<Scalar, size>;
+			using value_type = vector<Scalar, size, Mode>;
 
 			[[nodiscard]] [[rythe_always_inline]] static value_type computef(const value_type& val, Scalar m) noexcept
 			{
@@ -57,11 +59,11 @@ namespace rsl::math
 			}
 		};
 
-		template <typename Scalar>
-		struct compute_mod<Scalar, 1u>
+		template <arithmetic_type Scalar, storage_mode Mode>
+		struct compute_mod<vector<Scalar, 1ull, Mode>>
 		{
-			static constexpr size_type size = 1u;
-			using value_type = vector<Scalar, size>;
+			static constexpr size_type size = 1ull;
+			using value_type = vector<Scalar, size, Mode>;
 
 			[[nodiscard]] [[rythe_always_inline]] static Scalar computef(Scalar val, Scalar m) noexcept
 			{
@@ -78,28 +80,28 @@ namespace rsl::math
 		if constexpr (is_vector_v<T>)
 		{
 			static_assert(
-				::std::is_floating_point_v<typename T::scalar>,
+				is_floating_point_v<typename T::scalar>,
 				"Value must be floating point in order to use fmod, use mod instead."
 			);
-			return internal::compute_mod<typename T::scalar, T::size>::computef(val, m);
+			return internal::compute_mod<T>::computef(val, m);
 		}
 		else
 		{
 			static_assert(
-				::std::is_floating_point_v<T>, "Value must be floating point in order to use fmod, use mod instead."
+				is_floating_point_v<T>, "Value must be floating point in order to use fmod, use mod instead."
 			);
 			return ::std::fmod(val, m);
 		}
 	}
 
-	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
-	[[nodiscard]] [[rythe_always_inline]] static auto fmod(const vec_type& val, typename vec_type::scalar m)
+	template <vector_type VecType>
+	[[nodiscard]] [[rythe_always_inline]] static auto fmod(const VecType& val, typename VecType::scalar m)
 	{
 		static_assert(
-			::std::is_floating_point_v<typename vec_type::scalar>,
+			is_floating_point_v<typename VecType::scalar>,
 			"Value must be floating point in order to use fmod, use mod instead."
 		);
-		return internal::compute_mod<typename vec_type::scalar, vec_type::size>::computef(val, m);
+		return internal::compute_mod<VecType>::computef(val, m);
 	}
 
 	template <typename T>
@@ -107,16 +109,16 @@ namespace rsl::math
 	{
 		if constexpr (is_vector_v<T>)
 		{
-			if constexpr (::std::is_floating_point_v<typename T::scalar>)
+			if constexpr (is_floating_point_v<typename T::scalar>)
 			{
-				return internal::compute_mod<typename T::scalar, T::size>::computef(val, m);
+				return internal::compute_mod<T>::computef(val, m);
 			}
 			else
 			{
-				return internal::compute_mod<typename T::scalar, T::size>::compute(val, m);
+				return internal::compute_mod<T>::compute(val, m);
 			}
 		}
-		else if constexpr (::std::is_floating_point_v<T>)
+		else if constexpr (is_floating_point_v<T>)
 		{
 			return ::std::fmod(val, m);
 		}
@@ -126,27 +128,27 @@ namespace rsl::math
 		}
 	}
 
-	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
-	[[nodiscard]] [[rythe_always_inline]] static auto mod(const vec_type& val, typename vec_type::scalar m)
+	template <vector_type VecType>
+	[[nodiscard]] [[rythe_always_inline]] static auto mod(const VecType& val, typename VecType::scalar m)
 	{
-		if constexpr (::std::is_floating_point_v<typename vec_type::scalar>)
+		if constexpr (is_floating_point_v<typename VecType::scalar>)
 		{
-			return internal::compute_mod<typename vec_type::scalar, vec_type::size>::computef(val, m);
+			return internal::compute_mod<VecType>::computef(val, m);
 		}
 		else
 		{
-			return internal::compute_mod<typename vec_type::scalar, vec_type::size>::compute(val, m);
+			return internal::compute_mod<VecType>::compute(val, m);
 		}
 	}
 
-	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
-	[[nodiscard]] [[rythe_always_inline]] auto operator%(const vec_type& val, typename vec_type::scalar m)
+	template <vector_type VecType>
+	[[nodiscard]] [[rythe_always_inline]] auto operator%(const VecType& val, typename VecType::scalar m)
 	{
 		return mod(val, m);
 	}
 
-	template <typename vec_type, std::enable_if_t<is_vector_v<vec_type>, bool> = true>
-	[[nodiscard]] [[rythe_always_inline]] auto operator%(const vec_type& val, const vec_type& m)
+	template <vector_type VecType>
+	[[nodiscard]] [[rythe_always_inline]] auto operator%(const VecType& val, const VecType& m)
 	{
 		return mod(val, m);
 	}

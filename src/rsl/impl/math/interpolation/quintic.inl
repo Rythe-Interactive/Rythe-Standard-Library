@@ -77,14 +77,14 @@ namespace rsl::math
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			return internal::compute_quintic<quaternion<scalar>>::compute(
-				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+				forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax), forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_matrix_v<A> && is_matrix_v<B> && is_matrix_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			return internal::compute_quintic<matrix<scalar, A::row_count, A::col_count>>::compute(
-				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+				forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax), forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_vector_v<A> && is_vector_v<B> && is_vector_v<T>)
@@ -92,14 +92,14 @@ namespace rsl::math
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			constexpr size_type size = min(A::size, min(B::size, T::size))));
 			return internal::compute_quintic<vector<scalar, size>>::compute(
-				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+				forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax), forward<ValueType>(value)
 			);
 		}
 		else
 		{
-			return internal::_quintic_impl_(saturate(map01(
-				::std::forward<ValueType>(value), ::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax)
-			)));
+			return internal::_quintic_impl_(
+				saturate(map01(forward<ValueType>(value), forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax)))
+			);
 		}
 	}
 
@@ -111,23 +111,21 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<T>)
 		{
-			return internal::compute_quintic<quaternion<typename T::scalar>>::compute(::std::forward<ValueType>(value));
+			return internal::compute_quintic<quaternion<typename T::scalar>>::compute(forward<ValueType>(value));
 		}
 		if constexpr (is_matrix_v<T>)
 		{
 			return internal::compute_quintic<matrix<typename T::scalar, T::row_count, T::col_count>>::compute(
-				::std::forward<ValueType>(value)
+				forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_vector_v<T>)
 		{
-			return internal::compute_quintic<vector<typename T::scalar, T::size>>::compute(
-				::std::forward<ValueType>(value)
-			);
+			return internal::compute_quintic<vector<typename T::scalar, T::size>>::compute(forward<ValueType>(value));
 		}
 		else
 		{
-			return internal::_quintic_impl_(::std::forward<ValueType>(value));
+			return internal::_quintic_impl_(forward<ValueType>(value));
 		}
 	}
 
@@ -143,14 +141,14 @@ namespace rsl::math
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			return internal::compute_quintic<quaternion<scalar>>::compute_derivative(
-				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+				forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax), forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_matrix_v<A> && is_matrix_v<B> && is_matrix_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			return internal::compute_quintic<matrix<scalar, A::row_count, A::col_count>>::compute_derivative(
-				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+				forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax), forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_vector_v<A> && is_vector_v<B> && is_vector_v<T>)
@@ -158,14 +156,14 @@ namespace rsl::math
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			constexpr size_type size = min(A::size, min(B::size, T::size))));
 			return internal::compute_quintic<vector<scalar, size>>::compute_derivative(
-				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+				forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax), forward<ValueType>(value)
 			);
 		}
 		else
 		{
-			return internal::_quintic_derivative_impl_(saturate(map01(
-				::std::forward<ValueType>(value), ::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax)
-			)));
+			return internal::_quintic_derivative_impl_(
+				saturate(map01(forward<ValueType>(value), forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax)))
+			);
 		}
 	}
 
@@ -178,23 +176,23 @@ namespace rsl::math
 		if constexpr (is_quat_v<T>)
 		{
 			return internal::compute_quintic<quaternion<typename T::scalar>>::compute_derivative(
-				::std::forward<ValueType>(value)
+				forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_matrix_v<T>)
 		{
-			return internal::compute_quintic<matrix<typename T::scalar, T::row_count, T::col_count>>::
-				compute_derivative(::std::forward<ValueType>(value));
+			return internal::compute_quintic<
+				matrix<typename T::scalar, T::row_count, T::col_count>>::compute_derivative(forward<ValueType>(value));
 		}
 		if constexpr (is_vector_v<T>)
 		{
 			return internal::compute_quintic<vector<typename T::scalar, T::size>>::compute_derivative(
-				::std::forward<ValueType>(value)
+				forward<ValueType>(value)
 			);
 		}
 		else
 		{
-			return internal::_quintic_derivative_impl_(::std::forward<ValueType>(value));
+			return internal::_quintic_derivative_impl_(forward<ValueType>(value));
 		}
 	}
 
@@ -210,14 +208,14 @@ namespace rsl::math
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			return internal::compute_quintic<quaternion<scalar>>::compute_inverse(
-				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+				forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax), forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_matrix_v<A> && is_matrix_v<B> && is_matrix_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			return internal::compute_quintic<matrix<scalar, A::row_count, A::col_count>>::compute_inverse(
-				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+				forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax), forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_vector_v<A> && is_vector_v<B> && is_vector_v<T>)
@@ -225,14 +223,14 @@ namespace rsl::math
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			constexpr size_type size = min(A::size, min(B::size, T::size))));
 			return internal::compute_quintic<vector<scalar, size>>::compute_inverse(
-				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+				forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax), forward<ValueType>(value)
 			);
 		}
 		else
 		{
-			return internal::_inverse_quintic_impl_(saturate(map01(
-				::std::forward<ValueType>(value), ::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax)
-			)));
+			return internal::_inverse_quintic_impl_(
+				saturate(map01(forward<ValueType>(value), forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax)))
+			);
 		}
 	}
 
@@ -244,25 +242,24 @@ namespace rsl::math
 
 		if constexpr (is_quat_v<T>)
 		{
-			return internal::compute_quintic<quaternion<typename T::scalar>>::compute_inverse(
-				::std::forward<ValueType>(value)
+			return internal::compute_quintic<quaternion<typename T::scalar>>::compute_inverse(forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_matrix_v<T>)
 		{
 			return internal::compute_quintic<matrix<typename T::scalar, T::row_count, T::col_count>>::compute_inverse(
-				::std::forward<ValueType>(value)
+				forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_vector_v<T>)
 		{
 			return internal::compute_quintic<vector<typename T::scalar, T::size>>::compute_inverse(
-				::std::forward<ValueType>(value)
+				forward<ValueType>(value)
 			);
 		}
 		else
 		{
-			return internal::_inverse_quintic_impl_(::std::forward<ValueType>(value));
+			return internal::_inverse_quintic_impl_(forward<ValueType>(value));
 		}
 	}
 
@@ -278,14 +275,14 @@ namespace rsl::math
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			return internal::compute_quintic<quaternion<scalar>>::compute_inverse_derivative(
-				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+				forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax), forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_matrix_v<A> && is_matrix_v<B> && is_matrix_v<T>)
 		{
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			return internal::compute_quintic<matrix<scalar, A::row_count, A::col_count>>::compute_inverse_derivative(
-				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+				forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax), forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_vector_v<A> && is_vector_v<B> && is_vector_v<T>)
@@ -293,14 +290,14 @@ namespace rsl::math
 			using scalar = elevated_t<typename A::scalar, elevated_t<typename B::scalar, typename T::scalar>>;
 			constexpr size_type size = min(A::size, min(B::size, T::size))));
 			return internal::compute_quintic<vector<scalar, size>>::compute_inverse_derivative(
-				::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax), ::std::forward<ValueType>(value)
+				forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax), forward<ValueType>(value)
 			);
 		}
 		else
 		{
-			return internal::_inverse_quintic_derivative_impl_(saturate(map01(
-				::std::forward<ValueType>(value), ::std::forward<TypeMin>(edgeMin), ::std::forward<TypeMax>(edgeMax)
-			)));
+			return internal::_inverse_quintic_derivative_impl_(
+				saturate(map01(forward<ValueType>(value), forward<TypeMin>(edgeMin), forward<TypeMax>(edgeMax)))
+			);
 		}
 	}
 
@@ -313,23 +310,23 @@ namespace rsl::math
 		if constexpr (is_quat_v<T>)
 		{
 			return internal::compute_quintic<quaternion<typename T::scalar>>::compute_inverse_derivative(
-				::std::forward<ValueType>(value)
+				forward<ValueType>(value)
 			);
 		}
 		if constexpr (is_matrix_v<T>)
 		{
 			return internal::compute_quintic<matrix<typename T::scalar, T::row_count, T::col_count>>::
-				compute_inverse_derivative(::std::forward<ValueType>(value));
+				compute_inverse_derivative(forward<ValueType>(value));
 		}
 		if constexpr (is_vector_v<T>)
 		{
 			return internal::compute_quintic<vector<typename T::scalar, T::size>>::compute_inverse_derivative(
-				::std::forward<ValueType>(value)
+				forward<ValueType>(value)
 			);
 		}
 		else
 		{
-			return internal::_inverse_quintic_derivative_impl_(::std::forward<ValueType>(value));
+			return internal::_inverse_quintic_derivative_impl_(forward<ValueType>(value));
 		}
 	}
 } // namespace rsl::math

@@ -172,6 +172,21 @@ namespace rsl
 	#endif
 #endif
 
+#if !defined(rythe_debugbreak_instruction)
+	#if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
+		#define rythe_debugbreak_instruction __debugbreak
+	#elif defined(RYTHE_CLANG) && __has_builtin(__builtin_debugtrap)
+		#define rythe_debugbreak_instruction __builtin_debugtrap
+	#else
+		#include <signal.h>
+		#if defined(SIGTRAP)
+			#define rythe_debugbreak_instruction() raise(SIGTRAP)
+		#else
+			#define rythe_debugbreak_instruction() raise(SIGABRT)
+		#endif
+	#endif
+#endif
+
 #if !defined(__RYTHE_FULL_FUNC__)
 	#if defined(RYTHE_CLANG) || defined(RYTHE_GCC)
 		#define __RYTHE_FULL_FUNC__ __PRETTY_FUNCTION__
@@ -230,8 +245,8 @@ namespace rsl
 	#define RYTHE_COMPILER_ERROR(desc) _Pragma(RYTHE_STRINGIFY(GCC error desc))
 #endif
 
-#if defined(__SIZEOF_INT128__)
-	#define RYTHE_HAS_INT128
+#if defined(__FMA__) || defined(__AVX2__) || defined(__AVX__) || defined(__FMA4__)
+	#define RYTHE_FMA_ENABLED
 #endif
 
 #pragma endregion
@@ -281,7 +296,11 @@ namespace rsl
 	#define rythe_always_inline
 #else
 	#if defined(RYTHE_GCC)
-		#define rythe_always_inline gnu::always_inline
+  // GCC can't inline unless marked with the keyword inline,
+		// which in C++ means that the definition is on the same line as the declaration
+		// or local to the translation unit.
+		// Crucially this is not the same as compiler optimization inlining behaviour.
+		#define rythe_always_inline
 	#elif defined(RYTHE_CLANG)
 		#define rythe_always_inline clang::always_inline
 	#elif defined(RYTHE_MSVC)
@@ -302,7 +321,7 @@ namespace rsl
 #endif
 
 #if defined(RYTHE_GCC)
-	#define rythe_allocating gnu::allocating
+	#define rythe_allocating
 #elif defined(RYTHE_CLANG)
 	#define rythe_allocating
 #elif defined(RYTHE_MSVC)

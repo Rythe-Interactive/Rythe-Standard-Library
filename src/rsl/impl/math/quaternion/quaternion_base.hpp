@@ -1,7 +1,4 @@
 #pragma once
-#include <immintrin.h>
-
-#include "../../util/assert.hpp"
 #include "../../util/primitives.hpp"
 
 #include "../trigonometric/angle.hpp"
@@ -15,7 +12,7 @@ namespace rsl::math
 	template <arithmetic_type Scalar, size_type RowCount, size_type ColCount, storage_mode Mode>
 	struct matrix;
 
-	template <arithmetic_type Scalar, storage_mode Mode = storage_mode::defaultp>
+	template <arithmetic_type Scalar, storage_mode Mode = storage_mode::defaultStorage>
 	struct quaternion
 	{
 		using scalar = Scalar;
@@ -57,6 +54,9 @@ namespace rsl::math
 		[[rythe_always_inline]] explicit constexpr quaternion(const matrix<scalar, 4, 4, M>& m) noexcept;
 
 		static const quaternion identity;
+		static const quaternion rotate_x_45;
+		static const quaternion rotate_y_45;
+		static const quaternion rotate_z_45;
 		static const quaternion rotate_x_90;
 		static const quaternion rotate_y_90;
 		static const quaternion rotate_z_90;
@@ -66,8 +66,8 @@ namespace rsl::math
 
 		constexpr quaternion& operator=(const quaternion&) noexcept = default;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr scalar& operator[](size_type i) noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr const scalar& operator[](size_type i) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr scalar& operator[](size_type index) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const scalar& operator[](size_type index) const noexcept;
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr vec_type right() const noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr vec_type forward() const noexcept;
@@ -77,19 +77,21 @@ namespace rsl::math
 		[[nodiscard]] [[rythe_always_inline]] static constexpr quaternion
 		angle_axis(radians<scalar> angle, const vec_type& vec) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] static constexpr quaternion
-		look_at(const vec_type& _pos, const vec_type& _center, const vec_type& _up = vec_type::up) noexcept;
-		[[nodiscard]] [[rythe_always_inline]] static constexpr quaternion conjugate(const quaternion& _quat) noexcept;
+		look_at(const vec_type& pos, const vec_type& center, const vec_type& up = vec_type::up) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] static constexpr quaternion conjugate(const quaternion& quat) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] static constexpr quaternion from_euler(const vec_type& euler) noexcept;
 	};
 
+	template <arithmetic_type Scalar, storage_mode Mode>
+	[[nodiscard]] [[rythe_always_inline]] constexpr vector<Scalar, 4, Mode> as_vec(quaternion<Scalar, Mode> quat
+	) noexcept;
+
 	using quat = quaternion<float32>;
 	using quat64 = quaternion<float64>;
-	using quat_max = quaternion<float_max>;
 
 #ifdef RYTHE_PCH
 	template struct quaternion<float32>;
 	template struct quaternion<float64>;
-	template struct quaternion<float_max>;
 #endif
 } // namespace rsl::math
 
