@@ -31,12 +31,12 @@ namespace rsl
 	{
 	public:
 		using ref_counter = basic_reference_counter<internal::managed_payload_base, Alloc, Factory>;
-		using mem_rsc = ref_counter::mem_rsc;
+		using mem_rsc = typename ref_counter::mem_rsc;
 
-		using allocator_storage_type = ref_counter::allocator_storage_type;
-		using allocator_t = ref_counter::allocator_t;
-		using factory_storage_type = ref_counter::factory_storage_type;
-		using factory_t = ref_counter::factory_t;
+		using allocator_storage_type = typename ref_counter::allocator_storage_type;
+		using allocator_t = typename ref_counter::allocator_t;
+		using factory_storage_type = typename ref_counter::factory_storage_type;
+		using factory_t = typename ref_counter::factory_t;
 
 		[[rythe_always_inline]] constexpr managed_resource(nullptr_type)
 			noexcept(is_nothrow_constructible_v<ref_counter>);

@@ -150,7 +150,7 @@ namespace rsl
 	} // namespace internal
 
 	template <typename T, size_type N>
-	consteval constexpr_string<N> type_name() noexcept;
+	consteval constexpr_string<N> type_name() noexcept; // NOLINT
 
 	template <>
 	consteval constexpr_string<5> type_name<void>() noexcept

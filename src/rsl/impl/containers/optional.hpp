@@ -9,7 +9,7 @@ namespace rsl
 	template <typename T, typename... DecorationSignals>
 	struct optional_param
 	{
-		using type = decorate_type<T, DecorationSignals...>::type;
+		using type = typename decorate_type<T, DecorationSignals...>::type;
 	};
 
 	template <typename... DecorationSignals>
@@ -19,7 +19,7 @@ namespace rsl
 	};
 
 	template <typename T, typename... DecorationSignals>
-	using optional_param_t = optional_param<T, DecorationSignals...>::type;
+	using optional_param_t = typename optional_param<T, DecorationSignals...>::type;
 
 	/// Empty struct when T is void. When empty the size will be 1 byte, otherwise the size of T.
 	template <typename T>
@@ -45,10 +45,15 @@ namespace rsl
 	struct optional_storage<void>
 	{
 		constexpr static bool holds_value = false;
+
+		template <typename... Args>
+		optional_storage([[maybe_unused]] Args&&...)
+		{
+		}
 	};
 
 	template <bool Condition, typename T>
-	using conditional_storage = conditional<Condition, optional_storage<T>, optional_storage<void>>::type;
+	using conditional_storage = typename conditional<Condition, optional_storage<T>, optional_storage<void>>::type;
 
 	template <typename T, factory_type Factory = default_factory<T>>
 	class optional

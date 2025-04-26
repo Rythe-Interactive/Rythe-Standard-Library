@@ -20,17 +20,17 @@ namespace rsl
 		(m_destroyFunc)(ptr, count);
 	}
 
-	size_type type_erased_factory::typeSize() const noexcept
+	size_type type_erased_factory::type_size() const noexcept
 	{
 		return m_typeSize;
 	}
 
-	bool type_erased_factory::trivialCopy() const noexcept
+	bool type_erased_factory::trivial_copy() const noexcept
 	{
 		return m_triviallyCopyable;
 	}
 
-	id_type type_erased_factory::typeId() const noexcept
+	id_type type_erased_factory::type_id() const noexcept
 	{
 		return m_typeId;
 	}

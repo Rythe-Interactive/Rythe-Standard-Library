@@ -39,7 +39,7 @@ namespace rsl
 
 	template <typename T>
 	template <typename... Args>
-	inline T* default_factory<T>::construct(void* ptr, size_type count, Args&&... args)
+	inline T* default_factory<T>::construct(void* ptr, const size_type count, Args&&... args)
 		noexcept(is_nothrow_constructible_v<T, Args...>)
 	{
 		if constexpr ((is_trivially_default_constructible_v<T>) && sizeof...(Args) == 0)
@@ -65,7 +65,7 @@ namespace rsl
 	}
 
 	template <typename T>
-	inline T* default_factory<T>::move(void* dst, T* src, size_type count) noexcept(is_nothrow_move_constructible_v<T>)
+	inline T* default_factory<T>::move(void* dst, T* src, const size_type count) noexcept(is_nothrow_move_constructible_v<T>)
 	{
 		if constexpr (is_trivially_copy_constructible_v<T>)
 		{
@@ -86,7 +86,7 @@ namespace rsl
 	}
 
 	template <typename T>
-	inline void default_factory<T>::destroy(T* ptr, size_type count) noexcept
+	inline void default_factory<T>::destroy(T* ptr, const size_type count) noexcept
 	{
 		if constexpr (!is_trivially_destructible_v<T>)
 		{
@@ -98,37 +98,37 @@ namespace rsl
 	}
 
 	template <typename T>
-	inline void* typed_polymorphic_factory<T>::construct(void* ptr, size_type count) const
+	inline void* typed_polymorphic_factory<T>::construct(void* ptr, const size_type count) const
 	{
 		return internal::default_construct<T>(ptr, count);
 	}
 
 	template <typename T>
-	inline void* typed_polymorphic_factory<T>::move(void* dst, void* src, size_type count) const
+	inline void* typed_polymorphic_factory<T>::move(void* dst, void* src, const size_type count) const
 	{
 		return internal::default_move<T>(dst, src, count);
 	}
 
 	template <typename T>
-	inline void typed_polymorphic_factory<T>::destroy(void* ptr, size_type count) const noexcept
+	inline void typed_polymorphic_factory<T>::destroy(void* ptr, const size_type count) const noexcept
 	{
 		internal::default_destroy<T>(ptr, count);
 	}
 
 	template <typename T>
-	inline size_type typed_polymorphic_factory<T>::typeSize() const noexcept
+	inline size_type typed_polymorphic_factory<T>::type_size() const noexcept
 	{
 		return sizeof(T);
 	}
 
 	template <typename T>
-	inline bool typed_polymorphic_factory<T>::trivialCopy() const noexcept
+	inline bool typed_polymorphic_factory<T>::trivial_copy() const noexcept
 	{
 		return is_trivially_copyable_v<T>;
 	}
 
 	template <typename T>
-	inline id_type typed_polymorphic_factory<T>::typeId() const noexcept
+	inline id_type typed_polymorphic_factory<T>::type_id() const noexcept
 	{
 		return type_id<T>();
 	}

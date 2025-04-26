@@ -877,13 +877,14 @@ namespace rsl
 	}
 
 	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] constexpr T* to_address(T* const val) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr T* to_address(T* val) noexcept
 	{
 		static_assert(!is_function_v<T>);
 		return val;
 	}
 
 	template <typename T>
+		requires(!is_pointer_v<T>)
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto to_address(const T& val) noexcept
 	{
 		return to_address(val.operator->());

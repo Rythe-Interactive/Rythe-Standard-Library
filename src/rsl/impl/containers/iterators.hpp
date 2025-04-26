@@ -35,7 +35,7 @@ namespace rsl
 	template <internal::has_member_difference_type T>
 	struct incrementable_traits<T>
 	{
-		using difference_type = T::difference_type;
+		using difference_type = typename T::difference_type;
 	};
 
 	template <typename T>
@@ -46,7 +46,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	using iter_difference_t = incrementable_traits<T>::difference_type;
+	using iter_difference_t = typename incrementable_traits<T>::difference_type;
 
 	namespace internal
 	{
@@ -136,7 +136,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	using iter_value_t = indirectly_readable_traits<remove_cvr_t<T>>::value_type;
+	using iter_value_t = typename indirectly_readable_traits<remove_cvr_t<T>>::value_type;
 
 	template <internal::dereferenceable T>
 	using iter_reference_t = decltype(*declval<T&>());
@@ -242,8 +242,8 @@ namespace rsl
 				size_type diff = 0;
 				while (first != last)
 				{
-					first++;
-					diff++;
+					++first;
+					++diff;
 				}
 
 				return diff;
@@ -355,8 +355,8 @@ namespace rsl
 
 		auto& operator++() noexcept
 		{
-			m_key++;
-			m_value++;
+			++m_key;
+			++m_value;
 			return *this;
 		}
 
@@ -364,8 +364,8 @@ namespace rsl
 
 		auto& operator--() noexcept
 		{
-			m_key--;
-			m_value--;
+			--m_key;
+			--m_value;
 			return *this;
 		}
 
