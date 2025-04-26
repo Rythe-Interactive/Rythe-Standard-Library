@@ -30,10 +30,12 @@ namespace rsl
 	[[rythe_always_inline]] constexpr id_type hash_string(string_view str) noexcept;
 
 	template <hash_mode Mode, same_as<id_type>... HashTypes>
-	[[rythe_always_inline]] constexpr id_type combine_hash(id_type seed, const id_type hash, const HashTypes... hashes) noexcept;
+	[[rythe_always_inline]] constexpr id_type
+	combine_hash(id_type seed, const id_type hash, const HashTypes... hashes) noexcept;
 
 	template <same_as<id_type>... HashTypes>
-	[[rythe_always_inline]] constexpr id_type combine_hash(id_type seed, const id_type hash, const HashTypes... hashes) noexcept;
+	[[rythe_always_inline]] constexpr id_type
+	combine_hash(id_type seed, const id_type hash, const HashTypes... hashes) noexcept;
 
 	template <hash_mode Mode, typename T>
 	[[rythe_always_inline]] constexpr id_type hash_value(const T& val) noexcept;
