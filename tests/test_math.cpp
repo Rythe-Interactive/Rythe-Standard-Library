@@ -1027,13 +1027,23 @@ TEST_CASE("quaternions", "[math]")
 
 	constexpr static float32 sin22_5 = math::sin(degrees(22.5f).radians().value);
 	constexpr static float32 cos22_5 = math::cos(degrees(22.5f).radians().value);
-	constexpr static float32 sin45 = math::sin(degrees(45.f).radians().value);
-	constexpr static float32 cos45 = math::cos(degrees(45.f).radians().value);
+	constexpr static float32 sin45 = math::sin(	 degrees(45.f).radians().value);
+	constexpr static float32 cos45 = math::cos(  degrees(45.f).radians().value);
 
 	REQUIRE(close_enough(sin22_5, 0.3826834323650897717284599840304f));
 	REQUIRE(close_enough(cos22_5, 0.92387953251128675612818318939679f));
 	REQUIRE(close_enough(sin45, 0.70710678118654752440084436210485f));
 	REQUIRE(close_enough(cos45, 0.70710678118654752440084436210485f));
+
+	constexpr static float32 asin_sin22_5 = math::asin(sin22_5);
+	constexpr static float32 acos_cos22_5 = math::acos(cos22_5);
+	constexpr static float32 asin_sin45 = math::asin(sin45);
+	constexpr static float32 acos_cos45 = math::acos(cos45);
+
+	REQUIRE(close_enough(asin_sin22_5, degrees(22.5f).radians().value));
+	REQUIRE(close_enough(acos_cos22_5, degrees(22.5f).radians().value));
+	REQUIRE(close_enough(asin_sin45, degrees(45.f).radians().value));
+	REQUIRE(close_enough(acos_cos45, degrees(45.f).radians().value));
 
 	constexpr static quat identity(1.f, 0.f, 0.f, 0.f);
 	constexpr static quat rotate_x_45(cos22_5, sin22_5, 0.f, 0.f);
