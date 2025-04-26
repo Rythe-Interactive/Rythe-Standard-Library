@@ -234,7 +234,13 @@ namespace rsl
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
-	inline constexpr void dynamic_array<T, Alloc, Factory>::pop_back(size_type count) noexcept
+	inline constexpr void dynamic_array<T, Alloc, Factory>::pop_back() noexcept
+	{
+		reduce(1);
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	inline constexpr void dynamic_array<T, Alloc, Factory>::reduce(size_type count) noexcept
 	{
 		if (count > container_base::m_size)
 		{

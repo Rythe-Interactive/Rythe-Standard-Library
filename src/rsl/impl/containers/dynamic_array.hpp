@@ -7,7 +7,7 @@
 namespace rsl
 {
 	template <typename T, allocator_type Alloc = default_allocator, typed_factory_type Factory = default_factory<T>>
-	class dynamic_array final : public contiguous_container_base<T, Alloc, Factory, T*, const T*>
+	class dynamic_array : public contiguous_container_base<T, Alloc, Factory, T*, const T*>
 	{
 	public:
 		using container_base = contiguous_container_base<T, Alloc, Factory, T*, const T*>;
@@ -84,7 +84,9 @@ namespace rsl
 		[[rythe_always_inline]] constexpr value_type& emplace_back(Args&&... args)
 			noexcept(container_base::template construct_noexcept<Args...> && container_base::move_construct_noexcept);
 
-		[[rythe_always_inline]] constexpr void pop_back(size_type count = 1ull) noexcept;
+		[[rythe_always_inline]] constexpr void pop_back() noexcept;
+
+		[[rythe_always_inline]] constexpr void reduce(size_type count = 1ull) noexcept;
 
 		[[rythe_always_inline]] constexpr void clear() noexcept;
 
