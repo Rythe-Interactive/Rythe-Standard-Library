@@ -69,6 +69,9 @@ namespace rsl
 		[[rythe_always_inline]] constexpr dynamic_array& operator=(view_type src)
 			noexcept(container_base::copy_assign_noexcept && container_base::copy_construct_noexcept);
 
+		[[rythe_always_inline]] constexpr bool operator==(const dynamic_array& rhs);
+		[[rythe_always_inline]] constexpr bool operator!=(const dynamic_array& rhs);
+
 		template <typename... Args>
 		[[rythe_always_inline]] constexpr void resize(size_type newSize, Args&&... args)
 			noexcept(container_base::template construct_noexcept<Args...> && container_base::move_construct_noexcept);

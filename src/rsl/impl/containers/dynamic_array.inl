@@ -146,6 +146,24 @@ namespace rsl
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	inline constexpr bool dynamic_array<T, Alloc, Factory>::operator==(const dynamic_array<T, Alloc, Factory>& rhs)
+	{
+		bool result = true;
+		for(size_type i =0; i< this->size(); ++i)
+		{
+			result &= this->at(i) == rhs.at(i);
+		}
+
+		return result;
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+inline constexpr bool dynamic_array<T, Alloc, Factory>::operator!=(const dynamic_array<T, Alloc, Factory>& rhs)
+	{
+		return !(*this == rhs);
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	template <typename... Args>
 	inline constexpr void dynamic_array<T, Alloc, Factory>::resize(size_type newSize, Args&&... args)
 		noexcept(container_base::template construct_noexcept<Args...> && container_base::move_construct_noexcept)

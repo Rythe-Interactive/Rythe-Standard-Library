@@ -20,9 +20,9 @@ namespace rsl
 		[[rythe_always_inline]] string(const string& src) noexcept(base::container_base::copy_construct_noexcept) : base(src) {}
 		[[rythe_always_inline]] string(string&& src) noexcept : base(src) {}
 		template<size_type N>
-		[[rythe_always_inline]] string(const value_type (&arr)[N]) noexcept(base::container_base::move_construct_noexcept) : base(arr, N) {}
+		[[rythe_always_inline]] string(const value_type (&arr)[N]) noexcept(base::container_base::move_construct_noexcept) : base(arr) {}
 		template<size_type N>
-		[[rythe_always_inline]] string(value_type (&&arr)[N]) noexcept(base::container_base::copy_construct_noexcept): base(arr, N) {}
+		[[rythe_always_inline]] string(value_type (&&arr)[N]) noexcept(base::container_base::copy_construct_noexcept): base(rsl::move(arr)) {}
 		[[rythe_always_inline]] string(view_type src) noexcept(base::container_base::copy_construct_noexcept): base(src) {}
 		[[rythe_always_inline]] string(size_type capacity) noexcept : base(capacity) {}
 
@@ -32,7 +32,6 @@ namespace rsl
 
 		// operator+=
 		[[rythe_always_inline]] string& operator+=(view_type rhs);
-
 		//replace
 		[[rythe_always_inline]] string& replace(size_type, size_type, view_type);
 	};

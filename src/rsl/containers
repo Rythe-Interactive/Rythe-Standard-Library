@@ -7,3 +7,4 @@
 #include "impl/containers/type_map.hpp"
 #include "impl/containers/dynamic_array.hpp"
 #include "impl/containers/optional.hpp"
+#include "impl/containers/string.hpp"
