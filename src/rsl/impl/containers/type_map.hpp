@@ -1,24 +1,19 @@
 #pragma once
+#include "type_map.hpp"
 #include "../memory/allocator.hpp"
 #include "../util/assert.hpp"
 #include "../util/common.hpp"
 #include "../util/type_traits.hpp"
-#include "util/map_traits.hpp"
+#include "map/dynamic_map.hpp"
 
 namespace rsl
 {
 	template <
-		allocator_type Alloc = default_allocator, factory_type Factory = default_factory<void>,
-		template <typename...> typename MapType = std::unordered_map,
-		typename Comparer = typename map_traits<MapType>::template default_comparer<id_type>>
+		allocator_type Alloc = default_allocator, factory_type Factory = default_factory<void>>
 	class basic_type_map
 	{
 	private:
 		struct entry_item;
-
-		using underlying_map_value_type = typename map_traits<MapType>::template value_type<id_type, entry_item>;
-		using underlying_map_allocator = typename map_traits<MapType>::template alloc_type<
-			id_type, entry_item, Alloc, typename Factory::template retarget<underlying_map_value_type>>;
 
 	public:
 		using allocator_storage_type = allocator_storage<Alloc>;
@@ -27,17 +22,13 @@ namespace rsl
 		using factory_t = Factory;
 		template <typename T>
 		using alloc_type = typed_allocator<T, Alloc, typename Factory::template retarget<T>>;
-		using underlying_map = typename map_traits<MapType>::template customized_type<
-			id_type, entry_item, Comparer, Alloc, typename Factory::template retarget<underlying_map_value_type>>;
 
 		constexpr basic_type_map() = default;
 
 		explicit constexpr basic_type_map(const allocator_storage_type& allocStorage)
 			noexcept(is_nothrow_copy_constructible_v<allocator_storage_type>)
 			: m_allocator(allocStorage),
-			  m_storage(underlying_map_allocator(m_allocator))
-		{
-		}
+			  m_storage(allocStorage) {}
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr size_type size() const noexcept { return m_storage.size(); }
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool empty() const noexcept { return m_storage.empty(); }
@@ -53,9 +44,9 @@ namespace rsl
 		[[nodiscard]] [[rythe_always_inline]] constexpr const T* try_get() const noexcept
 		{
 			constexpr id_type typeHash = type_id<T>();
-			if (auto iter = m_storage.find(typeHash); iter != m_storage.end())
+			if (entry_item* entry = m_storage.find(typeHash); entry != nullptr)
 			{
-				return iter->second.template cast<const T>();
+				return entry->second.template cast<const T>();
 			}
 
 			return nullptr;
@@ -88,10 +79,10 @@ namespace rsl
 			auto result = m_storage.try_emplace(typeHash);
 			if (result.second)
 			{
-				result.first->second.template construct<T>(this, forward<Args>(args)...);
+				result.first.template construct<T>(this, forward<Args>(args)...);
 			}
 
-			return std::make_pair(ref(*(result.first->second.template cast<T>())), result.second);
+			return { ref(*(result.first.template cast<T>())), result.second };
 		}
 
 		template <typename T, typename... Args>
@@ -128,6 +119,7 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void clear() noexcept { m_storage.clear(); }
 
 		[[rythe_always_inline]] constexpr allocator_t& get_allocator() noexcept { return m_allocator.get_allocator(); }
+
 		[[rythe_always_inline]] constexpr const allocator_t& get_allocator() const noexcept
 		{
 			return m_allocator.get_allocator();
@@ -151,6 +143,7 @@ namespace rsl
 			deallocate_func deallocateEntry = nullptr;
 
 			[[rythe_always_inline]] constexpr entry_item() noexcept = default;
+
 			[[rythe_always_inline]] constexpr entry_item(entry_item&& other) noexcept
 				: data(other.data),
 				  map(other.map),
@@ -196,8 +189,8 @@ namespace rsl
 			}
 		};
 
-		alloc_type<underlying_map_value_type> m_allocator;
-		underlying_map m_storage;
+		alloc_type<pair<id_type, entry_item>> m_allocator;
+		dynamic_map<id_type, entry_item, allocator_t> m_storage;
 	};
 
 	using type_map = basic_type_map<>;

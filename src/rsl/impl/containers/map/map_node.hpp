@@ -26,15 +26,28 @@ namespace rsl::internal
 			}
 		}
 
-		hash_map_node(map_type&, hash_map_node&& other) noexcept // NOLINT(cppcoreguidelines*)
-			: m_data(other.m_data)
-		{
-		}
+		hash_map_node(hash_map_node&& other) noexcept // NOLINT(cppcoreguidelines*)
+			: m_data(other.m_data) {}
 
 		void destroy(map_type& map) noexcept
 		{
-			map.get_factory().destroy(m_data, 1);
+			if constexpr (map_type::is_map)
+			{
+				map.get_factory().destroy(&m_data->second, 1);
+				m_data->first.~key_type();
+			}
+			else
+			{
+				m_data->~value_type();
+			}
+
 			map.get_memory_pool().deallocate(m_data);
+			m_data = nullptr;
+		}
+
+		~hash_map_node()
+		{
+			rsl_assert_invalid_operation(m_data == nullptr);
 		}
 
 		value_type* operator->() noexcept { return m_data; }
@@ -83,6 +96,12 @@ namespace rsl::internal
 		value_type* m_data;
 	};
 
+	#if defined(RYHTE_VALIDATE) && RYTHE_VALIDATION_LEVEL >= RYTHE_HIGH_IMPACT_VALIDATION_LEVEL
+	#if !defined(RYTHE_VALIDATE_FLAT_MAP_NODE)
+		#define RYTHE_VALIDATE_FLAT_MAP_NODE
+	#endif
+	#endif
+
 	template <typename MapType>
 	class flat_hash_map_node
 	{
@@ -105,16 +124,45 @@ namespace rsl::internal
 			{
 				m_data = key;
 			}
+
+			#if defined(RYTHE_VALIDATE_FLAT_MAP_NODE)
+			m_holdsValue = true
+			#endif
 		}
 
-		flat_hash_map_node(map_type& map, flat_hash_map_node&& other) // NOLINT(cppcoreguidelines*)
+		flat_hash_map_node(flat_hash_map_node&& other) // NOLINT(cppcoreguidelines*)
 			noexcept(is_nothrow_move_constructible_v<value_type>)
+			: m_data(rsl::move(other.m_data))
 		{
-			m_data.first = move(other.m_data.first);
-			map.get_factory().move(&m_data.second, &other.m_data.second, 1);
+			#if defined(RYTHE_VALIDATE_FLAT_MAP_NODE)
+			m_holdsValue = other.m_holdsData;
+			other.m_holdsData = false;
+			#endif
 		}
 
-		void destroy(map_type& map) noexcept { map.get_factory().destroy(&m_data, 1); }
+		~flat_hash_map_node()
+		{
+			#if defined(RYTHE_VALIDATE_FLAT_MAP_NODE)
+			rsl_assert_invalid_operation(m_holdsValue);
+			#endif
+		}
+
+		void destroy(map_type& map) noexcept
+		{
+			if constexpr (map_type::is_map)
+			{
+				map.get_factory().destroy(&m_data.second, 1);
+				m_data.first.~key_type();
+			}
+			else
+			{
+				m_data.~value_type();
+			}
+
+			#if defined(RYTHE_VALIDATE_FLAT_MAP_NODE)
+			m_holdsData = false;
+			#endif
+		}
 
 		value_type* operator->() noexcept { return &m_data; }
 		const value_type* operator->() const noexcept { return &m_data; }
@@ -164,6 +212,10 @@ namespace rsl::internal
 			value_type m_data;
 			byte m_dummy;
 		};
+
+		#if defined(RYTHE_VALIDATE_FLAT_MAP_NODE)
+		bool m_holdsValue = false;
+		#endif
 	};
 
 	template <typename MapType, bool IsFlat = false>

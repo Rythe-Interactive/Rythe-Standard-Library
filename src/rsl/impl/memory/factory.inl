@@ -5,13 +5,14 @@ namespace rsl
 {
 	namespace internal
 	{
-		template <typename T, typename = void>
+		template <typename T>
 		struct memset_zero : false_type
 		{
 		};
 
 		template <typename T>
-		struct memset_zero<T, void_t<decltype(T::memset_zero)>> : bool_constant<T::memset_zero>
+			requires requires{ T::memset_zero; }
+		struct memset_zero<T> : bool_constant<T::memset_zero>
 		{
 		};
 
@@ -53,11 +54,11 @@ namespace rsl
 		}
 		else
 		{
-			T* first = new (ptr) T(std::forward<Args>(args)...);
+			T* first = new (ptr) T(rsl::forward<Args>(args)...);
 
 			for (size_type i = 1; i < count; i++)
 			{
-				new (first + i) T(std::forward<Args>(args)...);
+				new (first + i) T(rsl::forward<Args>(args)...);
 			}
 
 			return first;
@@ -70,15 +71,21 @@ namespace rsl
 		if constexpr (is_trivially_copy_constructible_v<T>)
 		{
 			std::memcpy(dst, src, count * sizeof(T));
+
+			if constexpr (internal::memset_zero<T>::value)
+			{
+				std::memset(src, 0, count * sizeof(T));
+			}
+
 			return static_cast<T*>(dst);
 		}
 		else
 		{
-			T* first = new (dst) T(std::move(src[0]));
+			T* first = new (dst) T(rsl::move(src[0]));
 
 			for (size_type i = 1; i < count; i++)
 			{
-				new (first + i) T(std::move(src[i]));
+				new (first + i) T(rsl::move(src[i]));
 			}
 
 			return first;

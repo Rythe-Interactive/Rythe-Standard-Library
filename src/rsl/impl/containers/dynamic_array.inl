@@ -346,6 +346,8 @@ namespace rsl
 	inline constexpr size_type dynamic_array<T, Alloc, Factory>::erase(size_type pos)
 		noexcept(container_base::move_construct_noexcept)
 	{
+		rsl_assert_invalid_access(pos < container_base::m_size);
+
 		mem_rsc::destroy(1, pos);
 		container_base::move_shift_elements_unsafe(pos + 1, npos, -1ll);
 		--container_base::m_size;
@@ -356,6 +358,8 @@ namespace rsl
 	inline constexpr size_type dynamic_array<T, Alloc, Factory>::erase(size_type first, size_type last)
 		noexcept(container_base::move_construct_noexcept)
 	{
+		rsl_assert_invalid_access(first < container_base::m_size);
+		rsl_assert_invalid_parameters(first < last);
 		if (last > container_base::m_size)
 		{
 			last = container_base::m_size;
