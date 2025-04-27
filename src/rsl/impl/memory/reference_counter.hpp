@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../util/primitives.hpp"
+#include "../util/assert.hpp"
 #include "memory_resource_base.hpp"
 
 namespace rsl

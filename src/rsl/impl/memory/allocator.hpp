@@ -1,9 +1,6 @@
 #pragma once
 
-#include "../util/assert.hpp"
-#include "../util/common.hpp"
 #include "../util/concepts.hpp"
-#include "../util/type_util.hpp"
 
 #include "heap_allocator.hpp"
 
@@ -38,6 +35,7 @@ namespace rsl
 	class polymorphic_allocator
 	{
 	public:
+		virtual ~polymorphic_allocator() = default;
 		[[nodiscard]] [[rythe_allocating]] virtual void* allocate(size_type size) noexcept = 0;
 		[[nodiscard]] [[rythe_allocating]] virtual void* allocate(size_type size, size_type alignment) noexcept = 0;
 

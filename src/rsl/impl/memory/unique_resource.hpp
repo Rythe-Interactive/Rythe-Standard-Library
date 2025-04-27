@@ -1,5 +1,7 @@
 #pragma once
 #include "../containers/optional.hpp"
+#include "allocator.hpp"
+#include "memory_resource_base.hpp"
 
 namespace rsl
 {

@@ -1,12 +1,11 @@
 #pragma once
 #include "../defines.hpp"
 
-#include <ppltasks.h>
-
 RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(5046)
 #include <bit>
 #include <functional>
 #include <ratio>
+#include <cstring>
 RYTHE_MSVC_SUPPRESS_WARNING_POP
 
 #include "primitives.hpp"
