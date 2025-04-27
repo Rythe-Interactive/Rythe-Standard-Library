@@ -12,10 +12,18 @@ namespace rsl::internal
 		using value_type = typename MapType::value_type;
 
 		template <typename... Args>
-		explicit hash_map_node(map_type& map, Args&&... args) // NOLINT(cppcoreguidelines*)
+		explicit hash_map_node(map_type& map, const key_type& key, Args&&... args) // NOLINT(cppcoreguidelines*)
 			: m_data(map.get_memory_pool().allocate())
 		{
-			map.get_factory().construct(m_data, 1, forward<Args>(args)...);
+			if constexpr (map_type::is_map)
+			{
+				m_data->first = key;
+				map.get_factory().construct(&m_data->second, 1, rsl::forward<Args>(args)...);
+			}
+			else
+			{
+				*m_data = key;
+			}
 		}
 
 		hash_map_node(map_type&, hash_map_node&& other) noexcept // NOLINT(cppcoreguidelines*)
@@ -85,16 +93,25 @@ namespace rsl::internal
 		using value_type = typename MapType::value_type;
 
 		template <typename... Args>
-		explicit flat_hash_map_node(map_type& map, Args&&... args) // NOLINT(cppcoreguidelines*)
+		explicit flat_hash_map_node(map_type& map, const key_type& key, Args&&... args) // NOLINT(cppcoreguidelines*)
 			noexcept(is_nothrow_constructible_v<value_type, Args...>)
 		{
-			map.get_factory().construct(&m_data, 1, rsl::forward<Args>(args)...);
+			if constexpr (map_type::is_map)
+			{
+				m_data.first = key;
+				map.get_factory().construct(&m_data.second, 1, rsl::forward<Args>(args)...);
+			}
+			else
+			{
+				m_data = key;
+			}
 		}
 
 		flat_hash_map_node(map_type& map, flat_hash_map_node&& other) // NOLINT(cppcoreguidelines*)
 			noexcept(is_nothrow_move_constructible_v<value_type>)
 		{
-			map.get_factory().move(&m_data, &other.m_data, 1);
+			m_data.first = move(other.m_data.first);
+			map.get_factory().move(&m_data.second, &other.m_data.second, 1);
 		}
 
 		void destroy(map_type& map) noexcept { map.get_factory().destroy(&m_data, 1); }

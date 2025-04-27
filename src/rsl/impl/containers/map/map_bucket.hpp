@@ -19,6 +19,8 @@ namespace rsl::internal
 		using storage_type = uint32;
 		using psl_type = unpacked_psl<storage_type>;
 
+		static constexpr bool memset_zero = true;
+
 		static_assert(FingerprintSize < 32);
 		static constexpr size_type fingerprint_size = FingerprintSize; // bits
 
@@ -36,6 +38,8 @@ namespace rsl::internal
 	{
 		using storage_type = uint64;
 		using psl_type = unpacked_psl<storage_type>;
+
+		static constexpr bool memset_zero = true;
 
 		static_assert(FingerprintSize < 64);
 		static constexpr size_type fingerprint_size = FingerprintSize; // bits

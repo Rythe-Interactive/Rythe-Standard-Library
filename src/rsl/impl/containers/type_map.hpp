@@ -140,7 +140,7 @@ namespace rsl
 			alloc_type<T>(map.m_allocator).destroy_and_deallocate(entry.template cast<T>());
 			entry.data = nullptr;
 			entry.map = nullptr;
-			entry.deallocate_entry = nullptr;
+			entry.deallocateEntry = nullptr;
 		}
 
 		struct entry_item

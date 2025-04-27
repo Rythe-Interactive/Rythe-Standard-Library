@@ -118,6 +118,19 @@ namespace rsl
 			return usedCapacity;
 		}
 
+		void reserve(const size_type newCapacity)
+		{
+			size_type currentCapacity = capacity();
+
+			size_type blockSize = next_block_size();
+			while (currentCapacity < newCapacity)
+			{
+				allocate_block();
+				currentCapacity += blockSize;
+				blockSize = next_block_size();
+			}
+		}
+
 		static constexpr size_type elementAlignment =
 			alignment_of<T>::value > alignment_of<T*>::value ? alignment_of<T>::value : alignment_of<T*>::value;
 		static constexpr size_type elementSize = (((sizeof(T) - 1) / elementAlignment) + 1) * elementAlignment;

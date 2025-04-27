@@ -8,6 +8,7 @@
 #include "../pair.hpp"
 
 #include "map_node.hpp"
+#include "spdlog/fmt/bundled/format.h"
 
 namespace rsl
 {
@@ -26,7 +27,7 @@ namespace rsl
 		static constexpr bool is_set = MapInfo::is_set;
 		static constexpr bool is_transparent = MapInfo::is_transparent;
 
-		static constexpr size_type max_load_factor = MapInfo::max_load_factor;
+		static constexpr float32 max_load_factor = MapInfo::max_load_factor;
 
 		using value_type = typename MapInfo::value_type;
 		using node_type = internal::map_node<hash_map_base>;
@@ -143,6 +144,29 @@ namespace rsl
 		{
 		}
 
+		[[nodiscard]] [[rythe_always_inline]] constexpr size_type capacity() const noexcept
+		{
+			return m_buckets.size();
+		}
+
+		void reserve(size_type newCapacity) noexcept(noexcept(declval<bucket_container>().reserve(0)) && noexcept(declval<value_container>().reserve(0)))
+		{
+			m_values.reserve(newCapacity);
+
+			if constexpr (data_pool::holds_value)
+			{
+				m_memoryPool->reserve(newCapacity);
+			}
+
+			if (newCapacity > m_buckets.size())
+			{
+				bucket_container oldBuckets = move(m_buckets);
+				m_buckets = bucket_container(newCapacity, in_place_signal);
+
+				rehash(oldBuckets);
+			}
+		}
+
 		void clear() noexcept
 		{
 			m_values.clear();
@@ -167,7 +191,7 @@ namespace rsl
 
 			if (insertResult.type == insert_result_type::newInsertion)
 			{
-				return m_values.emplace_back(*this, key, node_type(*this, forward<Args>(args)...)).value();
+				return m_values.emplace_back(*this, key, forward<Args>(args)...).value();
 			}
 
 			mapped_type& value = m_values[m_buckets[insertResult.index].index].value();
@@ -182,14 +206,19 @@ namespace rsl
 
 			if (insertResult.type == insert_result_type::newInsertion)
 			{
-				return {ref(m_values.emplace_back(*this, key, node_type(*this, forward<Args>(args)...)).value()), true};
+				return {ref(m_values.emplace_back(*this, key, forward<Args>(args)...).value()), true};
 			}
 
 			return {ref(m_values[m_buckets[insertResult.index].index].value()), false};
 		}
 
-		bool contains(const key_type& key) const
+		bool contains(const key_type& key) const noexcept
 		{
+			if (m_buckets.empty())
+			{
+				return false;
+			}
+
 			const hash_result hash = get_hash_result(key);
 
 			bucket_search_result searchResult = find_next_available(hash.homeIndex, 0u, hash.fingerprint, key);
@@ -224,9 +253,81 @@ namespace rsl
 		}
 
 	protected:
+		constexpr void rehash(const bucket_container& oldBuckets)
+		{
+			for (const bucket_type& bucket : oldBuckets)
+			{
+				size_type oldIndex = bucket.index;
+				key_type key = m_values[oldIndex].key();
+
+				const hash_result hash = get_hash_result(key);
+
+				bucket_search_result searchResult = find_next_available(hash.homeIndex, 0u, hash.fingerprint, key);
+
+				const insert_result result{
+					.index = hash.homeIndex + searchResult.unpackedPsl.psl,
+					.type =
+						(searchResult.type == search_result_type::existingItem ? insert_result_type::existingItem
+																			   : insert_result_type::newInsertion)
+				};
+
+				bucket_type insertBucket{
+					.pslAndFingerprint = pack_bucket_psl(searchResult.unpackedPsl), .index = oldIndex
+				};
+
+				index_type currentIndex = result.index;
+				while (searchResult.type == search_result_type::swap)
+				{
+					rsl::swap(m_buckets[currentIndex], insertBucket);
+					psl_type insertPsl = unpack_bucket_psl(insertBucket);
+
+					index_type homeIndex = currentIndex - insertPsl.psl;
+
+					searchResult = find_next_available(
+						homeIndex, insertPsl.psl + 1, insertPsl.fingerprint, m_values[insertBucket.index].key()
+					);
+					currentIndex = homeIndex + searchResult.unpackedPsl.psl;
+
+					rsl_assert_frequent(searchResult.type != search_result_type::existingItem);
+				}
+
+				rsl_assert_invalid_object(searchResult.type == search_result_type::newInsertion);
+				rsl_assert_invalid_object(currentIndex < m_buckets.size());
+				m_buckets[currentIndex] = insertBucket;
+			}
+		}
+
+		[[rythe_always_inline]] constexpr void maybe_grow() noexcept(noexcept(reserve(0)))
+		{
+			const size_type currentCapacity = capacity();
+			if (currentCapacity == 0)
+			{
+				if constexpr (max_load_factor >= 0.5f)
+				{
+					reserve(4);
+				}
+				else if constexpr (max_load_factor >= 0.25f)
+				{
+					reserve(8);
+				}
+				else
+				{
+					reserve(16);
+				}
+				return;
+			}
+
+			float32 currentLoadFactor = m_values.size() / static_cast<float32>(m_buckets.size());
+
+			if (currentLoadFactor >= max_load_factor)
+			{
+				reserve(currentCapacity * 2);
+			}
+		}
+
 		static storage_type pack_bucket_psl(const psl_type& unpackedPsl)
 		{
-			return storage_type((unpackedPsl.psl << bucket_type::fingerprint_size) & unpackedPsl.fingerprint);
+			return storage_type((unpackedPsl.psl << bucket_type::fingerprint_size) | unpackedPsl.fingerprint);
 		}
 
 		static psl_type unpack_bucket_psl(const bucket_type& bucket)
@@ -244,7 +345,7 @@ namespace rsl
 			index_type homeIndex;
 		};
 
-		hash_result get_hash_result(const key_type& key) const
+		hash_result get_hash_result(const key_type& key) const noexcept
 		{
 			id_type hash = m_hasher.hash(key);
 
@@ -271,7 +372,7 @@ namespace rsl
 
 		bucket_search_result find_next_available(
 			index_type homeIndex, storage_type startPsl, storage_type fingerprint, const key_type& key
-		) const
+		) const noexcept
 		{
 			psl_type insertPsl{.psl = startPsl, .fingerprint = fingerprint};
 
@@ -322,6 +423,7 @@ namespace rsl
 
 		insert_result insert_key_internal(const key_type& key, const index_type valueIndexHint)
 		{
+			maybe_grow();
 			const hash_result hash = get_hash_result(key);
 
 			bucket_search_result searchResult = find_next_available(hash.homeIndex, 0u, hash.fingerprint, key);
@@ -355,14 +457,8 @@ namespace rsl
 
 			if (searchResult.type == search_result_type::newInsertion)
 			{
-				if (currentIndex == m_buckets.size())
-				{
-					m_buckets.push_back(insertBucket);
-				}
-				else
-				{
-					m_buckets[currentIndex] = insertBucket;
-				}
+				rsl_assert_invalid_object(currentIndex < m_buckets.size());
+				m_buckets[currentIndex] = insertBucket;
 			}
 
 			return result;

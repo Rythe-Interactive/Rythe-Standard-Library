@@ -31,7 +31,7 @@ namespace
 namespace
 {
 	constexpr int const1 = 123456;
-	constexpr int const2 = 234567;
+	// constexpr int const2 = 234567;
 	constexpr int const3 = 345678;
 	constexpr int const4 = 456789;
 	constexpr int const5 = 567891;
@@ -41,8 +41,8 @@ namespace
 	constexpr float key2 = 2.34567f;
 	constexpr float key3 = 3.45678f;
 	constexpr float key4 = 4.56789f;
-	constexpr float key5 = 5.67891f;
-	constexpr float key6 = 6.78912f;
+	// constexpr float key5 = 5.67891f;
+	// constexpr float key6 = 6.78912f;
 
 	struct test_struct
 	{
