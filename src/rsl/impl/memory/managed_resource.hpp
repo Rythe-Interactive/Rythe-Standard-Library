@@ -4,6 +4,9 @@
 
 namespace rsl
 {
+	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
+	class managed_resource;
+
 	namespace internal
 	{
 		struct managed_payload_base : public manual_reference_counter
@@ -11,18 +14,16 @@ namespace rsl
 			virtual void destroy(void*) noexcept { rsl_assert_unreachable(); }
 		};
 
-		template <typename T, typename Deleter>
+		template <typename Deleter, typename T>
+		concept managed_deleter_type = requires(Deleter del, T& val) { del(val); };
+
+		template <typename T, managed_deleter_type<T> Deleter, typename ManagedResource>
 		struct managed_payload final : public managed_payload_base
 		{
 			Deleter deleter;
+			ManagedResource* thisObject;
 
-			void destroy(void* value) noexcept override
-			{
-				if (deleter)
-				{
-					deleter(*static_cast<T*>(value));
-				}
-			}
+			void destroy(void* value) noexcept override;
 		};
 	} // namespace internal
 
@@ -44,11 +45,11 @@ namespace rsl
 		[[rythe_always_inline]] explicit managed_resource(const allocator_storage_type& allocStorage)
 			noexcept(is_nothrow_constructible_v<ref_counter, const allocator_storage_type&>);
 
-		template <typename Deleter, typename... Args>
+		template <internal::managed_deleter_type<T> Deleter, typename... Args>
 		[[rythe_always_inline]] constexpr explicit managed_resource(Deleter deleter, Args&&... args)
 			noexcept(is_nothrow_constructible_v<ref_counter> && is_nothrow_constructible_v<T, Args...>);
 
-		template <typename Deleter, typename... Args>
+		template <internal::managed_deleter_type<T> Deleter, typename... Args>
 		[[rythe_always_inline]] managed_resource(
 			const allocator_storage_type& allocStorage, Deleter deleter, Args&&... args
 		) noexcept(is_nothrow_constructible_v<ref_counter, const allocator_storage_type&> && is_nothrow_constructible_v<T, Args...>);
@@ -57,7 +58,7 @@ namespace rsl
 
 		[[rythe_always_inline]] constexpr ~managed_resource() noexcept;
 
-		template <typename Deleter, typename... Args>
+		template <internal::managed_deleter_type<T> Deleter, typename... Args>
 		[[rythe_always_inline]] constexpr void arm(Deleter deleter, Args&&... args)
 			noexcept(is_nothrow_constructible_v<T, Args...>);
 
@@ -70,6 +71,12 @@ namespace rsl
 		[[rythe_always_inline]] constexpr const T* operator->() const noexcept { return &*m_value; }
 
 	private:
+		template <typename FriendT, internal::managed_deleter_type<T> FriendDeleter, typename FriendManagedResource>
+		friend struct managed_payload;
+
+		template <internal::managed_deleter_type<T> Deleter>
+		using typed_payload = internal::managed_payload<T, Deleter, managed_resource>;
+
 		optional<T> m_value;
 	};
 } // namespace rsl

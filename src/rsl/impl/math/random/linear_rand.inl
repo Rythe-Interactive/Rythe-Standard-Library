@@ -8,7 +8,7 @@ namespace rsl::math
 	{
 		if constexpr (::std::is_floating_point_v<Scalar>)
 		{
-			return min + (max - min) * RandomNumberGenerator::generateRandomFloat<Scalar>();
+			return min + (max - min) * random_number_generator::generateRandomFloat<Scalar>();
 		}
 		else
 		{
@@ -16,7 +16,7 @@ namespace rsl::math
 				::std::is_arithmetic_v<Scalar>,
 				"Input scalar type to linear_rand is neither a scalar nor any other supported type."
 			);
-			return min + RandomNumberGenerator::generateRandomInteger<Scalar>() % (max - min);
+			return min + random_number_generator::generateRandomInteger<Scalar>() % (max - min);
 		}
 	}
 

@@ -29,6 +29,12 @@ namespace rsl
 		return !occupied();
 	}
 
+	void manual_reference_counter::reset() noexcept
+	{
+		m_count = 0;
+		this->on_reset();
+	}
+
 	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
 	inline constexpr basic_reference_counter<Counter, Alloc, Factory>::basic_reference_counter(arm_signal_type) noexcept
 	{
@@ -130,6 +136,7 @@ namespace rsl
 
 		if (free())
 		{
+			mem_rsc::get_ptr()->reset();
 			mem_rsc::destroy_and_deallocate();
 		}
 		else

@@ -130,7 +130,7 @@ namespace rsl
 	template <typename T>
 	inline id_type typed_polymorphic_factory<T>::type_id() const noexcept
 	{
-		return type_id<T>();
+		return rsl::type_id<T>();
 	}
 
 	template <typename T>
@@ -140,7 +140,7 @@ namespace rsl
 		  m_destroyFunc(&internal::default_destroy<T>),
 		  m_typeSize(sizeof(T)),
 		  m_triviallyCopyable(is_trivially_copyable_v<T>),
-		  m_typeId(type_id<T>())
+		  m_typeId(rsl::type_id<T>())
 	{
 	}
 

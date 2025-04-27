@@ -6,16 +6,12 @@ namespace rsl
 	template <typename T, factory_type Factory>
 	inline constexpr optional<T, Factory>::optional() noexcept
 		: m_factory(),
-		  m_hasValue(false)
-	{
-	}
+		  m_hasValue(false) {}
 
 	template <typename T, factory_type Factory>
 	inline constexpr optional<T, Factory>::optional(nullptr_type) noexcept
 		: m_factory(),
-		  m_hasValue(false)
-	{
-	}
+		  m_hasValue(false) {}
 
 	template <typename T, factory_type Factory>
 	inline constexpr optional<T, Factory>::optional(const optional& other)
@@ -32,21 +28,21 @@ namespace rsl
 	template <typename T, factory_type Factory>
 	inline constexpr optional<T, Factory>::optional(optional&& other)
 		noexcept(is_nothrow_move_constructible_v<factory_storage_type> && is_nothrow_move_constructible_v<value_type>)
-		: m_factory(move(other.m_factory))
+		: m_factory(move(other.m_factory)),
+		  m_hasValue(false)
 	{
 		if (other.m_hasValue)
 		{
 			emplace(move(other.m_value));
 		}
+		other.reset();
 	}
 
 	template <typename T, factory_type Factory>
 	inline constexpr optional<T, Factory>::optional(const factory_storage_type& factoryStorage)
 		noexcept(is_nothrow_copy_constructible_v<factory_storage_type>)
 		: m_factory(factoryStorage),
-		  m_hasValue(false)
-	{
-	}
+		  m_hasValue(false) {}
 
 	template <typename T, factory_type Factory>
 	template <typename... Args>
@@ -184,7 +180,7 @@ namespace rsl
 	}
 
 	template <typename T, factory_type Factory>
-	inline constexpr const T& optional<T, Factory>::operator*() const& noexcept
+	inline constexpr const T& optional<T, Factory>::operator*() const & noexcept
 	{
 		rsl_assert_invalid_access(m_hasValue);
 		return m_value;
@@ -198,7 +194,7 @@ namespace rsl
 	}
 
 	template <typename T, factory_type Factory>
-	inline constexpr const T&& optional<T, Factory>::operator*() const&& noexcept
+	inline constexpr const T&& optional<T, Factory>::operator*() const && noexcept
 	{
 		rsl_assert_invalid_access(m_hasValue);
 		return move(m_value);
@@ -212,7 +208,7 @@ namespace rsl
 	}
 
 	template <typename T, factory_type Factory>
-	inline constexpr const T& optional<T, Factory>::value() const& noexcept
+	inline constexpr const T& optional<T, Factory>::value() const & noexcept
 	{
 		rsl_assert_invalid_access(m_hasValue);
 		return m_value;
@@ -226,20 +222,20 @@ namespace rsl
 	}
 
 	template <typename T, factory_type Factory>
-	inline constexpr const T&& optional<T, Factory>::value() const&& noexcept
+	inline constexpr const T&& optional<T, Factory>::value() const && noexcept
 	{
 		rsl_assert_invalid_access(m_hasValue);
 		return move(m_value);
 	}
 
 	template <typename T, factory_type Factory>
-	inline constexpr bool optional<T, Factory>::holds_value() noexcept
+	inline constexpr bool optional<T, Factory>::holds_value() const noexcept
 	{
 		return m_hasValue;
 	}
 
 	template <typename T, factory_type Factory>
-	inline constexpr optional<T, Factory>::operator bool() noexcept
+	inline constexpr optional<T, Factory>::operator bool() const noexcept
 	{
 		return holds_value();
 	}
@@ -263,5 +259,27 @@ namespace rsl
 			m_factory->destroy(&m_value, 1);
 			m_hasValue = false;
 		}
+	}
+
+	template <typename T, factory_type Factory>
+	constexpr void optional<T, Factory>::set_factory(const factory_storage_type& factoryStorage)
+		noexcept(is_nothrow_copy_assignable_v<factory_storage_type>)
+	{
+		m_factory = factoryStorage;
+	}
+
+	template <typename T, factory_type Factory>
+	constexpr Factory& optional<T, Factory>::get_factory() noexcept { return *m_factory; }
+
+	template <typename T, factory_type Factory>
+	constexpr const Factory& optional<T, Factory>::get_factory() const noexcept { return *m_factory; }
+
+	template <typename T, factory_type Factory>
+	constexpr factory_storage<Factory>& optional<T, Factory>::get_factory_storage() noexcept { return m_factory; }
+
+	template <typename T, factory_type Factory>
+	constexpr const factory_storage<Factory>& optional<T, Factory>::get_factory_storage() const noexcept
+	{
+		return m_factory;
 	}
 } // namespace rsl

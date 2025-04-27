@@ -4,13 +4,13 @@
 namespace rsl::math
 {
 	template <typename T, typename... Args, std::enable_if_t<std::is_base_of_v<random_number_engine_base, T>, bool>>
-	inline void RandomNumberGenerator::setRNGEngine(Args&&... args)
+	inline void random_number_generator::set_rng_engine(Args&&... args)
 	{
-		engine = std::make_unique<T>(forward<Args>(args)...);
+		m_engine = unique_object<T>(forward<Args>(args)...);
 	}
 
 	template <typename Integer>
-	[[nodiscard]] inline Integer RandomNumberGenerator::generateRandomInteger() noexcept
+	[[nodiscard]] inline Integer random_number_generator::generate_random_integer() noexcept
 	{
 		if constexpr (::std::is_signed_v<Integer>)
 		{
@@ -30,9 +30,9 @@ namespace rsl::math
 	}
 
 	template <typename Float>
-	[[nodiscard]] inline Float RandomNumberGenerator::generateRandomFloat() noexcept
+	[[nodiscard]] inline Float random_number_generator::generate_random_float() noexcept
 	{
-		auto integer = generateRandomInteger<uint_max>();
+		auto integer = generate_random_integer<uint_max>();
 		return integer / static_cast<Float>(::std::numeric_limits<uint_max>::max());
 	}
 } // namespace rsl::math

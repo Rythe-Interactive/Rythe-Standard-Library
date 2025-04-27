@@ -529,7 +529,7 @@ namespace rsl
 	inline constexpr void* type_erased_allocator<Alloc, Factory>::allocate_and_construct(size_type count)
 		noexcept(factory_traits<Factory>::template noexcept_constructable<>)
 	{
-		void* mem = m_alloc->allocate(count * m_factory->typeSize());
+		void* mem = m_alloc->allocate(count * m_factory->type_size());
 		return m_factory->construct(mem, count);
 	}
 
@@ -633,7 +633,7 @@ namespace rsl
 	type_erased_allocator<Alloc, Factory>::destroy_and_deallocate(void* ptr, size_type count) noexcept
 	{
 		m_factory->destroy(ptr, count);
-		m_alloc->deallocate(ptr, count * m_factory->typeSize());
+		m_alloc->deallocate(ptr, count * m_factory->type_size());
 	}
 
 	template <allocator_type Alloc, untyped_factory_type Factory>

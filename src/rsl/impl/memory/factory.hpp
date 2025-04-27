@@ -28,7 +28,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	concept untyped_factory_type = factory_type<T> && not_same_as<typename T::ptr_type, void*>;
+	concept untyped_factory_type = factory_type<T> && same_as<typename T::ptr_type, void*>;
 
 
 	template <typename T>

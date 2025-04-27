@@ -1760,4 +1760,7 @@ namespace rsl
 	{
 		return bit_cast<byte*>(ptr) + count;
 	}
+
+	template <typename LHS, typename RHS>
+	constexpr bool is_pointer_assignable_v = requires(LHS* lhs, RHS* rhs) { lhs = rhs; };
 } // namespace rsl

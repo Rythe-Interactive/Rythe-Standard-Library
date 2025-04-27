@@ -114,14 +114,23 @@ namespace rsl
 		[[nodiscard]] [[rythe_always_inline]] constexpr value_type&& value() && noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type&& value() const&& noexcept;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr bool holds_value() noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr operator bool() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool holds_value() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr operator bool() const noexcept;
 
 		template <typename... Args>
 		[[rythe_always_inline]] constexpr value_type& emplace(Args&&... args)
 			noexcept(is_nothrow_constructible_v<value_type, Args...>);
 
 		[[rythe_always_inline]] constexpr void reset() noexcept;
+
+		[[rythe_always_inline]] constexpr void set_factory(const factory_storage_type& factoryStorage)
+			noexcept(is_nothrow_copy_assignable_v<factory_storage_type>);
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr factory_t& get_factory() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const factory_t& get_factory() const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr factory_storage_type& get_factory_storage() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const factory_storage_type&	get_factory_storage() const noexcept;
 
 	private:
 		factory_storage_type m_factory;

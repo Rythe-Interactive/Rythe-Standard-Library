@@ -148,27 +148,27 @@ namespace rsl
 			using deallocate_func = void (*)(basic_type_map&, entry_item&);
 			void* data = nullptr;
 			basic_type_map* map = nullptr;
-			deallocate_func deallocate_entry = nullptr;
+			deallocate_func deallocateEntry = nullptr;
 
 			[[rythe_always_inline]] constexpr entry_item() noexcept = default;
 			[[rythe_always_inline]] constexpr entry_item(entry_item&& other) noexcept
 				: data(other.data),
 				  map(other.map),
-				  deallocate_entry(other.deallocate_entry)
+				  deallocateEntry(other.deallocateEntry)
 			{
 				other.data = nullptr;
 				other.map = nullptr;
-				other.deallocate_entry = nullptr;
+				other.deallocateEntry = nullptr;
 			}
 
 			[[rythe_always_inline]] constexpr entry_item& operator=(entry_item&& other) noexcept
 			{
 				data = other.data;
 				map = other.map;
-				deallocate_entry = other.deallocate_entry;
+				deallocateEntry = other.deallocateEntry;
 				other.data = nullptr;
 				other.map = nullptr;
-				other.deallocate_entry = nullptr;
+				other.deallocateEntry = nullptr;
 				return *this;
 			}
 
@@ -177,7 +177,7 @@ namespace rsl
 			{
 				data = alloc_type<T>(mapPtr->m_allocator).allocate_and_construct(1, forward<Args>(args)...);
 				map = mapPtr;
-				deallocate_entry = &basic_type_map::deallocate_entry<T>;
+				deallocateEntry = &basic_type_map::deallocate_entry<T>;
 			}
 
 			template <typename T>
@@ -191,7 +191,7 @@ namespace rsl
 				if (data)
 				{
 					rsl_assert_rarely(map);
-					(*deallocate_entry)(*map, *this);
+					(*deallocateEntry)(*map, *this);
 				}
 			}
 		};

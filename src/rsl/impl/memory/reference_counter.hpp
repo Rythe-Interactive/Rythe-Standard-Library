@@ -12,6 +12,7 @@ namespace rsl
 		{ val.count() } -> convertible_to<size_type>;
 		{ val.occupied() } -> convertible_to<bool>;
 		{ val.free() } -> convertible_to<bool>;
+		{ val.reset() };
 	};
 
 	class manual_reference_counter
@@ -23,6 +24,9 @@ namespace rsl
 		[[nodiscard]] [[rythe_always_inline]] constexpr size_type count() const noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool occupied() const noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool free() const noexcept;
+		[[rythe_always_inline]] void reset() noexcept;
+
+		virtual void on_reset() noexcept {};
 
 	private:
 		size_type m_count = 0;
