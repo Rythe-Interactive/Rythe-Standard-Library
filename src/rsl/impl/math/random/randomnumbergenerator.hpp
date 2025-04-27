@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../../util/primitives.hpp"
+#include "../../memory/unique_object.hpp"
 
 #include "random_number_engine.hpp"
-#include "memory/unique_object.hpp"
 
 namespace rsl::math
 {

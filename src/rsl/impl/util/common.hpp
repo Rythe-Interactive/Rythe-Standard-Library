@@ -7,7 +7,6 @@ RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(5046)
 #include <bit>
 #include <functional>
 #include <ratio>
-#include <type_traits>
 RYTHE_MSVC_SUPPRESS_WARNING_POP
 
 #include "primitives.hpp"
@@ -619,7 +618,7 @@ namespace rsl
 	};
 
 	template <typename To, typename From>
-	constexpr bool is_assignable_v = requires(add_lval_ref<To> to, add_lval_ref<From> from) {
+	constexpr bool is_assignable_v = requires(add_lval_ref_t<To> to, add_lval_ref_t<From> from) {
 		{ to = from };
 	};
 
@@ -629,7 +628,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	constexpr bool is_copy_assignable_v = requires(add_lval_ref<T> dst, const T& src) {
+	constexpr bool is_copy_assignable_v = requires(add_lval_ref_t<T> dst, const T& src) {
 		{ dst = src };
 	};
 
@@ -639,7 +638,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	constexpr bool is_move_assignable_v = requires(add_lval_ref<T> dst, T&& src) {
+	constexpr bool is_move_assignable_v = requires(add_lval_ref_t<T> dst, T&& src) {
 		{ dst = move(src) };
 	};
 
@@ -649,7 +648,7 @@ namespace rsl
 	};
 
 	template <typename To, typename From>
-	constexpr bool is_nothrow_assignable_v = requires(add_lval_ref<To> to, add_lval_ref<From> from) {
+	constexpr bool is_nothrow_assignable_v = requires(add_lval_ref_t<To> to, add_lval_ref_t<From> from) {
 		{ to = from } noexcept;
 	};
 
@@ -659,7 +658,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	constexpr bool is_nothrow_copy_assignable_v = requires(add_lval_ref<T> dst, const T& src) {
+	constexpr bool is_nothrow_copy_assignable_v = requires(add_lval_ref_t<T> dst, const T& src) {
 		{ dst = src } noexcept;
 	};
 
@@ -669,7 +668,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	constexpr bool is_nothrow_move_assignable_v = requires(add_lval_ref<T> dst, T&& src) {
+	constexpr bool is_nothrow_move_assignable_v = requires(add_lval_ref_t<T> dst, T&& src) {
 		{ dst = move(src) } noexcept;
 	};
 
@@ -847,6 +846,15 @@ namespace rsl
 		{
 			return ::std::bit_cast<To>(value);
 		}
+	}
+
+	template <typename To, typename From>
+		requires is_trivially_copyable_v<To> && is_trivially_copyable_v<From> && (sizeof(To) >= sizeof(From))
+	[[nodiscard]] constexpr To insert_cast(const From& value) noexcept
+	{
+		To dst{};
+		constexpr_memcpy(&dst, &value, sizeof(From));
+		return dst;
 	}
 
 	template <typename To, typename From>

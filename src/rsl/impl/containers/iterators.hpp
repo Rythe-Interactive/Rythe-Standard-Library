@@ -226,7 +226,7 @@ namespace rsl
 	concept contiguous_iterator =
 		random_access_iterator<It> && is_lvalue_reference_v<iter_reference_t<It>> &&
 		same_as<iter_value_t<It>, remove_cvr_t<iter_reference_t<It>>> && requires(const It& iter) {
-			{ to_address(iter) } -> same_as<add_pointer_t<iter_reference_t<It>>>;
+			{ rsl::to_address(iter) } -> same_as<add_pointer_t<iter_reference_t<It>>>;
 		};
 
 	namespace internal

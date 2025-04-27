@@ -211,7 +211,7 @@ namespace rsl
 	{
 		maybe_grow();
 		container_base::emplace_unsafe_impl(container_base::m_size, container_base::m_size + 1, value);
-		container_base::m_size++;
+		++container_base::m_size;
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
@@ -220,7 +220,7 @@ namespace rsl
 	{
 		maybe_grow();
 		container_base::emplace_unsafe_impl(container_base::m_size, container_base::m_size + 1, move(value));
-		container_base::m_size++;
+		++container_base::m_size;
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
@@ -229,8 +229,9 @@ namespace rsl
 		noexcept(container_base::template construct_noexcept<Args...> && container_base::move_construct_noexcept)
 	{
 		maybe_grow();
-		container_base::emplace_unsafe_impl(container_base::m_size, container_base::m_size + 1, forward<Args>(args)...);
-		container_base::m_size++;
+		container_base::emplace_unsafe_impl(container_base::m_size, container_base::m_size + 1, rsl::forward<Args>(args)...);
+		++container_base::m_size;
+		return container_base::back();
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
@@ -253,7 +254,7 @@ namespace rsl
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
-	inline constexpr void dynamic_array<T, Alloc, Factory>::assign(size_type count, const value_type& value)
+	inline constexpr void dynamic_array<T, Alloc, Factory>::assign(const size_type count, const value_type& value)
 	{
 		clear();
 		insert(0, count, value);
@@ -268,14 +269,14 @@ namespace rsl
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
-	inline constexpr dynamic_array<T, Alloc, Factory>::iterator_type
+	inline constexpr typename dynamic_array<T, Alloc, Factory>::iterator_type
 	dynamic_array<T, Alloc, Factory>::iterator_at(size_type i) noexcept
 	{
 		return container_base::begin() + i;
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
-	inline constexpr dynamic_array<T, Alloc, Factory>::const_iterator_type
+	inline constexpr typename dynamic_array<T, Alloc, Factory>::const_iterator_type
 	dynamic_array<T, Alloc, Factory>::iterator_at(size_type i) const noexcept
 	{
 		return container_base::begin() + i;
@@ -326,14 +327,14 @@ namespace rsl
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	template <input_iterator InputIt>
 	inline constexpr size_type dynamic_array<T, Alloc, Factory>::insert(
-		size_type pos, InputIt first, InputIt last
+		const size_type pos, InputIt first, InputIt last
 	) noexcept(container_base::move_construct_noexcept && container_base::template construct_noexcept<iter_value_t<InputIt>>)
 	{
 		size_type count = iterator_diff(first, last);
 		split_reserve(pos, count, container_base::m_size + count);
 
 		size_type i = pos;
-		for (InputIt iter = first; iter != last; iter++, i++)
+		for (InputIt iter = first; iter != last; ++iter, i++)
 		{
 			mem_rsc::construct(1, i, *iter);
 		}
@@ -347,7 +348,7 @@ namespace rsl
 	{
 		mem_rsc::destroy(1, pos);
 		container_base::move_shift_elements_unsafe(pos + 1, npos, -1ll);
-		container_base::m_size--;
+		--container_base::m_size;
 		return pos;
 	}
 
@@ -394,7 +395,7 @@ namespace rsl
 				{
 					mem_rsc::destroy(1, eraseLocation);
 					container_base::move_shift_elements_unsafe(eraseLocation + 1, i, shift);
-					container_base::m_size--;
+					--container_base::m_size;
 					shift -= 1ll;
 				}
 
@@ -406,7 +407,7 @@ namespace rsl
 		{
 			mem_rsc::destroy(1, eraseLocation);
 			container_base::move_shift_elements_unsafe(eraseLocation + 1, npos, shift);
-			container_base::m_size--;
+			--container_base::m_size;
 			return eraseLocation;
 		}
 
@@ -431,7 +432,7 @@ namespace rsl
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	inline constexpr void dynamic_array<T, Alloc, Factory>::copy_assign_impl(
-		const value_type* src, size_type srcSize, mem_rsc::typed_alloc_type* alloc
+		const value_type* src, size_type srcSize, typename mem_rsc::typed_alloc_type* alloc
 	) noexcept(container_base::copy_assign_noexcept && container_base::copy_construct_noexcept)
 	{
 		if (srcSize > container_base::m_capacity || alloc != nullptr)

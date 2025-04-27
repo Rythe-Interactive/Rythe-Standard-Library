@@ -5,6 +5,7 @@
 #include "../dynamic_array.hpp"
 #include "../optional.hpp"
 #include "../util/comparers.hpp"
+#include "../pair.hpp"
 
 #include "map_node.hpp"
 
@@ -36,14 +37,15 @@ namespace rsl
 		using allocator_t = typename MapInfo::allocator_t;
 		using allocator_storage_type = allocator_storage<allocator_t>;
 
-		using factory_t = typename MapInfo::template factory_t<node_type>;
+		using factory_t = typename MapInfo::template factory_t<mapped_type>;
 		using factory_storage_type = factory_storage<factory_t>;
 
 	private:
 		using bucket_factory_t = typename MapInfo::template factory_t<bucket_type>;
+		using node_factory_t = typename MapInfo::template factory_t<node_type>;
 
 		using data_pool = conditional_storage<!is_flat, memory_pool<value_type, allocator_t>>;
-		using value_container = dynamic_array<node_type, allocator_t, factory_t>;
+		using value_container = dynamic_array<node_type, allocator_t, node_factory_t>;
 		using bucket_container = dynamic_array<bucket_type, allocator_t, bucket_factory_t>;
 
 		constexpr static bool nothrow_constructible_alloc =
@@ -145,7 +147,11 @@ namespace rsl
 		{
 			m_values.clear();
 			m_buckets.clear();
-			m_memoryPool.clear();
+
+			if constexpr (data_pool::holds_value)
+			{
+				m_memoryPool->clear();
+			}
 		}
 
 		template <typename... Args>
@@ -161,7 +167,7 @@ namespace rsl
 
 			if (insertResult.type == insert_result_type::newInsertion)
 			{
-				return m_values.emplace_back(*this, key, mapped_type(forward<Args>(args)...)).value();
+				return m_values.emplace_back(*this, key, node_type(*this, forward<Args>(args)...)).value();
 			}
 
 			mapped_type& value = m_values[m_buckets[insertResult.index].index].value();
@@ -176,7 +182,7 @@ namespace rsl
 
 			if (insertResult.type == insert_result_type::newInsertion)
 			{
-				return {ref(m_values.emplace_back(*this, key, mapped_type(forward<Args>(args)...)).value()), true};
+				return {ref(m_values.emplace_back(*this, key, node_type(*this, forward<Args>(args)...)).value()), true};
 			}
 
 			return {ref(m_values[m_buckets[insertResult.index].index].value()), false};
@@ -240,12 +246,12 @@ namespace rsl
 
 		hash_result get_hash_result(const key_type& key) const
 		{
-			id_type hash = hash = m_hasher.hash(key);
+			id_type hash = m_hasher.hash(key);
 
 			hash_result result{};
 
-			result.fingerprint = result.hash & bucket_type::fingerprint_mask;
-			result.homeIndex = static_cast<index_type>(result.hash % m_buckets.size());
+			result.fingerprint = hash & bucket_type::fingerprint_mask;
+			result.homeIndex = static_cast<index_type>(hash % m_buckets.size());
 
 			return result;
 		}
@@ -273,7 +279,7 @@ namespace rsl
 			const size_type bucketCount = m_buckets.size();
 			while (searchIndex < bucketCount)
 			{
-				bucket_type& bucket = m_buckets[searchIndex];
+				const bucket_type& bucket = m_buckets[searchIndex];
 				if (bucket.pslAndFingerprint == 0u)
 				{
 					return bucket_search_result{.unpackedPsl = insertPsl, .type = search_result_type::newInsertion};
@@ -328,13 +334,13 @@ namespace rsl
 			};
 
 			bucket_type insertBucket{
-				.plsAndFingerprint = pack_bucket_psl(searchResult.unpackedPsl), .index = valueIndexHint
+				.pslAndFingerprint = pack_bucket_psl(searchResult.unpackedPsl), .index = valueIndexHint
 			};
 
 			index_type currentIndex = result.index;
 			while (searchResult.type == search_result_type::swap)
 			{
-				swap(m_buckets[currentIndex], insertBucket);
+				rsl::swap(m_buckets[currentIndex], insertBucket);
 				psl_type insertPsl = unpack_bucket_psl(insertBucket);
 
 				index_type homeIndex = currentIndex - insertPsl.psl;
@@ -344,10 +350,10 @@ namespace rsl
 				);
 				currentIndex = homeIndex + searchResult.unpackedPsl.psl;
 
-				rsl_assert_frequent(searchResult.type != insert_result_type::existingItem);
+				rsl_assert_frequent(searchResult.type != search_result_type::existingItem);
 			}
 
-			if (searchResult.type == insert_result_type::newInsertion)
+			if (searchResult.type == search_result_type::newInsertion)
 			{
 				if (currentIndex == m_buckets.size())
 				{

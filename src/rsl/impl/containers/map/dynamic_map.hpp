@@ -20,6 +20,7 @@ namespace rsl
 			map_info<Key, Value, Hash, KeyEqual, IsFlat, Alloc, FactoryType, MaxLoadFactor, FingerprintSize>>;
 
 	public:
-		using base_class::hash_map_base;
+		using hash_map_base<
+			map_info<Key, Value, Hash, KeyEqual, IsFlat, Alloc, FactoryType, MaxLoadFactor, FingerprintSize>>::hash_map_base;
 	};
 } // namespace rsl

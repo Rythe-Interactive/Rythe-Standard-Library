@@ -14,11 +14,10 @@ namespace rsl
 		template <typename Deleter, typename T>
 		concept unique_deleter_type = requires(Deleter del, T& val) { del(val); };
 
-		template <typename T, unique_deleter_type<T> Deleter, typename UniqueResource>
+		template <typename T, unique_deleter_type<T> Deleter>
 		struct unique_payload final : public unique_payload_base
 		{
 			Deleter deleter;
-			UniqueResource* thisObject;
 
 			void destroy(void* value) noexcept override;
 		};
@@ -98,11 +97,18 @@ namespace rsl
 		[[rythe_always_inline]] constexpr const T* operator->() const noexcept { return &*m_value; }
 
 	protected:
-		template <typename FriendT, internal::unique_deleter_type<T> FriendDeleter, typename FriendUniqueResource>
-		friend struct unique_payload;
+		template <internal::unique_deleter_type<T> Deleter>
+		struct deleter_wrapper
+		{
+			Deleter deleter;
+			unique_resource* thisObject;
+
+			[[rythe_always_inline]] constexpr operator bool() const noexcept { return deleter; }
+			[[rythe_always_inline]] constexpr void operator()(T& value) const noexcept;
+		};
 
 		template <internal::unique_deleter_type<T> Deleter>
-		using typed_payload = internal::unique_payload<T, Deleter, unique_resource>;
+		using typed_payload = internal::unique_payload<T, deleter_wrapper<Deleter>>;
 
 		optional<T> m_value;
 	};

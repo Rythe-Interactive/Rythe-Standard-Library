@@ -163,7 +163,7 @@ namespace rsl
 	inline constexpr T* typed_allocator<T, Alloc, Factory>::construct(T* ptr, size_type count, Args&&... args)
 		noexcept(factory_traits<Factory>::template noexcept_constructable<Args...>)
 	{
-		return m_factory->construct(ptr, count, forward<Args>(args)...);
+		return m_factory->construct(ptr, count, rsl::forward<Args>(args)...);
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>

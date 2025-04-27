@@ -72,7 +72,7 @@ namespace rsl
 
 		constexpr static size_type type_size() noexcept { return sizeof(T); };
 		constexpr static bool trivial_copy() noexcept { return is_trivially_copyable_v<T>; };
-		constexpr static id_type type_id() noexcept { return type_id<T>(); };
+		constexpr static id_type type_id() noexcept { return rsl::type_id<T>(); };
 	};
 
 	class polymorphic_factory

@@ -365,7 +365,7 @@ namespace rsl
 	typed_memory_resource_base<T, Alloc, Factory>::construct(size_type count, size_type offset, Args&&... args)
 		noexcept(factory_traits<Factory>::template noexcept_constructable<Args...>)
 	{
-		m_alloc.construct(m_ptr + offset, count, forward<Args>(args)...);
+		m_alloc.construct(m_ptr + offset, count, rsl::forward<Args>(args)...);
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory>

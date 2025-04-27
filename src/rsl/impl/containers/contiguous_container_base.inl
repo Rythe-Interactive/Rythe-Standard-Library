@@ -310,7 +310,7 @@ namespace rsl
 		size_type offset, size_type end, Args&&... args
 	) noexcept(construct_noexcept<Args...>)
 	{
-		mem_rsc::construct(end - offset, offset, forward<Args>(args)...);
+		mem_rsc::construct(end - offset, offset, rsl::forward<Args>(args)...);
 	}
 
 	template <

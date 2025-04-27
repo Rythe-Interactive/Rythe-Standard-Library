@@ -3,15 +3,13 @@
 
 namespace rsl
 {
-	template <typename T, internal::unique_deleter_type<T> Deleter, typename UniqueResource>
-	void internal::unique_payload<T, Deleter, UniqueResource>::destroy(void* value) noexcept
+	template <typename T, internal::unique_deleter_type<T> Deleter>
+	void internal::unique_payload<T, Deleter>::destroy(void* value) noexcept
 	{
 		if (deleter)
 		{
 			deleter(*static_cast<T*>(value));
 		}
-
-		thisObject->m_value.reset();
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
@@ -122,8 +120,8 @@ namespace rsl
 		mem_rsc::set_factory(type_erased_factory(construct_type_signal<typed_payload<Deleter>>));
 		mem_rsc::allocate_and_construct(1, forward<Args>(args)...);
 		typed_payload<Deleter>* payload = bit_cast<typed_payload<Deleter>*>(mem_rsc::get_ptr());
-		payload->deleter = deleter;
-		payload->this_object = this;
+		payload->deleter.deleter = deleter;
+		payload->deleter.thisObject = this;
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
@@ -143,5 +141,13 @@ namespace rsl
 		m_value.reset();
 		mem_rsc::destroy_and_deallocate();
 		mem_rsc::set_ptr(nullptr);
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	template <internal::unique_deleter_type<T> Deleter>
+	constexpr void unique_resource<T, Alloc, Factory>::deleter_wrapper<Deleter>::operator()(T& value) const noexcept
+ 	{
+		deleter(value);
+		thisObject->m_value.reset();
 	}
 }

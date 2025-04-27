@@ -88,7 +88,7 @@ namespace rsl::internal
 		explicit flat_hash_map_node(map_type& map, Args&&... args) // NOLINT(cppcoreguidelines*)
 			noexcept(is_nothrow_constructible_v<value_type, Args...>)
 		{
-			map.get_factory().construct(&m_data, 1, forward<Args>(args)...);
+			map.get_factory().construct(&m_data, 1, rsl::forward<Args>(args)...);
 		}
 
 		flat_hash_map_node(map_type& map, flat_hash_map_node&& other) // NOLINT(cppcoreguidelines*)

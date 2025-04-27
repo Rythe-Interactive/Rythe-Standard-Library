@@ -61,9 +61,6 @@ TEST_CASE("dynamic_map", "[containers]")
 
 	SECTION("construction")
 	{
-		rsl::internal::flat_hash_map_node<rsl::hash_map_base<rsl::map_info<float, test_struct>>>* iter = nullptr;
-		auto ptr = to_address(iter);
-
 		{
 			rsl::dynamic_map<float32, test_struct> map{};
 			REQUIRE(map.get_allocator().id == 1012234);

@@ -17,11 +17,10 @@ namespace rsl
 		template <typename Deleter, typename T>
 		concept managed_deleter_type = requires(Deleter del, T& val) { del(val); };
 
-		template <typename T, managed_deleter_type<T> Deleter, typename ManagedResource>
+		template <typename T, managed_deleter_type<T> Deleter>
 		struct managed_payload final : public managed_payload_base
 		{
 			Deleter deleter;
-			ManagedResource* thisObject;
 
 			void destroy(void* value) noexcept override;
 		};
@@ -71,11 +70,18 @@ namespace rsl
 		[[rythe_always_inline]] constexpr const T* operator->() const noexcept { return &*m_value; }
 
 	private:
-		template <typename FriendT, internal::managed_deleter_type<T> FriendDeleter, typename FriendManagedResource>
-		friend struct managed_payload;
+		template <internal::managed_deleter_type<T> Deleter>
+		struct deleter_wrapper
+		{
+			Deleter deleter;
+			managed_resource* thisObject;
+
+			[[rythe_always_inline]] constexpr operator bool() const noexcept { return deleter; }
+			[[rythe_always_inline]] constexpr void operator()(T& value) const noexcept;
+		};
 
 		template <internal::managed_deleter_type<T> Deleter>
-		using typed_payload = internal::managed_payload<T, Deleter, managed_resource>;
+		using typed_payload = internal::managed_payload<T, deleter_wrapper<Deleter>>;
 
 		optional<T> m_value;
 	};
