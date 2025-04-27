@@ -2,7 +2,7 @@
 
 #include "../util/common.hpp"
 #include "../util/primitives.hpp"
-#include "string_view.hpp"
+#include "views.hpp"
 
 namespace rsl
 {
@@ -67,7 +67,7 @@ namespace rsl
 	template <size_type N>
 	[[nodiscard]] constexpr bool operator==(constexpr_string<N> lhs, const char* rhs)
 	{
-		return string_view(lhs) == rhs;
+		return lhs == rhs;
 	}
 
 	template <size_type A, size_type B>

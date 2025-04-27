@@ -99,7 +99,7 @@ namespace rsl
 
 	template <
 		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
-	inline constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::view_type
+	inline constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::view_type
 	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::view() noexcept
 	{
 		return view_type(mem_rsc::get_ptr(), m_size);
@@ -107,7 +107,7 @@ namespace rsl
 
 	template <
 		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
-	inline constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_view_type
+	inline constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_view_type
 	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::view() const noexcept
 	{
 		return const_view_type(mem_rsc::get_ptr(), m_size);

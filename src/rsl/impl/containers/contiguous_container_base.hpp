@@ -1,4 +1,5 @@
 #pragma once
+#include "views.hpp"
 #include "../memory/memory_resource_base.hpp"
 #include "iterators.hpp"
 
@@ -16,8 +17,8 @@ namespace rsl
 		using const_iterator_type = ConstIter;
 		using reverse_iterator_type = std::reverse_iterator<iterator_type>;
 		using const_reverse_iterator_type = std::reverse_iterator<const_iterator_type>;
-		using view_type = std::span<value_type>;
-		using const_view_type = std::span<const value_type>;
+		using view_type = rsl::view<value_type>;
+		using const_view_type = view<const value_type>;
 		using allocator_storage_type = mem_rsc::allocator_storage_type;
 		using allocator_t = mem_rsc::allocator_t;
 		using factory_storage_type = mem_rsc::factory_storage_type;

@@ -69,8 +69,8 @@ namespace rsl
 
 			ret.copy_from(functionName.substr(first, end - first));
 #elif defined(RYTHE_CLANG)
-			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
+			auto first = find_first_not_of(functionName,' ', find_first_of(functionName,'=') + 1);
+			ret.copy_from(functionName.subview(first, find_last_of(functionName,']') - first));
 #else
 			ret.copy_from(functionName);
 #endif
@@ -94,8 +94,8 @@ namespace rsl
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
 			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
 #elif defined(RYTHE_CLANG)
-			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
+			auto first = find_first_not_of(functionName,' ', find_first_of(functionName,'=') + 1);
+			ret.copy_from(functionName.subview(first, find_last_of(functionName,']') - first));
 #else
 			ret.copy_from(functionName);
 #endif

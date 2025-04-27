@@ -1,6 +1,6 @@
 #pragma once
 
-#include <span>
+#include "views.hpp"
 
 #include "../util/assert.hpp"
 #include "../util/common.hpp"
@@ -17,8 +17,8 @@ namespace rsl
 		using const_iterator = const value_type*;
 		using reverse_iterator = std::reverse_iterator<iterator>;
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-		using view_type = std::span<value_type>;
-		using const_view_type = std::span<const value_type>;
+		using view_type = view<value_type>;
+		using const_view_type = view<const value_type>;
 
 		[[rythe_always_inline]] constexpr buffered_list() noexcept = default;
 		[[rythe_always_inline]] constexpr buffered_list(const buffered_list& src) noexcept(copy_construct_noexcept);
