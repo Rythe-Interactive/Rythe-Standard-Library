@@ -65,11 +65,12 @@ namespace rsl
 			requires (is_pointer_assignable_v<T, OtherType>)
 	constexpr unique_object<T, Alloc, Factory>::unique_object(unique_object<OtherType, Alloc, OtherFactory>&& other
 	) noexcept
-		: unique_rsc(other.unique_rsc::get_allocator_storage(), other.unique_rsc::get_factory_storage()), m_factory()
+		: unique_rsc(other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::get_allocator_storage(), other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::get_factory_storage()), m_factory()
 	{
-		unique_rsc::m_value.emplace(move(other.unique_rsc::m_value.value()));
-		mem_rsc::set_ptr(other.mem_rsc::get_ptr());
-		other.mem_rsc::set_ptr(nullptr);
+		using other_mem_rsc = typename unique_object<OtherType, Alloc, OtherFactory>::mem_rsc;
+		unique_rsc::m_value.emplace(move(other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::m_value.value()));
+		mem_rsc::set_ptr(other.other_mem_rsc::get_ptr());
+		other.other_mem_rsc::set_ptr(nullptr);
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>

@@ -5,6 +5,21 @@
 
 namespace rsl
 {
+	namespace internal
+	{
+		template <typename T, allocator_type Alloc>
+		struct multicast_delegate_invocation_result
+		{
+			using type = dynamic_array<T, Alloc>;
+		};
+
+		template <allocator_type Alloc>
+		struct multicast_delegate_invocation_result<void, Alloc>
+		{
+			using type = void;
+		};
+	}
+
 	template <typename ReturnType, typename... ParamTypes, allocator_type Alloc, untyped_factory_type Factory>
 	class multicast_delegate<ReturnType(ParamTypes...), Alloc, Factory> final :
 		private delegate_base<ReturnType(ParamTypes...), Alloc, Factory>
@@ -216,19 +231,7 @@ namespace rsl
 
 	private:
 		template <typename T>
-		struct invocation_result
-		{
-			using type = dynamic_array<T, allocator_t>;
-		};
-
-		template <>
-		struct invocation_result<void>
-		{
-			using type = void;
-		};
-
-		template <typename T>
-		using invocation_result_t = typename invocation_result<T>::type;
+		using invocation_result_t = typename internal::multicast_delegate_invocation_result<T, allocator_t>::type;
 
 	public:
 		[[rythe_always_inline]] constexpr auto operator()(ParamTypes... args) const;

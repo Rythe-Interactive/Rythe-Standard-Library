@@ -1,22 +1,22 @@
-#include "linear_rand.hpp"
 #pragma once
+#include "linear_rand.hpp"
 
 namespace rsl::math
 {
 	template <typename Scalar>
 	[[nodiscard]] Scalar linear_rand(Scalar min, Scalar max) noexcept
 	{
-		if constexpr (::std::is_floating_point_v<Scalar>)
+		if constexpr (is_floating_point_v<Scalar>)
 		{
-			return min + (max - min) * random_number_generator::generateRandomFloat<Scalar>();
+			return min + (max - min) * random_number_generator::generate_random_float<Scalar>();
 		}
 		else
 		{
 			static_assert(
-				::std::is_arithmetic_v<Scalar>,
+				is_arithmetic_v<Scalar>,
 				"Input scalar type to linear_rand is neither a scalar nor any other supported type."
 			);
-			return min + random_number_generator::generateRandomInteger<Scalar>() % (max - min);
+			return min + random_number_generator::generate_random_integer<Scalar>() % (max - min);
 		}
 	}
 
@@ -59,9 +59,8 @@ namespace rsl::math
 		};
 	} // namespace internal
 
-	template <
-		typename vec_type, typename Scalar,
-		::std::enable_if_t<is_vector_v<vec_type> && vec_type::size != 1 && !is_vector_v<Scalar>, bool>>
+	template <vector_type vec_type, arithmetic_type Scalar>
+			requires (remove_cvr_t<vec_type>::size != 1)
 	[[nodiscard]] vec_type linear_rand(Scalar min, Scalar max) noexcept
 	{
 		return internal::compute_linear_rand<vec_type>::compute(
@@ -69,10 +68,8 @@ namespace rsl::math
 		);
 	}
 
-	template <
-		typename vec_type0, typename vec_type1,
-		::std::enable_if_t<
-			is_vector_v<vec_type0> && is_vector_v<vec_type1> && vec_type0::size == vec_type1::size, bool>>
+	template <vector_type vec_type0, vector_type vec_type1>
+		requires (remove_cvr_t<vec_type0>::size == remove_cvr_t<vec_type1>::size)
 	[[nodiscard]] auto linear_rand(const vec_type0& min, const vec_type1& max) noexcept
 	{
 		using scalar = lowest_precision_t<typename vec_type0::scalar, typename vec_type1::scalar>;
