@@ -67,10 +67,9 @@ namespace rsl
 	) noexcept
 		: unique_rsc(other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::get_allocator_storage(), other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::get_factory_storage()), m_factory()
 	{
-		using other_mem_rsc = typename unique_object<OtherType, Alloc, OtherFactory>::mem_rsc;
 		unique_rsc::m_value.emplace(move(other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::m_value.value()));
-		mem_rsc::set_ptr(other.other_mem_rsc::get_ptr());
-		other.other_mem_rsc::set_ptr(nullptr);
+		mem_rsc::set_ptr(other.template unique_object<OtherType, Alloc, OtherFactory>::mem_rsc::get_ptr());
+		other.template unique_object<OtherType, Alloc, OtherFactory>::mem_rsc::set_ptr(nullptr);
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
