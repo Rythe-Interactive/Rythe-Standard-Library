@@ -52,10 +52,41 @@ namespace rsl::math
 			return constexpr_sin_impl(tan(value / static_cast<Scalar>(2)));
 		}
 
+		template <floating_point_type Scalar>
+		[[nodiscard]] [[rythe_always_inline]] constexpr Scalar constexpr_asin_impl(const Scalar value) noexcept
+		{
+			if (value > static_cast<Scalar>(1))
+			{
+				return limits<Scalar>::quiet_nan;
+			}
+
+			if (limits<Scalar>::min > abs(value - static_cast<Scalar>(1)))
+			{
+				return half_pi<Scalar>;
+			}
+
+			if (limits<Scalar>::min > value)
+			{
+				return static_cast<Scalar>(0);
+			}
+
+			return atan(value / sqrt(static_cast<Scalar>(1) - value * value));
+		}
+
 		template <arithmetic_type Scalar>
 		[[nodiscard]] [[rythe_always_inline]] constexpr Scalar constexpr_asin(const Scalar value) noexcept
 		{
-			return value;
+			if (is_nan(value))
+			{
+				return limits<Scalar>::quiet_nan;
+			}
+
+			if (value < static_cast<Scalar>(0))
+			{
+				return -constexpr_asin_impl(-value);
+			}
+
+			return constexpr_asin_impl(value);
 		}
 	} // namespace internal
 
