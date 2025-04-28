@@ -4,6 +4,9 @@
 
 namespace rsl
 {
+	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
+	class managed_resource;
+
 	namespace internal
 	{
 		struct managed_payload_base : public manual_reference_counter
@@ -11,18 +14,15 @@ namespace rsl
 			virtual void destroy(void*) noexcept { rsl_assert_unreachable(); }
 		};
 
-		template <typename T, typename Deleter>
+		template <typename Deleter, typename T>
+		concept managed_deleter_type = requires(Deleter del, T& val) { del(val); };
+
+		template <typename T, managed_deleter_type<T> Deleter>
 		struct managed_payload final : public managed_payload_base
 		{
 			Deleter deleter;
 
-			void destroy(void* value) noexcept override
-			{
-				if (deleter)
-				{
-					deleter(*static_cast<T*>(value));
-				}
-			}
+			void destroy(void* value) noexcept override;
 		};
 	} // namespace internal
 
@@ -31,12 +31,12 @@ namespace rsl
 	{
 	public:
 		using ref_counter = basic_reference_counter<internal::managed_payload_base, Alloc, Factory>;
-		using mem_rsc = ref_counter::mem_rsc;
+		using mem_rsc = typename ref_counter::mem_rsc;
 
-		using allocator_storage_type = ref_counter::allocator_storage_type;
-		using allocator_t = ref_counter::allocator_t;
-		using factory_storage_type = ref_counter::factory_storage_type;
-		using factory_t = ref_counter::factory_t;
+		using allocator_storage_type = typename ref_counter::allocator_storage_type;
+		using allocator_t = typename ref_counter::allocator_t;
+		using factory_storage_type = typename ref_counter::factory_storage_type;
+		using factory_t = typename ref_counter::factory_t;
 
 		[[rythe_always_inline]] constexpr managed_resource(nullptr_type)
 			noexcept(is_nothrow_constructible_v<ref_counter>);
@@ -44,11 +44,11 @@ namespace rsl
 		[[rythe_always_inline]] explicit managed_resource(const allocator_storage_type& allocStorage)
 			noexcept(is_nothrow_constructible_v<ref_counter, const allocator_storage_type&>);
 
-		template <typename Deleter, typename... Args>
+		template <internal::managed_deleter_type<T> Deleter, typename... Args>
 		[[rythe_always_inline]] constexpr explicit managed_resource(Deleter deleter, Args&&... args)
 			noexcept(is_nothrow_constructible_v<ref_counter> && is_nothrow_constructible_v<T, Args...>);
 
-		template <typename Deleter, typename... Args>
+		template <internal::managed_deleter_type<T> Deleter, typename... Args>
 		[[rythe_always_inline]] managed_resource(
 			const allocator_storage_type& allocStorage, Deleter deleter, Args&&... args
 		) noexcept(is_nothrow_constructible_v<ref_counter, const allocator_storage_type&> && is_nothrow_constructible_v<T, Args...>);
@@ -57,7 +57,7 @@ namespace rsl
 
 		[[rythe_always_inline]] constexpr ~managed_resource() noexcept;
 
-		template <typename Deleter, typename... Args>
+		template <internal::managed_deleter_type<T> Deleter, typename... Args>
 		[[rythe_always_inline]] constexpr void arm(Deleter deleter, Args&&... args)
 			noexcept(is_nothrow_constructible_v<T, Args...>);
 
@@ -70,6 +70,19 @@ namespace rsl
 		[[rythe_always_inline]] constexpr const T* operator->() const noexcept { return &*m_value; }
 
 	private:
+		template <internal::managed_deleter_type<T> Deleter>
+		struct deleter_wrapper
+		{
+			Deleter deleter;
+			managed_resource* thisObject;
+
+			[[rythe_always_inline]] constexpr operator bool() const noexcept { return deleter; }
+			[[rythe_always_inline]] constexpr void operator()(T& value) const noexcept;
+		};
+
+		template <internal::managed_deleter_type<T> Deleter>
+		using typed_payload = internal::managed_payload<T, deleter_wrapper<Deleter>>;
+
 		optional<T> m_value;
 	};
 } // namespace rsl

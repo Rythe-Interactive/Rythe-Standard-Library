@@ -241,7 +241,7 @@ namespace rsl
 	{                                                                                                                  \
 		[[rythe_always_inline]] constexpr static id_type hash(const T& val) noexcept                                   \
 		{                                                                                                              \
-			return internal::hash::hash_int<Mode>(bit_cast<uint64>(val));                                              \
+			return internal::hash::hash_int<Mode>(insert_cast<uint64>(val));                                           \
 		}                                                                                                              \
 	};
 

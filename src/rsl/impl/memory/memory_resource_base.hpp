@@ -227,14 +227,14 @@ namespace rsl
 		struct select_memory_resource
 		{
 			using type = typed_memory_resource_base<T, Alloc, Factory>;
-			constexpr static bool isUntyped = false;
+			constexpr static bool is_untyped = false;
 		};
 
 		template <typename T, allocator_type Alloc, factory_type Factory>
 		struct select_memory_resource<T, Alloc, Factory, true>
 		{
 			using type = untyped_memory_resource_base<Alloc, Factory, T>;
-			constexpr static bool isUntyped = true;
+			constexpr static bool is_untyped = true;
 		};
 	} // namespace internal
 } // namespace rsl

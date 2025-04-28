@@ -5,13 +5,14 @@ namespace rsl
 {
 	namespace internal
 	{
-		template <typename T, typename = void>
+		template <typename T>
 		struct memset_zero : false_type
 		{
 		};
 
 		template <typename T>
-		struct memset_zero<T, void_t<decltype(T::memset_zero)>> : bool_constant<T::memset_zero>
+			requires requires{ T::memset_zero; }
+		struct memset_zero<T> : bool_constant<T::memset_zero>
 		{
 		};
 
@@ -39,7 +40,7 @@ namespace rsl
 
 	template <typename T>
 	template <typename... Args>
-	inline T* default_factory<T>::construct(void* ptr, size_type count, Args&&... args)
+	inline T* default_factory<T>::construct(void* ptr, const size_type count, Args&&... args)
 		noexcept(is_nothrow_constructible_v<T, Args...>)
 	{
 		if constexpr ((is_trivially_default_constructible_v<T>) && sizeof...(Args) == 0)
@@ -53,11 +54,11 @@ namespace rsl
 		}
 		else
 		{
-			T* first = new (ptr) T(std::forward<Args>(args)...);
+			T* first = new (ptr) T(rsl::forward<Args>(args)...);
 
 			for (size_type i = 1; i < count; i++)
 			{
-				new (first + i) T(std::forward<Args>(args)...);
+				new (first + i) T(rsl::forward<Args>(args)...);
 			}
 
 			return first;
@@ -65,20 +66,26 @@ namespace rsl
 	}
 
 	template <typename T>
-	inline T* default_factory<T>::move(void* dst, T* src, size_type count) noexcept(is_nothrow_move_constructible_v<T>)
+	inline T* default_factory<T>::move(void* dst, T* src, const size_type count) noexcept(is_nothrow_move_constructible_v<T>)
 	{
 		if constexpr (is_trivially_copy_constructible_v<T>)
 		{
 			std::memcpy(dst, src, count * sizeof(T));
+
+			if constexpr (internal::memset_zero<T>::value)
+			{
+				std::memset(src, 0, count * sizeof(T));
+			}
+
 			return static_cast<T*>(dst);
 		}
 		else
 		{
-			T* first = new (dst) T(std::move(src[0]));
+			T* first = new (dst) T(rsl::move(src[0]));
 
 			for (size_type i = 1; i < count; i++)
 			{
-				new (first + i) T(std::move(src[i]));
+				new (first + i) T(rsl::move(src[i]));
 			}
 
 			return first;
@@ -86,7 +93,7 @@ namespace rsl
 	}
 
 	template <typename T>
-	inline void default_factory<T>::destroy(T* ptr, size_type count) noexcept
+	inline void default_factory<T>::destroy(T* ptr, const size_type count) noexcept
 	{
 		if constexpr (!is_trivially_destructible_v<T>)
 		{
@@ -98,39 +105,39 @@ namespace rsl
 	}
 
 	template <typename T>
-	inline void* typed_polymorphic_factory<T>::construct(void* ptr, size_type count) const
+	inline void* typed_polymorphic_factory<T>::construct(void* ptr, const size_type count) const
 	{
 		return internal::default_construct<T>(ptr, count);
 	}
 
 	template <typename T>
-	inline void* typed_polymorphic_factory<T>::move(void* dst, void* src, size_type count) const
+	inline void* typed_polymorphic_factory<T>::move(void* dst, void* src, const size_type count) const
 	{
 		return internal::default_move<T>(dst, src, count);
 	}
 
 	template <typename T>
-	inline void typed_polymorphic_factory<T>::destroy(void* ptr, size_type count) const noexcept
+	inline void typed_polymorphic_factory<T>::destroy(void* ptr, const size_type count) const noexcept
 	{
 		internal::default_destroy<T>(ptr, count);
 	}
 
 	template <typename T>
-	inline size_type typed_polymorphic_factory<T>::typeSize() const noexcept
+	inline size_type typed_polymorphic_factory<T>::type_size() const noexcept
 	{
 		return sizeof(T);
 	}
 
 	template <typename T>
-	inline bool typed_polymorphic_factory<T>::trivialCopy() const noexcept
+	inline bool typed_polymorphic_factory<T>::trivial_copy() const noexcept
 	{
 		return is_trivially_copyable_v<T>;
 	}
 
 	template <typename T>
-	inline id_type typed_polymorphic_factory<T>::typeId() const noexcept
+	inline id_type typed_polymorphic_factory<T>::type_id() const noexcept
 	{
-		return type_id<T>();
+		return rsl::type_id<T>();
 	}
 
 	template <typename T>
@@ -140,7 +147,7 @@ namespace rsl
 		  m_destroyFunc(&internal::default_destroy<T>),
 		  m_typeSize(sizeof(T)),
 		  m_triviallyCopyable(is_trivially_copyable_v<T>),
-		  m_typeId(type_id<T>())
+		  m_typeId(rsl::type_id<T>())
 	{
 	}
 

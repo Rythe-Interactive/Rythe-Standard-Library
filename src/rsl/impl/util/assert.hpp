@@ -167,9 +167,13 @@ namespace rsl::asserts
 
 #define rsl_assert_unimplemented() rsl_always_assert_msg("function not implemented")
 #define rsl_assert_unreachable() rsl_always_assert_msg(false, "reached unreachable code")
+#define rsl_assert_ptr_out_of_range(ptr, begin, end) rsl_assert_msg_frequent(((ptr) > (begin)) && ((ptr) < (end)), "pointer out of range")
+#define rsl_assert_ptr_out_of_range_msg(ptr, begin, end, msg) rsl_assert_msg_frequent(((ptr) > (begin)) && ((ptr) < (end)), msg)
 #define rsl_assert_out_of_range(expr) rsl_assert_msg_frequent(expr, "out of range")
 #define rsl_assert_out_of_range_msg(expr, msg) rsl_assert_msg_frequent(expr, msg)
 #define rsl_assert_invalid_access(expr) rsl_assert_msg_frequent(expr, "invalid access")
+#define rsl_assert_invalid_parameters(expr) rsl_assert_msg_frequent(expr, "invalid parameters")
+#define rsl_assert_invalid_operation(expr) rsl_assert_msg_frequent(expr, "invalid operation")
 #define rsl_assert_invalid_object(expr) rsl_assert_msg_frequent(expr, "invalid object")
 #define rsl_assert_duplicate_object(expr) rsl_assert_msg_frequent(expr, "duplicate object")
 #define rsl_assert_borrow_release_mismatch(expr) rsl_assert_msg_frequent(expr, "borrow release mismatch")

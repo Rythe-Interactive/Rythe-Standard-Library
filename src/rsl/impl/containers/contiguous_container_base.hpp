@@ -11,31 +11,30 @@ namespace rsl
 	class contiguous_container_base : public internal::select_memory_resource<T, Alloc, Factory>::type
 	{
 	public:
-		using mem_rsc = internal::select_memory_resource<T, Alloc, Factory>::type;
+		using mem_rsc = typename internal::select_memory_resource<T, Alloc, Factory>::type;
 		using value_type = T;
 		using iterator_type = Iter;
 		using const_iterator_type = ConstIter;
-		using reverse_iterator_type = std::reverse_iterator<iterator_type>;
-		using const_reverse_iterator_type = std::reverse_iterator<const_iterator_type>;
+		using reverse_iterator_type = reverse_iterator<iterator_type>;
+		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
 		using view_type = rsl::view<value_type>;
 		using const_view_type = view<const value_type>;
-		using allocator_storage_type = mem_rsc::allocator_storage_type;
-		using allocator_t = mem_rsc::allocator_t;
-		using factory_storage_type = mem_rsc::factory_storage_type;
-		using factory_t = mem_rsc::factory_t;
+		using allocator_storage_type = typename mem_rsc::allocator_storage_type;
+		using allocator_t = typename mem_rsc::allocator_t;
+		using factory_storage_type = typename mem_rsc::factory_storage_type;
+		using factory_t = typename mem_rsc::factory_t;
 
 		[[rythe_always_inline]] constexpr contiguous_container_base()
 			noexcept(is_nothrow_constructible_v<mem_rsc>) = default;
 		virtual ~contiguous_container_base() = default;
 
-		[[rythe_always_inline]] explicit contiguous_container_base(const allocator_storage_type& allocStorage)
+		[[rythe_always_inline]] explicit constexpr contiguous_container_base(const allocator_storage_type& allocStorage)
 			noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>);
-		[[rythe_always_inline]] explicit contiguous_container_base(const factory_storage_type& factoryStorage)
+		[[rythe_always_inline]] explicit constexpr contiguous_container_base(const factory_storage_type& factoryStorage)
 			noexcept(is_nothrow_constructible_v<mem_rsc, const factory_storage_type&>);
-		[[rythe_always_inline]] contiguous_container_base(
+		[[rythe_always_inline]] constexpr contiguous_container_base(
 			const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage
 		) noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&, const factory_storage_type&>);
-
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr size_type size() const noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool empty() const noexcept;

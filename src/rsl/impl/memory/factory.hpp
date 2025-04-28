@@ -6,23 +6,29 @@
 namespace rsl
 {
 	template <typename T>
-	concept factory_type = requires(T factory, void* mem, typename T::ptr_type ptr, size_type n) {
+	concept factory_type = requires(T factory, void* mem, typename T::ptr_type ptr, size_type n)
+	{
 		{ factory.construct(mem, n) } -> convertible_to<typename T::ptr_type>;
 		{ factory.move(mem, ptr, n) } -> convertible_to<typename T::ptr_type>;
 		{ factory.destroy(ptr, n) } noexcept;
+		{ factory.type_size() } noexcept -> convertible_to<size_type>;
+		{ factory.trivial_copy() } noexcept -> convertible_to<bool>;
+		{ factory.type_id() } noexcept -> convertible_to<id_type>;
 	};
 
 	template <typename T>
-	concept noexcept_factory_type = requires(T factory, void* mem, typename T::ptr_type ptr, size_type n) {
+	concept noexcept_factory_type = requires(T factory, void* mem, typename T::ptr_type ptr, size_type n)
+	{
 		{ factory.construct(mem, n) } noexcept -> convertible_to<typename T::ptr_type>;
 		{ factory.move(mem, ptr, n) } noexcept -> convertible_to<typename T::ptr_type>;
 		{ factory.destroy(ptr, n) } noexcept;
+		{ factory.type_size() } noexcept -> convertible_to<size_type>;
+		{ factory.trivial_copy() } noexcept -> convertible_to<bool>;
+		{ factory.type_id() } noexcept -> convertible_to<id_type>;
 	};
 
 	template <typename T>
-	concept untyped_factory_type = factory_type<T> && requires(T factory) {
-		{ factory.typeSize() } noexcept -> convertible_to<size_type>;
-	};
+	concept untyped_factory_type = factory_type<T> && same_as<typename T::ptr_type, void*>;
 
 
 	template <typename T>
@@ -33,11 +39,13 @@ namespace rsl
 	{
 		template <typename... Args>
 		constexpr static bool noexcept_constructable =
-			requires(Factory factory, void* mem, size_type n, Args&&... args) {
+			requires(Factory factory, void* mem, size_type n, Args&&... args)
+			{
 				{ factory.construct(mem, n, forward<Args>(args)...) } noexcept;
 			};
 		constexpr static bool noexcept_moveable =
-			requires(Factory factory, void* mem, typename Factory::ptr_type ptr, size_type n) {
+			requires(Factory factory, void* mem, typename Factory::ptr_type ptr, size_type n)
+			{
 				{ factory.move(mem, ptr, n) } noexcept;
 			};
 	};
@@ -55,27 +63,30 @@ namespace rsl
 		constexpr default_factory() noexcept = default;
 
 		template <typename Other>
-		constexpr default_factory(default_factory<Other>) noexcept
-		{
-		}
+		constexpr default_factory(default_factory<Other>) noexcept {}
 
 		template <typename... Args>
 		T* construct(void* ptr, size_type count, Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>);
 		T* move(void* dst, T* src, size_type count) noexcept(is_nothrow_move_constructible_v<T>);
 		void destroy(T* ptr, size_type count) noexcept;
+
+		constexpr static size_type type_size() noexcept { return sizeof(T); };
+		constexpr static bool trivial_copy() noexcept { return is_trivially_copyable_v<T>; };
+		constexpr static id_type type_id() noexcept { return rsl::type_id<T>(); };
 	};
 
 	class polymorphic_factory
 	{
 	public:
 		using ptr_type = void*;
+		virtual ~polymorphic_factory() = default;
 
 		virtual void* construct(void* ptr, size_type count) const = 0;
 		virtual void* move(void* dst, void* src, size_type count) const = 0;
 		virtual void destroy(void* ptr, size_type count) const noexcept = 0;
-		virtual size_type typeSize() const noexcept = 0;
-		virtual bool trivialCopy() const noexcept = 0;
-		virtual id_type typeId() const noexcept = 0;
+		virtual size_type type_size() const noexcept = 0;
+		virtual bool trivial_copy() const noexcept = 0;
+		virtual id_type type_id() const noexcept = 0;
 	};
 
 	template <typename T>
@@ -87,9 +98,9 @@ namespace rsl
 		void* construct(void* ptr, size_type count) const override;
 		void* move(void* dst, void* src, size_type count) const override;
 		void destroy(void* ptr, size_type count) const noexcept override;
-		size_type typeSize() const noexcept override;
-		bool trivialCopy() const noexcept override;
-		id_type typeId() const noexcept override;
+		size_type type_size() const noexcept override;
+		bool trivial_copy() const noexcept override;
+		id_type type_id() const noexcept override;
 	};
 
 	class type_erased_factory
@@ -108,9 +119,9 @@ namespace rsl
 		void* construct(void* ptr, size_type count) const;
 		void* move(void* dst, void* src, size_type count) const;
 		void destroy(void* ptr, size_type count) const noexcept;
-		[[nodiscard]] size_type typeSize() const noexcept;
-		[[nodiscard]] bool trivialCopy() const noexcept;
-		[[nodiscard]] id_type typeId() const noexcept;
+		[[nodiscard]] size_type type_size() const noexcept;
+		[[nodiscard]] bool trivial_copy() const noexcept;
+		[[nodiscard]] id_type type_id() const noexcept;
 
 	private:
 		construct_func m_constructFunc = nullptr;

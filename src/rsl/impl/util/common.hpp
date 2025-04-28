@@ -1,13 +1,11 @@
 #pragma once
 #include "../defines.hpp"
 
-#include <ppltasks.h>
-
 RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(5046)
 #include <bit>
 #include <functional>
 #include <ratio>
-#include <type_traits>
+#include <cstring>
 RYTHE_MSVC_SUPPRESS_WARNING_POP
 
 #include "primitives.hpp"
@@ -619,7 +617,7 @@ namespace rsl
 	};
 
 	template <typename To, typename From>
-	constexpr bool is_assignable_v = requires(add_lval_ref<To> to, add_lval_ref<From> from) {
+	constexpr bool is_assignable_v = requires(add_lval_ref_t<To> to, add_lval_ref_t<From> from) {
 		{ to = from };
 	};
 
@@ -629,7 +627,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	constexpr bool is_copy_assignable_v = requires(add_lval_ref<T> dst, const T& src) {
+	constexpr bool is_copy_assignable_v = requires(add_lval_ref_t<T> dst, const T& src) {
 		{ dst = src };
 	};
 
@@ -639,7 +637,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	constexpr bool is_move_assignable_v = requires(add_lval_ref<T> dst, T&& src) {
+	constexpr bool is_move_assignable_v = requires(add_lval_ref_t<T> dst, T&& src) {
 		{ dst = move(src) };
 	};
 
@@ -649,7 +647,7 @@ namespace rsl
 	};
 
 	template <typename To, typename From>
-	constexpr bool is_nothrow_assignable_v = requires(add_lval_ref<To> to, add_lval_ref<From> from) {
+	constexpr bool is_nothrow_assignable_v = requires(add_lval_ref_t<To> to, add_lval_ref_t<From> from) {
 		{ to = from } noexcept;
 	};
 
@@ -659,7 +657,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	constexpr bool is_nothrow_copy_assignable_v = requires(add_lval_ref<T> dst, const T& src) {
+	constexpr bool is_nothrow_copy_assignable_v = requires(add_lval_ref_t<T> dst, const T& src) {
 		{ dst = src } noexcept;
 	};
 
@@ -669,7 +667,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	constexpr bool is_nothrow_move_assignable_v = requires(add_lval_ref<T> dst, T&& src) {
+	constexpr bool is_nothrow_move_assignable_v = requires(add_lval_ref_t<T> dst, T&& src) {
 		{ dst = move(src) } noexcept;
 	};
 
@@ -850,6 +848,15 @@ namespace rsl
 	}
 
 	template <typename To, typename From>
+		requires is_trivially_copyable_v<To> && is_trivially_copyable_v<From> && (sizeof(To) >= sizeof(From))
+	[[nodiscard]] constexpr To insert_cast(const From& value) noexcept
+	{
+		To dst{};
+		constexpr_memcpy(&dst, &value, sizeof(From));
+		return dst;
+	}
+
+	template <typename To, typename From>
 	constexpr void* constexpr_memcpy(To* dst, const From* src, const size_type count) noexcept
 	{
 		if (is_constant_evaluated())
@@ -877,13 +884,14 @@ namespace rsl
 	}
 
 	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] constexpr T* to_address(T* const val) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr T* to_address(T* val) noexcept
 	{
 		static_assert(!is_function_v<T>);
 		return val;
 	}
 
 	template <typename T>
+		requires(!is_pointer_v<T>)
 	[[nodiscard]] [[rythe_always_inline]] constexpr auto to_address(const T& val) noexcept
 	{
 		return to_address(val.operator->());
@@ -1759,4 +1767,7 @@ namespace rsl
 	{
 		return bit_cast<byte*>(ptr) + count;
 	}
+
+	template <typename LHS, typename RHS>
+	constexpr bool is_pointer_assignable_v = requires(LHS* lhs, RHS* rhs) { lhs = rhs; };
 } // namespace rsl

@@ -2,6 +2,7 @@
 
 #include "../memory/factory_storage.hpp"
 #include "../util/type_traits.hpp"
+#include "../util/assert.hpp"
 
 namespace rsl
 {
@@ -9,7 +10,7 @@ namespace rsl
 	template <typename T, typename... DecorationSignals>
 	struct optional_param
 	{
-		using type = decorate_type<T, DecorationSignals...>::type;
+		using type = typename decorate_type<T, DecorationSignals...>::type;
 	};
 
 	template <typename... DecorationSignals>
@@ -19,7 +20,7 @@ namespace rsl
 	};
 
 	template <typename T, typename... DecorationSignals>
-	using optional_param_t = optional_param<T, DecorationSignals...>::type;
+	using optional_param_t = typename optional_param<T, DecorationSignals...>::type;
 
 	/// Empty struct when T is void. When empty the size will be 1 byte, otherwise the size of T.
 	template <typename T>
@@ -45,10 +46,15 @@ namespace rsl
 	struct optional_storage<void>
 	{
 		constexpr static bool holds_value = false;
+
+		template <typename... Args>
+		optional_storage([[maybe_unused]] Args&&...)
+		{
+		}
 	};
 
 	template <bool Condition, typename T>
-	using conditional_storage = conditional<Condition, optional_storage<T>, optional_storage<void>>::type;
+	using conditional_storage = typename conditional<Condition, optional_storage<T>, optional_storage<void>>::type;
 
 	template <typename T, factory_type Factory = default_factory<T>>
 	class optional
@@ -109,14 +115,23 @@ namespace rsl
 		[[nodiscard]] [[rythe_always_inline]] constexpr value_type&& value() && noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const value_type&& value() const&& noexcept;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr bool holds_value() noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr operator bool() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr bool holds_value() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr operator bool() const noexcept;
 
 		template <typename... Args>
 		[[rythe_always_inline]] constexpr value_type& emplace(Args&&... args)
 			noexcept(is_nothrow_constructible_v<value_type, Args...>);
 
 		[[rythe_always_inline]] constexpr void reset() noexcept;
+
+		[[rythe_always_inline]] constexpr void set_factory(const factory_storage_type& factoryStorage)
+			noexcept(is_nothrow_copy_assignable_v<factory_storage_type>);
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr factory_t& get_factory() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const factory_t& get_factory() const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr factory_storage_type& get_factory_storage() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const factory_storage_type&	get_factory_storage() const noexcept;
 
 	private:
 		factory_storage_type m_factory;

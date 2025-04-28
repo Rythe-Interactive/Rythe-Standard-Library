@@ -13,10 +13,10 @@ namespace rsl
 	{
 	public:
 		using value_type = ValueType;
-		using iterator = value_type*;
-		using const_iterator = const value_type*;
-		using reverse_iterator = std::reverse_iterator<iterator>;
-		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+		using iterator_type = value_type*;
+		using const_iterator_type = const value_type*;
+		using reverse_iterator_type = reverse_iterator<iterator_type>;
+		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
 		using view_type = view<value_type>;
 		using const_view_type = view<const value_type>;
 
@@ -75,21 +75,21 @@ namespace rsl
 		[[nodiscard]] [[rythe_always_inline]] constexpr operator view_type() noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr operator const_view_type() const noexcept;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr iterator begin() noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator begin() const noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator cbegin() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr iterator_type begin() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type begin() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type cbegin() const noexcept;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr iterator end() noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator end() const noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator cend() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr iterator_type end() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type end() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type cend() const noexcept;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr reverse_iterator rend() noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator rend() const noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator crend() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr reverse_iterator_type rend() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator_type rend() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator_type crend() const noexcept;
 
-		[[nodiscard]] [[rythe_always_inline]] constexpr reverse_iterator rbegin() noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator rbegin() const noexcept;
-		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator crbegin() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr reverse_iterator_type rbegin() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator_type rbegin() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator_type crbegin() const noexcept;
 
 	private:
 		union value_container

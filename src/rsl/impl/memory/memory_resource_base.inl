@@ -68,28 +68,28 @@ namespace rsl
 	}
 
 	template <allocator_type Alloc, untyped_factory_type Factory, typename UtilType>
-	inline constexpr untyped_memory_resource_base<Alloc, Factory, UtilType>::allocator_storage_type&
+	inline constexpr typename untyped_memory_resource_base<Alloc, Factory, UtilType>::allocator_storage_type&
 	untyped_memory_resource_base<Alloc, Factory, UtilType>::get_allocator_storage() noexcept
 	{
 		return m_alloc.get_allocator_storage();
 	}
 
 	template <allocator_type Alloc, untyped_factory_type Factory, typename UtilType>
-	inline constexpr const untyped_memory_resource_base<Alloc, Factory, UtilType>::allocator_storage_type&
+	inline constexpr const typename untyped_memory_resource_base<Alloc, Factory, UtilType>::allocator_storage_type&
 	untyped_memory_resource_base<Alloc, Factory, UtilType>::get_allocator_storage() const noexcept
 	{
 		return m_alloc.get_allocator_storage();
 	}
 
 	template <allocator_type Alloc, untyped_factory_type Factory, typename UtilType>
-	inline constexpr untyped_memory_resource_base<Alloc, Factory, UtilType>::factory_storage_type&
+	inline constexpr typename untyped_memory_resource_base<Alloc, Factory, UtilType>::factory_storage_type&
 	untyped_memory_resource_base<Alloc, Factory, UtilType>::get_factory_storage() noexcept
 	{
 		return m_alloc.get_factory_storage();
 	}
 
 	template <allocator_type Alloc, untyped_factory_type Factory, typename UtilType>
-	inline constexpr const untyped_memory_resource_base<Alloc, Factory, UtilType>::factory_storage_type&
+	inline constexpr const typename untyped_memory_resource_base<Alloc, Factory, UtilType>::factory_storage_type&
 	untyped_memory_resource_base<Alloc, Factory, UtilType>::get_factory_storage() const noexcept
 	{
 		return m_alloc.get_factory_storage();
@@ -288,28 +288,28 @@ namespace rsl
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory>
-	inline constexpr typed_memory_resource_base<T, Alloc, Factory>::allocator_storage_type&
+	inline constexpr typename typed_memory_resource_base<T, Alloc, Factory>::allocator_storage_type&
 	typed_memory_resource_base<T, Alloc, Factory>::get_allocator_storage() noexcept
 	{
 		return m_alloc.get_allocator_storage();
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory>
-	inline constexpr const typed_memory_resource_base<T, Alloc, Factory>::allocator_storage_type&
+	inline constexpr const typename typed_memory_resource_base<T, Alloc, Factory>::allocator_storage_type&
 	typed_memory_resource_base<T, Alloc, Factory>::get_allocator_storage() const noexcept
 	{
 		return m_alloc.get_allocator_storage();
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory>
-	inline constexpr typed_memory_resource_base<T, Alloc, Factory>::factory_storage_type&
+	inline constexpr typename typed_memory_resource_base<T, Alloc, Factory>::factory_storage_type&
 	typed_memory_resource_base<T, Alloc, Factory>::get_factory_storage() noexcept
 	{
 		return m_alloc.get_factory_storage();
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory>
-	inline constexpr const typed_memory_resource_base<T, Alloc, Factory>::factory_storage_type&
+	inline constexpr const typename typed_memory_resource_base<T, Alloc, Factory>::factory_storage_type&
 	typed_memory_resource_base<T, Alloc, Factory>::get_factory_storage() const noexcept
 	{
 		return m_alloc.get_factory_storage();
@@ -365,7 +365,7 @@ namespace rsl
 	typed_memory_resource_base<T, Alloc, Factory>::construct(size_type count, size_type offset, Args&&... args)
 		noexcept(factory_traits<Factory>::template noexcept_constructable<Args...>)
 	{
-		m_alloc.construct(m_ptr + offset, count, forward<Args>(args)...);
+		m_alloc.construct(m_ptr + offset, count, rsl::forward<Args>(args)...);
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory>
