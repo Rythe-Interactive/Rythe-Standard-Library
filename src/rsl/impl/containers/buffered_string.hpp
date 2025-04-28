@@ -164,13 +164,13 @@ namespace rsl
 		constexpr const_iterator_type end() const noexcept { return &m_buffer[m_size]; }
 		constexpr const_iterator_type cend() const noexcept { return &m_buffer[m_size]; }
 
-		constexpr reverse_iterator_type rend() noexcept { return reverse_iterator(&m_buffer[m_size]); }
-		constexpr const_reverse_iterator_type rend() const noexcept { return const_reverse_iterator(&m_buffer[m_size]); }
-		constexpr const_reverse_iterator_type crend() const noexcept { return const_reverse_iterator(&m_buffer[m_size]); }
+		constexpr reverse_iterator_type rend() noexcept { return reverse_iterator_type(begin()); }
+		constexpr const_reverse_iterator_type rend() const noexcept { return crend(); }
+		constexpr const_reverse_iterator_type crend() const noexcept { return const_reverse_iterator_type(cbegin()); }
 
-		constexpr reverse_iterator_type rbegin() noexcept { return reverse_iterator(m_buffer); }
-		constexpr const_reverse_iterator_type rbegin() const noexcept { return const_reverse_iterator(m_buffer); }
-		constexpr const_reverse_iterator_type crbegin() const noexcept { return const_reverse_iterator(m_buffer); }
+		constexpr reverse_iterator_type rbegin() noexcept { return reverse_iterator_type(end()); }
+		constexpr const_reverse_iterator_type rbegin() const noexcept { return crbegin(); }
+		constexpr const_reverse_iterator_type crbegin() const noexcept { return const_reverse_iterator_type(cend()); }
 	};
 
 	template <size_type maxSize, typename CharType>

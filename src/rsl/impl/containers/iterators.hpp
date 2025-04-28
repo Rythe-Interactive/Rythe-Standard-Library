@@ -1,6 +1,7 @@
 #pragma once
 #include "../util/concepts.hpp"
-#include "../util/type_traits.hpp"
+#include "../util/type_util.hpp"
+#include "pair.hpp"
 
 namespace rsl
 {
@@ -272,7 +273,7 @@ namespace rsl
 		return internal::iterator_diff_impl<It>{}(first, last);
 	}
 
-	template <input_or_output_iterator It>
+	template <bidirectional_iterator It>
 	class reverse_iterator
 	{
 	public:
@@ -288,21 +289,21 @@ namespace rsl
 		constexpr explicit reverse_iterator(const underlying_iter& iter) noexcept : m_iter(iter) {}
 		constexpr explicit reverse_iterator(underlying_iter&& iter) noexcept : m_iter(rsl::move(iter)) {}
 
-		template <input_or_output_iterator OtherNodeIter>
+		template <bidirectional_iterator OtherNodeIter>
 		constexpr reverse_iterator(const reverse_iterator<OtherNodeIter>& other) noexcept
 			requires constructible_from<underlying_iter, OtherNodeIter> && not_same_as<underlying_iter, OtherNodeIter>
 			: m_iter(other.m_iter)
 		{
 		}
 
-		template <input_or_output_iterator OtherNodeIter>
+		template <bidirectional_iterator OtherNodeIter>
 		constexpr reverse_iterator(reverse_iterator<OtherNodeIter>&& other) noexcept
 			requires constructible_from<underlying_iter, OtherNodeIter&&> && not_same_as<underlying_iter, OtherNodeIter>
 			: m_iter(rsl::move(other.m_iter))
 		{
 		}
 
-		template <input_or_output_iterator OtherNodeIter>
+		template <bidirectional_iterator OtherNodeIter>
 		constexpr reverse_iterator& operator=(const reverse_iterator<OtherNodeIter>& other) noexcept
 			requires assignable_from<underlying_iter, OtherNodeIter> && not_same_as<underlying_iter, OtherNodeIter>
 		{
@@ -310,7 +311,7 @@ namespace rsl
 			return *this;
 		}
 
-		template <input_or_output_iterator OtherNodeIter>
+		template <bidirectional_iterator OtherNodeIter>
 		constexpr reverse_iterator& operator=(reverse_iterator<OtherNodeIter>&& other) noexcept
 			requires assignable_from<underlying_iter, OtherNodeIter&&> && not_same_as<underlying_iter, OtherNodeIter>
 		{
@@ -332,14 +333,12 @@ namespace rsl
 		}
 
 		constexpr reverse_iterator& operator++() noexcept
-			requires forward_iterator<underlying_iter>
 		{
 			--m_iter;
 			return *this;
 		}
 
 		constexpr reverse_iterator operator++(int) noexcept
-			requires forward_iterator<underlying_iter>
 		{
 			reverse_iterator tmp = *this;
 			++(*this);
@@ -360,14 +359,12 @@ namespace rsl
 		}
 
 		constexpr reverse_iterator& operator--() noexcept
-			requires bidirectional_iterator<underlying_iter>
 		{
 			++m_iter;
 			return *this;
 		}
 
 		constexpr reverse_iterator operator--(int) noexcept
-			requires bidirectional_iterator<underlying_iter>
 		{
 			reverse_iterator tmp = *this;
 			--(*this);
@@ -380,17 +377,17 @@ namespace rsl
 			return m_iter[-n];
 		}
 
-		constexpr ref_type operator*() const noexcept { return *m_iter; }
-		constexpr ptr_type operator->() const noexcept { return &*m_iter; }
+		constexpr ref_type operator*() const noexcept { underlying_iter tmp = m_iter; return *--tmp; }
+		constexpr ptr_type operator->() const noexcept { return &operator*(); }
 
-		template <input_or_output_iterator OtherNodeIter>
+		template <bidirectional_iterator OtherNodeIter>
 			requires sentinel_for<underlying_iter, OtherNodeIter>
 		constexpr bool operator==(const reverse_iterator<OtherNodeIter>& other) const noexcept
 		{
 			return m_iter == other.m_iter;
 		}
 
-		template <input_or_output_iterator OtherNodeIter>
+		template <bidirectional_iterator OtherNodeIter>
 			requires sentinel_for<underlying_iter, OtherNodeIter>
 		constexpr bool operator!=(const reverse_iterator<OtherNodeIter>& other) const noexcept
 		{

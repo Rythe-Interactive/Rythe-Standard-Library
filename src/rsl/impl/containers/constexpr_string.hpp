@@ -255,11 +255,11 @@ namespace rsl
 		constexpr_string<I> ret{};
 
 		constexpr size_type minSize = I < N ? I : N;
-		for (size_type i = 0; i < minSize; i++)
+		for (size_type i = 0; i < minSize; ++i)
 		{
 			ret[i] = buffer[i];
 		}
-		for (size_type i = minSize; i < I; i++)
+		for (size_type i = minSize; i < I; ++i)
 		{
 			ret[i] = '\0';
 		}

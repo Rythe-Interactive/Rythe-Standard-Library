@@ -287,42 +287,42 @@ namespace rsl
 	inline constexpr typename buffered_list<ValueType, maxSize>::reverse_iterator_type
 	buffered_list<ValueType, maxSize>::rend() noexcept
 	{
-		return reverse_iterator_type(&m_buffer[m_size].value);
+		return reverse_iterator_type(begin());
 	}
 
 	template <typename ValueType, size_type maxSize>
 	inline constexpr typename buffered_list<ValueType, maxSize>::const_reverse_iterator_type
 	buffered_list<ValueType, maxSize>::rend() const noexcept
 	{
-		return const_reverse_iterator_type(&m_buffer[m_size].value);
+		return crend();
 	}
 
 	template <typename ValueType, size_type maxSize>
 	inline constexpr typename buffered_list<ValueType, maxSize>::const_reverse_iterator_type
 	buffered_list<ValueType, maxSize>::crend() const noexcept
 	{
-		return const_reverse_iterator_type(&m_buffer[m_size].value);
+		return const_reverse_iterator_type(cbegin());
 	}
 
 	template <typename ValueType, size_type maxSize>
 	inline constexpr typename buffered_list<ValueType, maxSize>::reverse_iterator_type
 	buffered_list<ValueType, maxSize>::rbegin() noexcept
 	{
-		return reverse_iterator_type(&m_buffer->value);
+		return reverse_iterator_type(end());
 	}
 
 	template <typename ValueType, size_type maxSize>
 	inline constexpr typename buffered_list<ValueType, maxSize>::const_reverse_iterator_type
 	buffered_list<ValueType, maxSize>::rbegin() const noexcept
 	{
-		return const_reverse_iterator_type(&m_buffer->value);
+		return crbegin();
 	}
 
 	template <typename ValueType, size_type maxSize>
 	inline constexpr typename buffered_list<ValueType, maxSize>::const_reverse_iterator_type
 	buffered_list<ValueType, maxSize>::crbegin() const noexcept
 	{
-		return const_reverse_iterator_type(&m_buffer->value);
+		return const_reverse_iterator_type(cend());
 	}
 
 	template <typename ValueType, size_type maxSize>
