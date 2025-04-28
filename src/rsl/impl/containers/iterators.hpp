@@ -24,7 +24,7 @@ namespace rsl
 		requires is_object_v<T>
 	struct incrementable_traits<T*>
 	{
-		using difference_type = ptrdiff_t;
+		using difference_type = diff_type;
 	};
 
 	template <typename T>
@@ -63,6 +63,11 @@ namespace rsl
 		concept dereferenceable = requires(T& val) {
 			{ *val } -> can_reference;
 		};
+
+		template <typename T>
+		concept pointable = requires(T& val) {
+			{ val.operator->() } -> dereferenceable;
+		} || (is_pointer_v<T>);
 
 		template <typename>
 		struct cond_value_type
@@ -141,6 +146,9 @@ namespace rsl
 	template <internal::dereferenceable T>
 	using iter_reference_t = decltype(*declval<T&>());
 
+	template <internal::pointable T>
+	using iter_pointer_t = decltype(&*declval<T&>());
+
 	namespace internal
 	{
 		template <typename T>
@@ -176,9 +184,7 @@ namespace rsl
 	};
 
 	template <typename It>
-	concept input_or_output_iterator = requires(It iter) {
-		{ *iter } -> internal::can_reference;
-	} && weakly_incrementable<It>;
+	concept input_or_output_iterator = internal::dereferenceable<It> && internal::pointable<It> && weakly_incrementable<It>;
 
 	template <typename Se, typename It>
 	concept sentinel_for =
@@ -213,13 +219,12 @@ namespace rsl
 
 	template <typename It>
 	concept random_access_iterator = bidirectional_iterator<It> && totally_ordered<It> && sized_sentinel_for<It, It> &&
-									 requires(It iter, const It other, const iter_difference_t<It> n) {
+									 requires(It iter, const It constIter, const iter_difference_t<It> n) {
 										 { iter += n } -> same_as<It&>;
-										 { other + n } -> same_as<It>;
-										 { n + other } -> same_as<It>;
+										 { constIter + n } -> same_as<It>;
 										 { iter -= n } -> same_as<It&>;
-										 { other - n } -> same_as<It>;
-										 { other[n] } -> same_as<iter_reference_t<It>>;
+										 { constIter - n } -> same_as<It>;
+										 { constIter[n] } -> same_as<iter_reference_t<It>>;
 									 };
 
 	template <typename It>
@@ -267,11 +272,140 @@ namespace rsl
 		return internal::iterator_diff_impl<It>{}(first, last);
 	}
 
+	template <input_or_output_iterator It>
+	class reverse_iterator
+	{
+	public:
+		using underlying_iter = It;
+		using difference_type = iter_difference_t<It>;
+
+		using ref_type = iter_reference_t<underlying_iter>;
+		using ptr_type = iter_pointer_t<underlying_iter>;
+
+		constexpr reverse_iterator() noexcept = default;
+		constexpr reverse_iterator(nullptr_type) noexcept {};
+
+		constexpr explicit reverse_iterator(const underlying_iter& iter) noexcept : m_iter(iter) {}
+		constexpr explicit reverse_iterator(underlying_iter&& iter) noexcept : m_iter(rsl::move(iter)) {}
+
+		template <input_or_output_iterator OtherNodeIter>
+		constexpr reverse_iterator(const reverse_iterator<OtherNodeIter>& other) noexcept
+			requires constructible_from<underlying_iter, OtherNodeIter> && not_same_as<underlying_iter, OtherNodeIter>
+			: m_iter(other.m_iter)
+		{
+		}
+
+		template <input_or_output_iterator OtherNodeIter>
+		constexpr reverse_iterator(reverse_iterator<OtherNodeIter>&& other) noexcept
+			requires constructible_from<underlying_iter, OtherNodeIter&&> && not_same_as<underlying_iter, OtherNodeIter>
+			: m_iter(rsl::move(other.m_iter))
+		{
+		}
+
+		template <input_or_output_iterator OtherNodeIter>
+		constexpr reverse_iterator& operator=(const reverse_iterator<OtherNodeIter>& other) noexcept
+			requires assignable_from<underlying_iter, OtherNodeIter> && not_same_as<underlying_iter, OtherNodeIter>
+		{
+			m_iter = other.m_iter;
+			return *this;
+		}
+
+		template <input_or_output_iterator OtherNodeIter>
+		constexpr reverse_iterator& operator=(reverse_iterator<OtherNodeIter>&& other) noexcept
+			requires assignable_from<underlying_iter, OtherNodeIter&&> && not_same_as<underlying_iter, OtherNodeIter>
+		{
+			m_iter = rsl::move(other.m_iter);
+			return *this;
+		}
+
+		constexpr reverse_iterator& operator+=(const difference_type offset) noexcept
+			requires random_access_iterator<underlying_iter>
+		{
+			m_iter -= offset;
+			return *this;
+		}
+
+		constexpr reverse_iterator operator+(const difference_type offset) const noexcept
+			requires random_access_iterator<underlying_iter>
+		{
+			return reverse_iterator(m_iter - offset);
+		}
+
+		constexpr reverse_iterator& operator++() noexcept
+			requires forward_iterator<underlying_iter>
+		{
+			--m_iter;
+			return *this;
+		}
+
+		constexpr reverse_iterator operator++(int) noexcept
+			requires forward_iterator<underlying_iter>
+		{
+			reverse_iterator tmp = *this;
+			++(*this);
+			return tmp;
+		}
+
+		constexpr reverse_iterator& operator-=(const difference_type offset) noexcept
+			requires random_access_iterator<underlying_iter>
+		{
+			m_iter += offset;
+			return *this;
+		}
+
+		constexpr reverse_iterator operator-(const difference_type offset) const noexcept
+			requires random_access_iterator<underlying_iter>
+		{
+			return reverse_iterator(m_iter + offset);
+		}
+
+		constexpr reverse_iterator& operator--() noexcept
+			requires bidirectional_iterator<underlying_iter>
+		{
+			++m_iter;
+			return *this;
+		}
+
+		constexpr reverse_iterator operator--(int) noexcept
+			requires bidirectional_iterator<underlying_iter>
+		{
+			reverse_iterator tmp = *this;
+			--(*this);
+			return tmp;
+		}
+
+		constexpr ref_type operator[](const difference_type n) const noexcept
+			requires random_access_iterator<underlying_iter>
+		{
+			return m_iter[-n];
+		}
+
+		constexpr ref_type operator*() const noexcept { return *m_iter; }
+		constexpr ptr_type operator->() const noexcept { return &*m_iter; }
+
+		template <input_or_output_iterator OtherNodeIter>
+			requires sentinel_for<underlying_iter, OtherNodeIter>
+		constexpr bool operator==(const reverse_iterator<OtherNodeIter>& other) const noexcept
+		{
+			return m_iter == other.m_iter;
+		}
+
+		template <input_or_output_iterator OtherNodeIter>
+			requires sentinel_for<underlying_iter, OtherNodeIter>
+		constexpr bool operator!=(const reverse_iterator<OtherNodeIter>& other) const noexcept
+		{
+			return m_iter != other.m_iter;
+		}
+
+	private:
+		underlying_iter m_iter{nullptr};
+	};
+
 	template <class T>
 	struct pair_range
 	{
 		using iterator = T;
-		pair_range(const std::pair<T, T> r) noexcept
+		pair_range(const pair<T, T> r) noexcept
 			: range(r)
 		{
 		}
@@ -285,17 +419,14 @@ namespace rsl
 		[[nodiscard]] [[rythe_always_inline]] auto& begin() const { return range.first; }
 
 		[[nodiscard]] [[rythe_always_inline]] auto& end() const { return range.second; }
-		std::pair<T, T> range;
+		pair<T, T> range;
 	};
 
-
-#if !defined(DOXY_EXCLUDE)
 	template <class T>
-	pair_range(std::pair<T, T>) -> pair_range<T>;
+	pair_range(pair<T, T>) -> pair_range<T>;
 
 	template <class T>
 	pair_range(T begin, T end) -> pair_range<remove_reference_t<T>>;
-#endif
 
 	template <class It>
 	bool checked_next(It& iter, It end, size_type diff)
@@ -311,9 +442,7 @@ namespace rsl
 		return true;
 	}
 
-	template <
-		class KeysIterator, class ValuesIterator, class Category = std::bidirectional_iterator_tag,
-		class Diff = rsl::diff_type>
+	template <typename KeysIterator, typename ValuesIterator>
 	class key_value_pair_iterator
 	{
 	public:
@@ -321,11 +450,8 @@ namespace rsl
 		using values_proxy_type = ValuesIterator;
 		using key_type = typename keys_proxy_type::value_type;
 		using value_type = typename values_proxy_type::value_type;
-		using pair_type = std::pair<key_type&, value_type&>;
-		using const_pair_type = std::pair<const key_type&, const value_type&>;
-
-		using iterator_category = Category;
-		using difference_type = Diff;
+		using pair_type = pair<key_type&, value_type&>;
+		using const_pair_type = pair<const key_type&, const value_type&>;
 
 		explicit key_value_pair_iterator(keys_proxy_type keys, values_proxy_type values)
 			: m_key(keys),
@@ -456,10 +582,8 @@ namespace rsl
 		PairIteratorContainer& m_container;
 	};
 
-#if !defined(DOXY_EXCLUDE)
 	template <class PairIteratorContainer>
 	keys_only_view(PairIteratorContainer&) -> keys_only_view<PairIteratorContainer>;
-#endif
 
 	template <class PairIteratorContainer>
 	class values_only_view
@@ -477,8 +601,6 @@ namespace rsl
 		PairIteratorContainer& m_container;
 	};
 
-#if !defined(DOXY_EXCLUDE)
 	template <class PairIteratorContainer>
 	values_only_view(PairIteratorContainer&) -> values_only_view<PairIteratorContainer>;
-#endif
 } // namespace rsl

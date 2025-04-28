@@ -1,5 +1,6 @@
 #pragma once
 
+#include "map_iterator.hpp"
 #include "../../memory/memory_pool.hpp"
 #include "../any.hpp"
 #include "../dynamic_array.hpp"
@@ -61,6 +62,11 @@ namespace rsl
 			nothrow_constructible_alloc && nothrow_constructible_fact;
 
 	public:
+		using iterator_type = hash_map_iterator<hash_map_base, typename value_container::iterator_type>;
+		using const_iterator_type = hash_map_iterator<hash_map_base, typename value_container::const_iterator_type>;
+		using reverse_iterator_type = hash_map_iterator<hash_map_base, typename value_container::reverse_iterator_type>;
+		using const_reverse_iterator_type = hash_map_iterator<hash_map_base, typename value_container::const_reverse_iterator_type>;
+
 		[[rythe_always_inline]] constexpr hash_map_base() noexcept(MapInfo::nothrow_constructible);
 
 		[[rythe_always_inline]] constexpr hash_map_base(const hasher_type& h, const key_comparer_type& equal)
@@ -93,6 +99,18 @@ namespace rsl
 
 		void clear() noexcept;
 
+		bool contains(const key_type& key) const noexcept;
+
+		const mapped_type* find(const key_type& key) const noexcept
+			requires (MapInfo::is_map);
+		mapped_type* find(const key_type& key) noexcept
+		requires (MapInfo::is_map);
+
+		const mapped_type& at(const key_type& key) const
+			requires (MapInfo::is_map);
+		mapped_type& at(const key_type& key)
+			requires (MapInfo::is_map);
+
 		template <typename... Args>
 		mapped_type& emplace(const key_type& key, Args&&... args);
 
@@ -101,17 +119,6 @@ namespace rsl
 
 		template <typename... Args>
 		pair<mapped_type&, bool> try_emplace(const key_type& key, Args&&... args);
-
-		bool contains(const key_type& key) const noexcept;
-		const mapped_type& at(const key_type& key) const
-			requires (MapInfo::is_map);
-		mapped_type& at(const key_type& key)
-			requires (MapInfo::is_map);
-
-		const mapped_type* find(const key_type& key) const noexcept
-			requires (MapInfo::is_map);
-		mapped_type* find(const key_type& key) noexcept
-			requires (MapInfo::is_map);
 
 		[[rythe_always_inline]] constexpr void erase(const key_type& key) noexcept;
 
@@ -125,6 +132,22 @@ namespace rsl
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr factory_t& get_factory() noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const factory_t& get_factory() const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr iterator_type begin() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type begin() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type cbegin() const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr iterator_type end() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type end() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type cend() const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr reverse_iterator_type rbegin() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator_type rbegin() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator_type crbegin() const noexcept;
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr reverse_iterator_type rend() noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator_type rend() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator_type crend() const noexcept;
 
 	protected:
 		constexpr void rehash(const bucket_container& oldBuckets) noexcept;
@@ -173,12 +196,14 @@ namespace rsl
 		};
 
 		constexpr insert_result insert_key_internal(
-			const key_type& key, const index_type valueIndexHint
+			const key_type& key, index_type valueIndexHint
 		) noexcept(noexcept(reserve(0)));
 
 	private:
 		value_container m_values;
 		bucket_container m_buckets;
+
+		size_type m_lastValueBucketIndex;
 
 		storage_type m_minPsl;
 		storage_type m_maxPsl;

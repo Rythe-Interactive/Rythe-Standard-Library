@@ -11,14 +11,14 @@ namespace rsl
 	{
 	public:
 		using container_base = contiguous_container_base<T, Alloc, Factory, T*, const T*>;
-		using mem_rsc = container_base::mem_rsc;
+		using mem_rsc = typename container_base::mem_rsc;
 		using value_type = T;
-		using iterator_type = container_base::iterator_type;
-		using const_iterator_type = container_base::const_iterator_type;
-		using reverse_iterator_type = container_base::reverse_iterator_type;
-		using const_reverse_iterator_type = container_base::const_reverse_iterator_type;
-		using view_type = container_base::view_type;
-		using const_view_type = container_base::const_view_type;
+		using iterator_type = typename container_base::iterator_type;
+		using const_iterator_type = typename container_base::const_iterator_type;
+		using reverse_iterator_type = typename container_base::reverse_iterator_type;
+		using const_reverse_iterator_type = typename container_base::const_reverse_iterator_type;
+		using view_type = typename container_base::view_type;
+		using const_view_type = typename container_base::const_view_type;
 		using allocator_storage_type = allocator_storage<Alloc>;
 		using allocator_t = Alloc;
 		using factory_storage_type = factory_storage<Factory>;
@@ -106,15 +106,51 @@ namespace rsl
 			size_type pos, InputIt first, InputIt last
 		) noexcept(container_base::move_construct_noexcept && container_base::template construct_noexcept<iter_value_t<InputIt>>);
 
-		[[rythe_always_inline]] constexpr size_type erase(size_type pos)
+		// If it's possible to do a bulk erasure, then erase_shift in bulk might be faster. Try both and test!
+		[[rythe_always_inline]] constexpr size_type erase_swap(size_type pos)
 			noexcept(container_base::move_construct_noexcept);
-		[[rythe_always_inline]] constexpr size_type erase(size_type first, size_type last)
+
+		// Unless specifically required, use erase_shift for bulk erasures.
+		// Effectively the same as erase_shift, but reverses the order of shifted elements.
+		[[rythe_always_inline]] constexpr size_type erase_swap(const_view_type view)
 			noexcept(container_base::move_construct_noexcept);
+		// Unless specifically required, use erase_shift for bulk erasures.
+		// Effectively the same as erase_shift, but reverses the order of shifted elements.
+		[[rythe_always_inline]] constexpr size_type erase_swap(size_type first, size_type last)
+			noexcept(container_base::move_construct_noexcept);
+
+		// Returns amount of items removed, specific location of erasure is not possible to reconstruct.
 		template <typename Comp>
-		[[rythe_always_inline]] constexpr size_type erase(Comp&& comparable)
+		[[rythe_always_inline]] constexpr size_type erase_swap(Comp&& comparable)
 			noexcept(container_base::move_construct_noexcept);
+
+		// Returns amount of items removed, specific location of erasure is not possible to reconstruct.
 		template <typename Func>
-		[[rythe_always_inline]] constexpr size_type erase(Func&& comparer)
+		[[rythe_always_inline]] constexpr size_type erase_swap(Func&& comparer)
+			noexcept(container_base::move_construct_noexcept)
+			requires invocable<Func, bool(const_iterator_type)>;
+
+		// Unless specifically required, use erase_swap for single erasures.
+		// If it's possible to do a bulk erasure, then erase_shift in bulk might be faster. Try both and test!
+		[[rythe_always_inline]] constexpr size_type erase_shift(size_type pos)
+			noexcept(container_base::move_construct_noexcept);
+		[[rythe_always_inline]] constexpr size_type erase_shift(const_view_type view)
+			noexcept(container_base::move_construct_noexcept);
+		[[rythe_always_inline]] constexpr size_type erase_shift(size_type first, size_type last)
+			noexcept(container_base::move_construct_noexcept);
+
+		// Unless specifically required use erase_swap for selective erasures.
+		// Depending on your use case erase_swap might be faster. Try both and test!
+		// Returns amount of items removed, specific location of erasure is not possible to reconstruct.
+		template <typename Comp>
+		[[rythe_always_inline]] constexpr size_type erase_shift(Comp&& comparable)
+			noexcept(container_base::move_construct_noexcept);
+
+		// Unless specifically required use erase_swap for selective erasures.
+		// Depending on your use case erase_swap might be faster. Try both and test!
+		// Returns amount of items removed, specific location of erasure is not possible to reconstruct.
+		template <typename Func>
+		[[rythe_always_inline]] constexpr size_type erase_shift(Func&& comparer)
 			noexcept(container_base::move_construct_noexcept)
 			requires invocable<Func, bool(const_iterator_type)>;
 
@@ -122,7 +158,7 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void maybe_grow() noexcept(container_base::move_construct_noexcept);
 
 		[[rythe_always_inline]] constexpr void
-		copy_assign_impl(const value_type* src, size_type srcSize, mem_rsc::typed_alloc_type* alloc = nullptr)
+		copy_assign_impl(const value_type* src, size_type srcSize, typename mem_rsc::typed_alloc_type* alloc = nullptr)
 			noexcept(container_base::copy_assign_noexcept && container_base::copy_construct_noexcept);
 
 		[[rythe_always_inline]] constexpr void move_data_assign_impl(const value_type* src, size_type srcSize)

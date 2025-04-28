@@ -8,6 +8,7 @@ namespace rsl
 	constexpr hash_map_base<MapInfo>::hash_map_base() noexcept(MapInfo::nothrow_constructible)
 		: m_values(),
 		  m_buckets(),
+		  m_lastValueBucketIndex(0),
 		  m_minPsl(0),
 		  m_maxPsl(0),
 		  m_hasher(),
@@ -21,6 +22,7 @@ namespace rsl
 		noexcept(MapInfo::nothrow_copy_constructible)
 		: m_values(),
 		  m_buckets(),
+		  m_lastValueBucketIndex(0),
 		  m_minPsl(0),
 		  m_maxPsl(0),
 		  m_hasher(h),
@@ -34,6 +36,7 @@ namespace rsl
 		noexcept(MapInfo::nothrow_hasher_copy_constructible)
 		: m_values(),
 		  m_buckets(),
+		  m_lastValueBucketIndex(0),
 		  m_minPsl(0),
 		  m_maxPsl(0),
 		  m_hasher(h),
@@ -47,6 +50,7 @@ namespace rsl
 		noexcept(MapInfo::nothrow_comparer_copy_constructible)
 		: m_values(),
 		  m_buckets(),
+		  m_lastValueBucketIndex(0),
 		  m_minPsl(0),
 		  m_maxPsl(0),
 		  m_hasher(),
@@ -60,6 +64,7 @@ namespace rsl
 		noexcept(nothrow_constructible_alloc)
 		: m_values(allocStorage),
 		  m_buckets(allocStorage),
+		  m_lastValueBucketIndex(0),
 		  m_minPsl(0),
 		  m_maxPsl(0),
 		  m_hasher(),
@@ -73,6 +78,7 @@ namespace rsl
 		noexcept(nothrow_constructible_fact)
 		: m_values(factoryStorage),
 		  m_buckets(factoryStorage),
+		  m_lastValueBucketIndex(0),
 		  m_minPsl(0),
 		  m_maxPsl(0),
 		  m_hasher(),
@@ -88,6 +94,7 @@ namespace rsl
 	) noexcept(nothrow_constructible_alloc_fact)
 		: m_values(allocStorage, factoryStorage),
 		  m_buckets(allocStorage, factoryStorage),
+		  m_lastValueBucketIndex(0),
 		  m_minPsl(0),
 		  m_maxPsl(0),
 		  m_hasher(),
@@ -132,17 +139,18 @@ namespace rsl
 		}
 
 		size_type index = hash.homeIndex + searchResult.unpackedPsl.psl;
-		m_values[m_buckets[index].index].destroy(*this);
-		m_values.erase(m_buckets[index].index);
+		size_type valueIndex = m_buckets[index].index;
+		m_values[valueIndex].destroy(*this);
+		m_values.erase_swap(valueIndex);
+		m_buckets[m_lastValueBucketIndex].index = valueIndex;
 
 		psl_type currentPsl = unpack_bucket_psl(m_buckets[index + 1]);
 
-		bool recalcMax = searchResult.unpackedPsl.psl == m_maxPsl;
 		while (currentPsl.psl != 0)
 		{
 			bucket_type& bucket = m_buckets[index + 1];
 			storage_type newPsl = currentPsl.psl - 1;
-			bucket.pslAndFingerprint = pack_bucket_psl(psl_type{ .psl = newPsl, .fingerprint = currentPsl.fingerprint });
+			bucket.pslAndFingerprint = pack_bucket_psl(psl_type{.psl = newPsl, .fingerprint = currentPsl.fingerprint});
 			m_buckets[index] = bucket;
 
 			if (newPsl < m_minPsl)
@@ -150,26 +158,23 @@ namespace rsl
 				m_minPsl = newPsl;
 			}
 
-			if (currentPsl.psl == m_maxPsl)
-			{
-				recalcMax = true;
-			}
-
 			++index;
 			currentPsl = unpack_bucket_psl(m_buckets[index + 1]);
 		}
 
-		if (recalcMax)
+		m_maxPsl = 0;
+		m_lastValueBucketIndex = 0;
+		for (size_type i = 0; i < m_buckets.size(); ++i)
 		{
-			m_maxPsl = 0;
-
-			for (const bucket_type& bucket : m_buckets)
+			psl_type unpackedPsl = unpack_bucket_psl(m_buckets[i]);
+			if (unpackedPsl.psl > m_maxPsl)
 			{
-				psl_type unpackedPsl = unpack_bucket_psl(bucket);
-				if (unpackedPsl.psl > m_maxPsl)
-				{
-					m_maxPsl = unpackedPsl.psl;
-				}
+				m_maxPsl = unpackedPsl.psl;
+			}
+
+			if (m_buckets[i].index > m_buckets[m_lastValueBucketIndex].index)
+			{
+				m_lastValueBucketIndex = i;
 			}
 		}
 
@@ -217,6 +222,82 @@ namespace rsl
 	}
 
 	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::iterator_type hash_map_base<MapInfo>::begin() noexcept
+	{
+		return iterator_type(m_values.begin());
+	}
+
+	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::const_iterator_type hash_map_base<MapInfo>::begin() const noexcept
+	{
+		return const_iterator_type(m_values.cbegin());
+	}
+
+	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::const_iterator_type hash_map_base<MapInfo>::cbegin() const noexcept
+	{
+		return const_iterator_type(m_values.cbegin());
+	}
+
+	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::iterator_type hash_map_base<MapInfo>::end() noexcept
+	{
+		return iterator_type(m_values.end());
+	}
+
+	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::const_iterator_type hash_map_base<MapInfo>::end() const noexcept
+	{
+		return const_iterator_type(m_values.cend());
+	}
+
+	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::const_iterator_type hash_map_base<MapInfo>::cend() const noexcept
+	{
+		return const_iterator_type(m_values.cend());
+	}
+
+	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::reverse_iterator_type hash_map_base<MapInfo>::rbegin() noexcept
+	{
+		return reverse_iterator_type(m_values.rbegin());
+	}
+
+	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::const_reverse_iterator_type hash_map_base<MapInfo>::rbegin() const
+		noexcept
+	{
+		return const_reverse_iterator_type(m_values.crbegin());
+	}
+
+	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::const_reverse_iterator_type hash_map_base<MapInfo>::crbegin() const
+		noexcept
+	{
+		return const_reverse_iterator_type(m_values.crbegin());
+	}
+
+	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::reverse_iterator_type hash_map_base<MapInfo>::rend() noexcept
+	{
+		return reverse_iterator_type(m_values.rend());
+	}
+
+	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::const_reverse_iterator_type hash_map_base<MapInfo>::rend() const
+	noexcept
+	{
+		return const_reverse_iterator_type(m_values.crend());
+	}
+
+	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::const_reverse_iterator_type hash_map_base<MapInfo>::crend() const
+		noexcept
+	{
+		return const_reverse_iterator_type(m_values.crend());
+	}
+
+	template <typename MapInfo>
 	constexpr void hash_map_base<MapInfo>::rehash(const bucket_container& oldBuckets) noexcept
 	{
 		for (const bucket_type& bucket : oldBuckets)
@@ -250,7 +331,7 @@ namespace rsl
 
 				searchResult = find_next_available(
 					homeIndex, insertPsl.psl + 1, insertPsl.fingerprint, m_values[insertBucket.index].key(), false
-					);
+				);
 				currentIndex = homeIndex + searchResult.unpackedPsl.psl;
 
 				rsl_assert_frequent(searchResult.type != search_result_type::existingItem);
@@ -263,9 +344,10 @@ namespace rsl
 
 		m_maxPsl = 0;
 		m_minPsl = math::limits<storage_type>::max;
-		for (const bucket_type& bucket : m_buckets)
+		m_lastValueBucketIndex = 0;
+		for (size_type i = 0; i < m_buckets.size(); ++i)
 		{
-			psl_type unpackedPsl = unpack_bucket_psl(bucket);
+			psl_type unpackedPsl = unpack_bucket_psl(m_buckets[i]);
 			if (unpackedPsl.psl < m_minPsl)
 			{
 				m_minPsl = unpackedPsl.psl;
@@ -274,6 +356,11 @@ namespace rsl
 			if (unpackedPsl.psl > m_maxPsl)
 			{
 				m_maxPsl = unpackedPsl.psl;
+			}
+
+			if (m_buckets[i].index > m_buckets[m_lastValueBucketIndex].index)
+			{
+				m_lastValueBucketIndex = i;
 			}
 		}
 	}
@@ -353,21 +440,21 @@ namespace rsl
 			const bucket_type& bucket = m_buckets[searchIndex];
 			if (bucket.pslAndFingerprint == 0u)
 			{
-				return bucket_search_result{ .unpackedPsl = insertPsl, .type = search_result_type::newInsertion };
+				return bucket_search_result{.unpackedPsl = insertPsl, .type = search_result_type::newInsertion};
 			}
 
 			psl_type unpackedPsl = unpack_bucket_psl(bucket);
 
 			if (unpackedPsl.psl < insertPsl.psl)
 			{
-				return bucket_search_result{ .unpackedPsl = insertPsl, .type = search_result_type::swap };
+				return bucket_search_result{.unpackedPsl = insertPsl, .type = search_result_type::swap};
 			}
 
 			if (unpackedPsl.psl == insertPsl.psl && unpackedPsl.fingerprint == insertPsl.fingerprint)
 			{
 				if (m_keyComparer(m_values[bucket.index].key(), key))
 				{
-					return bucket_search_result{ .unpackedPsl = insertPsl, .type = search_result_type::existingItem };
+					return bucket_search_result{.unpackedPsl = insertPsl, .type = search_result_type::existingItem};
 				}
 			}
 
@@ -376,7 +463,7 @@ namespace rsl
 
 			if (earlyOut && insertPsl.psl > m_maxPsl)
 			{
-				return bucket_search_result{ .unpackedPsl = m_maxPsl, .type = search_result_type::itemNotFound };
+				return bucket_search_result{.unpackedPsl = m_maxPsl, .type = search_result_type::itemNotFound};
 			}
 		}
 
@@ -416,8 +503,14 @@ namespace rsl
 			.pslAndFingerprint = pack_bucket_psl(searchResult.unpackedPsl), .index = valueIndexHint
 		};
 
-		bool recalcMin = false;
 		index_type currentIndex = result.index;
+
+		if (insertBucket.index > m_buckets[m_lastValueBucketIndex].index)
+		{
+			m_lastValueBucketIndex = currentIndex;
+		}
+
+		bool recalcMin = false;
 		while (searchResult.type == search_result_type::swap)
 		{
 			rsl::swap(m_buckets[currentIndex], insertBucket);

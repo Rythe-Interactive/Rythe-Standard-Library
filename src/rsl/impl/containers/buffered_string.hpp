@@ -5,6 +5,8 @@
 #include "../util/assert.hpp"
 #include "../util/primitives.hpp"
 
+#include "iterators.hpp"
+
 namespace rsl
 {
 	template <size_type maxSize, typename CharType = char>
@@ -14,10 +16,10 @@ namespace rsl
 		using value_type = CharType;
 		using reference = value_type&;
 		using const_reference = const value_type&;
-		using iterator = value_type*;
-		using const_iterator = const value_type*;
-		using reverse_iterator = std::reverse_iterator<iterator>;
-		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+		using iterator_type = value_type*;
+		using const_iterator_type = const value_type*;
+		using reverse_iterator_type = reverse_iterator<iterator_type>;
+		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
 		using view_type = std::basic_string_view<value_type>;
 
 	private:
@@ -154,21 +156,21 @@ namespace rsl
 		constexpr operator const value_type*() const noexcept { return m_buffer; }
 		constexpr operator view_type() const noexcept { return view(); }
 
-		constexpr iterator begin() noexcept { return m_buffer; }
-		constexpr const_iterator begin() const noexcept { return m_buffer; }
-		constexpr const_iterator cbegin() const noexcept { return m_buffer; }
+		constexpr iterator_type begin() noexcept { return m_buffer; }
+		constexpr const_iterator_type begin() const noexcept { return m_buffer; }
+		constexpr const_iterator_type cbegin() const noexcept { return m_buffer; }
 
-		constexpr iterator end() noexcept { return &m_buffer[m_size]; }
-		constexpr const_iterator end() const noexcept { return &m_buffer[m_size]; }
-		constexpr const_iterator cend() const noexcept { return &m_buffer[m_size]; }
+		constexpr iterator_type end() noexcept { return &m_buffer[m_size]; }
+		constexpr const_iterator_type end() const noexcept { return &m_buffer[m_size]; }
+		constexpr const_iterator_type cend() const noexcept { return &m_buffer[m_size]; }
 
-		constexpr reverse_iterator rend() noexcept { return reverse_iterator(&m_buffer[m_size]); }
-		constexpr const_reverse_iterator rend() const noexcept { return const_reverse_iterator(&m_buffer[m_size]); }
-		constexpr const_reverse_iterator crend() const noexcept { return const_reverse_iterator(&m_buffer[m_size]); }
+		constexpr reverse_iterator_type rend() noexcept { return reverse_iterator(&m_buffer[m_size]); }
+		constexpr const_reverse_iterator_type rend() const noexcept { return const_reverse_iterator(&m_buffer[m_size]); }
+		constexpr const_reverse_iterator_type crend() const noexcept { return const_reverse_iterator(&m_buffer[m_size]); }
 
-		constexpr reverse_iterator rbegin() noexcept { return reverse_iterator(m_buffer); }
-		constexpr const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(m_buffer); }
-		constexpr const_reverse_iterator crbegin() const noexcept { return const_reverse_iterator(m_buffer); }
+		constexpr reverse_iterator_type rbegin() noexcept { return reverse_iterator(m_buffer); }
+		constexpr const_reverse_iterator_type rbegin() const noexcept { return const_reverse_iterator(m_buffer); }
+		constexpr const_reverse_iterator_type crbegin() const noexcept { return const_reverse_iterator(m_buffer); }
 	};
 
 	template <size_type maxSize, typename CharType>

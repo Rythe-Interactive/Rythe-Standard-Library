@@ -166,6 +166,8 @@ namespace rsl::asserts
 #endif // RYTHE_VALIDATE
 
 #define rsl_assert_unreachable() rsl_always_assert_msg(false, "reached unreachable code")
+#define rsl_assert_ptr_out_of_range(ptr, begin, end) rsl_assert_msg_frequent(((ptr) > (begin)) && ((ptr) < (end)), "pointer out of range")
+#define rsl_assert_ptr_out_of_range_msg(ptr, begin, end, msg) rsl_assert_msg_frequent(((ptr) > (begin)) && ((ptr) < (end)), msg)
 #define rsl_assert_out_of_range(expr) rsl_assert_msg_frequent(expr, "out of range")
 #define rsl_assert_out_of_range_msg(expr, msg) rsl_assert_msg_frequent(expr, msg)
 #define rsl_assert_invalid_access(expr) rsl_assert_msg_frequent(expr, "invalid access")

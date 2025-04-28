@@ -217,7 +217,7 @@ namespace rsl
 		[[rythe_always_inline]] constexpr multicast_delegate& assign(value_type&& del);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...)>
-		[[rythe_always_inline]] multicast_delegate& assign(T& instance);
+		[[rythe_always_inline]] constexpr multicast_delegate& assign(T& instance);
 
 		template <typename T, ReturnType (T::*TMethod)(ParamTypes...) const>
 		[[rythe_always_inline]] constexpr multicast_delegate& assign(const T& instance);
