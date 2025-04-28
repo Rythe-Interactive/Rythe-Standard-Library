@@ -190,7 +190,7 @@ namespace rsl
 	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::reverse_iterator_type
 	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::rbegin() noexcept
 	{
-		return reverse_iterator_type((mem_rsc::get_ptr() + m_size) - 1);
+		return reverse_iterator_type(end());
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
@@ -204,14 +204,14 @@ namespace rsl
 	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_reverse_iterator_type
 	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::crbegin() const noexcept
 	{
-		return const_reverse_iterator_type((mem_rsc::get_ptr() + m_size) - 1);
+		return const_reverse_iterator_type(cend());
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
 	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::reverse_iterator_type
 	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::rend() noexcept
 	{
-		return reverse_iterator_type(mem_rsc::get_ptr() - 1);
+		return reverse_iterator_type(begin());
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
@@ -225,7 +225,7 @@ namespace rsl
 	constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::const_reverse_iterator_type
 	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::crend() const noexcept
 	{
-		return const_reverse_iterator_type(mem_rsc::get_ptr() - 1);
+		return const_reverse_iterator_type(cbegin());
 	}
 
 	template <
