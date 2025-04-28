@@ -4,9 +4,9 @@
 #include "../util/common.hpp"
 #include "../util/primitives.hpp"
 
-
 namespace rsl
 {
+	// TODO(Rowan): constexpr strings are still useful if the string never leaks from constant evaluation time to runtime. constexpr_string is needed if you want to be able to read the results of a string at runtime.
 	template <allocator_type Alloc = default_allocator>
 	struct string final : public dynamic_array<char, Alloc>
 	{
@@ -16,15 +16,7 @@ namespace rsl
 		using value_type = typename base::value_type;
 		using view_type = typename base::view_type;
 
-		[[rythe_always_inline]] string() noexcept(is_nothrow_constructible_v<base>);
-		[[rythe_always_inline]] string(const string& src) noexcept(base::container_base::copy_construct_noexcept);
-		[[rythe_always_inline]] string(string&& src) noexcept;
-		template<size_type N>
-		[[rythe_always_inline]] string(const value_type (&arr)[N]) noexcept(base::container_base::move_construct_noexcept);
-		template<size_type N>
-		[[rythe_always_inline]] string(value_type (&&arr)[N]) noexcept(base::container_base::copy_construct_noexcept);
-		[[rythe_always_inline]] string(view_type src) noexcept(base::container_base::copy_construct_noexcept);
-		[[rythe_always_inline]] string(size_type capacity) noexcept;
+		using dynamic_array<char, Alloc>::dynamic_array;
 
 	public:
 		//assign
@@ -41,6 +33,10 @@ namespace rsl
 		//replace
 		[[rythe_always_inline]] string& replace(size_type, size_type, view_type);
 	};
+
+	// TODO(Rowan): This rly doesn't work. ig that's why std::basic_string exists. we could also do: using dynamic_string = string<default_allocator>; and use dynamic_string for everything instead of string<>.
+	template<typename T>
+	string(T) -> string<>;
 
 } // namespace rsl
 

@@ -4,34 +4,12 @@
 namespace rsl
 {
 	template <allocator_type Alloc>
-	inline string<Alloc>::string() noexcept(is_nothrow_constructible_v<base>) : base() {}
-
-	template <allocator_type Alloc>
-	inline string<Alloc>::string(const string& src) noexcept(base::container_base::copy_construct_noexcept) : base(src) {}
-
-	template <allocator_type Alloc>
-	inline string<Alloc>::string(string&& src) noexcept : base(src) {}
-
-	template <allocator_type Alloc>
-	template <size_type N>
-	inline string<Alloc>::string(const value_type (&arr)[N]) noexcept(base::container_base::move_construct_noexcept) : base(arr) {}
-
-	template <allocator_type Alloc>
-	template <size_type N>
-	inline string<Alloc>::string(value_type (&&arr)[N]) noexcept(base::container_base::copy_construct_noexcept) : base(rsl::move(arr)) {}
-
-	template <allocator_type Alloc>
-	inline string<Alloc>::string(view_type src) noexcept(base::container_base::copy_construct_noexcept): base(src) {}
-
-	template <allocator_type Alloc>
-	inline string<Alloc>::string(size_type capacity) noexcept : base(capacity) {}
-
-	template <allocator_type Alloc>
 	template <size_type N>
 	void string<Alloc>::assign(const value_type (&src)[N]) noexcept(base::container_base::copy_assign_noexcept)
 	{
 		this->reserve(N);
 		this->resize(N);
+		// TODO(Rowan): this doesn't work, need to memcpy, not just swap out the pointer.
 		this->set_ptr(const_cast<char*const>(&src[0]));
 	}
 

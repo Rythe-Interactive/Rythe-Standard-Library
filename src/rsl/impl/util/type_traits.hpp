@@ -167,7 +167,7 @@ namespace rsl
 	template <typename T>
 	consteval id_type type_id() noexcept
 	{
-		return hash_string(std::string_view(type_name<T>()));
+		return hash_string(string_view(type_name<T>()));
 	}
 
 	namespace internal
