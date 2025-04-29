@@ -9,6 +9,7 @@ namespace rsl
 		if (deleter)
 		{
 			deleter(*static_cast<T*>(value));
+			deleter = nullptr;
 		}
 	}
 
@@ -49,30 +50,31 @@ namespace rsl
 	{
 		m_value.emplace(forward<Args>(args)...);
 
-		ref_counter::set_factory(Factory(construct_type_signal<typed_payload<Deleter>>));
+		ref_counter::set_factory(Factory(construct_type_signal<internal::managed_payload<T, Deleter>>));
 		ref_counter::arm();
 
-		typed_payload<Deleter>* payload = bit_cast<typed_payload<Deleter>*>(mem_rsc::get_ptr());
-		payload->deleter.deleter = deleter;
-		payload->deleter.thisObject = this;
+        bit_cast<internal::managed_payload<T, Deleter>*>(mem_rsc::get_ptr())->deleter = deleter;
+	}
+
+	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
+	constexpr void managed_resource<T, Alloc, Factory>::disarm_impl() noexcept
+	{
+		if (ref_counter::is_armed() && ref_counter::free())
+		{
+			mem_rsc::get_ptr()->destroy(get());
+		}
 	}
 
 	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
 	constexpr managed_resource<T, Alloc, Factory>::~managed_resource() noexcept
 	{
-		if (ref_counter::is_armed() && ref_counter::free())
-		{
-			mem_rsc::get_ptr()->destroy(get());
-			m_value.reset();
-		}
+		disarm_impl();
 	}
 
 	template <typename T, allocator_type Alloc, untyped_factory_type Factory>
-	template <internal::managed_deleter_type<T> Deleter>
-	constexpr void managed_resource<T, Alloc, Factory>::deleter_wrapper<Deleter>::operator()(T& value) const noexcept
+	void managed_resource<T, Alloc, Factory>::on_disarm() noexcept
 	{
-		deleter(value);
-		thisObject->m_value.reset();
+		disarm_impl();
 	}
 
 } // namespace rsl

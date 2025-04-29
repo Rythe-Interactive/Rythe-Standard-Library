@@ -61,7 +61,10 @@ namespace rsl
 	};
 
 	template <typename T>
-	class default_factory
+	class default_factory;
+
+	template <constructible_at_all T>
+	class default_factory<T>
 	{
 	public:
 		using value_type = T;
@@ -75,7 +78,7 @@ namespace rsl
 		constexpr default_factory() noexcept = default;
 
 		template <typename Other>
-		constexpr default_factory(default_factory<Other>) noexcept {}
+		constexpr default_factory(default_factory<Other>) noexcept {} // NOLINT(*-explicit-constructor)
 
 		template <typename... Args>
 		T construct_single_inline(Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>);
@@ -104,7 +107,7 @@ namespace rsl
 		constexpr default_factory() noexcept = default;
 
 		template <typename Other>
-		constexpr default_factory(default_factory<Other>) noexcept { rsl_assert_unreachable(); }
+		constexpr default_factory(default_factory<Other>) noexcept { rsl_assert_unreachable(); } // NOLINT(*-explicit-constructor)
 
 		template <typename... Args>
 		static void construct_single_inline(Args&&...) { rsl_assert_unreachable(); }
@@ -115,7 +118,7 @@ namespace rsl
 
 		constexpr static size_type type_size() noexcept { rsl_assert_unreachable(); return 0; }
 		constexpr static bool trivial_copy() noexcept { rsl_assert_unreachable(); return false; }
-		constexpr static id_type type_id() noexcept { rsl_assert_unreachable(); return rsl::type_id<void>(); }
+		constexpr static id_type type_id() noexcept { rsl_assert_unreachable(); return 0; }
 	};
 
 	template <typename T>
@@ -131,9 +134,9 @@ namespace rsl
 		virtual void* construct(void* ptr, size_type count) const = 0;
 		virtual void* move(void* dst, void* src, size_type count) const = 0;
 		virtual void destroy(void* ptr, size_type count) const noexcept = 0;
-		virtual size_type type_size() const noexcept = 0;
-		virtual bool trivial_copy() const noexcept = 0;
-		virtual id_type type_id() const noexcept = 0;
+		[[nodiscard]] virtual size_type type_size() const noexcept = 0;
+		[[nodiscard]] virtual bool trivial_copy() const noexcept = 0;
+		[[nodiscard]] virtual id_type type_id() const noexcept = 0;
 	};
 
 	// Crucially does not qualify as a typed factory
@@ -146,9 +149,9 @@ namespace rsl
 		void* construct(void* ptr, size_type count) const override;
 		void* move(void* dst, void* src, size_type count) const override;
 		void destroy(void* ptr, size_type count) const noexcept override;
-		size_type type_size() const noexcept override;
-		bool trivial_copy() const noexcept override;
-		id_type type_id() const noexcept override;
+		[[nodiscard]] size_type type_size() const noexcept override;
+		[[nodiscard]] bool trivial_copy() const noexcept override;
+		[[nodiscard]] id_type type_id() const noexcept override;
 	};
 
 	class type_erased_factory
@@ -162,7 +165,7 @@ namespace rsl
 
 		type_erased_factory() noexcept = default;
 		template <typename T>
-		[[rythe_always_inline]] type_erased_factory(construct_type_signal_type<T>) noexcept;
+		[[rythe_always_inline]] type_erased_factory(construct_type_signal_type<T>) noexcept; // NOLINT(*-explicit-constructor)
 
 		void* construct(void* ptr, size_type count) const;
 		void* move(void* dst, void* src, size_type count) const;
@@ -181,7 +184,7 @@ namespace rsl
 	};
 
 	template <untyped_factory_type Factory>
-	[[nodiscard]] [[rythe_always_inline]] bool can_trivially_copy(Factory& factory) noexcept;
+	[[nodiscard]] [[rythe_always_inline]] bool can_trivially_copy(Factory& factory) noexcept; // NOLINT(*-redundant-declaration)
 
 } // namespace rsl
 

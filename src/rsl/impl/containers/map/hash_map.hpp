@@ -33,7 +33,7 @@ namespace rsl
 		static constexpr float32 max_load_factor = MapInfo::max_load_factor;
 
 		using value_type = typename MapInfo::value_type;
-		using node_type = internal::map_node<hash_map_base>;
+		using node_type = internal::map_node<MapInfo>;
 		using bucket_type = typename MapInfo::bucket_type;
 		using psl_type = typename MapInfo::psl_type;
 		using storage_type = typename MapInfo::storage_type;

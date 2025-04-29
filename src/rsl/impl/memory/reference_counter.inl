@@ -121,12 +121,14 @@ namespace rsl
 	}
 
 	template <reference_counted Counter, allocator_type Alloc, factory_type Factory>
-	constexpr void basic_reference_counter<Counter, Alloc, Factory>::disarm() noexcept
+	void basic_reference_counter<Counter, Alloc, Factory>::disarm() noexcept
 	{
 		if (!is_armed())
 		{
 			return;
 		}
+
+        on_disarm();
 
 		if (free())
 		{

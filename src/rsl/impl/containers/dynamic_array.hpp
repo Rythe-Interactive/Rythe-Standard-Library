@@ -121,8 +121,8 @@ namespace rsl
 
 		// Returns amount of items removed, specific location of erasure is not possible to reconstruct.
 		template <typename Comp>
-		[[rythe_always_inline]] constexpr size_type erase_swap(Comp&& comparable)
-			noexcept(container_base::move_construct_noexcept);
+		[[rythe_always_inline]] constexpr size_type erase_swap(const Comp& comparable)
+			noexcept(container_base::move_construct_noexcept) requires equality_comparable_with<Comp, value_type>;
 
 		// Returns amount of items removed, specific location of erasure is not possible to reconstruct.
 		template <typename Func>
@@ -143,8 +143,8 @@ namespace rsl
 		// Depending on your use case erase_swap might be faster. Try both and test!
 		// Returns amount of items removed, specific location of erasure is not possible to reconstruct.
 		template <typename Comp>
-		[[rythe_always_inline]] constexpr size_type erase_shift(Comp&& comparable)
-			noexcept(container_base::move_construct_noexcept);
+		[[rythe_always_inline]] constexpr size_type erase_shift(const Comp& comparable)
+			noexcept(container_base::move_construct_noexcept) requires equality_comparable_with<Comp, value_type>;
 
 		// Unless specifically required use erase_swap for selective erasures.
 		// Depending on your use case erase_swap might be faster. Try both and test!

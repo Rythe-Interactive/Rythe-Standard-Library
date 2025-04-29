@@ -48,7 +48,7 @@ namespace rsl
 
 		template <typename OtherType, optional_typed_factory_type OtherFactory>
 			requires (is_pointer_assignable_v<T, OtherType>)
-		[[rythe_always_inline]] constexpr unique_object(unique_object<OtherType, Alloc, OtherFactory>&& other) noexcept;
+		[[rythe_always_inline]] constexpr unique_object(unique_object<OtherType, Alloc, OtherFactory>&& other) noexcept; // NOLINT(*-explicit-constructor)
 
 		[[rythe_always_inline]] constexpr unique_object& operator=(unique_object&& other) noexcept;
 
@@ -99,8 +99,8 @@ namespace rsl
 		friend class unique_object;
 
 		template <typename... Args>
-			requires (factory_t::valid_factory)
-		[[rythe_always_inline]] constexpr void arm(Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>);
+		[[rythe_always_inline]] constexpr void arm(Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>)
+			requires (factory_t::valid_factory);
 
 		factory_storage_type m_factory;
 	};

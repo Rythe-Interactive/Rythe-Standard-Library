@@ -13,8 +13,10 @@ namespace rsl
 		{
 			constexpr_string ret = name;
 
-			constexpr_string anonymousNamespacefilter = "(anonymous namespace)::";
-			ret = ret.filter(anonymousNamespacefilter);
+			constexpr_string anonymousNamespacefilterGCC = "(anonymous namespace)::";
+			ret = ret.filter(anonymousNamespacefilterGCC);
+			constexpr_string anonymousNamespacefilterMSVC = "`anonymous-namespace'::";
+			ret = ret.filter(anonymousNamespacefilterMSVC);
 			constexpr_string cxxfilter = "__cxx11::";
 			ret = ret.filter(cxxfilter);
 			constexpr_string classFilter = "class ";
@@ -167,7 +169,7 @@ namespace rsl
 	template <typename T>
 	consteval id_type type_id() noexcept
 	{
-		return hash_string(std::string_view(type_name<T>()));
+		return hash_string(string_view(type_name<T>()));
 	}
 
 	namespace internal

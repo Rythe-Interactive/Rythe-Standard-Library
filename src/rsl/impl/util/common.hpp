@@ -770,6 +770,7 @@ namespace rsl
 		}
 
 		// Has no size requirements, but not every compiler is happy with this implementation.
+		// Causes an internal compiler on MSVC
 		// TODO(Glyn): Needs more research
 		template <typename To, typename From>
 			requires is_trivially_copyable_v<To> && is_trivially_constructible_v<To> && is_trivially_copyable_v<From>

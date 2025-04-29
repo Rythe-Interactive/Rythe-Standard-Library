@@ -100,17 +100,18 @@ namespace rsl
 
 	template <typename T, allocator_type Alloc, optional_typed_factory_type Factory>
 	template <typename... Args>
-			requires (Factory::valid_factory)
 	constexpr void unique_object<T, Alloc, Factory>::arm(Args&&... args)
 		noexcept(is_nothrow_constructible_v<T, Args...>)
+			requires (factory_t::valid_factory)
 	{
 		T* ptr = this->get_allocator().allocate(m_factory->type_size());
 		m_factory->construct(ptr, 1, forward<Args>(args)...);
 
-		unique_rsc::arm([this](T* mem)
+		unique_rsc::arm(
+			[factory = m_factory, allocator = this->get_allocator_storage()](T* mem)
 		{
-			this->m_factory->destroy(mem, 1);
-			this->get_allocator().deallocate(mem, this->m_factory->type_size());
+			factory->destroy(mem, 1);
+			allocator->deallocate(mem, factory->type_size());
 		}, ptr);
 	}
 }

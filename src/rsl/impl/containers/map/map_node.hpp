@@ -2,14 +2,17 @@
 
 namespace rsl::internal
 {
-	template <typename MapType>
+	template <typename MapInfo>
 	class hash_map_node
 	{
 	public:
-		using map_type = MapType;
-		using key_type = typename MapType::key_type;
-		using mapped_type = typename MapType::mapped_type;
-		using value_type = typename MapType::value_type;
+		static constexpr bool is_map = MapInfo::is_map;
+		static constexpr bool is_set = MapInfo::is_set;
+		static constexpr bool is_transparent = MapInfo::is_transparent;
+
+		using key_type = typename MapInfo::key_type;
+		using mapped_type = typename MapInfo::mapped_type;
+		using value_type = typename MapInfo::value_type;
 
 		explicit constexpr hash_map_node(value_type* data) noexcept
 			: m_data(data) {}
@@ -32,37 +35,37 @@ namespace rsl::internal
 		const value_type& operator*() const { return *m_data; }
 
 		[[nodiscard]] key_type& key() noexcept
-			requires map_type::is_map
+			requires is_map
 		{
 			return m_data->first;
 		}
 
 		[[nodiscard]] const key_type& key() const noexcept
-			requires map_type::is_map
+			requires is_map
 		{
 			return m_data->first;
 		}
 
 		[[nodiscard]] value_type& key() noexcept
-			requires map_type::is_set
+			requires is_set
 		{
 			return *m_data;
 		}
 
 		[[nodiscard]] const value_type& key() const noexcept
-			requires map_type::is_set
+			requires is_set
 		{
 			return *m_data;
 		}
 
 		[[nodiscard]] mapped_type& value() noexcept
-			requires map_type::is_map
+			requires is_map
 		{
 			return m_data->second;
 		}
 
 		[[nodiscard]] const mapped_type& value() const noexcept
-			requires map_type::is_map
+			requires is_map
 		{
 			return m_data->second;
 		}
@@ -71,14 +74,17 @@ namespace rsl::internal
 		value_type* m_data;
 	};
 
-	template <typename MapType>
+	template <typename MapInfo>
 	class flat_hash_map_node
 	{
 	public:
-		using map_type = MapType;
-		using key_type = typename MapType::key_type;
-		using mapped_type = typename MapType::mapped_type;
-		using value_type = typename MapType::value_type;
+		static constexpr bool is_map = MapInfo::is_map;
+		static constexpr bool is_set = MapInfo::is_set;
+		static constexpr bool is_transparent = MapInfo::is_transparent;
+
+		using key_type = typename MapInfo::key_type;
+		using mapped_type = typename MapInfo::mapped_type;
+		using value_type = typename MapInfo::value_type;
 
 		template <typename... Args>
 		explicit flat_hash_map_node(Args&&... args) // NOLINT(cppcoreguidelines*)
@@ -96,37 +102,37 @@ namespace rsl::internal
 		const value_type& operator*() const noexcept { return m_data; }
 
 		[[nodiscard]] key_type& key() noexcept
-			requires map_type::is_map
+			requires is_map
 		{
 			return m_data.first;
 		}
 
 		[[nodiscard]] const key_type& key() const noexcept
-			requires map_type::is_map
+			requires is_map
 		{
 			return m_data.first;
 		}
 
 		[[nodiscard]] value_type& key() noexcept
-			requires map_type::is_set
+			requires is_set
 		{
 			return m_data;
 		}
 
 		[[nodiscard]] const value_type& key() const noexcept
-			requires map_type::is_set
+			requires is_set
 		{
 			return m_data;
 		}
 
 		[[nodiscard]] mapped_type& value() noexcept
-			requires map_type::is_map
+			requires is_map
 		{
 			return m_data.second;
 		}
 
 		[[nodiscard]] const mapped_type& value() const noexcept
-			requires map_type::is_map
+			requires is_map
 		{
 			return m_data.second;
 		}
@@ -135,20 +141,20 @@ namespace rsl::internal
 		value_type m_data;
 	};
 
-	template <typename MapType, bool IsFlat = false>
+	template <typename MapInfo, bool IsFlat = false>
 	struct select_node_type
 	{
-		using type = hash_map_node<MapType>;
+		using type = hash_map_node<MapInfo>;
 	};
 
-	template <typename MapType>
-	struct select_node_type<MapType, true>
+	template <typename MapInfo>
+	struct select_node_type<MapInfo, true>
 	{
-		using type = flat_hash_map_node<MapType>;
+		using type = flat_hash_map_node<MapInfo>;
 	};
 
-	template <typename MapType>
-	using map_node = typename select_node_type<MapType, MapType::is_flat>::type;
+	template <typename MapInfo>
+	using map_node = typename select_node_type<MapInfo, MapInfo::is_flat>::type;
 
 
 } // namespace rsl::internal
