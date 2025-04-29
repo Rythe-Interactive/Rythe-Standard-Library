@@ -456,4 +456,14 @@ namespace rsl
 	type(type&&) noexcept = default;                                                                                   \
 	type& operator=(type&&) noexcept = default;
 
+#define RYTHE_BIT_FLAG_OPERATORS(EnumType)																								\
+	constexpr EnumType operator|(EnumType lhs, EnumType rhs) noexcept																    \
+	{																																    \
+		return static_cast<EnumType>(static_cast<underlying_type_t<EnumType>>(lhs) | static_cast<underlying_type_t<EnumType>>(rhs));    \
+	}																																    \
+	constexpr EnumType operator&(EnumType lhs, EnumType rhs) noexcept																    \
+	{																																    \
+		return static_cast<EnumType>(static_cast<underlying_type_t<EnumType>>(lhs) & static_cast<underlying_type_t<EnumType>>(rhs));    \
+	}																																    \
+
 #pragma endregion

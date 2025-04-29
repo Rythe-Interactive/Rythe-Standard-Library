@@ -87,7 +87,7 @@ namespace rsl
 	template <typename T, typename DecorationSignal>
 	struct decorate_type<T, DecorationSignal>
 	{
-		static_assert(false, "Uknown signal.");
+		static_assert(false, "Unknown signal."); // NOLINT
 	};
 
 	template <typename T>
@@ -99,7 +99,7 @@ namespace rsl
 	template <typename T, typename DecorationSignal, typename... Rest>
 	struct decorate_type<T, DecorationSignal, Rest...>
 	{
-		using type = decorate_type<typename decorate_type<T, DecorationSignal>::type, Rest...>::type;
+		using type = typename decorate_type<typename decorate_type<T, DecorationSignal>::type, Rest...>::type;
 	};
 
 	template <typename T>
@@ -127,7 +127,7 @@ namespace rsl
 	};
 
 	template <typename T, typename... DecorationSignals>
-	using decorate_type_t = decorate_type<T, DecorationSignals...>::type;
+	using decorate_type_t = typename decorate_type<T, DecorationSignals...>::type;
 
 	template <typename T, typename = void>
 	struct is_always_equal
@@ -142,7 +142,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	using is_always_equal_t = is_always_equal<T>::type;
+	using is_always_equal_t = typename is_always_equal<T>::type;
 
 	template <size_type>
 	struct select_sized_integer;

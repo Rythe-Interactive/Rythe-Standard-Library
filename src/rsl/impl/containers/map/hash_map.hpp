@@ -18,6 +18,9 @@ namespace rsl
 	{
 	public:
 		static constexpr bool is_flat = MapInfo::is_flat;
+		static constexpr bool is_large = MapInfo::is_large;
+		static constexpr bool is_dense = MapInfo::is_dense;
+
 		using key_type = typename MapInfo::key_type;
 		using mapped_type = typename MapInfo::mapped_type;
 		using hasher_type = typename MapInfo::hasher_type;
@@ -41,10 +44,10 @@ namespace rsl
 		using factory_t = typename MapInfo::template factory_t<mapped_type>;
 		using factory_storage_type = factory_storage<factory_t>;
 
-	private:
 		using bucket_factory_t = typename MapInfo::template factory_t<bucket_type>;
 		using node_factory_t = typename MapInfo::template factory_t<node_type>;
 
+	private:
 		using data_pool = conditional_storage<!is_flat, memory_pool<value_type, allocator_t>>;
 		using value_container = dynamic_array<node_type, allocator_t, node_factory_t>;
 		using bucket_container = dynamic_array<bucket_type, allocator_t, bucket_factory_t>;
@@ -150,6 +153,11 @@ namespace rsl
 		[[nodiscard]] [[rythe_always_inline]] constexpr const_reverse_iterator_type crend() const noexcept;
 
 	protected:
+		template <typename... Args>
+		[[nodiscard]] [[rythe_always_inline]] constexpr node_type create_node(const key_type& key, Args&&... args);
+
+		[[rythe_always_inline]] constexpr void destroy_node(node_type& node) noexcept;
+
 		constexpr void rehash(const bucket_container& oldBuckets) noexcept;
 
 		[[rythe_always_inline]] constexpr void maybe_grow() noexcept(noexcept(reserve(0)));

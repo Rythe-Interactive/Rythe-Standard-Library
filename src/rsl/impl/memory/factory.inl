@@ -17,6 +17,13 @@ namespace rsl
 		};
 
 		template <typename T, typename... Args>
+		[[rythe_always_inline]] T default_construct_single_inline(Args&&... args)
+			noexcept(noexcept(default_factory<T>{}.construct_single_inline(forward<Args>(args)...)))
+		{
+			return default_factory<T>{}.construct_single_inline(forward<Args>(args)...);
+		}
+
+		template <typename T, typename... Args>
 		[[rythe_always_inline]] void* default_construct(void* ptr, size_type count, Args&&... args)
 			noexcept(noexcept(default_factory<T>{}.construct(ptr, count, forward<Args>(args)...)))
 		{
@@ -37,6 +44,13 @@ namespace rsl
 			default_factory<T>{}.destroy(static_cast<T*>(ptr), count);
 		}
 	} // namespace internal
+
+	template <typename T>
+	template <typename ... Args>
+	T default_factory<T>::construct_single_inline(Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>)
+	{
+		return T(rsl::forward<Args>(args)...);
+	}
 
 	template <typename T>
 	template <typename... Args>

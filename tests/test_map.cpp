@@ -67,13 +67,13 @@ TEST_CASE("dynamic_map", "[containers]")
 		}
 		{
 			test_heap_allocator alloc{1234};
-			rsl::dynamic_map<float32, test_struct, test_heap_allocator> map{alloc};
+			rsl::dynamic_map<float32, test_struct> map{alloc};
 			REQUIRE(map.get_allocator().id == 1234);
 		}
 		{
 			default_pmu_allocator alloc;
 			allocator_storage<polymorphic_allocator> store(alloc);
-			rsl::dynamic_map<float32, test_struct, polymorphic_allocator> map{store};
+			rsl::dynamic_map<float32, test_struct, hash_map_flags::defaultFlags, polymorphic_allocator> map{store};
 			REQUIRE((&(map.get_allocator())) == &alloc);
 		}
 	}
