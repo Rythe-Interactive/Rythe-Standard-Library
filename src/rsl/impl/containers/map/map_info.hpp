@@ -20,8 +20,7 @@ namespace rsl
 		none = 0,
 		flat = 1 << 0,
 		large = 1 << 1,
-		dense = 1 << 2,
-		all = flat | large | dense,
+		all = flat | large,
 		defaultFlags = all,
 	};
 
@@ -37,11 +36,6 @@ namespace rsl
 		return (flags & hash_map_flags::large) != hash_map_flags::none;
 	}
 
-	constexpr bool hash_map_flags_is_dense(const hash_map_flags flags) noexcept
-	{
-		return (flags & hash_map_flags::dense) != hash_map_flags::none;
-	}
-
 	template <
 		typename Key, typename Value, hash_map_flags Flags = hash_map_flags::defaultFlags, allocator_type Alloc = default_allocator,
 		typed_factory_type FactoryType = default_factory<internal::map_value_type<Key, Value, hash_map_flags_is_flat(Flags)>>,
@@ -50,7 +44,7 @@ namespace rsl
 		size_type FingerprintSize = internal::recommended_fingerprint_size<hash_map_flags_is_large(Flags)>>
 	struct map_info
 	{
-		constexpr static float32 max_load_factor = static_cast<float32>(MaxLoadFactor::num) / MaxLoadFactor::den;
+		constexpr static float32 max_load_factor = static_cast<float32>(MaxLoadFactor::num) / static_cast<float32>(MaxLoadFactor::den);
 		static_assert(max_load_factor > 0.1f && max_load_factor <= 0.99f, "MaxLoadFactor needs to be > 0.1 && < 0.99");
 
 		using key_type = Key;
@@ -58,7 +52,6 @@ namespace rsl
 
 		constexpr static bool is_flat = hash_map_flags_is_flat(Flags);
 		constexpr static bool is_large = hash_map_flags_is_large(Flags);
-		constexpr static bool is_dense = hash_map_flags_is_dense(Flags);
 
 		using bucket_type = internal::hash_map_bucket<is_large, FingerprintSize>;
 		using psl_type = typename bucket_type::psl_type;
