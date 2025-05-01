@@ -10,7 +10,7 @@ namespace rsl
 		this->reserve(N);
 		this->resize(N);
 		// TODO(Rowan): this doesn't work, need to memcpy, not just swap out the pointer.
-		this->set_ptr(const_cast<char*const>(&src[0]));
+		constexpr_memcpy(&this->m_ptr[0], &src[0], N);
 	}
 
 	template <allocator_type Alloc>
