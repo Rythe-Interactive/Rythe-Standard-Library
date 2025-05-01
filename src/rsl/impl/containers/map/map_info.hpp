@@ -15,12 +15,39 @@ namespace rsl
 			is_void<Value>::value, Key, pair<typename conditional<IsFlat, Key, const Key>::type, Value>>::type;
 	}
 
+	enum struct hash_map_flags
+	{
+		none = 0,
+		flat = 1 << 0,
+		large = 1 << 1,
+		dense = 1 << 2,
+		all = flat | large | dense,
+		defaultFlags = all,
+	};
+
+	RYTHE_BIT_FLAG_OPERATORS(hash_map_flags)
+
+	constexpr bool hash_map_flags_is_flat(const hash_map_flags flags) noexcept
+	{
+		return (flags & hash_map_flags::flat) != hash_map_flags::none;
+	}
+
+	constexpr bool hash_map_flags_is_large(const hash_map_flags flags) noexcept
+	{
+		return (flags & hash_map_flags::large) != hash_map_flags::none;
+	}
+
+	constexpr bool hash_map_flags_is_dense(const hash_map_flags flags) noexcept
+	{
+		return (flags & hash_map_flags::dense) != hash_map_flags::none;
+	}
+
 	template <
-		typename Key, typename Value, typename Hash = ::rsl::hash<Key>, typename KeyEqual = equal<Key>,
-		bool IsFlat = true, allocator_type Alloc = default_allocator,
-		typed_factory_type FactoryType = default_factory<internal::map_value_type<Key, Value, IsFlat>>,
-		ratio_type MaxLoadFactor = ::std::ratio<80, 100>, bool IsLarge = true,
-		size_type FingerprintSize = internal::recommended_fingerprint_size<IsLarge>>
+		typename Key, typename Value, hash_map_flags Flags = hash_map_flags::defaultFlags, allocator_type Alloc = default_allocator,
+		typed_factory_type FactoryType = default_factory<internal::map_value_type<Key, Value, hash_map_flags_is_flat(Flags)>>,
+		typename Hash = ::rsl::hash<Key>, typename KeyEqual = equal<Key>,
+		ratio_type MaxLoadFactor = ::std::ratio<80, 100>,
+		size_type FingerprintSize = internal::recommended_fingerprint_size<hash_map_flags_is_large(Flags)>>
 	struct map_info
 	{
 		constexpr static float32 max_load_factor = static_cast<float32>(MaxLoadFactor::num) / MaxLoadFactor::den;
@@ -29,9 +56,11 @@ namespace rsl
 		using key_type = Key;
 		using mapped_type = Value;
 
-		constexpr static bool is_flat = IsFlat;
+		constexpr static bool is_flat = hash_map_flags_is_flat(Flags);
+		constexpr static bool is_large = hash_map_flags_is_large(Flags);
+		constexpr static bool is_dense = hash_map_flags_is_dense(Flags);
 
-		using bucket_type = internal::hash_map_bucket<IsLarge, FingerprintSize>;
+		using bucket_type = internal::hash_map_bucket<is_large, FingerprintSize>;
 		using psl_type = typename bucket_type::psl_type;
 		using storage_type = typename bucket_type::storage_type;
 
@@ -43,7 +72,7 @@ namespace rsl
 		static constexpr bool is_transparent =
 			has_is_transparent<hasher_type>::value && has_is_transparent<key_comparer_type>::value;
 
-		using value_type = internal::map_value_type<Key, Value, IsFlat>;
+		using value_type = internal::map_value_type<Key, Value, is_flat>;
 
 		using allocator_t = Alloc;
 

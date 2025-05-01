@@ -44,6 +44,7 @@ namespace rsl::asserts
 } // namespace rsl::asserts
 
 #define __rsl_assert_impl(expr, file, line, msg, soft)                                                                 \
+	if(!is_constant_evaluated())																					   \
 	{                                                                                                                  \
 		if (!rsl::asserts::assert_handler)                                                                             \
 		{                                                                                                              \

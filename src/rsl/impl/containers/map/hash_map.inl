@@ -140,7 +140,7 @@ namespace rsl
 
 		size_type index = hash.homeIndex + searchResult.unpackedPsl.psl;
 		size_type valueIndex = m_buckets[index].index;
-		m_values[valueIndex].destroy(*this);
+		destroy_node(m_values[valueIndex]);
 		m_values.erase_swap(valueIndex);
 		m_buckets[m_lastValueBucketIndex].index = valueIndex;
 
@@ -295,6 +295,53 @@ namespace rsl
 		noexcept
 	{
 		return const_reverse_iterator_type(m_values.crend());
+	}
+
+	template <typename MapInfo>
+	template <typename ... Args>
+	constexpr typename hash_map_base<MapInfo>::node_type
+	hash_map_base<MapInfo>::create_node(const key_type& key, Args&&... args)
+	{
+		if constexpr (is_flat)
+		{
+			return node_type(key, m_factory->construct_single_inline(rsl::forward<Args>(args)...));
+		}
+		else
+		{
+			value_type* newValue = m_memoryPool->allocate();
+
+			if constexpr (is_map)
+			{
+				new(&newValue->first) key_type(key);
+				m_factory->construct(&newValue->second, 1, rsl::forward<Args>(args)...);
+			}
+			else
+			{
+				*newValue = key;
+			}
+
+			return node_type(newValue);
+		}
+	}
+
+	template <typename MapInfo>
+	constexpr void hash_map_base<MapInfo>::destroy_node(node_type& node) noexcept
+	{
+		if constexpr (!is_flat)
+		{
+			if constexpr (is_map)
+			{
+				m_factory->destroy(&node->second, 1);
+				node->first.~key_type();
+			}
+			else
+			{
+				node->~value_type();
+			}
+
+			m_memoryPool->deallocate(node.get_ptr());
+			node->set_ptr(nullptr);
+		}
 	}
 
 	template <typename MapInfo>
@@ -565,7 +612,7 @@ namespace rsl
 	{
 		m_values.reserve(newCapacity);
 
-		if constexpr (data_pool::holds_value)
+		if constexpr (!is_flat)
 		{
 			m_memoryPool->reserve(newCapacity);
 		}
@@ -584,13 +631,13 @@ namespace rsl
 	{
 		for (node_type& node : m_values)
 		{
-			node.destroy(*this);
+			destroy_node(node);
 		}
 
 		m_values.clear();
 		m_buckets.clear();
 
-		if constexpr (data_pool::holds_value)
+		if constexpr (!is_flat)
 		{
 			m_memoryPool->clear();
 		}
@@ -612,7 +659,7 @@ namespace rsl
 
 		if (insertResult.type == insert_result_type::newInsertion)
 		{
-			return m_values.emplace_back(*this, key, forward<Args>(args)...).value();
+			return m_values.emplace_back(create_node(key, forward<Args>(args)...)).value();
 		}
 
 		mapped_type& value = m_values[m_buckets[insertResult.index].index].value();
@@ -629,7 +676,7 @@ namespace rsl
 
 		if (insertResult.type == insert_result_type::newInsertion)
 		{
-			return {ref(m_values.emplace_back(*this, key, forward<Args>(args)...).value()), true};
+			return {ref(m_values.emplace_back(create_node(key, forward<Args>(args)...)).value()), true};
 		}
 
 		return {ref(m_values[m_buckets[insertResult.index].index].value()), false};

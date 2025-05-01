@@ -23,6 +23,7 @@ namespace rsl
 			Deleter deleter;
 
 			void destroy(void* value) noexcept override;
+			virtual void on_reset() noexcept override { rsl_assert_invalid_object(!deleter); }
 		};
 	} // namespace internal
 
@@ -69,20 +70,11 @@ namespace rsl
 		[[rythe_always_inline]] constexpr T* operator->() noexcept { return &*m_value; }
 		[[rythe_always_inline]] constexpr const T* operator->() const noexcept { return &*m_value; }
 
+    protected:
+		constexpr void disarm_impl() noexcept;
+		virtual void on_disarm() noexcept;
+
 	private:
-		template <internal::managed_deleter_type<T> Deleter>
-		struct deleter_wrapper
-		{
-			Deleter deleter;
-			managed_resource* thisObject;
-
-			[[rythe_always_inline]] constexpr operator bool() const noexcept { return deleter; }
-			[[rythe_always_inline]] constexpr void operator()(T& value) const noexcept;
-		};
-
-		template <internal::managed_deleter_type<T> Deleter>
-		using typed_payload = internal::managed_payload<T, deleter_wrapper<Deleter>>;
-
 		optional<T> m_value;
 	};
 } // namespace rsl

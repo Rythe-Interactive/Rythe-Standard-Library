@@ -420,8 +420,8 @@ inline constexpr bool dynamic_array<T, Alloc, Factory>::operator!=(const dynamic
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	template <typename Comp>
-	constexpr size_type dynamic_array<T, Alloc, Factory>::erase_swap(Comp&& comparable)
-		noexcept(container_base::move_construct_noexcept)
+	constexpr size_type dynamic_array<T, Alloc, Factory>::erase_swap(const Comp& comparable)
+		noexcept(container_base::move_construct_noexcept) requires equality_comparable_with<Comp, value_type>
 	{
 		return erase_swap([&](const_iterator_type iter) { return (*iter) == comparable; });
 	}
@@ -429,7 +429,7 @@ inline constexpr bool dynamic_array<T, Alloc, Factory>::operator!=(const dynamic
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	template <typename Func>
 	constexpr size_type dynamic_array<T, Alloc, Factory>::erase_swap(Func&& comparer)
-		noexcept(container_base::move_construct_noexcept) requires invocable<Func, bool(typename contiguous_container_base<T, Alloc, Factory>::const_iterator_type)>
+		noexcept(container_base::move_construct_noexcept) requires invocable<Func, bool(const_iterator_type)>
 	{
 		const size_type originalSize = container_base::m_size;
 
@@ -489,8 +489,8 @@ inline constexpr bool dynamic_array<T, Alloc, Factory>::operator!=(const dynamic
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	template <typename Comp>
-	constexpr size_type dynamic_array<T, Alloc, Factory>::erase_shift(Comp&& comparable)
-		noexcept(container_base::move_construct_noexcept)
+	constexpr size_type dynamic_array<T, Alloc, Factory>::erase_shift(const Comp& comparable)
+		noexcept(container_base::move_construct_noexcept) requires equality_comparable_with<Comp, value_type>
 	{
 		return erase_shift([&](const_iterator_type iter) { return (*iter) == comparable; });
 	}

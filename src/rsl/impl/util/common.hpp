@@ -116,6 +116,17 @@ namespace rsl
 	{
 	};
 
+	template<typename EnumType>
+		requires (is_enum_v<EnumType>)
+	using underlying_type_t = __underlying_type(EnumType);
+
+	template<typename EnumType>
+		requires (is_enum_v<EnumType>)
+	struct underlying_type
+	{
+		using type = underlying_type_t<EnumType>;
+	};
+
 	template <bool Test, typename TrueType, typename FalseType>
 	struct conditional
 	{
@@ -759,6 +770,7 @@ namespace rsl
 		}
 
 		// Has no size requirements, but not every compiler is happy with this implementation.
+		// Causes an internal compiler on MSVC
 		// TODO(Glyn): Needs more research
 		template <typename To, typename From>
 			requires is_trivially_copyable_v<To> && is_trivially_constructible_v<To> && is_trivially_copyable_v<From>
@@ -1719,6 +1731,12 @@ namespace rsl
 		{
 			return ((make_sequence_t<is_invocable, any_type, ParamCounts, Func>::value) || ...);
 		}
+
+		template <typename T, size_type... ParamCounts>
+		consteval bool test_constructible_impl([[maybe_unused]] integer_sequence<size_type, ParamCounts...> intSeq)
+		{
+			return ((make_sequence_t<is_constructible, any_type, ParamCounts, T>::value) || ...);
+		}
 	} // namespace internal
 
 	template <typename Func, size_type MaxParams = 32>
@@ -1735,6 +1753,24 @@ namespace rsl
 
 	template <typename Func, size_type MaxParams = 32>
 	constexpr bool is_functor_v = requires { &Func::operator(); } && is_invocable_any_v<Func, MaxParams>;
+
+	template <typename T, size_type MaxParams = 32>
+	struct is_constructible_any
+	{
+		static constexpr bool value = internal::test_constructible_impl<T>(make_index_sequence<MaxParams>{});
+	};
+
+	template <typename T, size_type MaxParams = 32>
+	constexpr bool is_constructible_any_v = is_constructible_any<T, MaxParams>::value;
+
+	template <typename T>
+	inline constexpr bool is_abstract_v = !is_void_v<T> && !is_constructible_any_v<T>;
+
+	template <typename T>
+	struct is_abstract
+	{
+		static constexpr bool value = is_abstract_v<T>;
+	};
 
 	// TODO: Make our own ratio type.
 	template <typename Type>

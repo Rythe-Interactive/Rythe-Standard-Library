@@ -81,7 +81,7 @@ namespace rsl
 		) noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&, const factory_storage_type&>);
 
 		[[rythe_always_inline]] constexpr void arm() noexcept;
-		[[rythe_always_inline]] constexpr void disarm() noexcept;
+		[[rythe_always_inline]] void disarm() noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool is_armed() const noexcept;
 
 		[[rythe_always_inline]] constexpr size_type borrow() noexcept;
@@ -93,6 +93,7 @@ namespace rsl
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool free() const noexcept;
 
 	protected:
+		virtual void on_disarm() noexcept {};
 		[[rythe_always_inline]] constexpr void arm(Counter* ptr) noexcept;
 	};
 

@@ -103,6 +103,12 @@ namespace rsl
 								 constructible_from<T, const T&> && convertible_to<const T&, T> &&
 								 constructible_from<T, const T> && convertible_to<const T, T>;
 
+	template<typename T>
+	concept constructible_at_all = is_constructible_any_v<T>;
+
+	template<typename T>
+	concept not_constructible = !is_constructible_any_v<T>;
+
 	template <typename T>
 	concept boolean_testable = convertible_to<T, bool> && requires(T&& val) {
 		{ !static_cast<T&&>(val) } -> convertible_to<bool>;

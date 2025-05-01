@@ -9,6 +9,7 @@ namespace
 	struct alignas(16) test_struct
 	{
 		rsl::f32 x, y, z;
+		rsl::byte _padding[4];
 	};
 } // namespace
 

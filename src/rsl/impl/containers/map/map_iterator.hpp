@@ -9,15 +9,18 @@ namespace rsl
 
 	[[maybe_unused]] constexpr move_to_next_tag_type move_to_next_tag{};
 
-	template <typename MapType, input_or_output_iterator NodeIter>
+	template <typename MapInfo, input_or_output_iterator NodeIter>
 	class hash_map_iterator
 	{
 	public:
-		using map_type = MapType;
-		using key_type = typename map_type::key_type;
-		using mapped_type = typename map_type::mapped_type;
-		using value_type = typename map_type::value_type;
-		using node_type = typename map_type::node_type;
+		static constexpr bool is_map = MapInfo::is_map;
+		static constexpr bool is_set = MapInfo::is_set;
+		static constexpr bool is_transparent = MapInfo::is_transparent;
+
+		using key_type = typename MapInfo::key_type;
+		using mapped_type = typename MapInfo::mapped_type;
+		using value_type = typename MapInfo::value_type;
+		using node_type = remove_reference_t<iter_reference_t<NodeIter>>;
 		using node_iter = NodeIter;
 
 		using difference_type = iter_difference_t<node_iter>;
@@ -32,21 +35,21 @@ namespace rsl
 		constexpr explicit hash_map_iterator(node_iter&& iter) noexcept : m_node(rsl::move(iter)) {}
 
 		template <input_or_output_iterator OtherNodeIter>
-		constexpr hash_map_iterator(const hash_map_iterator<map_type, OtherNodeIter>& other) noexcept
+		constexpr hash_map_iterator(const hash_map_iterator<MapInfo, OtherNodeIter>& other) noexcept
 			requires constructible_from<node_iter, OtherNodeIter> && not_same_as<node_iter, OtherNodeIter>
 			: m_node(other.m_node)
 		{
 		}
 
 		template <input_or_output_iterator OtherNodeIter>
-		constexpr hash_map_iterator(hash_map_iterator<map_type, OtherNodeIter>&& other) noexcept
+		constexpr hash_map_iterator(hash_map_iterator<MapInfo, OtherNodeIter>&& other) noexcept
 			requires constructible_from<node_iter, OtherNodeIter&&> && not_same_as<node_iter, OtherNodeIter>
 			: m_node(rsl::move(other.m_node))
 		{
 		}
 
 		template <input_or_output_iterator OtherNodeIter>
-		constexpr hash_map_iterator& operator=(const hash_map_iterator<map_type, OtherNodeIter>& other) noexcept
+		constexpr hash_map_iterator& operator=(const hash_map_iterator<MapInfo, OtherNodeIter>& other) noexcept
 			requires assignable_from<node_iter, OtherNodeIter> && not_same_as<node_iter, OtherNodeIter>
 		{
 			m_node = other.m_node;
@@ -54,7 +57,7 @@ namespace rsl
 		}
 
 		template <input_or_output_iterator OtherNodeIter>
-		constexpr hash_map_iterator& operator=(hash_map_iterator<map_type, OtherNodeIter>&& other) noexcept
+		constexpr hash_map_iterator& operator=(hash_map_iterator<MapInfo, OtherNodeIter>&& other) noexcept
 			requires assignable_from<node_iter, OtherNodeIter&&> && not_same_as<node_iter, OtherNodeIter>
 		{
 			m_node = rsl::move(other.m_node);
@@ -128,14 +131,14 @@ namespace rsl
 
 		template <input_or_output_iterator OtherNodeIter>
 			requires sentinel_for<node_iter, OtherNodeIter>
-		constexpr bool operator==(const hash_map_iterator<map_type, OtherNodeIter>& other) const noexcept
+		constexpr bool operator==(const hash_map_iterator<MapInfo, OtherNodeIter>& other) const noexcept
 		{
 			return m_node == other.m_node;
 		}
 
 		template <input_or_output_iterator OtherNodeIter>
 			requires sentinel_for<node_iter, OtherNodeIter>
-		constexpr bool operator!=(const hash_map_iterator<map_type, OtherNodeIter>& other) const noexcept
+		constexpr bool operator!=(const hash_map_iterator<MapInfo, OtherNodeIter>& other) const noexcept
 		{
 			return m_node != other.m_node;
 		}

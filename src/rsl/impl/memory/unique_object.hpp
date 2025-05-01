@@ -3,7 +3,7 @@
 
 namespace rsl
 {
-	template <typename T, allocator_type Alloc = default_allocator, typed_factory_type Factory = default_factory<T>>
+	template <typename T, allocator_type Alloc = default_allocator, optional_typed_factory_type Factory = default_factory<T>>
 	class unique_object : private unique_resource<T*, Alloc>
 	{
 	public:
@@ -46,13 +46,13 @@ namespace rsl
 		unique_object(const unique_object&) = delete;
 		[[rythe_always_inline]] constexpr unique_object(unique_object&& other) noexcept;
 
-		template <typename OtherType, typed_factory_type OtherFactory>
+		template <typename OtherType, optional_typed_factory_type OtherFactory>
 			requires (is_pointer_assignable_v<T, OtherType>)
-		[[rythe_always_inline]] constexpr unique_object(unique_object<OtherType, Alloc, OtherFactory>&& other) noexcept;
+		[[rythe_always_inline]] constexpr unique_object(unique_object<OtherType, Alloc, OtherFactory>&& other) noexcept; // NOLINT(*-explicit-constructor)
 
 		[[rythe_always_inline]] constexpr unique_object& operator=(unique_object&& other) noexcept;
 
-		template <typename OtherType, typed_factory_type OtherFactory>
+		template <typename OtherType, optional_typed_factory_type OtherFactory>
 			requires (is_pointer_assignable_v<T, OtherType>)
 		[[rythe_always_inline]] constexpr unique_object& operator=(unique_object<OtherType, Alloc, OtherFactory>&& other) noexcept;
 
@@ -61,22 +61,22 @@ namespace rsl
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr factory_t& get_factory() noexcept
 		{
-			return unique_rsc::get_factory();
+			return *m_factory;
 		}
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr const factory_t& get_factory() const noexcept
 		{
-			return unique_rsc::get_factory();
+			return *m_factory;
 		}
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr factory_storage_type& get_factory_storage() noexcept
 		{
-			return unique_rsc::get_factory_storage();
+			return m_factory;
 		}
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr const factory_storage_type& get_factory_storage() const noexcept
 		{
-			return unique_rsc::get_factory_storage();
+			return m_factory;
 		}
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool is_armed() const noexcept
@@ -95,11 +95,12 @@ namespace rsl
 		[[rythe_always_inline]] constexpr const T* operator->() const noexcept { return *unique_rsc::get(); }
 
 	private:
-		template <typename FriendT, allocator_type FriendAlloc, typed_factory_type FriendFactory>
+		template <typename FriendT, allocator_type FriendAlloc, optional_typed_factory_type FriendFactory>
 		friend class unique_object;
 
 		template <typename... Args>
-		[[rythe_always_inline]] constexpr void arm(Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>);
+		[[rythe_always_inline]] constexpr void arm(Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>)
+			requires (factory_t::valid_factory);
 
 		factory_storage_type m_factory;
 	};

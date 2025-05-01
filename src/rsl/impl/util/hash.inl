@@ -23,82 +23,67 @@ namespace rsl
 			constexpr uint64 default_secret[3] = {0x2d358dccaa6c78a5ull, 0x8bb84b93962eacc9ull, 0x4b33a62ed433d4a3ull};
 
 			template <hash_mode Mode>
-			constexpr void manual_mum(uint64* a, uint64* b) noexcept
+			constexpr uint64 manual_mum(const uint64 multiplier, const uint64 multiplicand, uint64* highProduct ) noexcept
 			{
-				uint64 ha = *a >> 32;
-				uint64 hb = *b >> 32;
-				uint64 la = static_cast<uint32>(*a);
-				uint64 lb = static_cast<uint32>(*b);
+				const uint64 ha = multiplier >> 32;
+				const uint64 hb = multiplicand >> 32;
+				const uint64 la = static_cast<uint32>(multiplier);
+				const uint64 lb = static_cast<uint32>(multiplicand);
 
-				uint64 rh = ha * hb;
-				uint64 rm0 = ha * lb;
-				uint64 rm1 = hb * la;
-				uint64 rl = la * lb;
-				uint64 t = rl + (rm0 << 32);
+				const uint64 rh = ha * hb;
+				const uint64 rm0 = ha * lb;
+				const uint64 rm1 = hb * la;
+				const uint64 rl = la * lb;
+				const uint64 t = rl + (rm0 << 32);
 				uint64 c = static_cast<uint64>(t < rl);
 
-				uint64 lo = t + (rm1 << 32);
+				const uint64 lo = t + (rm1 << 32);
 				c += static_cast<uint64>(lo < t);
-				uint64 hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
+				const uint64 hi = rh + (rm0 >> 32) + (rm1 >> 32) + c;
 
 				if constexpr (Mode == hash_mode::fast_hash)
 				{
-					*a = lo;
-					*b = hi;
+					*highProduct = hi;
+					return lo;
 				}
 				else
 				{
-					*a ^= lo;
-					*b ^= hi;
+					*highProduct = multiplicand ^ hi;
+					return multiplier ^ lo;
 				}
 			}
 
 			template <hash_mode Mode>
-			constexpr void mum(uint64* a, uint64* b) noexcept
+			constexpr void mum(uint64& a, uint64& b) noexcept
 			{
-#if defined(RYTHE_HAS_INT128)
-				uint128 result = *a;
-				result *= *b;
-				if constexpr (Mode == hash_mode::fast_hash)
-				{
-					*a = static_cast<uint64>(result);
-					*b = static_cast<uint64>(result >> 64);
-				}
-				else
-				{
-					*a ^= static_cast<uint64>(result);
-					*b ^= static_cast<uint64>(result >> 64);
-				}
-#else
 	#if defined(RYTHE_MSVC) || defined(RYTHE_CLANG_MSVC)
 				if (is_constant_evaluated())
 				{
-					manual_mum<Mode>(a, b);
+					a = manual_mum<Mode>(a, b, &b);
 				}
 				else
 				{
 					if constexpr (Mode == hash_mode::fast_hash)
 					{
-						*a = _umul128(*a, *b, b);
+						a = _umul128(a, b, &b);
 					}
 					else
 					{
 						uint64 tmpB;
-						const uint64 tmpA = _umul128(*a, *b, &tmpB);
-						*a ^= tmpA;
-						*b ^= tmpB;
+						const uint64 tmpA = _umul128(a, b, &tmpB);
+						a ^= tmpA;
+						b ^= tmpB;
 					}
 				}
 	#else
-				manual_mum<Mode>(a, b);
+				a = manual_mum<Mode>(a, b, &b);
 	#endif
-#endif
 			}
 
 			template <hash_mode Mode>
 			[[nodiscard]] [[rythe_always_inline]] constexpr uint64 mix(uint64 a, uint64 b) noexcept
 			{
-				mum<Mode>(&a, &b);
+				mum<Mode>(a, b);
 				return a ^ b;
 			}
 
@@ -213,7 +198,7 @@ namespace rsl
 
 				a ^= secret[1];
 				b ^= seed;
-				mum<Mode>(&a, &b);
+				mum<Mode>(a, b);
 
 				return mix<Mode>(a ^ secret[0] ^ dataSize, b ^ secret[1]);
 			}
@@ -306,7 +291,7 @@ namespace rsl
 			byte* data = new byte[str.size()];
 			constexpr_memcpy(data, str.data(), str.size());
 
-			id_type result = hash_bytes<Mode>(view<const byte>(data, str.size()));
+			const id_type result = hash_bytes<Mode>(span<const byte>(data, str.size()));
 
 			delete[] data;
 
