@@ -291,7 +291,7 @@ namespace rsl
 			byte* data = new byte[str.size()];
 			constexpr_memcpy(data, str.data(), str.size());
 
-			const id_type result = hash_bytes<Mode>(span<const byte>(data, str.size()));
+			const id_type result = hash_bytes<Mode>(view<const byte>(data, str.size()));
 
 			delete[] data;
 
