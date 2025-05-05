@@ -4,17 +4,17 @@
 
 namespace rsl
 {
-	void* type_erased_factory::construct(void* ptr, size_type count) const
+	void* type_erased_factory::construct(void* ptr, const size_type count) const
 	{
 		return m_constructFunc ? (m_constructFunc)(ptr, count) : nullptr;
 	}
 
-	void* type_erased_factory::move(void* dst, void* src, size_type count) const
+	void* type_erased_factory::move(void* dst, void* src, const size_type count) const
 	{
 		return m_moveFunc ? (m_moveFunc)(dst, src, count) : nullptr;
 	}
 
-	void type_erased_factory::destroy(void* ptr, size_type count) const noexcept
+	void type_erased_factory::destroy(void* ptr, const size_type count) const noexcept
 	{
 		rsl_assert_frequent(m_destroyFunc);
 		(m_destroyFunc)(ptr, count);
@@ -33,5 +33,15 @@ namespace rsl
 	id_type type_erased_factory::type_id() const noexcept
 	{
 		return m_typeId;
+	}
+
+	bool type_erased_factory::is_valid() const noexcept
+	{
+		return m_constructFunc     != nullptr &&
+		       m_moveFunc	       != nullptr &&
+		       m_destroyFunc	   != nullptr &&
+		       m_typeSize		   != 0		  &&
+		       m_typeId			   != invalid_id;
+
 	}
 } // namespace rsl

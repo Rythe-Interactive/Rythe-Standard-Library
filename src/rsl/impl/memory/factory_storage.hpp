@@ -25,6 +25,8 @@ namespace rsl
 		[[rythe_always_inline]] constexpr Factory* operator->() noexcept { return &value; }
 		[[rythe_always_inline]] constexpr const Factory* operator->() const noexcept { return &value; }
 
+		[[rythe_always_inline]] constexpr operator bool() const noexcept { return value.is_valid(); }
+
 		Factory value;
 	};
 
@@ -39,6 +41,8 @@ namespace rsl
 		[[rythe_always_inline]] constexpr const polymorphic_factory& operator*() const noexcept { return *value; }
 		[[rythe_always_inline]] constexpr polymorphic_factory* operator->() noexcept { return value; }
 		[[rythe_always_inline]] constexpr const polymorphic_factory* operator->() const noexcept { return value; }
+
+		[[rythe_always_inline]] constexpr operator bool() const noexcept { return value && value->is_valid(); }
 
 		mutable polymorphic_factory* value = nullptr;
 	};

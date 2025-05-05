@@ -4,7 +4,7 @@
 
 namespace rsl
 {
-	inline allocator_storage<polymorphic_allocator>::allocator_storage() noexcept
+	allocator_storage<polymorphic_allocator>::allocator_storage() noexcept
 		: value(allocator_context::threadSpecificAllocator)
 	{
 	}

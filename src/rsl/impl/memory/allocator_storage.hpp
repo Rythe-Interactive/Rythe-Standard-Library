@@ -18,6 +18,8 @@ namespace rsl
 		[[rythe_always_inline]] constexpr Alloc* operator->() noexcept { return &value; }
 		[[rythe_always_inline]] constexpr const Alloc* operator->() const noexcept { return &value; }
 
+		[[rythe_always_inline]] constexpr operator bool() const noexcept { return value.is_valid(); }
+
 		Alloc value;
 	};
 
@@ -29,12 +31,14 @@ namespace rsl
 		[[rythe_always_inline]] constexpr allocator_storage& operator=(const allocator_storage& other
 		) noexcept = default;
 
-		[[rythe_always_inline]] constexpr allocator_storage(polymorphic_allocator& alloc) noexcept;
+		[[rythe_always_inline]] constexpr allocator_storage(polymorphic_allocator* alloc) noexcept;
 
 		[[rythe_always_inline]] constexpr polymorphic_allocator& operator*() noexcept { return *value; }
 		[[rythe_always_inline]] constexpr const polymorphic_allocator& operator*() const noexcept { return *value; }
 		[[rythe_always_inline]] constexpr polymorphic_allocator* operator->() noexcept { return value; }
 		[[rythe_always_inline]] constexpr const polymorphic_allocator* operator->() const noexcept { return value; }
+
+		[[rythe_always_inline]] constexpr operator bool() const noexcept { return value && value->is_valid(); }
 
 		mutable polymorphic_allocator* value;
 	};

@@ -17,8 +17,8 @@ namespace rsl
 	{
 	}
 
-	inline constexpr allocator_storage<polymorphic_allocator>::allocator_storage(polymorphic_allocator& alloc) noexcept
-		: value(&alloc)
+	inline constexpr allocator_storage<polymorphic_allocator>::allocator_storage(polymorphic_allocator* alloc) noexcept
+		: value(alloc)
 	{
 	}
 } // namespace rsl

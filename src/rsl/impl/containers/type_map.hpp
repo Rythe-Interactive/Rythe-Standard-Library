@@ -44,9 +44,9 @@ namespace rsl
 		[[nodiscard]] [[rythe_always_inline]] constexpr const T* try_get() const noexcept
 		{
 			constexpr id_type typeHash = type_id<T>();
-			if (entry_item* entry = m_storage.find(typeHash); entry != nullptr)
+			if (const entry_item* entry = m_storage.find(typeHash); entry != nullptr)
 			{
-				return entry->second.template cast<const T>();
+				return entry->template cast<const T>();
 			}
 
 			return nullptr;
@@ -195,5 +195,5 @@ namespace rsl
 
 	using type_map = basic_type_map<>;
 
-	using pmu_alloc_type_map = basic_type_map<pmu_alloc_ptr_wrapper>;
+	using pmu_alloc_type_map = basic_type_map<polymorphic_allocator>;
 } // namespace rsl

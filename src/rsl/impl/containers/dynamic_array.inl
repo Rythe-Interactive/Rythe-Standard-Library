@@ -17,7 +17,7 @@ namespace rsl
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	constexpr dynamic_array<T, Alloc, Factory>::dynamic_array(dynamic_array&& src) noexcept
-		: container_base(move(src))
+		: container_base(rsl::move(src))
 	{
 		src.set_ptr(nullptr);
 		src.m_size = 0;

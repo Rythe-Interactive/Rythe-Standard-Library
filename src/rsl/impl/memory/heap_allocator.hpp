@@ -10,6 +10,8 @@ namespace rsl
 	public:
 		using value_type = void;
 
+		[[rythe_always_inline]] constexpr bool is_valid() const noexcept { return true; } //NOLINT
+
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] constexpr void* allocate(size_type size) noexcept;
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] constexpr void*
 		allocate(size_type size, size_type alignment) noexcept;

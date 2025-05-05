@@ -115,10 +115,10 @@ namespace rsl
 	constexpr void unique_resource<T, Alloc, Factory>::arm(Deleter deleter, Args&&... args)
 		noexcept(is_nothrow_constructible_v<T, Args...>)
 	{
-		m_value.emplace(forward<Args>(args)...);
+		m_value.emplace(rsl::forward<Args>(args)...);
 
 		mem_rsc::set_factory(type_erased_factory(construct_type_signal<internal::unique_payload<T, Deleter>>));
-		mem_rsc::allocate_and_construct(1, forward<Args>(args)...);
+		mem_rsc::allocate_and_construct(1);
 		bit_cast<internal::unique_payload<T, Deleter>*>(mem_rsc::get_ptr())->deleter = deleter;
 	}
 

@@ -3,7 +3,7 @@
 
 namespace rsl
 {
-	template <typename T, allocator_type Alloc = default_allocator, optional_typed_factory_type Factory = default_factory<T>>
+	template <typename T, allocator_type Alloc = default_allocator, statically_optional_typed_factory_type Factory = default_factory<T>>
 	class unique_object : private unique_resource<T*, Alloc>
 	{
 	public:
@@ -46,13 +46,13 @@ namespace rsl
 		unique_object(const unique_object&) = delete;
 		[[rythe_always_inline]] constexpr unique_object(unique_object&& other) noexcept;
 
-		template <typename OtherType, optional_typed_factory_type OtherFactory>
+		template <typename OtherType, statically_optional_typed_factory_type OtherFactory>
 			requires (is_pointer_assignable_v<T, OtherType>)
 		[[rythe_always_inline]] constexpr unique_object(unique_object<OtherType, Alloc, OtherFactory>&& other) noexcept; // NOLINT(*-explicit-constructor)
 
 		[[rythe_always_inline]] constexpr unique_object& operator=(unique_object&& other) noexcept;
 
-		template <typename OtherType, optional_typed_factory_type OtherFactory>
+		template <typename OtherType, statically_optional_typed_factory_type OtherFactory>
 			requires (is_pointer_assignable_v<T, OtherType>)
 		[[rythe_always_inline]] constexpr unique_object& operator=(unique_object<OtherType, Alloc, OtherFactory>&& other) noexcept;
 
@@ -95,8 +95,17 @@ namespace rsl
 		[[rythe_always_inline]] constexpr const T* operator->() const noexcept { return *unique_rsc::get(); }
 
 	private:
-		template <typename FriendT, allocator_type FriendAlloc, optional_typed_factory_type FriendFactory>
+		template <typename FriendT, allocator_type FriendAlloc, statically_optional_typed_factory_type FriendFactory>
 		friend class unique_object;
+
+		struct deleter
+		{
+			factory_storage_type factory;
+			allocator_storage_type allocator;
+			void operator()(T* mem) noexcept;
+
+			operator bool() const noexcept { return factory && allocator; }
+		};
 
 		template <typename... Args>
 		[[rythe_always_inline]] constexpr void arm(Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>)
