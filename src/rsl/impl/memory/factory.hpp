@@ -106,7 +106,7 @@ namespace rsl
 		constexpr default_factory() noexcept = default;
 
 		template <typename Other>
-		constexpr default_factory(default_factory<Other>) noexcept { rsl_assert_unreachable(); } // NOLINT(*-explicit-constructor)
+		constexpr default_factory(default_factory<Other>) noexcept { } // NOLINT(*-explicit-constructor)
 
 		template <typename... Args>
 		static void construct_single_inline(Args&&...) { rsl_assert_unreachable(); }

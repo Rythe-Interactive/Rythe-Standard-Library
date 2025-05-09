@@ -70,7 +70,7 @@ namespace rsl::math
 
 		scalar value;
 
-		constexpr radians<scalar> radians() const noexcept { return {deg2rad<scalar> * value}; }
+		constexpr math::radians<scalar> radians() const noexcept { return {deg2rad<scalar> * value}; }
 	};
 
 	template <arithmetic_type Precision>
