@@ -57,12 +57,7 @@ namespace rsl::math
 		result[0] = r;
 		result[1] = u;
 		result[2] = f;
-
-		vector<Scalar, 3, mode> xxx{r[0], u[0], f[0]};
-		vector<Scalar, 3, mode> yyy{r[1], u[1], f[1]};
-		vector<Scalar, 3, mode> zzz{r[2], u[2], f[2]};
-
-		result[3] = vector<Scalar, 4, mode>(-(xxx * eye[0] + yyy * eye[1] + zzz * eye[2]), static_cast<Scalar>(1));
+		result[3] = vector<Scalar, 4, mode>(eye, static_cast<Scalar>(1));
 
 		return result;
 	}
