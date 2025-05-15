@@ -67,7 +67,11 @@ namespace rsl
 	) noexcept
 		: unique_rsc(other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::get_allocator_storage(), other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::get_factory_storage()), m_factory(other.get_factory_storage())
 	{
-		unique_rsc::m_value.emplace(rsl::move(other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::m_value.value()));
+		if (other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::m_value.holds_value())
+		{
+			unique_rsc::m_value.emplace(rsl::move(other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::m_value.value()));
+		}
+
 		mem_rsc::set_ptr(other.template unique_object<OtherType, Alloc, OtherFactory>::mem_rsc::get_ptr());
 		other.template unique_object<OtherType, Alloc, OtherFactory>::mem_rsc::set_ptr(nullptr);
 	}
