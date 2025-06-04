@@ -1,8 +1,8 @@
 #pragma once
 
-#include <string_view>
+#include "string.hpp"
 
 namespace rsl
 {
-	using string_view = std::string_view;
+	using string_view = string::view_type;
 }

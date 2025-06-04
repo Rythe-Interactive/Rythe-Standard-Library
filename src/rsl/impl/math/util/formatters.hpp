@@ -10,9 +10,10 @@
 
 namespace rsl::log::internal
 {
-	constexpr const char* parse_float(fmt::format_parse_context& ctx, char& presentation)
+	constexpr const char* parse_float(const fmt::format_parse_context& ctx, char& presentation)
 	{
-		auto it = ctx.begin(), end = ctx.end();
+		auto it = ctx.begin();
+		const auto end = ctx.end();
 
 		if (!it)
 		{
@@ -24,7 +25,7 @@ namespace rsl::log::internal
 			presentation = *it++;
 		}
 
-		rsl_hard_assert_msg((it == end || *it == '}'), "invalid format");
+		rsl_assert_msg_rarely((it == end || *it == '}'), "invalid format");
 
 		return it;
 	}
