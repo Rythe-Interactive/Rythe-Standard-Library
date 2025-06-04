@@ -4,5 +4,8 @@
 
 namespace rsl
 {
-	using string = dynamic_array<char>;
+	using string = dynamic_array<utf8>;
+	using wstring = dynamic_array<utf16>;
+
+	wstring to_utf16(string::view_type str);
 }

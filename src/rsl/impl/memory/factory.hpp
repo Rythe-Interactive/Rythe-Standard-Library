@@ -2,10 +2,12 @@
 
 #include "../util/assert.hpp"
 #include "../util/concepts.hpp"
-#include "../util/type_traits.hpp"
 
 namespace rsl
 {
+	template <typename T>
+	consteval id_type type_id() noexcept;
+
 	template <typename T>
 	concept factory_type = requires(T factory, void* mem, typename T::ptr_type ptr, size_type n)
 	{

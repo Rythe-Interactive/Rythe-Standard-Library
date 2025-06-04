@@ -42,16 +42,22 @@ namespace rsl
 					 container_base, const allocator_storage_type&, const factory_storage_type&>);
 
 		template <size_type N>
-		[[rythe_always_inline]] constexpr dynamic_array(const value_type (&arr)[N])
+		[[rythe_always_inline]] constexpr static dynamic_array from_array(const value_type (&arr)[N])
 			noexcept(container_base::copy_construct_noexcept);
 		template <size_type N>
-		[[rythe_always_inline]] constexpr dynamic_array(value_type (&&arr)[N])
+		[[rythe_always_inline]] constexpr static dynamic_array from_array(value_type (&&arr)[N])
 			noexcept(container_base::move_construct_noexcept);
-		[[rythe_always_inline]] constexpr dynamic_array(view_type src)
+
+		[[rythe_always_inline]] constexpr static dynamic_array from_buffer(const value_type* ptr, size_type count)
 			noexcept(container_base::copy_construct_noexcept);
-		[[rythe_always_inline]] constexpr dynamic_array(size_type capacity) noexcept;
+
+		[[rythe_always_inline]] constexpr static dynamic_array from_view(view_type src)
+			noexcept(container_base::copy_construct_noexcept);
+
+		[[rythe_always_inline]] constexpr static dynamic_array create_reserved(size_type capacity) noexcept;
+
 		template <typename... Args>
-		[[rythe_always_inline]] constexpr dynamic_array(size_type count, in_place_signal_type, Args&&... args)
+		[[rythe_always_inline]] constexpr static dynamic_array create_in_place(size_type count, Args&&... args)
 			noexcept(container_base::template construct_noexcept<Args...>);
 
 		using container_base::operator view_type;
@@ -91,6 +97,8 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void assign(size_type count, const value_type& value);
 		template <input_iterator InputIt>
 		[[rythe_always_inline]] constexpr void assign(InputIt first, InputIt last);
+		template <input_iterator InputIt>
+		[[rythe_always_inline]] constexpr void assign(const value_type* ptr, size_type count);
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr iterator_type iterator_at(size_type i) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type iterator_at(size_type i) const noexcept;
@@ -104,7 +112,9 @@ namespace rsl
 		template <input_iterator InputIt>
 		[[rythe_always_inline]] constexpr size_type insert(
 			size_type pos, InputIt first, InputIt last
-		) noexcept(container_base::move_construct_noexcept && container_base::template construct_noexcept<iter_value_t<InputIt>>);
+			) noexcept(container_base::move_construct_noexcept && container_base::template construct_noexcept<iter_value_t<InputIt>>);
+		[[rythe_always_inline]] constexpr size_type insert(size_type pos, const value_type* ptr, size_type count)
+			noexcept(container_base::move_construct_noexcept && container_base::copy_construct_noexcept);
 
 		// If it's possible to do a bulk erasure, then erase_shift in bulk might be faster. Try both and test!
 		[[rythe_always_inline]] constexpr size_type erase_swap(size_type pos)

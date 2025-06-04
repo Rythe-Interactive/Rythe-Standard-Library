@@ -230,38 +230,53 @@ namespace rsl
 
 	template <
 		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	template <input_iterator InputIt>
 	constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::copy_assign_from_unsafe_impl(
-		const size_type offset, const size_type end, const value_type* src
+		const size_type offset, const size_type end, InputIt srcIter
 	) noexcept(copy_assign_noexcept)
 	{
-		for (auto to = mem_rsc::get_ptr() + offset; to != mem_rsc::get_ptr() + end; ++to, ++src)
+		for (auto to = mem_rsc::get_ptr() + offset; to != mem_rsc::get_ptr() + end; ++to, ++srcIter)
 		{
-			*to = *src;
+			*to = *srcIter;
 		}
 	}
 
 	template <
 		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	template <input_iterator InputIt>
 	constexpr void
 	contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::copy_construct_from_unsafe_impl(
-		const size_type offset, const size_type end, const value_type* src
+		const size_type offset, const size_type end, InputIt srcIter
 	) noexcept(copy_construct_noexcept)
 	{
-		for (size_type i = offset; i != end; i++, ++src)
+		for (size_type i = offset; i != end; i++, ++srcIter)
 		{
-			mem_rsc::construct(1, i, *src);
+			mem_rsc::construct(1, i, *srcIter);
 		}
 	}
 
 	template <
 		typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	template <input_iterator InputIt>
 	constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::move_assign_from_unsafe_impl(
-		const size_type offset, const size_type end, const value_type* src
+		const size_type offset, const size_type end, InputIt srcIter
 	) noexcept(move_assign_noexcept)
 	{
-		for (auto to = mem_rsc::get_ptr() + offset; to != mem_rsc::get_ptr() + end; ++to, ++src)
+		for (auto to = mem_rsc::get_ptr() + offset; to != mem_rsc::get_ptr() + end; ++to, ++srcIter)
 		{
-			*to = move(*src);
+			*to = move(*srcIter);
+		}
+	}
+
+	template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	template <input_iterator InputIt>
+	constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::move_construct_from_unsafe_impl(
+		const size_type offset, const size_type end, InputIt srcIter
+	) noexcept(move_construct_noexcept)
+	{
+		for (size_type i = offset; i != end; i++, ++srcIter)
+		{
+			mem_rsc::construct(1, i, move(*srcIter));
 		}
 	}
 
@@ -273,17 +288,6 @@ namespace rsl
 	) noexcept(construct_noexcept<Args...>)
 	{
 		mem_rsc::construct(end - offset, offset, rsl::forward<Args>(args)...);
-	}
-
-	template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter>
-	constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter>::move_construct_from_unsafe_impl(
-		const size_type offset, const size_type end, const value_type* src
-	) noexcept(move_construct_noexcept)
-	{
-		for (size_type i = offset; i != end; i++, ++src)
-		{
-			mem_rsc::construct(1, i, move(*src));
-		}
 	}
 
 	template <
