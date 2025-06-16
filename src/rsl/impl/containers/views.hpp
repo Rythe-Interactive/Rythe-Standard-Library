@@ -2,6 +2,7 @@
 
 #include "../util/common.hpp"
 #include "../util/primitives.hpp"
+#include "../util/string_util.hpp"
 #include "iterators.hpp"
 
 namespace rsl
@@ -16,7 +17,7 @@ namespace rsl
 		using reference = T&;
 		using const_reference = add_const_t<T>&;
 		using iterator_type = Iter;
-		using const_iterator_type = add_const_t<T>*;
+		using const_iterator_type = add_const_t<T>*; // TODO(Rowan): const Iter makes a const * to a non const T, we should probably add a wrapper iterator like std::const_iterator<> to iterators.hpp. Also do we even want custom iterators for this type?
 		using reverse_iterator_type = reverse_iterator<iterator_type>;
 		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
 
@@ -29,6 +30,10 @@ namespace rsl
 		[[rythe_always_inline]] constexpr view(const value_type (&)[N]) noexcept;
 		[[rythe_always_inline]] constexpr view(const view&) noexcept;
 		[[rythe_always_inline]] constexpr view(value_type&&) noexcept;
+
+		template <size_type N>
+		[[rythe_always_inline]] constexpr view(string_literal<N> literal) noexcept requires same_as<T, const char>;
+		[[rythe_always_inline]] constexpr static view from_string_length(T* str, T terminator = T{}) noexcept requires char_type<T>;
 
 	public:
 		[[rythe_always_inline]] constexpr view& operator=(const view&) = default;
@@ -84,6 +89,9 @@ namespace rsl
 	view(const T (&)[N]) -> view<T>;
 	template <size_type N>
 	view(const char (&)[N]) -> view<const char>;
+
+	template <size_type N>
+	view(string_literal<N>) -> view<const char>;
 
 	using string_view = rsl::view<const char>;
 

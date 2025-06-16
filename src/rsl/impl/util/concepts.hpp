@@ -43,6 +43,9 @@ namespace rsl
 	concept arithmetic_type = is_arithmetic_v<remove_cvr_t<T>>;
 
 	template <typename T>
+	concept char_type = is_char_v<remove_cvr_t<T>>;
+
+	template <typename T>
 	concept unsigned_type = is_unsigned_v<remove_cvr_t<T>>;
 
 	template <typename T>

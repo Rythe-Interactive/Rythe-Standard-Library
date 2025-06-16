@@ -1,5 +1,7 @@
 #pragma once
 
+#include "impl/util/string_util.hpp"
+
 #include "impl/containers/buffered_string.hpp"
 #include "impl/containers/constexpr_string.hpp"
 #include "impl/containers/delegate.hpp"

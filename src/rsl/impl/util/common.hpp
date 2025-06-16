@@ -330,6 +330,15 @@ namespace rsl
 	{
 	};
 
+	template <typename T>
+	inline constexpr bool is_char_v = is_any_of_v<
+		remove_cv_t<T>, char, signed char, unsigned char, wchar_t, char8_t, char16_t, char32_t>;
+
+	template <typename T>
+	struct is_char : bool_constant<is_char_v<T>>
+	{
+	};
+
 	namespace internal
 	{
 		template <typename T, bool = is_integral_v<T>>
