@@ -34,9 +34,7 @@ namespace rsl
 		[[rythe_always_inline]] string& replace(size_type, size_type, view_type);
 	};
 
-	// TODO(Rowan): This rly doesn't work. ig that's why std::basic_string exists. we could also do: using dynamic_string = string<default_allocator>; and use dynamic_string for everything instead of string<>.
-	template<typename T>
-	string(T) -> string<>;
+	using dynamic_string = string<default_allocator>;
 
 } // namespace rsl
 

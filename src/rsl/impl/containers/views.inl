@@ -212,29 +212,24 @@ namespace rsl
 	constexpr bool view<T, Iter>::empty() const noexcept
 	{
 		return m_count == 0 || m_src == nullptr;
-
 	}
 
 	template <typename T, contiguous_iterator Iter>
 	constexpr view<T, Iter> view<T, Iter>::subview(size_type pos, size_type n) const
 	{
 		const size_type maxCount = m_count - pos;
-		if (n > maxCount)
-		{
-			n = maxCount;
-		}
-
 		return view<T, Iter>(m_src + pos, n);
 	}
 
+	//TODO(Rowan): Implement a better search algo
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_of(view<T, Iter> str, view<T, Iter> other, size_type pos) noexcept
+	constexpr size_type find_first_of(view<T, Iter> key, view<T, Iter> str, size_type pos) noexcept
 	{
 		size_type count = pos;
-		for (auto iter = str.begin() + pos; iter != str.end(); ++iter)
+		for (auto iter = key.begin() + pos; iter != key.end(); ++iter)
 		{
 			++count;
-			for (auto it = other.begin(); it != other.end(); ++it)
+			for (auto it = str.begin(); it != str.end(); ++it)
 				if (*iter == *it)
 					return count;
 		}
@@ -242,13 +237,13 @@ namespace rsl
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_not_of(view<T, Iter> str, view<T, Iter> other, size_type pos) noexcept
+	constexpr size_type find_first_not_of(view<T, Iter> key, view<T, Iter> str, size_type pos) noexcept
 	{
 		size_type count = pos;
-		for (auto iter = str.begin() + pos; iter != str.end(); ++iter)
+		for (auto iter = key.begin() + pos; iter != key.end(); ++iter)
 		{
 			++count;
-			for (auto it = other.begin(); it != other.end(); ++it)
+			for (auto it = str.begin(); it != str.end(); ++it)
 				if (*iter != *it)
 					return count;
 		}
@@ -256,13 +251,13 @@ namespace rsl
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_of(view<T, Iter> str, view<T, Iter> other, size_type pos) noexcept
+	constexpr size_type find_last_of(view<T, Iter> key, view<T, Iter> str, size_type pos) noexcept
 	{
 		size_type count = pos;
-		for (auto iter = str.rbegin() + pos; iter != str.rend(); ++iter)
+		for (auto iter = key.rbegin() + pos; iter != key.rend(); ++iter)
 		{
 			--count;
-			for (auto it = other.begin(); it != other.end(); ++it)
+			for (auto it = str.begin(); it != str.end(); ++it)
 			{
 				if (*iter == *it)
 				{
@@ -274,13 +269,13 @@ namespace rsl
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_not_of(view<T, Iter> str, view<T, Iter> other, [[maybe_unused]] size_type pos) noexcept
+	constexpr size_type find_last_not_of(view<T, Iter> key, view<T, Iter> str, [[maybe_unused]] size_type pos) noexcept
 	{
-		size_type count = str.size();
-		for (auto iter = str.rbegin(); iter != str.rend() + pos; ++iter)
+		size_type count = key.size();
+		for (auto iter = key.rbegin(); iter != key.rend() + pos; ++iter)
 		{
 			--count;
-			for (auto it = other.begin(); it != other.end(); ++it)
+			for (auto it = str.begin(); it != str.end(); ++it)
 				if (*iter != *it)
 					return count;
 		}
@@ -288,26 +283,26 @@ namespace rsl
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_of(view<T, Iter> str, add_const_t<T>& other, size_type pos) noexcept
+	constexpr size_type find_first_of(view<T, Iter> key, add_const_t<T>& str, size_type pos) noexcept
 	{
-		return find_first_of(str, view(&other, 1), pos);
+		return find_first_of(key, view(&str, 1), pos);
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_not_of(view<T, Iter> str, add_const_t<T>& other, size_type pos) noexcept
+	constexpr size_type find_first_not_of(view<T, Iter> key, add_const_t<T>& str, size_type pos) noexcept
 	{
-		return find_first_not_of(str, view(&other, 1), pos);
+		return find_first_not_of(key, view(&str, 1), pos);
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_of(view<T, Iter> str, add_const_t<T>& other, size_type pos) noexcept
+	constexpr size_type find_last_of(view<T, Iter> key, add_const_t<T>& str, size_type pos) noexcept
 	{
-		return find_last_of(str, view(&other, 1), pos);
+		return find_last_of(key, view(&str, 1), pos);
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_not_of(view<T, Iter> str, add_const_t<T>& other, size_type pos) noexcept
+	constexpr size_type find_last_not_of(view<T, Iter> key, add_const_t<T>& str, size_type pos) noexcept
 	{
-		return find_last_not_of(str, view(&other, 1), pos);
+		return find_last_not_of(key, view(&str, 1), pos);
 	}
 }

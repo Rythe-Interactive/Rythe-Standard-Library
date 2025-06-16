@@ -9,7 +9,6 @@ namespace rsl
 	{
 		this->reserve(N);
 		this->resize(N);
-		// TODO(Rowan): this doesn't work, need to memcpy, not just swap out the pointer.
 		constexpr_memcpy(&this->m_ptr[0], &src[0], N);
 	}
 
@@ -22,6 +21,7 @@ namespace rsl
 		this->set_ptr(std::move(const_cast<char*const>(&src[0])));
 	}
 
+	//TODO(Rowan): Woops forgot to implement these
 	template <allocator_type Alloc>
 	inline string<Alloc>& string<Alloc>::append(view_type view)
 	{
