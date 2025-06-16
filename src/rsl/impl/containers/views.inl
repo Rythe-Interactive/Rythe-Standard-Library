@@ -218,11 +218,17 @@ namespace rsl
 	template <typename T, contiguous_iterator Iter>
 	constexpr view<T, Iter> view<T, Iter>::subview(size_type pos, size_type n) const
 	{
+		const size_type maxCount = m_count - pos;
+		if (n > maxCount)
+		{
+			n = maxCount;
+		}
+
 		return view<T, Iter>(m_src + pos, n);
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_of(view<T, Iter> str, view<T, Iter> other, [[maybe_unused]] size_type pos) noexcept
+	constexpr size_type find_first_of(view<T, Iter> str, view<T, Iter> other, size_type pos) noexcept
 	{
 		size_type count = pos;
 		for (auto iter = str.begin() + pos; iter != str.end(); ++iter)
@@ -236,7 +242,7 @@ namespace rsl
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_not_of(view<T, Iter> str, view<T, Iter> other, [[maybe_unused]] size_type pos) noexcept
+	constexpr size_type find_first_not_of(view<T, Iter> str, view<T, Iter> other, size_type pos) noexcept
 	{
 		size_type count = pos;
 		for (auto iter = str.begin() + pos; iter != str.end(); ++iter)
@@ -250,10 +256,10 @@ namespace rsl
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_of(view<T, Iter> str, view<T, Iter> other, [[maybe_unused]] size_type pos) noexcept
+	constexpr size_type find_last_of(view<T, Iter> str, view<T, Iter> other, size_type pos) noexcept
 	{
-		size_type count = str.size();
-		for (auto iter = str.rbegin(); iter != str.rend(); ++iter)
+		size_type count = pos;
+		for (auto iter = str.rbegin() + pos; iter != str.rend(); ++iter)
 		{
 			--count;
 			for (auto it = other.begin(); it != other.end(); ++it)
