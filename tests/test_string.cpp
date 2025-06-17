@@ -41,35 +41,67 @@ TEST_CASE("string","[containers]")
 
 	SECTION("search")
 	{
-		string_literal str = string_literal("abcdeffedcba");
+		view str = "abcdeffedcba"_sv;
 		{
-			size_type offset = rsl::find_last_of(view(str), 'd', 0);
+			size_type offset = rsl::find_first_of(str, 'd', 0);
+			REQUIRE(offset == 3);
+			REQUIRE(str[offset] == 'd');
+		}
+		{
+			size_type offset = rsl::find_first_of(str, 'c', 0);
+			REQUIRE(offset == 2);
+			REQUIRE(str[offset] == 'c');
+		}
+		{
+			size_type offset = rsl::find_first_of(str, "efb"_sv, 0);
+			REQUIRE(offset == 1);
+			REQUIRE(str[offset] == 'b');
+		}
+
+		{
+			size_type offset = rsl::find_first_not_of(str, 'd', 0);
+			REQUIRE(offset == 0);
+			REQUIRE(str[offset] == 'a');
+		}
+		{
+			size_type offset = rsl::find_first_not_of(str, 'a', 0);
+			REQUIRE(offset == 1);
+			REQUIRE(str[offset] == 'b');
+		}
+		{
+			size_type offset = rsl::find_first_not_of(str, "abcde"_sv, 0);
+			REQUIRE(offset == 5);
+			REQUIRE(str[offset] == 'f');
+		}
+
+		{
+			size_type offset = rsl::find_last_of(str, 'd', 0);
 			REQUIRE(offset == 8);
 			REQUIRE(str[offset] == 'd');
 		}
 		{
-			size_type offset = rsl::find_last_of(view(str), 'c', 0);
+			size_type offset = rsl::find_last_of(str, 'c', 0);
 			REQUIRE(offset == 9);
 			REQUIRE(str[offset] == 'c');
 		}
 		{
-			size_type offset = rsl::find_last_of(view(str), view(string_literal("efb")), 0);
+			size_type offset = rsl::find_last_of(str, "efb"_sv, 0);
 			REQUIRE(offset == 10);
 			REQUIRE(str[offset] == 'b');
 		}
 
 		{
-			size_type offset = rsl::find_last_not_of(view(str), 'd', 0);
+			size_type offset = rsl::find_last_not_of(str, 'd', 0);
 			REQUIRE(offset == 11);
 			REQUIRE(str[offset] == 'a');
 		}
 		{
-			size_type offset = rsl::find_last_not_of(view(str), 'a', 0);
+			size_type offset = rsl::find_last_not_of(str, 'a', 0);
 			REQUIRE(offset == 10);
 			REQUIRE(str[offset] == 'b');
 		}
 		{
-			size_type offset = rsl::find_last_not_of(view(str), view(string_literal("abcde")), 0);
+			size_type offset = rsl::find_last_not_of(str, "abcde"_sv, 0);
 			REQUIRE(offset == 6);
 			REQUIRE(str[offset] == 'f');
 		}

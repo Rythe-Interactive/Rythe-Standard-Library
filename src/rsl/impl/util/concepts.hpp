@@ -57,6 +57,35 @@ namespace rsl
 	template <typename T1, typename T2>
 	concept not_same_as = !is_same_v<T1, T2>;
 
+	template <typename T1, typename T2>
+	concept distinct_from = !same_as<remove_cvr_t<T1>, remove_cvr_t<T2>>;
+
+	template <typename From, typename To>
+	concept convertible_to = is_convertible_v<From, To> && requires { static_cast<To>(declval<From>()); };
+
+	template <typename T1, typename T2>
+	concept common_reference_with =
+		requires {
+		typename common_reference_t<T1, T2>;
+		typename common_reference_t<T2, T1>;
+		} && same_as<common_reference_t<T1, T2>, common_reference_t<T2, T1>>
+		&& convertible_to<T1, common_reference_t<T1, T2>> && convertible_to<T2, common_reference_t<T1, T2>>;
+
+	template <typename T1, typename T2>
+	concept common_with =
+		requires {
+		typename common_type_t<T1, T2>;
+		typename common_type_t<T2, T1>;
+		}
+	&& same_as<common_type_t<T1, T2>, common_type_t<T2, T1>>
+	&& requires {
+		static_cast<common_type_t<T1, T2>>(declval<T1>());
+		static_cast<common_type_t<T1, T2>>(declval<T2>());
+	}
+	&& common_reference_with<add_lval_ref_t<const T1>, add_lval_ref_t<const T2>>
+	&& common_reference_with<add_lval_ref_t<common_type_t<T1, T2>>,
+		common_reference_t<add_lval_ref_t<const T1>, add_lval_ref_t<const T2>>>;
+
 	template <typename T>
 	concept nothrow_copy_constructible = is_nothrow_copy_constructible_v<T>;
 
@@ -66,17 +95,6 @@ namespace rsl
 	template <typename Derived, typename Base>
 	concept derived_from =
 		::rsl::is_base_of_v<Base, Derived> && ::rsl::is_convertible_v<const volatile Derived*, const volatile Base*>;
-
-	template <typename From, typename To>
-	concept convertible_to = ::rsl::is_convertible_v<From, To> && requires { static_cast<To>(::rsl::declval<From>()); };
-
-	template <typename LHS, typename RHS>
-	concept common_reference_with =
-		requires {
-			typename common_reference_t<LHS, RHS>;
-			typename common_reference_t<RHS, LHS>;
-		} && same_as<common_reference_t<LHS, RHS>, common_reference_t<RHS, LHS>> &&
-		convertible_to<LHS, common_reference_t<LHS, RHS>> && convertible_to<RHS, common_reference_t<LHS, RHS>>;
 
 	template <typename LHS, typename RHS>
 	concept assignable_from =
@@ -194,7 +212,7 @@ namespace rsl
 			using parameter_list = type_sequence<Args...>;
 
 			template <typename Func>
-			auto test_func(Func&&) -> decltype(std::invoke(rsl::declval<Func>(), rsl::declval<Args>()...));
+			auto test_func(Func&&) -> decltype(std::invoke(rsl::declval<Func>(), rsl::declval<Args>()...)); // NOLINT
 
 			template <typename Func>
 			constexpr static bool is_compatible_with = requires(Func&& func, Args&&... args) {

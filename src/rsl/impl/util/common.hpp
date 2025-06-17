@@ -1107,6 +1107,25 @@ namespace rsl
 	template <typename From, typename To>
 	inline constexpr bool is_convertible_v = is_convertible<From, To>::value;
 
+	// Implementation details of is_nothrow_convertible<...>
+	namespace internal
+	{
+		template <typename From, typename To, bool = is_convertible_v<From, To>, bool = is_void_v<To>>
+		constexpr bool is_nothrow_convertible_impl_v = noexcept(fake_copy_init<To>(declval<From>()));
+
+		template <typename From, typename To, bool _IsVoid>
+		constexpr bool is_nothrow_convertible_impl_v<From, To, false, _IsVoid> = false;
+
+		template <typename From, typename To>
+		constexpr bool is_nothrow_convertible_impl_v<From, To, true, true> = true;
+	}
+
+	template <typename From, typename To>
+	constexpr bool is_nothrow_convertible_v = internal::is_nothrow_convertible_impl_v<From, To>;
+
+	template <typename From, typename To>
+	struct is_nothrow_convertible : bool_constant<internal::is_nothrow_convertible_impl_v<From, To>> {};
+
 	template <typename... T>
 	struct common_type;
 

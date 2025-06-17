@@ -17,7 +17,7 @@ namespace rsl
 
 	template <typename T, contiguous_iterator Iter>
 	template <size_type N>
-	constexpr view<T, Iter>::view(const value_type (&arr)[N]) noexcept : m_src(const_cast<value_type*>(&arr[0])),
+	constexpr view<T, Iter>::view(value_type (&arr)[N]) noexcept : m_src(arr),
 		m_count(N) {}
 
 	template <typename T, contiguous_iterator Iter>
@@ -25,6 +25,11 @@ namespace rsl
 
 	template <typename T, contiguous_iterator Iter>
 	constexpr view<T, Iter>::view(value_type&& src) noexcept : m_src(&src), m_count(1) {}
+
+	template <typename T, contiguous_iterator Iter>
+	constexpr view<T, Iter>::view(view<remove_const_t<value_type>, iterator_type> other) noexcept requires (is_const_v<T>)
+		: m_src(other.m_src), m_count(other.m_count)
+	{}
 
 	template <typename T, contiguous_iterator Iter>
 	template <size_type N>
@@ -240,7 +245,7 @@ namespace rsl
 
 	//TODO(Rowan): Implement a better search algo
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_of(view<T, Iter> str, view<T, Iter> key, size_type pos) noexcept
+	constexpr size_type find_first_of(view<const T, Iter> str, view<const T, Iter> key, size_type pos) noexcept
 	{
 		for (auto iter = str.begin() + pos; iter != str.end(); ++iter)
 		{
@@ -257,24 +262,32 @@ namespace rsl
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_not_of(view<T, Iter> str, view<T, Iter> key, size_type pos) noexcept
+	constexpr size_type find_first_not_of(view<const T, Iter> str, view<const T, Iter> key, size_type pos) noexcept
 	{
 		for (auto iter = str.begin() + pos; iter != str.end(); ++iter)
 		{
+			bool found = true;
 			for (auto it = key.begin(); it != key.end(); ++it)
 			{
-				if (*iter != *it)
+				if (*iter == *it)
 				{
-					return pos;
+					found = false;
+					break;
 				}
 			}
+
+			if (found)
+			{
+				return pos;
+			}
+
 			++pos;
 		}
 		return npos;
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_of(view<T, Iter> str, view<T, Iter> key, size_type pos) noexcept
+	constexpr size_type find_last_of(view<const T, Iter> str, view<const T, Iter> key, size_type pos) noexcept
 	{
 		using reverse_iter = typename view<T, Iter>::reverse_iterator_type;
 		reverse_iter endIter = reverse_iter(str.begin() + pos);
@@ -296,7 +309,7 @@ namespace rsl
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_not_of(view<T, Iter> str, view<T, Iter> key, [[maybe_unused]] size_type pos) noexcept
+	constexpr size_type find_last_not_of(view<const T, Iter> str, view<const T, Iter> key, [[maybe_unused]] size_type pos) noexcept
 	{
 		using reverse_iter = typename view<T, Iter>::reverse_iterator_type;
 		reverse_iter endIter = reverse_iter(str.begin() + pos);
@@ -325,25 +338,25 @@ namespace rsl
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_of(view<T, Iter> str, add_const_t<T>& key, size_type pos) noexcept
+	constexpr size_type find_first_of(view<const T, Iter> str, const T& key, size_type pos) noexcept
 	{
 		return find_first_of(str, view(&key, 1), pos);
 	}
 
-	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_not_of(view<T, Iter> str, add_const_t<T>& key, size_type pos) noexcept
+	template <typename T, contiguous_iterator Iter, same_as<T> C>
+	constexpr size_type find_first_not_of(view<const T, Iter> str, const C& key, size_type pos) noexcept
 	{
 		return find_first_not_of(str, view(&key, 1), pos);
 	}
 
-	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_of(view<T, Iter> str, add_const_t<T>& key, size_type pos) noexcept
+	template <typename T, contiguous_iterator Iter, same_as<T> C>
+	constexpr size_type find_last_of(view<const T, Iter> str, const C& key, size_type pos) noexcept
 	{
 		return find_last_of(str, view(&key, 1), pos);
 	}
 
-	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_not_of(view<T, Iter> str, add_const_t<T>& key, size_type pos) noexcept
+	template <typename T, contiguous_iterator Iter, same_as<T> C>
+	constexpr size_type find_last_not_of(view<const T, Iter> str, const C& key, size_type pos) noexcept
 	{
 		return find_last_not_of(str, view(&key, 1), pos);
 	}

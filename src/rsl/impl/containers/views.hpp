@@ -17,7 +17,7 @@ namespace rsl
 		using reference = T&;
 		using const_reference = add_const_t<T>&;
 		using iterator_type = Iter;
-		using const_iterator_type = add_const_t<T>*; // TODO(Rowan): const Iter makes a const * to a non const T, we should probably add a wrapper iterator like std::const_iterator<> to iterators.hpp. Also do we even want custom iterators for this type?
+		using const_iterator_type = const_iterator<Iter>;
 		using reverse_iterator_type = reverse_iterator<iterator_type>;
 		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
 
@@ -27,9 +27,11 @@ namespace rsl
 		template <typename It>
 		[[rythe_always_inline]] constexpr view(It, It);
 		template <size_type N>
-		[[rythe_always_inline]] constexpr view(const value_type (&)[N]) noexcept;
+		[[rythe_always_inline]] constexpr view(value_type (&)[N]) noexcept;
 		[[rythe_always_inline]] constexpr view(const view&) noexcept;
 		[[rythe_always_inline]] constexpr view(value_type&&) noexcept;
+
+		[[rythe_always_inline]] constexpr view(view<remove_const_t<value_type>, iterator_type> other) noexcept requires (is_const_v<value_type>);
 
 		template <size_type N>
 		[[rythe_always_inline]] constexpr view(string_literal<N> literal) noexcept requires same_as<T, const char>;
@@ -82,51 +84,59 @@ namespace rsl
 	};
 
 	template <typename It>
-	view(It, size_type) -> view<remove_reference_t<iter_reference_t<It>>, It>;
+	view(It, size_type) -> view<iter_read_t<It>, It>;
+
 	template <typename It>
-	view(It, It) -> view<remove_reference_t<iter_reference_t<It>>, It>;
+	view(It, It) -> view<iter_read_t<It>, It>;
+
 	template <typename T, size_type N>
-	view(const T (&)[N]) -> view<T>;
-	template <size_type N>
-	view(const char (&)[N]) -> view<const char>;
+	view(T (&)[N]) -> view<T>;
+
+	template <typename T, contiguous_iterator Iter>
+	view(view<T, Iter> other) -> view<const T, const_iterator<Iter>>;
 
 	template <size_type N>
 	view(string_literal<N>) -> view<const char>;
 
 	using string_view = rsl::view<const char>;
 
-	// TODO(Rowan): The below functions don't use pos
+	[[nodiscard]] [[rythe_always_inline]] constexpr string_view operator""_sv(const char* str, const size_type size) noexcept
+	{
+		return string_view(str, size);
+	}
+
 	// TODO(Rowan): The below functions check for any occurrence of any of the items in other in str, not for the sequence of other in str. Is that intended?
+	//				https://en.cppreference.com/w/cpp/string/basic_string_view/find_last_not_of.html see overload 1
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_of(view<T, Iter> key, view<T, Iter> str,
+	constexpr size_type find_first_of(view<const T, Iter> str, view<const T, Iter> key,
 	                                  [[maybe_unused]] size_type pos = 0) noexcept;
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_not_of(view<T, Iter> key, view<T, Iter> str,
+	constexpr size_type find_first_not_of(view<const T, Iter> str, view<const T, Iter> key,
 	                                      [[maybe_unused]] size_type pos = 0) noexcept;
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_of(view<T, Iter> key, view<T, Iter> str,
+	constexpr size_type find_last_of(view<const T, Iter> str, view<const T, Iter> key,
 	                                 [[maybe_unused]] size_type pos = 0) noexcept;
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_not_of(view<T, Iter> key, view<T, Iter> str,
+	constexpr size_type find_last_not_of(view<const T, Iter> str, view<const T, Iter> key,
 	                                     [[maybe_unused]] size_type pos = 0) noexcept;
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_of(view<T, Iter> key, add_const_t<T>& str,
+	constexpr size_type find_first_of(view<const T, Iter> str, const T& key,
 	                                  [[maybe_unused]] size_type pos = 0) noexcept;
 
-	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_not_of(view<T, Iter> key, add_const_t<T>& str,
+	template <typename T, contiguous_iterator Iter, same_as<T> C>
+	constexpr size_type find_first_not_of(view<const T, Iter> str, const C& key,
 	                                      [[maybe_unused]] size_type pos = 0) noexcept;
 
-	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_of(view<T, Iter> key, add_const_t<T>& str,
+	template <typename T, contiguous_iterator Iter, same_as<T> C>
+	constexpr size_type find_last_of(view<const T, Iter> str, const C& key,
 	                                 [[maybe_unused]] size_type pos = 0) noexcept;
 
-	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_not_of(view<T, Iter> key, add_const_t<T>& str,
+	template <typename T, contiguous_iterator Iter, same_as<T> C>
+	constexpr size_type find_last_not_of(view<const T, Iter> str, const C& key,
 	                                     [[maybe_unused]] size_type pos = 0) noexcept;
 }
 
