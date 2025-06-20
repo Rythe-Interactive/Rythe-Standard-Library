@@ -8,8 +8,7 @@ namespace rsl
 	constexpr view<T, Iter>::view() noexcept = default;
 
 	template <typename T, contiguous_iterator Iter>
-	template <typename It>
-	constexpr view<T, Iter>::view(It first, const size_type count) : m_src(first), m_count(count) {}
+	constexpr view<T, Iter>::view(const pointer ptr, const size_type count) : m_src(ptr), m_count(count) {}
 
 	template <typename T, contiguous_iterator Iter>
 	template <typename It>
@@ -17,8 +16,16 @@ namespace rsl
 
 	template <typename T, contiguous_iterator Iter>
 	template <size_type N>
-	constexpr view<T, Iter>::view(value_type (&arr)[N]) noexcept : m_src(arr),
-		m_count(N) {}
+	constexpr view<T, Iter>::view(value_type (&arr)[N]) noexcept : m_src(arr), m_count(N)
+	{
+		if constexpr (is_same_v<remove_const_t<value_type>, char>)
+		{
+			if (m_src[m_count - 1] == '\0')
+			{
+				--m_count;
+			}
+		}
+	}
 
 	template <typename T, contiguous_iterator Iter>
 	constexpr view<T, Iter>::view(const view& other) noexcept : m_src(other.m_src), m_count(other.m_count) {}
@@ -27,13 +34,10 @@ namespace rsl
 	constexpr view<T, Iter>::view(value_type&& src) noexcept : m_src(&src), m_count(1) {}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr view<T, Iter>::view(view<remove_const_t<value_type>, iterator_type> other) noexcept requires (is_const_v<T>)
-		: m_src(other.m_src), m_count(other.m_count)
-	{}
-
-	template <typename T, contiguous_iterator Iter>
-	template <size_type N>
-	constexpr view<T, Iter>::view(string_literal<N> literal) noexcept requires same_as<T, const char> : view(literal.value, literal.size()) {}
+	constexpr view<T, Iter>::operator view<const T, const_iterator<Iter>>() noexcept requires (!is_const_v<T>)
+	{
+		return view<const T, const_iterator<Iter>>(m_src, m_count);
+	}
 
 	template <typename T, contiguous_iterator Iter>
 	constexpr view<T, Iter> view<T, Iter>::from_string_length(T* str, const T terminator) noexcept requires char_type<T>

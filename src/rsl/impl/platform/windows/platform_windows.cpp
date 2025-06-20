@@ -19,6 +19,8 @@
 #include "../platform.hpp"
 
 #define RYTHE_THREAD_HANDLE_IMPL HANDLE
+
+#include "containers/string.hpp"
 #include "threading/thread.hpp"
 
 namespace rsl
@@ -28,7 +30,7 @@ namespace rsl
 		struct native_thread_context
 		{
 			pmu_allocator* allocator;
-			string name;
+			dynamic_string name;
 			platform::native_thread_start function;
 			void* userData;
 		};
@@ -38,7 +40,7 @@ namespace rsl
 			native_thread_context& context = *static_cast<native_thread_context*>(args);
 			pmu_allocator* allocator = context.allocator;
 
-			wstring wideName = to_utf16(context.name);
+			dynamic_wstring wideName = to_utf16(context.name);
 			[[maybe_unused]] HRESULT _ = ::SetThreadDescription(::GetCurrentThread(), wideName.data());
 
 			const uint32 result = context.function(context.userData);
@@ -67,9 +69,9 @@ namespace rsl
 		return bit_cast<void*>(::GetProcAddress(library.m_handle, symbolName));
 	}
 
-	thread platform::create_thread(const native_thread_start startFunction, void* userData, string_view name,	pmu_allocator& allocator)
+	thread platform::create_thread(const native_thread_start startFunction, void* userData, string_view name, pmu_allocator& allocator)
 	{
-		rsl_always_assert(startFunction);
+		rsl_assert_always(startFunction);
 
 		thread result;
 
@@ -82,7 +84,7 @@ namespace rsl
 		internal::default_construct<native_thread_context>(threadContext, 1);
 
 		threadContext->allocator = &allocator;
-		threadContext->name = name;
+		threadContext->name = dynamic_string::from_view(name);
 		threadContext->function = startFunction;
 		threadContext->userData = userData;
 

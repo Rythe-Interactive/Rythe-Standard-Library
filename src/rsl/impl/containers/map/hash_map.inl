@@ -478,7 +478,7 @@ namespace rsl
 		index_type homeIndex, storage_type startPsl, storage_type fingerprint, const key_type& key, bool earlyOut
 	) const noexcept
 	{
-		psl_type insertPsl{.psl = startPsl, .fingerprint = fingerprint};
+		psl_type insertPsl{ .psl = startPsl, .fingerprint = fingerprint };
 
 		index_type searchIndex = homeIndex + insertPsl.psl;
 		const size_type bucketCount = m_buckets.size();
@@ -487,21 +487,21 @@ namespace rsl
 			const bucket_type& bucket = m_buckets[searchIndex];
 			if (bucket.pslAndFingerprint == 0u)
 			{
-				return bucket_search_result{.unpackedPsl = insertPsl, .type = search_result_type::newInsertion};
+				return bucket_search_result{ .unpackedPsl = insertPsl, .type = search_result_type::newInsertion };
 			}
 
 			psl_type unpackedPsl = unpack_bucket_psl(bucket);
 
 			if (unpackedPsl.psl < insertPsl.psl)
 			{
-				return bucket_search_result{.unpackedPsl = insertPsl, .type = search_result_type::swap};
+				return bucket_search_result{ .unpackedPsl = insertPsl, .type = search_result_type::swap };
 			}
 
 			if (unpackedPsl.psl == insertPsl.psl && unpackedPsl.fingerprint == insertPsl.fingerprint)
 			{
 				if (m_keyComparer(m_values[bucket.index].key(), key))
 				{
-					return bucket_search_result{.unpackedPsl = insertPsl, .type = search_result_type::existingItem};
+					return bucket_search_result{ .unpackedPsl = insertPsl, .type = search_result_type::existingItem };
 				}
 			}
 
@@ -510,7 +510,7 @@ namespace rsl
 
 			if (earlyOut && insertPsl.psl > m_maxPsl)
 			{
-				return bucket_search_result{.unpackedPsl = m_maxPsl, .type = search_result_type::itemNotFound};
+				return bucket_search_result{ .unpackedPsl = psl_type{ .psl = m_maxPsl, .fingerprint = fingerprint }, .type = search_result_type::itemNotFound };
 			}
 		}
 
@@ -740,6 +740,6 @@ namespace rsl
 	typename hash_map_base<MapInfo>::mapped_type* hash_map_base<MapInfo>::find(const key_type& key) noexcept
 		requires (MapInfo::is_map)
 	{
-		return const_cast<mapped_type*>(as_const(*this).find(key));
+		return const_cast<mapped_type*>(rsl::as_const(*this).find(key));
 	}
 }

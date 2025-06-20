@@ -1,8 +1,5 @@
 #pragma once
 
-#include <realtimeapiset.h>
-#include <winapifamily.h>
-
 #ifndef _WINPLATFORMDEF_
 	#define _WINPLATFORMDEF_
 
@@ -63,3 +60,6 @@
 		#endif
 	#endif
 #endif
+
+#include <realtimeapiset.h>
+#include <winapifamily.h>

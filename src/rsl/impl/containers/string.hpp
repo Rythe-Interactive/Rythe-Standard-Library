@@ -16,6 +16,7 @@ namespace rsl
 		using container_base = typename base::container_base;
 		using value_type = typename base::value_type;
 		using view_type = typename base::view_type;
+		using const_view_type = typename base::const_view_type;
 
 		using dynamic_array<CharType, Alloc>::dynamic_array;
 		using dynamic_array<CharType, Alloc>::operator=;
@@ -30,7 +31,7 @@ namespace rsl
 		[[rythe_always_inline]] constexpr static basic_dynamic_string from_buffer(const value_type* ptr, size_type count)
 			noexcept(container_base::copy_construct_noexcept);
 
-		[[rythe_always_inline]] constexpr static basic_dynamic_string from_view(view_type src)
+		[[rythe_always_inline]] constexpr static basic_dynamic_string from_view(const_view_type src)
 			noexcept(container_base::copy_construct_noexcept);
 
 		[[rythe_always_inline]] constexpr static basic_dynamic_string create_reserved(size_type capacity) noexcept;
@@ -40,16 +41,20 @@ namespace rsl
 			noexcept(container_base::copy_construct_noexcept);
 
 		// append
-		[[rythe_always_inline]] basic_dynamic_string& append(view_type); // TODO(Rowan): move to dynamic_array
+		[[rythe_always_inline]] basic_dynamic_string& append(const_view_type); // TODO(Rowan): move to dynamic_array
 
 		// operator+=
-		[[rythe_always_inline]] basic_dynamic_string& operator+=(view_type);
+		[[rythe_always_inline]] basic_dynamic_string& operator+=(const_view_type);
 
 		// replace
-		[[rythe_always_inline]] basic_dynamic_string& replace(size_type, size_type, view_type);
+		[[rythe_always_inline]] basic_dynamic_string& replace(size_type, size_type, const_view_type);
 	};
 
 	using dynamic_string = basic_dynamic_string<>;
+
+	using dynamic_wstring = basic_dynamic_string<utf16>;
+
+	dynamic_wstring to_utf16(dynamic_string::const_view_type str);
 
 } // namespace rsl
 
