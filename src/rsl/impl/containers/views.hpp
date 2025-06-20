@@ -22,8 +22,7 @@ namespace rsl
 		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
 
 		[[rythe_always_inline]] constexpr view() noexcept;
-		template <typename It>
-		[[rythe_always_inline]] constexpr view(It, size_type);
+		[[rythe_always_inline]] constexpr view(pointer ptr, size_type count);
 		template <typename It>
 		[[rythe_always_inline]] constexpr view(It, It);
 		template <size_type N>
@@ -31,10 +30,8 @@ namespace rsl
 		[[rythe_always_inline]] constexpr view(const view&) noexcept;
 		[[rythe_always_inline]] constexpr view(value_type&&) noexcept;
 
-		[[rythe_always_inline]] constexpr view(view<remove_const_t<value_type>, iterator_type> other) noexcept requires (is_const_v<value_type>);
+		[[rythe_always_inline]] constexpr operator view<const value_type, const_iterator_type>() noexcept requires (!is_const_v<value_type>);
 
-		template <size_type N>
-		[[rythe_always_inline]] constexpr view(string_literal<N> literal) noexcept requires same_as<T, const char>;
 		[[rythe_always_inline]] constexpr static view from_string_length(T* str, T terminator = T{}) noexcept requires char_type<T>;
 
 	public:
@@ -94,9 +91,6 @@ namespace rsl
 
 	template <typename T, contiguous_iterator Iter>
 	view(view<T, Iter> other) -> view<const T, const_iterator<Iter>>;
-
-	template <size_type N>
-	view(string_literal<N>) -> view<const char>;
 
 	using string_view = rsl::view<const char>;
 

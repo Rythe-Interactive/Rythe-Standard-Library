@@ -45,7 +45,7 @@ namespace rsl
 	}
 
 	template <typename CharType, allocator_type Alloc>
-	constexpr basic_dynamic_string<CharType, Alloc> basic_dynamic_string<CharType, Alloc>::from_view(view_type src)
+	constexpr basic_dynamic_string<CharType, Alloc> basic_dynamic_string<CharType, Alloc>::from_view(const_view_type src)
 		noexcept(container_base::copy_construct_noexcept)
 	{
 		basic_dynamic_string result;
@@ -83,19 +83,19 @@ namespace rsl
 
 	//TODO(Rowan): Woops forgot to implement these
 	template <typename CharType, allocator_type Alloc>
-	inline basic_dynamic_string<CharType, Alloc>& basic_dynamic_string<CharType, Alloc>::append(view_type view)
+	inline basic_dynamic_string<CharType, Alloc>& basic_dynamic_string<CharType, Alloc>::append([[maybe_unused]] const_view_type view)
 	{
 		return *this;
 	}
 
 	template <typename CharType, allocator_type Alloc>
-	inline basic_dynamic_string<CharType, Alloc>& basic_dynamic_string<CharType, Alloc>::operator+=(view_type rhs)
+	inline basic_dynamic_string<CharType, Alloc>& basic_dynamic_string<CharType, Alloc>::operator+=([[maybe_unused]] const_view_type rhs)
 	{
 		return *this;
 	}
 
 	template <typename CharType, allocator_type Alloc>
-	inline basic_dynamic_string<CharType, Alloc>& basic_dynamic_string<CharType, Alloc>::replace(size_type pos, size_type count, view_type view)
+	inline basic_dynamic_string<CharType, Alloc>& basic_dynamic_string<CharType, Alloc>::replace([[maybe_unused]] size_type pos, [[maybe_unused]] size_type count, [[maybe_unused]] const_view_type view)
 	{
 		return *this;
 	}

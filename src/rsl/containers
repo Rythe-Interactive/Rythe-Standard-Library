@@ -10,3 +10,4 @@
 #include "impl/containers/dynamic_array.hpp"
 #include "impl/containers/optional.hpp"
 #include "impl/containers/string.hpp"
+#include "impl/containers/string_literal.hpp"
