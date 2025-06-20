@@ -37,7 +37,7 @@ namespace rsl
 				{
 					return width - count;
 				}
-				character = character << 6u | currentChar & 0x3fu;
+				character = (character << 6u) | (currentChar & 0x3fu);
 				readPos++;
 			}
 
@@ -46,13 +46,13 @@ namespace rsl
 		}
 	}
 
-	dynamic_wstring to_utf16(dynamic_string::view_type str)
+	dynamic_wstring to_utf16(dynamic_string::const_view_type str)
 	{
 		dynamic_wstring result;
 		result.reserve(str.size());
 
-		utf8* data = str.data();
-		utf8* end = data + str.size();
+		const utf8* data = str.data();
+		utf8 const * const end = data + str.size();
 
 		while (data != end)
 		{
@@ -63,8 +63,8 @@ namespace rsl
 			if (character >= 0x10000u)
 			{
 				character -= 0x10000u;
-				result.push_back(static_cast<utf16>(character >> 10u & 0x3ffu | 0xd800u));
-				result.push_back(static_cast<utf16>(character & 0x3ffu | 0xdc00u));
+				result.push_back(static_cast<utf16>(((character >> 10u) & 0x3ffu) | 0xd800u));
+				result.push_back(static_cast<utf16>((character & 0x3ffu) | 0xdc00u));
 			}
 			else
 			{

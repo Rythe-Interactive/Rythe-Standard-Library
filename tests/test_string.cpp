@@ -41,7 +41,8 @@ TEST_CASE("string","[containers]")
 
 	SECTION("search")
 	{
-		view str = "abcdeffedcba"_sv;
+		view str = "abcdeffedcba";
+
 		{
 			size_type offset = rsl::find_first_of(str, 'd', 0);
 			REQUIRE(offset == 3);
