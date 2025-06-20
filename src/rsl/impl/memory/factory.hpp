@@ -2,10 +2,12 @@
 
 #include "../util/assert.hpp"
 #include "../util/concepts.hpp"
-#include "../util/type_traits.hpp"
 
 namespace rsl
 {
+	template <typename T>
+	consteval id_type type_id() noexcept;
+
 	template <typename T>
 	concept factory_type = requires(T factory, void* mem, typename T::ptr_type ptr, size_type n)
 	{
@@ -15,6 +17,7 @@ namespace rsl
 		{ factory.type_size() } noexcept -> convertible_to<size_type>;
 		{ factory.trivial_copy() } noexcept -> convertible_to<bool>;
 		{ factory.type_id() } noexcept -> convertible_to<id_type>;
+		{ factory.is_valid() } noexcept -> convertible_to<bool>;
 	};
 
 	template <typename T>
@@ -26,20 +29,16 @@ namespace rsl
 	};
 
 	template <typename T>
-	concept noexcept_factory_type = requires(T factory, void* mem, typename T::ptr_type ptr, size_type n)
+	concept noexcept_factory_type = factory_type<T> && requires(T factory, void* mem, typename T::ptr_type ptr, size_type n)
 	{
 		{ factory.construct(mem, n) } noexcept -> convertible_to<typename T::ptr_type>;
 		{ factory.move(mem, ptr, n) } noexcept -> convertible_to<typename T::ptr_type>;
-		{ factory.destroy(ptr, n) } noexcept;
-		{ factory.type_size() } noexcept -> convertible_to<size_type>;
-		{ factory.trivial_copy() } noexcept -> convertible_to<bool>;
-		{ factory.type_id() } noexcept -> convertible_to<id_type>;
 	} && (invert<typed_factory_type<T>> || requires(T factory) {
 		{ factory.construct_single_inline() } noexcept -> convertible_to<typename T::value_type>;
 	});
 
 	template <typename T>
-	concept optional_typed_factory_type = requires
+	concept statically_optional_typed_factory_type = requires
 	{
 		{ T::valid_factory } ->convertible_to<bool>;
 	} && ( typed_factory_type<T> || (T::valid_factory == false));
@@ -71,6 +70,7 @@ namespace rsl
 		using ptr_type = T*;
 
 		constexpr static bool valid_factory = true;
+		[[rythe_always_inline]] constexpr bool is_valid() const noexcept { return valid_factory; } //NOLINT
 
 		template <typename Other>
 		using retarget = default_factory<Other>;
@@ -100,6 +100,7 @@ namespace rsl
 		using ptr_type = void*;
 
 		constexpr static bool valid_factory = false;
+		[[rythe_always_inline]] constexpr bool is_valid() const noexcept { return valid_factory; } //NOLINT
 
 		template <typename Other>
 		using retarget = default_factory<Other>;
@@ -107,7 +108,7 @@ namespace rsl
 		constexpr default_factory() noexcept = default;
 
 		template <typename Other>
-		constexpr default_factory(default_factory<Other>) noexcept { rsl_assert_unreachable(); } // NOLINT(*-explicit-constructor)
+		constexpr default_factory(default_factory<Other>) noexcept { } // NOLINT(*-explicit-constructor)
 
 		template <typename... Args>
 		static void construct_single_inline(Args&&...) { rsl_assert_unreachable(); }
@@ -130,6 +131,8 @@ namespace rsl
 	public:
 		using ptr_type = void*;
 		virtual ~polymorphic_factory() = default;
+
+		virtual bool is_valid() const noexcept { return true; } // NOLINT
 
 		virtual void* construct(void* ptr, size_type count) const = 0;
 		virtual void* move(void* dst, void* src, size_type count) const = 0;
@@ -162,6 +165,8 @@ namespace rsl
 		using construct_func = void* (*)(void* ptr, size_type count);
 		using move_func = void* (*)(void* dst, void* src, size_type count);
 		using destroy_func = void (*)(void* ptr, size_type count);
+
+		[[rythe_always_inline]] bool is_valid() const noexcept;
 
 		type_erased_factory() noexcept = default;
 		template <typename T>

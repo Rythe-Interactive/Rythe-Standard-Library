@@ -62,6 +62,9 @@ namespace rsl
 
 	using cstring = const char*;
 
+	using utf8 = char;
+	using utf16 = wchar_t;
+
 	using uint = uint32;
 
 	using byte = uint8;
@@ -84,7 +87,7 @@ namespace rsl
 #define PRIORITY_MAX CHAR_MAX
 #define PRIORITY_MIN CHAR_MIN
 
-	using id_type = size_type;
+	using id_type = ptr_type;
 
 #define invalid_id 0
 

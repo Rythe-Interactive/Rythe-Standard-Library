@@ -9,14 +9,14 @@
 
 namespace rsl::time
 {
-	template <duration_rep precision = time32, chrono_clock clock_t = std::chrono::high_resolution_clock>
+	template <duration_rep Precision = time32, clock_type ClockType = std::chrono::high_resolution_clock>
 	struct stopwatch
 	{
 	public:
-		using time_type = precision;
+		using time_type = Precision;
 		using span_type = time::span<time_type>;
-		using time_point_type = time::point<precision, clock_t>;
-		using clock_type = clock_t;
+		using time_point_type = time::point<Precision, ClockType>;
+		using clock_type = ClockType;
 
 	private:
 		std::chrono::time_point<clock_type> m_start{clock_type::now()};
@@ -37,7 +37,7 @@ namespace rsl::time
 		{
 			return time_point_type{m_start.time_since_epoch()};
 		}
-		[[rythe_always_inline]] time_point_type current_point() const noexcept
+		[[rythe_always_inline]] static time_point_type current_point() noexcept
 		{
 			return time_point_type{clock_type::now()};
 		}

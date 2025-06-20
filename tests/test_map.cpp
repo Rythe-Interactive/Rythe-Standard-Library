@@ -19,6 +19,7 @@ namespace
 		using rsl::heap_allocator::allocate;
 		using rsl::heap_allocator::deallocate;
 		using rsl::heap_allocator::reallocate;
+		using rsl::heap_allocator::is_valid;
 	};
 } // namespace
 
@@ -72,7 +73,7 @@ TEST_CASE("dynamic_map", "[containers]")
 		}
 		{
 			default_pmu_allocator alloc;
-			allocator_storage<polymorphic_allocator> store(alloc);
+			allocator_storage<polymorphic_allocator> store(&alloc);
 			rsl::dynamic_map<float32, test_struct, hash_map_flags::defaultFlags, polymorphic_allocator> map{store};
 			REQUIRE((&(map.get_allocator())) == &alloc);
 		}

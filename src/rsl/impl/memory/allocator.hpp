@@ -14,6 +14,7 @@ namespace rsl
 		{ alloc.reallocate(ptr, n, n, n) } noexcept -> convertible_to<void*>;
 		{ alloc.deallocate(ptr, n) } noexcept;
 		{ alloc.deallocate(ptr, n, n) } noexcept;
+		{ alloc.is_valid() } noexcept -> convertible_to<bool>;
 	};
 
 	template <typename T>
@@ -24,6 +25,7 @@ namespace rsl
 		{ alloc.reallocate(ptr, n, n, n) } -> convertible_to<void*>;
 		{ alloc.deallocate(ptr, n) };
 		{ alloc.deallocate(ptr, n, n) };
+		{ alloc.is_valid() } noexcept -> convertible_to<bool>;
 	};
 
 #if !defined(RSL_DEFAULT_ALLOCATOR_OVERRIDE)
@@ -35,6 +37,8 @@ namespace rsl
 	class polymorphic_allocator
 	{
 	public:
+		virtual bool is_valid() const noexcept { return true; } //NOLINT
+
 		virtual ~polymorphic_allocator() = default;
 		[[nodiscard]] [[rythe_allocating]] virtual void* allocate(size_type size) noexcept = 0;
 		[[nodiscard]] [[rythe_allocating]] virtual void* allocate(size_type size, size_type alignment) noexcept = 0;
@@ -46,6 +50,16 @@ namespace rsl
 
 		virtual void deallocate(void* ptr, size_type size) noexcept = 0;
 		virtual void deallocate(void* ptr, size_type size, size_type alignment) noexcept = 0;
+
+		template<not_same_as<void> T>
+		[[nodiscard]] [[rythe_allocating]] T* allocate() noexcept { return static_cast<T*>(allocate(sizeof(T))); }
+		template<not_same_as<void> T>
+		[[nodiscard]] [[rythe_allocating]] T* allocate(const size_type alignment) noexcept { return static_cast<T*>(allocate(sizeof(T), alignment)); }
+
+		template<not_same_as<void> T>
+		void deallocate(T* ptr) noexcept { deallocate(static_cast<void*>(ptr), sizeof(T)); }
+		template<not_same_as<void> T>
+		void deallocate(T* ptr, const size_type alignment) noexcept { deallocate(ptr, sizeof(T), alignment); }
 	};
 
 	using pmu_allocator = polymorphic_allocator;
@@ -87,6 +101,7 @@ namespace rsl
 		{
 		}
 
+		[[rythe_always_inline]] constexpr bool is_valid() const noexcept { return allocatorPtr; }
 
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] constexpr void* allocate(size_type size) noexcept;
 		[[nodiscard]] [[rythe_allocating]] [[rythe_always_inline]] constexpr void*

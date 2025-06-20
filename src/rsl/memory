@@ -11,3 +11,4 @@
 #include "impl/memory/reference_counter.hpp"
 #include "impl/memory/stl_compatibility.hpp"
 #include "impl/memory/typed_allocator.hpp"
+#include "impl/memory/unique_object.hpp"

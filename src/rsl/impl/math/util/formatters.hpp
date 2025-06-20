@@ -24,7 +24,7 @@ namespace rsl::log::internal
 			presentation = *it++;
 		}
 
-		rsl_hard_assert_msg((it == end || *it == '}'), "invalid format");
+		rsl_assert_msg_hard((it == end || *it == '}'), "invalid format");
 
 		return it;
 	}

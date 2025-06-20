@@ -19,7 +19,6 @@ namespace rsl
 	public:
 		static constexpr bool is_flat = MapInfo::is_flat;
 		static constexpr bool is_large = MapInfo::is_large;
-		static constexpr bool is_dense = MapInfo::is_dense;
 
 		using key_type = typename MapInfo::key_type;
 		using mapped_type = typename MapInfo::mapped_type;
@@ -213,6 +212,7 @@ namespace rsl
 
 		size_type m_lastValueBucketIndex;
 
+		// Sacrifice rehash, erase, and add for faster lookups.
 		storage_type m_minPsl;
 		storage_type m_maxPsl;
 

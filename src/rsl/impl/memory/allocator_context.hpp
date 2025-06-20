@@ -8,6 +8,7 @@ namespace rsl
 	{
 		static default_polymorphic_allocator defaultGlobalAllocator;
 		static pmu_allocator* globalAllocator;
+		static default_polymorphic_allocator defaultThreadSpecificAllocator;
 		static thread_local pmu_allocator* threadSpecificAllocator;
 	};
 

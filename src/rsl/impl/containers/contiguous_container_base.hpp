@@ -85,20 +85,24 @@ namespace rsl
 		template <typename... Args>
 		constexpr static bool construct_noexcept = is_nothrow_constructible_v<value_type, Args...>;
 
+		template <input_iterator InputIt>
 		[[rythe_always_inline]] constexpr void
-		copy_assign_from_unsafe_impl(size_type offset, size_type end, const value_type* src)
+		copy_assign_from_unsafe_impl(size_type offset, size_type end, InputIt srcIter)
 			noexcept(copy_assign_noexcept);
 
+		template <input_iterator InputIt>
 		[[rythe_always_inline]] constexpr void
-		copy_construct_from_unsafe_impl(size_type offset, size_type end, const value_type* src)
+		copy_construct_from_unsafe_impl(size_type offset, size_type end, InputIt srcIter)
 			noexcept(copy_construct_noexcept);
 
+		template <input_iterator InputIt>
 		[[rythe_always_inline]] constexpr void
-		move_assign_from_unsafe_impl(size_type offset, size_type end, const value_type* src)
+		move_assign_from_unsafe_impl(size_type offset, size_type end, InputIt srcIter)
 			noexcept(move_assign_noexcept);
 
+		template <input_iterator InputIt>
 		[[rythe_always_inline]] constexpr void
-		move_construct_from_unsafe_impl(size_type offset, size_type end, const value_type* src)
+		move_construct_from_unsafe_impl(size_type offset, size_type end, InputIt srcIter)
 			noexcept(move_construct_noexcept);
 
 		template <typename... Args>

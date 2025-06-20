@@ -30,7 +30,7 @@ namespace rsl
 		[[rythe_always_inline]] constexpr buffered_list(value_type (&&arr)[N]) noexcept(move_construct_noexcept);
 		[[rythe_always_inline]] constexpr buffered_list(view_type src) noexcept(copy_construct_noexcept);
 		template <typename... Args>
-		[[rythe_always_inline]] constexpr buffered_list(size_type count, in_place_signal_type, Args&&... args)
+		[[rythe_always_inline]] constexpr static buffered_list create_in_place(size_type count, Args&&... args)
 			noexcept(construct_noexcept<Args...>);
 
 		[[rythe_always_inline]] constexpr buffered_list& operator=(const buffered_list& src)

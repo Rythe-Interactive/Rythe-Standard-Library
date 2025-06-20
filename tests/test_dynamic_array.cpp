@@ -19,6 +19,7 @@ namespace
 		using rsl::heap_allocator::allocate;
 		using rsl::heap_allocator::deallocate;
 		using rsl::heap_allocator::reallocate;
+		using rsl::heap_allocator::is_valid;
 	};
 } // namespace
 
@@ -95,7 +96,7 @@ TEST_CASE("dynamic_array", "[containers]")
 		}
 		{
 			default_pmu_allocator alloc;
-			allocator_storage<polymorphic_allocator> store(alloc);
+			allocator_storage<polymorphic_allocator> store(&alloc);
 			rsl::dynamic_array<int, polymorphic_allocator> list{store};
 			REQUIRE((&(list.get_allocator())) == &alloc);
 		}

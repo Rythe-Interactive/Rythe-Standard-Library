@@ -9,17 +9,17 @@
 namespace rsl::time
 {
 	template <typename Clock>
-	concept chrono_clock = requires {
+	concept clock_type = requires {
 		{ Clock::now() } -> specialization_of<std::chrono::time_point>;
 		requires specialization_of<typename Clock::duration, std::chrono::duration>;
 	};
 
-	template <duration_rep precision = time32, chrono_clock clock_t = std::chrono::high_resolution_clock>
+	template <duration_rep Precision = time32, clock_type ClockType = std::chrono::high_resolution_clock>
 	struct point
 	{ // represents a point in time
 	private:
-		using rep = typename clock_t::rep;
-		using tp_t = typename clock_t::time_point;
+		using rep = typename ClockType::rep;
+		using tp_t = typename ClockType::time_point;
 
 		template <duration_rep T>
 		[[nodiscard]] [[rythe_always_inline]] constexpr days_duration<T> d_dur() const
@@ -78,10 +78,10 @@ namespace rsl::time
 		}
 
 	public:
-		using time_type = precision;
+		using time_type = Precision;
 		using span_type = time::span<time_type>;
-		using duration_type = typename clock_t::duration;
-		using clock_type = clock_t;
+		using duration_type = typename ClockType::duration;
+		using clock_type = ClockType;
 
 		duration_type duration{duration_type::zero()}; // duration since the epoch
 
@@ -97,7 +97,7 @@ namespace rsl::time
 		}
 
 		template <std::convertible_to<duration_type> other_duration>
-		constexpr point(const point<clock_t, other_duration>& other)
+		constexpr point(const point<ClockType, other_duration>& other)
 			noexcept(rsl::is_arithmetic_v<rep> && rsl::is_arithmetic_v<typename other_duration::rep>) /* strengthened */
 			: duration(other.duration)
 		{
@@ -224,7 +224,7 @@ namespace rsl::time
 	extern const point32 genesis;
 } // namespace rsl::time
 
-template <rsl::time::duration_rep precision, rsl::time::chrono_clock clock_t, rsl::time::duration_rep precision2>
+template <rsl::time::duration_rep precision, rsl::time::clock_type clock_t, rsl::time::duration_rep precision2>
 [[nodiscard]] [[rythe_always_inline]] constexpr auto
 operator<=>(const rsl::time::point<precision, clock_t>& lhs, const rsl::time::point<precision2, clock_t>& rhs)
 	noexcept(rsl::is_arithmetic_v<typename clock_t::rep>) /* strengthened */
@@ -232,7 +232,7 @@ operator<=>(const rsl::time::point<precision, clock_t>& lhs, const rsl::time::po
 	return lhs.duration <=> rhs.duration;
 }
 
-template <rsl::time::duration_rep precision, rsl::time::chrono_clock clock_t, rsl::time::duration_rep precision2>
+template <rsl::time::duration_rep precision, rsl::time::clock_type clock_t, rsl::time::duration_rep precision2>
 [[nodiscard]] [[rythe_always_inline]] constexpr rsl::time::common_span<precision, precision2>
 operator-(const rsl::time::point<precision, clock_t>& lhs, const rsl::time::point<precision2, clock_t>& rhs)
 	noexcept(rsl::is_arithmetic_v<typename clock_t::rep>) /* strengthened */

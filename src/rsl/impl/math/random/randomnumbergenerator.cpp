@@ -2,7 +2,7 @@
 
 namespace rsl::math
 {
-	unique_object<random_number_engine_base> random_number_generator::m_engine = unique_object<rythe_default_engine>();
+	unique_object<random_number_engine_base> random_number_generator::m_engine = unique_object<rythe_default_engine>::create_in_place();
 
 	void random_number_generator::set_rng_engine(unique_object<random_number_engine_base>&& newEngine) noexcept
 	{

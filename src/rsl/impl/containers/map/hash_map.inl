@@ -620,7 +620,7 @@ namespace rsl
 		if (newCapacity > m_buckets.size())
 		{
 			bucket_container oldBuckets = move(m_buckets);
-			m_buckets = bucket_container(newCapacity, in_place_signal);
+			m_buckets = bucket_container::create_in_place(newCapacity);
 
 			rehash(oldBuckets);
 		}
@@ -676,7 +676,7 @@ namespace rsl
 
 		if (insertResult.type == insert_result_type::newInsertion)
 		{
-			return {ref(m_values.emplace_back(create_node(key, forward<Args>(args)...)).value()), true};
+			return {ref(m_values.emplace_back(create_node(key, rsl::forward<Args>(args)...)).value()), true};
 		}
 
 		return {ref(m_values[m_buckets[insertResult.index].index].value()), false};
