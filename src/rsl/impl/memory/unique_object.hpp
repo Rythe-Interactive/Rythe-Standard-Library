@@ -27,18 +27,16 @@ namespace rsl
 			noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>);
 
 		template <typename... Args>
-		[[rythe_always_inline]] constexpr explicit unique_object(in_place_signal_type, Args&&... args)
+		[[rythe_always_inline]] constexpr static unique_object create_in_place(Args&&... args)
 			noexcept(is_nothrow_constructible_v<mem_rsc> && is_nothrow_constructible_v<T, Args...>);
 
 		template <typename... Args>
-		[[rythe_always_inline]] unique_object(const allocator_storage_type& allocStorage,
-		                                      in_place_signal_type, Args&&... args)
+		[[rythe_always_inline]] static unique_object create_in_place_with_allocator(const allocator_storage_type& allocStorage, Args&&... args)
 			noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&> &&
 			is_nothrow_constructible_v<T, Args...>);
 
 		template <typename... Args>
-		[[rythe_always_inline]] unique_object(const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage,
-											  in_place_signal_type, Args&&... args)
+		[[rythe_always_inline]] static unique_object create_in_place_alloc_factory(const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage, Args&&... args)
 			noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&> &&
 				is_nothrow_constructible_v<T, Args...>);
 

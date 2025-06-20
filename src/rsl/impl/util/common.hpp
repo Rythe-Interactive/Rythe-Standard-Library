@@ -25,17 +25,11 @@ namespace rsl
 	template <typename T>
 	constexpr construct_type_signal_type construct_type_signal = construct_type_signal_type<T>{};
 
-	struct in_place_signal_type
-	{
-	};
-
-	inline constexpr in_place_signal_type in_place_signal = in_place_signal_type{};
-
 	template <typename T>
 	struct in_place_type_signal_type
 	{
 	};
-
+	
 	template <typename T>
 	inline constexpr in_place_type_signal_type<T> in_place_type_signal = in_place_type_signal_type<T>{};
 
@@ -1806,4 +1800,72 @@ namespace rsl
 
 	template <typename LHS, typename RHS>
 	constexpr bool is_pointer_assignable_v = requires(LHS* lhs, RHS* rhs) { lhs = rhs; };
+
+	struct lval_ref_signal
+	{
+	};
+
+	using ref_signal = lval_ref_signal;
+
+	struct rval_ref_signal
+	{
+	};
+
+	using move_signal = rval_ref_signal;
+
+	struct const_signal
+	{
+	};
+
+	struct pointer_signal
+	{
+	};
+
+	template <typename T, typename... DecorationSignals>
+	struct decorate_type;
+
+	template <typename T, typename DecorationSignal>
+	struct decorate_type<T, DecorationSignal>
+	{
+		static_assert(false, "Unknown signal."); // NOLINT
+	};
+
+	template <typename T>
+	struct decorate_type<T>
+	{
+		using type = T;
+	};
+
+	template <typename T, typename DecorationSignal, typename... Rest>
+	struct decorate_type<T, DecorationSignal, Rest...>
+	{
+		using type = typename decorate_type<typename decorate_type<T, DecorationSignal>::type, Rest...>::type;
+	};
+
+	template <typename T>
+	struct decorate_type<T, lval_ref_signal>
+	{
+		using type = typename add_lval_ref<T>::type;
+	};
+
+	template <typename T>
+	struct decorate_type<T, rval_ref_signal>
+	{
+		using type = typename add_rval_ref<T>::type;
+	};
+
+	template <typename T>
+	struct decorate_type<T, const_signal>
+	{
+		using type = typename add_const<T>::type;
+	};
+
+	template <typename T>
+	struct decorate_type<T, pointer_signal>
+	{
+		using type = typename add_pointer<T>::type;
+	};
+
+	template <typename T, typename... DecorationSignals>
+	using decorate_type_t = typename decorate_type<T, DecorationSignals...>::type;
 } // namespace rsl

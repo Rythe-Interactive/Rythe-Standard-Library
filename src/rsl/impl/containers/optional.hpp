@@ -74,11 +74,11 @@ namespace rsl
 			noexcept(is_nothrow_copy_constructible_v<factory_storage_type>);
 
 		template <typename... Args>
-		[[rythe_always_inline]] constexpr optional(in_place_signal_type, Args&&... args)
+		[[rythe_always_inline]] constexpr static optional create_in_place(Args&&... args)
 			noexcept(is_nothrow_constructible_v<value_type, Args...>);
 		template <typename... Args>
-		[[rythe_always_inline]] constexpr optional(
-			const factory_storage_type& factoryStorage, in_place_signal_type, Args&&... args
+		[[rythe_always_inline]] constexpr static optional create_in_place_with_factory(
+			const factory_storage_type& factoryStorage, Args&&... args
 		) noexcept(is_nothrow_constructible_v<value_type, Args...>);
 
 		[[rythe_always_inline]] constexpr optional(const value_type& value)

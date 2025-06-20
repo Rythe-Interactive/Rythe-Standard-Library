@@ -387,7 +387,7 @@ namespace rsl
 	constexpr size_type dynamic_array<T, Alloc, Factory>::erase_swap(size_type pos)
 		noexcept(container_base::move_construct_noexcept)
 	{
-		rsl_assert_invalid_access(pos < container_base::m_size);
+		rsl_assert_out_of_range(pos < container_base::m_size);
 
 		--container_base::m_size;
 		mem_rsc::destroy(1, pos);
@@ -416,7 +416,7 @@ namespace rsl
 	constexpr size_type dynamic_array<T, Alloc, Factory>::erase_swap(const size_type first, size_type last)
 		noexcept(container_base::move_construct_noexcept)
 	{
-		rsl_assert_invalid_access(first < container_base::m_size);
+		rsl_assert_out_of_range(first < container_base::m_size);
 		rsl_assert_invalid_parameters(first < last);
 		if (last > container_base::m_size)
 		{
@@ -467,7 +467,7 @@ namespace rsl
 	constexpr size_type dynamic_array<T, Alloc, Factory>::erase_shift(const size_type pos)
 		noexcept(container_base::move_construct_noexcept)
 	{
-		rsl_assert_invalid_access(pos < container_base::m_size);
+		rsl_assert_out_of_range(pos < container_base::m_size);
 
 		mem_rsc::destroy(1, pos);
 		container_base::move_shift_elements_unsafe(pos + 1, container_base::m_size, -1ll);
@@ -490,7 +490,7 @@ namespace rsl
 	constexpr size_type dynamic_array<T, Alloc, Factory>::erase_shift(const size_type first, size_type last)
 		noexcept(container_base::move_construct_noexcept)
 	{
-		rsl_assert_invalid_access(first < container_base::m_size);
+		rsl_assert_out_of_range(first < container_base::m_size);
 		rsl_assert_invalid_parameters(first < last);
 		if (last > container_base::m_size)
 		{
