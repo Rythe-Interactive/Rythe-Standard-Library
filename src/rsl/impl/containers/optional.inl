@@ -46,21 +46,23 @@ namespace rsl
 
 	template <typename T, factory_type Factory>
 	template <typename... Args>
-	constexpr optional<T, Factory>::optional(in_place_signal_type, Args&&... args)
+	constexpr optional<T, Factory> optional<T, Factory>::create_in_place(Args&&... args)
 		noexcept(is_nothrow_constructible_v<value_type, Args...>)
-		: m_factory()
 	{
-		emplace(forward<Args>(args)...);
+		optional ret;
+		ret.emplace(forward<Args>(args)...);
+		return ret;
 	}
 
 	template <typename T, factory_type Factory>
 	template <typename... Args>
-	constexpr optional<T, Factory>::optional(
-		const factory_storage_type& factoryStorage, in_place_signal_type, Args&&... args
+	constexpr optional<T, Factory> optional<T, Factory>::create_in_place_with_factory(
+		const factory_storage_type& factoryStorage, Args&&... args
 	) noexcept(is_nothrow_constructible_v<value_type, Args...>)
-		: m_factory(factoryStorage)
 	{
-		emplace(forward<Args>(args)...);
+		optional ret(factoryStorage);
+		ret.emplace(forward<Args>(args)...);
+		return ret;
 	}
 
 	template <typename T, factory_type Factory>

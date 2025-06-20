@@ -7,7 +7,7 @@ namespace rsl
 	constexpr multicast_delegate<ReturnType(ParamTypes...), Alloc, Factory>::multicast_delegate(
 		const value_type& val
 	) noexcept
-		: m_invocationList(1, in_place_signal, val.m_invocation)
+		: m_invocationList(invocation_container::create_in_place(1, val.m_invocation))
 	{
 	}
 

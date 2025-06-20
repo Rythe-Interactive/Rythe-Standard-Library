@@ -25,12 +25,6 @@ namespace rsl
 	template <typename T>
 	constexpr construct_type_signal_type construct_type_signal = construct_type_signal_type<T>{};
 
-	struct in_place_signal_type
-	{
-	};
-
-	inline constexpr in_place_signal_type in_place_signal = in_place_signal_type{};
-
 	template <typename T>
 	struct in_place_type_signal_type
 	{
@@ -327,6 +321,15 @@ namespace rsl
 
 	template <typename T>
 	struct is_arithmetic : bool_constant<is_arithmetic_v<T>>
+	{
+	};
+
+	template <typename T>
+	inline constexpr bool is_char_v = is_any_of_v<
+		remove_cv_t<T>, char, signed char, unsigned char, wchar_t, char8_t, char16_t, char32_t>;
+
+	template <typename T>
+	struct is_char : bool_constant<is_char_v<T>>
 	{
 	};
 
@@ -724,7 +727,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	constexpr bool is_trivial_v = ::std::is_trivial_v<T>; // Uses compiler magic behind the scenes.
+	constexpr bool is_trivial_v = __is_trivial(T); // Compiler magic.
 
 	template <typename T>
 	struct is_trivial : bool_constant<is_trivial_v<T>>
@@ -732,8 +735,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	constexpr bool is_trivially_copyable_v =
-		::std::is_trivially_copyable_v<T>; // Uses compiler magic behind the scenes.
+	constexpr bool is_trivially_copyable_v = __is_trivially_copyable(T); // Compiler magic.
 
 	template <typename T>
 	struct is_trivially_copyable : bool_constant<is_trivially_copyable_v<T>>
@@ -827,6 +829,31 @@ namespace rsl
 			delete[] srcData;
 			delete[] dstData;
 		}
+
+		// Might still break on some compilers if T is unsigned long long
+		template <typename T>
+			requires is_trivially_constructible_v<T>
+		constexpr void constexpr_memset_impl(T* dst, const byte val, const size_type count)
+		{
+			const size_type itemCount = count / sizeof(T);
+			constexpr size_type stepSize = sizeof(T);
+
+			struct converter
+			{
+				byte from[stepSize];
+			};
+
+			for (size_type i = 0; i < itemCount; i++)
+			{
+				converter conv{};
+				for (size_type j = 0; j < stepSize; j++)
+				{
+					conv.from[j] = val;
+				}
+
+				dst[i] = ::std::bit_cast<T>(conv);
+			}
+		}
 	} // namespace internal
 
 	template <typename To, typename From>
@@ -873,8 +900,19 @@ namespace rsl
 	{
 		if (is_constant_evaluated())
 		{
-			internal::constexpr_memcpy_impl(dst, src, count);
-			return dst;
+			if constexpr (is_void_v<To>)
+			{
+				return constexpr_memcpy(bit_cast<byte*>(dst), src, count);
+			}
+			else if constexpr (is_void_v<From>)
+			{
+				return constexpr_memcpy(dst, bit_cast<const byte*>(src), count);
+			}
+			else
+			{
+				internal::constexpr_memcpy_impl(dst, src, count);
+				return dst;
+			}
 		}
 		else
 		{
@@ -882,16 +920,24 @@ namespace rsl
 		}
 	}
 
-	template <>
-	constexpr void* constexpr_memcpy<void, void>(void* dst, const void* src, const size_type count) noexcept
+	template <typename T>
+	constexpr void* constexpr_memset(T* dst, const byte value, const size_type count)
 	{
 		if (is_constant_evaluated())
 		{
-			return constexpr_memcpy(bit_cast<byte*>(dst), bit_cast<const byte*>(src), count);
+			if constexpr (is_void_v<T>)
+			{
+				return constexpr_memset(bit_cast<byte*>(dst), value, count);
+			}
+			else
+			{
+				internal::constexpr_memset_impl(dst, value, count);
+				return dst;
+			}
 		}
 		else
 		{
-			return memcpy(dst, src, count);
+			return memset(dst, value, count);
 		}
 	}
 
@@ -1097,6 +1143,25 @@ namespace rsl
 
 	template <typename From, typename To>
 	inline constexpr bool is_convertible_v = is_convertible<From, To>::value;
+
+	// Implementation details of is_nothrow_convertible<...>
+	namespace internal
+	{
+		template <typename From, typename To, bool = is_convertible_v<From, To>, bool = is_void_v<To>>
+		constexpr bool is_nothrow_convertible_impl_v = noexcept(fake_copy_init<To>(declval<From>()));
+
+		template <typename From, typename To, bool _IsVoid>
+		constexpr bool is_nothrow_convertible_impl_v<From, To, false, _IsVoid> = false;
+
+		template <typename From, typename To>
+		constexpr bool is_nothrow_convertible_impl_v<From, To, true, true> = true;
+	}
+
+	template <typename From, typename To>
+	constexpr bool is_nothrow_convertible_v = internal::is_nothrow_convertible_impl_v<From, To>;
+
+	template <typename From, typename To>
+	struct is_nothrow_convertible : bool_constant<internal::is_nothrow_convertible_impl_v<From, To>> {};
 
 	template <typename... T>
 	struct common_type;
@@ -1423,6 +1488,18 @@ namespace rsl
 
 	template <typename T>
 	void as_const(const T&&) = delete;
+
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr const T* as_const_ptr(T* ptr) noexcept
+	{
+		return ptr;
+	}
+
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr const T* as_const_ptr(const T* ptr) noexcept
+	{
+		return ptr;
+	}
 
 	template <template <typename...> typename T, typename U, size_type I, typename... Args>
 	struct make_sequence : make_sequence<T, U, I - 1, Args..., U>
@@ -1806,4 +1883,72 @@ namespace rsl
 
 	template <typename LHS, typename RHS>
 	constexpr bool is_pointer_assignable_v = requires(LHS* lhs, RHS* rhs) { lhs = rhs; };
+
+	struct lval_ref_signal
+	{
+	};
+
+	using ref_signal = lval_ref_signal;
+
+	struct rval_ref_signal
+	{
+	};
+
+	using move_signal = rval_ref_signal;
+
+	struct const_signal
+	{
+	};
+
+	struct pointer_signal
+	{
+	};
+
+	template <typename T, typename... DecorationSignals>
+	struct decorate_type;
+
+	template <typename T, typename DecorationSignal>
+	struct decorate_type<T, DecorationSignal>
+	{
+		static_assert(false, "Unknown signal."); // NOLINT
+	};
+
+	template <typename T>
+	struct decorate_type<T>
+	{
+		using type = T;
+	};
+
+	template <typename T, typename DecorationSignal, typename... Rest>
+	struct decorate_type<T, DecorationSignal, Rest...>
+	{
+		using type = typename decorate_type<typename decorate_type<T, DecorationSignal>::type, Rest...>::type;
+	};
+
+	template <typename T>
+	struct decorate_type<T, lval_ref_signal>
+	{
+		using type = typename add_lval_ref<T>::type;
+	};
+
+	template <typename T>
+	struct decorate_type<T, rval_ref_signal>
+	{
+		using type = typename add_rval_ref<T>::type;
+	};
+
+	template <typename T>
+	struct decorate_type<T, const_signal>
+	{
+		using type = typename add_const<T>::type;
+	};
+
+	template <typename T>
+	struct decorate_type<T, pointer_signal>
+	{
+		using type = typename add_pointer<T>::type;
+	};
+
+	template <typename T, typename... DecorationSignals>
+	using decorate_type_t = typename decorate_type<T, DecorationSignals...>::type;
 } // namespace rsl

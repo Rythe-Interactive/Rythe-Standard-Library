@@ -620,7 +620,7 @@ namespace rsl
 		if (newCapacity > m_buckets.size())
 		{
 			bucket_container oldBuckets = move(m_buckets);
-			m_buckets = bucket_container(newCapacity, in_place_signal);
+			m_buckets = bucket_container::create_in_place(newCapacity);
 
 			rehash(oldBuckets);
 		}

@@ -59,7 +59,9 @@ namespace rsl
 
 		template <typename... Args>
 		[[rythe_always_inline]] constexpr T* construct(T* ptr, size_type count = 1, Args&&... args)
-			noexcept(factory_traits<Factory>::template noexcept_constructable<Args...>);
+		noexcept(factory_traits<Factory>::template noexcept_constructable<Args...>);
+		[[rythe_always_inline]] constexpr T* copy(T* dst, const T* src, size_type count = 1)
+			noexcept(factory_traits<Factory>::noexcept_moveable);
 		[[rythe_always_inline]] constexpr T* move(T* dst, T* src, size_type count = 1)
 			noexcept(factory_traits<Factory>::noexcept_moveable);
 		[[rythe_always_inline]] constexpr void destroy(T* ptr, size_type count = 1) noexcept;

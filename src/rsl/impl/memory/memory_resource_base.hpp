@@ -185,6 +185,13 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void destroy(size_type count = 1, size_type offset = 0) noexcept;
 
 		template <typename... Args>
+		[[rythe_always_inline]] constexpr void copy(size_type count, size_type offset, const T* src)
+			noexcept(factory_traits<Factory>::noexcept_copyable);
+		template <typename... Args>
+		[[rythe_always_inline]] constexpr void move(size_type count, size_type offset, T* src)
+			noexcept(factory_traits<Factory>::noexcept_moveable);
+
+		template <typename... Args>
 		[[rythe_allocating]] [[rythe_always_inline]] constexpr void
 		allocate_and_construct(size_type count = 1, Args&&... args)
 			noexcept(factory_traits<Factory>::template noexcept_constructable<Args...>);

@@ -1,10 +1,6 @@
 #pragma once
 
-#include "../containers/span.hpp"
-#include "../containers/string_view.hpp"
-#include "string_util.hpp"
-#include "type_util.hpp"
-#include "utilities.hpp"
+#include "../containers/views.hpp"
 
 #ifndef RSL_DEFAULT_HASH_MODE
 	#define RSL_DEFAULT_HASH_MODE fast_hash
@@ -20,14 +16,14 @@ namespace rsl
 	};
 
 	template <hash_mode Mode>
-	[[rythe_always_inline]] constexpr id_type hash_bytes(span<const byte> bytes) noexcept;
+	[[rythe_always_inline]] constexpr id_type hash_bytes(view<const byte> bytes) noexcept;
 
-	[[rythe_always_inline]] constexpr id_type hash_bytes(span<const byte> bytes) noexcept;
+	[[rythe_always_inline]] constexpr id_type hash_bytes(view<const byte> bytes) noexcept;
 
 	template <hash_mode Mode>
-	[[rythe_always_inline]] constexpr id_type hash_string(string_view str) noexcept;
+	[[rythe_always_inline]] constexpr id_type hash_string(rsl::string_view str) noexcept;
 
-	[[rythe_always_inline]] constexpr id_type hash_string(string_view str) noexcept;
+	[[rythe_always_inline]] constexpr id_type hash_string(rsl::string_view str) noexcept;
 
 	template <hash_mode Mode, same_as<id_type>... HashTypes>
 	[[rythe_always_inline]] constexpr id_type
@@ -48,7 +44,7 @@ namespace rsl
 	{
 		[[rythe_always_inline]] constexpr static id_type hash(const T& val) noexcept
 		{
-			return hash_bytes<Mode>(std::span(bit_cast<const byte*>(&val), sizeof(T)));
+			return hash_bytes<Mode>(view(bit_cast<const byte*>(&val), sizeof(T)));
 		}
 	};
 
