@@ -2,7 +2,7 @@
 #include "../util/primitives.hpp"
 
 #include "../util/hash.hpp"
-#include "span.hpp"
+#include "view.hpp"
 #include "string_view.hpp"
 
 #include <bit>

@@ -1,4 +1,5 @@
 #pragma once
+#include "views.hpp"
 #include "../memory/memory_resource_base.hpp"
 #include "iterators.hpp"
 
@@ -16,8 +17,8 @@ namespace rsl
 		using const_iterator_type = ConstIter;
 		using reverse_iterator_type = reverse_iterator<iterator_type>;
 		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
-		using view_type = std::span<value_type>;
-		using const_view_type = std::span<const value_type>;
+		using view_type = rsl::view<value_type>;
+		using const_view_type = view<const value_type>;
 		using allocator_storage_type = typename mem_rsc::allocator_storage_type;
 		using allocator_t = typename mem_rsc::allocator_t;
 		using factory_storage_type = typename mem_rsc::factory_storage_type;
@@ -84,20 +85,24 @@ namespace rsl
 		template <typename... Args>
 		constexpr static bool construct_noexcept = is_nothrow_constructible_v<value_type, Args...>;
 
+		template <input_iterator InputIt>
 		[[rythe_always_inline]] constexpr void
-		copy_assign_from_unsafe_impl(size_type offset, size_type end, const value_type* src)
+		copy_assign_from_unsafe_impl(size_type offset, size_type end, InputIt srcIter)
 			noexcept(copy_assign_noexcept);
 
+		template <input_iterator InputIt>
 		[[rythe_always_inline]] constexpr void
-		copy_construct_from_unsafe_impl(size_type offset, size_type end, const value_type* src)
+		copy_construct_from_unsafe_impl(size_type offset, size_type end, InputIt srcIter)
 			noexcept(copy_construct_noexcept);
 
+		template <input_iterator InputIt>
 		[[rythe_always_inline]] constexpr void
-		move_assign_from_unsafe_impl(size_type offset, size_type end, const value_type* src)
+		move_assign_from_unsafe_impl(size_type offset, size_type end, InputIt srcIter)
 			noexcept(move_assign_noexcept);
 
+		template <input_iterator InputIt>
 		[[rythe_always_inline]] constexpr void
-		move_construct_from_unsafe_impl(size_type offset, size_type end, const value_type* src)
+		move_construct_from_unsafe_impl(size_type offset, size_type end, InputIt srcIter)
 			noexcept(move_construct_noexcept);
 
 		template <typename... Args>

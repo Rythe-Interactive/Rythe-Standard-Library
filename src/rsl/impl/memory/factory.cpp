@@ -9,6 +9,11 @@ namespace rsl
 		return m_constructFunc ? (m_constructFunc)(ptr, count) : nullptr;
 	}
 
+	void* type_erased_factory::copy(void* dst, const void* src, const size_type count) const
+	{
+		return m_copyFunc ? (m_copyFunc)(dst, src, count) : nullptr;
+	}
+
 	void* type_erased_factory::move(void* dst, void* src, const size_type count) const
 	{
 		return m_moveFunc ? (m_moveFunc)(dst, src, count) : nullptr;

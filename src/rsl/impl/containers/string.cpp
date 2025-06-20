@@ -46,9 +46,9 @@ namespace rsl
 		}
 	}
 
-	wstring to_utf16(string::view_type str)
+	dynamic_wstring to_utf16(dynamic_string::view_type str)
 	{
-		wstring result;
+		dynamic_wstring result;
 		result.reserve(str.size());
 
 		utf8* data = str.data();
@@ -57,7 +57,7 @@ namespace rsl
 		while (data != end)
 		{
 			uint32 character = 0u;
-			size_type bytesRead = read_utf8(data, character);
+			const size_type bytesRead = read_utf8(data, character);
 			data += bytesRead;
 
 			if (character >= 0x10000u)

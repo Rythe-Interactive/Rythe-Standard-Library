@@ -11,7 +11,7 @@ namespace rsl
 			{
 				if (assertError)
 				{
-					rsl_soft_assert_msg_consistent(false, err.message);
+					rsl_assert_msg_soft_consistent(false, err.message);
 				}
 				else
 				{
@@ -23,7 +23,7 @@ namespace rsl
 			{
 				if (assertError)
 				{
-					rsl_hard_assert_msg(false, err.message);
+					rsl_assert_msg_hard(false, err.message);
 				}
 				else
 				{
@@ -35,7 +35,7 @@ namespace rsl
 			{
 				if (assertError)
 				{
-					rsl_hard_assert_msg(false, err.message);
+					rsl_assert_msg_hard(false, err.message);
 				}
 				else
 				{
@@ -89,10 +89,10 @@ namespace rsl
 	namespace
 	{
 		void error_handler_based_assert_handler(
-			std::string_view expression, std::string_view file, size_type line, std::string_view message, bool soft
+			const std::string_view expression, const std::string_view file, const size_type line, const std::string_view message, const bool soft, bool* ignore
 		)
 		{
-			get_error_handler()->handle_assert(expression, file, line, message, soft);
+			get_error_handler()->handle_assert(expression, file, line, message, soft, ignore);
 		}
 	} // namespace
 

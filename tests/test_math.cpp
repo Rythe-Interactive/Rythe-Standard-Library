@@ -65,7 +65,7 @@ TEST_CASE("vectors", "[math]")
 		constexpr float1 vec1(const1);
 
 		CHECK(vec1 != const0);
-		CHECK(vec0.x != vec1.x);
+		CHECK(!close_enough(vec0.x, vec1.x));
 		CHECK(vec0 != vec1);
 
 		{
@@ -1070,6 +1070,21 @@ TEST_CASE("matrices", "[math]")
 			CHECK(matrix[1] == float4::up);
 			CHECK(matrix[2] == float4::backward);
 			CHECK(matrix[3] == float4(0.f, 0.f, 3.f, 1.f));
+		}
+		{
+			constexpr float3 camPos = forward3 * 3.f + up3 * 2.f;
+			constexpr float3 focusPos = up3 * 0.5f + right3 * 1.2f;
+			
+			constexpr float4x4 matrix = look_at(camPos, focusPos, up3);
+
+			constexpr float3 forward = normalize(focusPos - camPos);
+			constexpr float3 right = normalize(cross(up3, forward));
+			constexpr float3 up = normalize(cross(forward, right));
+
+			CHECK(matrix[0] == right);
+			CHECK(matrix[1] == up);
+			CHECK(matrix[2] == forward);
+			CHECK(matrix[3] == float4(camPos, 1.f));
 		}
 	}
 }

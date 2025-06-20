@@ -2,7 +2,7 @@
 
 #include "../util/common.hpp"
 #include "../util/primitives.hpp"
-#include "string_view.hpp"
+#include "views.hpp"
 
 namespace rsl
 {
@@ -61,13 +61,14 @@ namespace rsl
 
 		consteval void copy_from(string_view str) noexcept;
 
-		explicit constexpr operator string_view() const noexcept { return string_view(buffer, size()); }
+		[[nodiscard]] constexpr string_view view() const noexcept { return string_view(buffer, size()); }
+		[[nodiscard]] explicit constexpr operator string_view() const noexcept { return view(); }
 	};
 
 	template <size_type N>
 	[[nodiscard]] constexpr bool operator==(constexpr_string<N> lhs, const char* rhs)
 	{
-		return string_view(lhs) == rhs;
+		return lhs.view() == string_view::from_string_length(rhs);
 	}
 
 	template <size_type A, size_type B>

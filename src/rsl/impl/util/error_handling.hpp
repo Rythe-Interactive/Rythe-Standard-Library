@@ -76,10 +76,10 @@ namespace rsl
 	struct error_handler
 	{
 		virtual void handle_assert(
-			std::string_view expression, std::string_view file, size_type line, std::string_view message, bool soft
+			const std::string_view expression, const std::string_view file, const size_type line, const std::string_view message, const bool soft, bool* ignore
 		)
 		{
-			rsl::asserts::internal::default_assert_handler(expression, file, line, message, soft);
+			rsl::asserts::internal::default_assert_handler(expression, file, line, message, soft, ignore);
 		}
 
 		virtual void handle_error(const error_type& error, bool assertError);
@@ -160,8 +160,8 @@ namespace rsl
 
 		[[rythe_always_inline]] void resolve() noexcept
 		{
-			rsl_hard_assert_msg(!is_okay(), "Tried to resolve a valid result without error.");
-			rsl_hard_assert_msg(
+			rsl_assert_msg_hard(!is_okay(), "Tried to resolve a valid result without error.");
+			rsl_assert_msg_hard(
 				m_errid == error_context::currentError,
 				"Errors not resolved in order. Earlier result remains unresolved."
 			);
@@ -245,13 +245,13 @@ namespace rsl
 
 		[[nodiscard]] [[rythe_always_inline]] result_type& value() noexcept
 		{
-			rsl_hard_assert_msg(is_okay(), "Tried to get value of result with unresolved error.");
+			rsl_assert_msg_hard(is_okay(), "Tried to get value of result with unresolved error.");
 			return m_value;
 		}
 
 		[[nodiscard]] [[rythe_always_inline]] const result_type& value() const noexcept
 		{
-			rsl_hard_assert_msg(is_okay(), "Tried to get value of result with unresolved error.");
+			rsl_assert_msg_hard(is_okay(), "Tried to get value of result with unresolved error.");
 			return m_value;
 		}
 	};
@@ -277,7 +277,7 @@ namespace rsl
 			errid errorBlockStart, ErrorType errorType, std::string_view message, error_severity severity
 		) noexcept
 		{
-			rsl_hard_assert_msg(
+			rsl_assert_msg_hard(
 				error_context::errors.size() != RSL_ERR_MAX_COUNT,
 				"Max error count overflow, consider changing RSL_ERR_ID_UNDERLYING to a larger type."
 			);

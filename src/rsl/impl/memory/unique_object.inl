@@ -26,34 +26,34 @@ namespace rsl
 
 	template <typename T, allocator_type Alloc, statically_optional_typed_factory_type Factory>
 	template <typename... Args>
-	constexpr unique_object<T, Alloc, Factory>::unique_object(in_place_signal_type, Args&&... args)
+	constexpr unique_object<T, Alloc, Factory> unique_object<T, Alloc, Factory>::create_in_place(Args&&... args)
 		noexcept(is_nothrow_constructible_v<mem_rsc> && is_nothrow_constructible_v<T, Args...>)
-		: unique_rsc(), m_factory()
 	{
-		unique_object::arm(forward<Args>(args)...);
+		unique_object ret;
+		ret.arm(forward<Args>(args)...);
+		return ret;
 	}
 
 	template <typename T, allocator_type Alloc, statically_optional_typed_factory_type Factory>
 	template <typename... Args>
-	unique_object<T, Alloc, Factory>::unique_object(const allocator_storage_type& allocStorage,
-	                                                in_place_signal_type, Args&&... args)
+	unique_object<T, Alloc, Factory> unique_object<T, Alloc, Factory>::create_in_place_with_allocator(const allocator_storage_type& allocStorage, Args&&... args)
 		noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&> && is_nothrow_constructible_v<
 			         T, Args...>)
-		: unique_rsc(allocStorage), m_factory()
 	{
-		unique_object::arm(forward<Args>(args)...);
+		unique_object ret(allocStorage);
+		ret.arm(forward<Args>(args)...);
+		return ret;
 	}
 
 	template <typename T, allocator_type Alloc, statically_optional_typed_factory_type Factory>
 	template <typename... Args>
-	unique_object<T, Alloc, Factory>::unique_object(const allocator_storage_type& allocStorage,
-	                                                const factory_storage_type& factoryStorage,
-	                                                in_place_signal_type, Args&&... args)
-		noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&> && is_nothrow_constructible_v<
-			         T, Args...>)
-		: unique_rsc(allocStorage), m_factory(factoryStorage)
+	unique_object<T, Alloc, Factory> unique_object<T, Alloc, Factory>::create_in_place_alloc_factory(const allocator_storage_type& allocStorage,
+	                                                const factory_storage_type& factoryStorage, Args&&... args)
+		noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&> && is_nothrow_constructible_v<T, Args...>)
 	{
-		unique_object::arm(forward<Args>(args)...);
+		unique_object ret(allocStorage, factoryStorage);
+		ret.arm(forward<Args>(args)...);
+		return ret;
 	}
 
 	template <typename T, allocator_type Alloc, statically_optional_typed_factory_type Factory>
@@ -67,7 +67,11 @@ namespace rsl
 	) noexcept
 		: unique_rsc(other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::get_allocator_storage(), other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::get_factory_storage()), m_factory(other.get_factory_storage())
 	{
-		unique_rsc::m_value.emplace(rsl::move(other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::m_value.value()));
+		if (other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::m_value.holds_value())
+		{
+			unique_rsc::m_value.emplace(rsl::move(other.template unique_object<OtherType, Alloc, OtherFactory>::unique_rsc::m_value.value()));
+		}
+
 		mem_rsc::set_ptr(other.template unique_object<OtherType, Alloc, OtherFactory>::mem_rsc::get_ptr());
 		other.template unique_object<OtherType, Alloc, OtherFactory>::mem_rsc::set_ptr(nullptr);
 	}

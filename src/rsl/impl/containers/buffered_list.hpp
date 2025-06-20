@@ -1,6 +1,6 @@
 #pragma once
 
-#include <span>
+#include "views.hpp"
 
 #include "../util/assert.hpp"
 #include "../util/common.hpp"
@@ -18,8 +18,8 @@ namespace rsl
 		using const_iterator_type = const value_type*;
 		using reverse_iterator_type = reverse_iterator<iterator_type>;
 		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
-		using view_type = std::span<value_type>;
-		using const_view_type = std::span<const value_type>;
+		using view_type = view<value_type>;
+		using const_view_type = view<const value_type>;
 
 		[[rythe_always_inline]] constexpr buffered_list() noexcept = default;
 		[[rythe_always_inline]] constexpr buffered_list(const buffered_list& src) noexcept(copy_construct_noexcept);
@@ -30,7 +30,7 @@ namespace rsl
 		[[rythe_always_inline]] constexpr buffered_list(value_type (&&arr)[N]) noexcept(move_construct_noexcept);
 		[[rythe_always_inline]] constexpr buffered_list(view_type src) noexcept(copy_construct_noexcept);
 		template <typename... Args>
-		[[rythe_always_inline]] constexpr buffered_list(size_type count, in_place_signal_type, Args&&... args)
+		[[rythe_always_inline]] constexpr static buffered_list create_in_place(size_type count, Args&&... args)
 			noexcept(construct_noexcept<Args...>);
 
 		[[rythe_always_inline]] constexpr buffered_list& operator=(const buffered_list& src)

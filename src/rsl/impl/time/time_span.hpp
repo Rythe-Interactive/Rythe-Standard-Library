@@ -9,33 +9,33 @@ namespace rsl::time
 	template <typename Rep>
 	concept duration_rep = !is_specialization_v<Rep, std::chrono::duration>;
 
-	template <duration_rep precision = nano_seconds>
-	using nano_seconds_duration = std::chrono::duration<precision, std::nano>;
+	template <duration_rep Precision = nano_seconds>
+	using nano_seconds_duration = std::chrono::duration<Precision, std::nano>;
 
-	template <duration_rep precision = micro_seconds>
-	using micro_seconds_duration = std::chrono::duration<precision, std::micro>;
+	template <duration_rep Precision = micro_seconds>
+	using micro_seconds_duration = std::chrono::duration<Precision, std::micro>;
 
-	template <duration_rep precision = milli_seconds>
-	using milli_seconds_duration = std::chrono::duration<precision, std::milli>;
+	template <duration_rep Precision = milli_seconds>
+	using milli_seconds_duration = std::chrono::duration<Precision, std::milli>;
 
-	template <duration_rep precision = seconds>
-	using seconds_duration = std::chrono::duration<precision, std::ratio<1>>;
+	template <duration_rep Precision = seconds>
+	using seconds_duration = std::chrono::duration<Precision, std::ratio<1>>;
 
-	template <duration_rep precision = minutes>
-	using minutes_duration = std::chrono::duration<precision, std::ratio<60>>;
+	template <duration_rep Precision = minutes>
+	using minutes_duration = std::chrono::duration<Precision, std::ratio<60>>;
 
-	template <duration_rep precision = hours>
+	template <duration_rep Precision = hours>
 	using hours_duration =
-		std::chrono::duration<precision, std::ratio_multiply<std::ratio<60>, std::chrono::minutes::period>>;
+		std::chrono::duration<Precision, std::ratio_multiply<std::ratio<60>, std::chrono::minutes::period>>;
 
-	template <duration_rep precision = days>
+	template <duration_rep Precision = days>
 	using days_duration =
-		std::chrono::duration<precision, std::ratio_multiply<std::ratio<24>, std::chrono::hours::period>>;
+		std::chrono::duration<Precision, std::ratio_multiply<std::ratio<24>, std::chrono::hours::period>>;
 
-	template <duration_rep precision = time32>
+	template <duration_rep Precision = time32>
 	struct span
 	{
-		using time_type = precision;
+		using time_type = Precision;
 		using duration_type = std::chrono::duration<time_type>;
 
 		duration_type duration{duration_type::zero()};
@@ -47,41 +47,41 @@ namespace rsl::time
 		{
 		}
 
-		template <duration_rep other_time, ratio_type ratio>
-		constexpr explicit span(const std::chrono::duration<other_time, ratio>& other) noexcept
+		template <duration_rep OtherTime, ratio_type Ratio>
+		constexpr explicit span(const std::chrono::duration<OtherTime, Ratio>& other) noexcept
 			: duration(std::chrono::duration_cast<duration_type>(other))
 		{
 		}
 
-		template <duration_rep other_time>
-			requires(!std::same_as<other_time, time_type>)
-		constexpr explicit span(const span<other_time>& other) noexcept
+		template <duration_rep OtherTime>
+			requires(!std::same_as<OtherTime, time_type>)
+		constexpr explicit span(const span<OtherTime>& other) noexcept
 			: duration(other.duration)
 		{
 		}
 
-		template <duration_rep other_time, ratio_type ratio>
-		constexpr explicit span(std::chrono::duration<other_time, ratio>&& other) noexcept
+		template <duration_rep OtherTime, ratio_type Ratio>
+		constexpr explicit span(std::chrono::duration<OtherTime, Ratio>&& other) noexcept
 			: duration(std::chrono::duration_cast<duration_type>(other))
 		{
 		}
 
-		template <duration_rep other_time>
-			requires(!std::same_as<other_time, time_type>)
-		constexpr explicit span(span<other_time>&& other) noexcept
+		template <duration_rep OtherTime>
+			requires(!std::same_as<OtherTime, time_type>)
+		constexpr explicit span(span<OtherTime>&& other) noexcept
 			: duration(std::move(other.duration))
 		{
 		}
 
-		template <duration_rep other_time>
-			requires(!std::same_as<other_time, time_type>)
-		constexpr explicit span(other_time other) noexcept
+		template <duration_rep OtherTime>
+			requires(!std::same_as<OtherTime, time_type>)
+		constexpr explicit span(OtherTime other) noexcept
 			: duration(other)
 		{
 		}
 
-		template <duration_rep other_time>
-		constexpr span<other_time> cast() const noexcept
+		template <duration_rep OtherTime>
+		constexpr span<OtherTime> cast() const noexcept
 		{
 			return {*this};
 		}
@@ -184,40 +184,40 @@ namespace rsl::time
 			return span(duration--);
 		}
 
-		template <duration_rep other_time>
-		[[rythe_always_inline]] constexpr span& operator+=(const span<other_time>& rhs)
+		template <duration_rep OtherTime>
+		[[rythe_always_inline]] constexpr span& operator+=(const span<OtherTime>& rhs)
 			noexcept(rsl::is_arithmetic_v<time_type>) /* strengthened */
 		{
 			duration += std::chrono::duration_cast<duration_type>(rhs.duration);
 			return *this;
 		}
 
-		template <duration_rep other_time>
-		[[rythe_always_inline]] constexpr span& operator-=(const span<other_time>& rhs)
+		template <duration_rep OtherTime>
+		[[rythe_always_inline]] constexpr span& operator-=(const span<OtherTime>& rhs)
 			noexcept(rsl::is_arithmetic_v<time_type>) /* strengthened */
 		{
 			duration -= std::chrono::duration_cast<duration_type>(rhs.duration);
 			return *this;
 		}
 
-		template <duration_rep other_time>
-		[[rythe_always_inline]] constexpr span& operator*=(const span<other_time>& rhs)
+		template <duration_rep OtherTime>
+		[[rythe_always_inline]] constexpr span& operator*=(const span<OtherTime>& rhs)
 			noexcept(rsl::is_arithmetic_v<time_type>) /* strengthened */
 		{
 			duration *= std::chrono::duration_cast<duration_type>(rhs.duration);
 			return *this;
 		}
 
-		template <duration_rep other_time>
-		[[rythe_always_inline]] constexpr span& operator/=(const span<other_time>& rhs)
+		template <duration_rep OtherTime>
+		[[rythe_always_inline]] constexpr span& operator/=(const span<OtherTime>& rhs)
 			noexcept(rsl::is_arithmetic_v<time_type>) /* strengthened */
 		{
 			duration /= std::chrono::duration_cast<duration_type>(rhs.duration);
 			return *this;
 		}
 
-		template <duration_rep other_time>
-		[[rythe_always_inline]] constexpr span& operator%=(const span<other_time>& rhs)
+		template <duration_rep OtherTime>
+		[[rythe_always_inline]] constexpr span& operator%=(const span<OtherTime>& rhs)
 			noexcept(rsl::is_arithmetic_v<time_type>) /* strengthened */
 		{
 			duration %= std::chrono::duration_cast<duration_type>(rhs.duration);
@@ -235,57 +235,57 @@ namespace rsl::time
 		}
 	};
 
-	template <duration_rep precisionLHS, duration_rep precisionRHS>
-	using common_span = time::span<std::common_type_t<precisionLHS, precisionRHS>>;
+	template <duration_rep PrecisionLHS, duration_rep PrecisionRHS>
+	using common_span = time::span<std::common_type_t<PrecisionLHS, PrecisionRHS>>;
 
 	using span32 = span<time32>;
 	using span64 = span<time64>;
 } // namespace rsl::time
 
-template <rsl::time::duration_rep precisionLHS, rsl::time::duration_rep precisionRHS>
+template <rsl::time::duration_rep PrecisionLHS, rsl::time::duration_rep PrecisionRHS>
 [[nodiscard]] [[rythe_always_inline]] constexpr auto
-operator+(const rsl::time::span<precisionLHS>& lhs, const rsl::time::span<precisionRHS>& rhs)
-	noexcept(rsl::is_arithmetic_v<precisionLHS> && rsl::is_arithmetic_v<precisionRHS>) /* strengthened */
+operator+(const rsl::time::span<PrecisionLHS>& lhs, const rsl::time::span<PrecisionRHS>& rhs)
+	noexcept(rsl::is_arithmetic_v<PrecisionLHS> && rsl::is_arithmetic_v<PrecisionRHS>) /* strengthened */
 {
-	return rsl::time::common_span<precisionLHS, precisionRHS>(lhs.duration + rhs.duration);
+	return rsl::time::common_span<PrecisionLHS, PrecisionRHS>(lhs.duration + rhs.duration);
 }
 
-template <rsl::time::duration_rep precisionLHS, rsl::time::duration_rep precisionRHS>
+template <rsl::time::duration_rep PrecisionLHS, rsl::time::duration_rep PrecisionRHS>
 [[nodiscard]] [[rythe_always_inline]] constexpr auto
-operator-(const rsl::time::span<precisionLHS>& lhs, const rsl::time::span<precisionRHS>& rhs)
-	noexcept(rsl::is_arithmetic_v<precisionLHS> && rsl::is_arithmetic_v<precisionRHS>) /* strengthened */
+operator-(const rsl::time::span<PrecisionLHS>& lhs, const rsl::time::span<PrecisionRHS>& rhs)
+	noexcept(rsl::is_arithmetic_v<PrecisionLHS> && rsl::is_arithmetic_v<PrecisionRHS>) /* strengthened */
 {
-	return rsl::time::common_span<precisionLHS, precisionRHS>(lhs.duration - rhs.duration);
+	return rsl::time::common_span<PrecisionLHS, PrecisionRHS>(lhs.duration - rhs.duration);
 }
 
-template <rsl::time::duration_rep precisionLHS, rsl::time::duration_rep precisionRHS>
+template <rsl::time::duration_rep PrecisionLHS, rsl::time::duration_rep PrecisionRHS>
 [[nodiscard]] [[rythe_always_inline]] constexpr auto
-operator*(const rsl::time::span<precisionLHS>& lhs, const rsl::time::span<precisionRHS>& rhs)
-	noexcept(rsl::is_arithmetic_v<precisionLHS> && rsl::is_arithmetic_v<precisionRHS>) /* strengthened */
+operator*(const rsl::time::span<PrecisionLHS>& lhs, const rsl::time::span<PrecisionRHS>& rhs)
+	noexcept(rsl::is_arithmetic_v<PrecisionLHS> && rsl::is_arithmetic_v<PrecisionRHS>) /* strengthened */
 {
-	return rsl::time::common_span<precisionLHS, precisionRHS>(lhs.duration * rhs.duration);
+	return rsl::time::common_span<PrecisionLHS, PrecisionRHS>(lhs.duration * rhs.duration);
 }
 
-template <rsl::time::duration_rep precisionLHS, rsl::time::duration_rep precisionRHS>
+template <rsl::time::duration_rep PrecisionLHS, rsl::time::duration_rep PrecisionRHS>
 [[nodiscard]] [[rythe_always_inline]] constexpr auto
-operator/(const rsl::time::span<precisionLHS>& lhs, const rsl::time::span<precisionRHS>& rhs)
-	noexcept(rsl::is_arithmetic_v<precisionLHS> && rsl::is_arithmetic_v<precisionRHS>) /* strengthened */
+operator/(const rsl::time::span<PrecisionLHS>& lhs, const rsl::time::span<PrecisionRHS>& rhs)
+	noexcept(rsl::is_arithmetic_v<PrecisionLHS> && rsl::is_arithmetic_v<PrecisionRHS>) /* strengthened */
 {
-	return rsl::time::common_span<precisionLHS, precisionRHS>(lhs.duration / rhs.duration);
+	return rsl::time::common_span<PrecisionLHS, PrecisionRHS>(lhs.duration / rhs.duration);
 }
 
-template <rsl::time::duration_rep precisionLHS, rsl::time::duration_rep precisionRHS>
+template <rsl::time::duration_rep PrecisionLHS, rsl::time::duration_rep PrecisionRHS>
 [[nodiscard]] [[rythe_always_inline]] constexpr auto
-operator%(const rsl::time::span<precisionLHS>& lhs, const rsl::time::span<precisionRHS>& rhs)
-	noexcept(rsl::is_arithmetic_v<precisionLHS> && rsl::is_arithmetic_v<precisionRHS>) /* strengthened */
+operator%(const rsl::time::span<PrecisionLHS>& lhs, const rsl::time::span<PrecisionRHS>& rhs)
+	noexcept(rsl::is_arithmetic_v<PrecisionLHS> && rsl::is_arithmetic_v<PrecisionRHS>) /* strengthened */
 {
-	return rsl::time::common_span<precisionLHS, precisionRHS>(lhs.duration % rhs.duration);
+	return rsl::time::common_span<PrecisionLHS, PrecisionRHS>(lhs.duration % rhs.duration);
 }
 
-template <rsl::time::duration_rep precisionLHS, rsl::time::duration_rep precisionRHS>
+template <rsl::time::duration_rep PrecisionLHS, rsl::time::duration_rep PrecisionRHS>
 [[nodiscard]] [[rythe_always_inline]] constexpr auto
-operator<=>(const rsl::time::span<precisionLHS>& lhs, const rsl::time::span<precisionRHS>& rhs)
-	noexcept(rsl::is_arithmetic_v<precisionLHS> && rsl::is_arithmetic_v<precisionRHS>) /* strengthened */
+operator<=>(const rsl::time::span<PrecisionLHS>& lhs, const rsl::time::span<PrecisionRHS>& rhs)
+	noexcept(rsl::is_arithmetic_v<PrecisionLHS> && rsl::is_arithmetic_v<PrecisionRHS>) /* strengthened */
 {
 	return lhs.duration.count() <=> rhs.duration.count();
 }

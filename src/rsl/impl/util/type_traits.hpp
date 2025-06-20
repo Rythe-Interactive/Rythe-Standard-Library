@@ -53,9 +53,9 @@ namespace rsl
 		template <typename T>
 		consteval auto compiler_dependent_type_name() noexcept
 		{
-			string_view functionName = __RYTHE_FULL_FUNC__;
+			constexpr string_view functionName = __RYTHE_FULL_FUNC__;
 
-			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
+			constexpr_string<functionName.size()> ret{};
 #if defined(RYTHE_MSVC)
 			auto first = functionName.find_first_of('<', functionName.find("compiler_dependent_type_name")) + 1;
 			auto end = functionName.find_last_of('>');
@@ -71,8 +71,8 @@ namespace rsl
 
 			ret.copy_from(functionName.substr(first, end - first));
 #elif defined(RYTHE_CLANG)
-			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
+			auto first = find_first_not_of(functionName,' ', find_first_of(functionName,'=') + 1);
+			ret.copy_from(functionName.subview(first, find_last_of(functionName,']') - first));
 #else
 			ret.copy_from(functionName);
 #endif
@@ -83,9 +83,9 @@ namespace rsl
 		template <template <typename...> typename T>
 		consteval auto compiler_dependent_templated_type_name() noexcept
 		{
-			string_view functionName = __RYTHE_FULL_FUNC__;
+			constexpr string_view functionName = __RYTHE_FULL_FUNC__;
 
-			constexpr_string<constexpr_strlen(__RYTHE_FULL_FUNC__) + 1> ret{};
+			constexpr_string<functionName.size()> ret{};
 #if defined(RYTHE_MSVC)
 			auto first =
 				functionName.find_first_of('<', functionName.find("compiler_dependent_templated_type_name")) + 1;
@@ -96,8 +96,8 @@ namespace rsl
 			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
 			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
 #elif defined(RYTHE_CLANG)
-			auto first = functionName.find_first_not_of(' ', functionName.find_first_of('=') + 1);
-			ret.copy_from(functionName.substr(first, functionName.find_last_of(']') - first));
+			auto first = find_first_not_of(functionName,' ', find_first_of(functionName,'=') + 1);
+			ret.copy_from(functionName.subview(first, find_last_of(functionName,']') - first));
 #else
 			ret.copy_from(functionName);
 #endif
