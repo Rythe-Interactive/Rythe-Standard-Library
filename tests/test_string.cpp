@@ -17,7 +17,7 @@ TEST_CASE("string","[containers]")
 		}
 
 		{//copy constructor
-			rsl::dynamic_string s = "hello world";
+			rsl::dynamic_string s = dynamic_string::from_array("hello world");
 			rsl::dynamic_string s2(s);
 			REQUIRE(!s.empty());
 			REQUIRE(!s2.empty());
@@ -26,14 +26,14 @@ TEST_CASE("string","[containers]")
 		}
 
 		{//capacity constructor
-			rsl::dynamic_string s(10);
+			rsl::dynamic_string s = dynamic_string::create_reserved(10);
 			REQUIRE(s.empty());
 			REQUIRE(s.capacity() == 10);
 		}
 
 		{//char array constructor
 			const char str[5] = {'h','e','l','l','o'};
-			rsl::dynamic_string s(str);
+			rsl::dynamic_string s = dynamic_string::from_array(str);
 			REQUIRE(!s.empty());
 			REQUIRE(s.capacity() == 5);
 		}

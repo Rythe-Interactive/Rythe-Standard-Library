@@ -376,6 +376,22 @@ namespace rsl
 	}
 
 	template <typename T, allocator_type Alloc, factory_type Factory>
+	template <typename ... Args>
+	constexpr void typed_memory_resource_base<T, Alloc, Factory>::copy(size_type count, size_type offset, const T* src)
+		noexcept(factory_traits<Factory>::noexcept_copyable)
+	{
+		m_alloc.copy(m_ptr + offset, src, count);
+	}
+
+	template <typename T, allocator_type Alloc, factory_type Factory>
+	template <typename ... Args>
+	constexpr void typed_memory_resource_base<T, Alloc, Factory>::move(size_type count, size_type offset, T* src)
+		noexcept(factory_traits<Factory>::noexcept_moveable)
+	{
+		m_alloc.move(m_ptr + offset, src, count);
+	}
+
+	template <typename T, allocator_type Alloc, factory_type Factory>
 	template <typename... Args>
 	inline constexpr void
 	typed_memory_resource_base<T, Alloc, Factory>::allocate_and_construct(size_type count, Args&&... args)

@@ -104,6 +104,10 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void assign(InputIt first, InputIt last);
 		template <input_iterator InputIt>
 		[[rythe_always_inline]] constexpr void assign(const value_type* ptr, size_type count);
+		template<size_type N>
+		[[rythe_always_inline]] constexpr void assign(const value_type (&src)[N]);
+		template<size_type N>
+		[[rythe_always_inline]] constexpr void assign(value_type (&&src)[N]);
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr iterator_type iterator_at(size_type i) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type iterator_at(size_type i) const noexcept;
@@ -120,6 +124,12 @@ namespace rsl
 			) noexcept(container_base::move_construct_noexcept && container_base::template construct_noexcept<iter_value_t<InputIt>>);
 		[[rythe_always_inline]] constexpr size_type insert(size_type pos, const value_type* ptr, size_type count)
 			noexcept(container_base::move_construct_noexcept && container_base::copy_construct_noexcept);
+		template<size_type N>
+		[[rythe_always_inline]] constexpr size_type insert(size_type pos, const value_type (&src)[N])
+			noexcept(container_base::move_construct_noexcept && container_base::copy_construct_noexcept);
+		template<size_type N>
+		[[rythe_always_inline]] constexpr size_type insert(size_type pos, value_type (&&src)[N])
+			noexcept(container_base::move_construct_noexcept);
 
 		// If it's possible to do a bulk erasure, then erase_shift in bulk might be faster. Try both and test!
 		[[rythe_always_inline]] constexpr size_type erase_swap(size_type pos)

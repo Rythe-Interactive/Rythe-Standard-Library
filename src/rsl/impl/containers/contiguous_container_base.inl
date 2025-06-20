@@ -249,9 +249,16 @@ namespace rsl
 		const size_type offset, const size_type end, InputIt srcIter
 	) noexcept(copy_construct_noexcept)
 	{
-		for (size_type i = offset; i != end; i++, ++srcIter)
+		if constexpr (is_pointer_v<InputIt>)
 		{
-			mem_rsc::construct(1, i, *srcIter);
+			mem_rsc::copy(end - offset, offset, srcIter);
+		}
+		else
+		{
+			for (size_type i = offset; i != end; i++, ++srcIter)
+			{
+				mem_rsc::construct(1, i, *srcIter);
+			}
 		}
 	}
 
@@ -274,9 +281,16 @@ namespace rsl
 		const size_type offset, const size_type end, InputIt srcIter
 	) noexcept(move_construct_noexcept)
 	{
-		for (size_type i = offset; i != end; i++, ++srcIter)
+		if constexpr (is_pointer_v<InputIt>)
 		{
-			mem_rsc::construct(1, i, move(*srcIter));
+			mem_rsc::move(end - offset, offset, srcIter);
+		}
+		else
+		{
+			for (size_type i = offset; i != end; i++, ++srcIter)
+			{
+				mem_rsc::construct(1, i, move(*srcIter));
+			}
 		}
 	}
 

@@ -29,7 +29,7 @@ namespace rsl
 	struct in_place_type_signal_type
 	{
 	};
-	
+
 	template <typename T>
 	inline constexpr in_place_type_signal_type<T> in_place_type_signal = in_place_type_signal_type<T>{};
 
@@ -727,7 +727,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	constexpr bool is_trivial_v = ::std::is_trivial_v<T>; // Uses compiler magic behind the scenes.
+	constexpr bool is_trivial_v = __is_trivial(T); // Compiler magic.
 
 	template <typename T>
 	struct is_trivial : bool_constant<is_trivial_v<T>>
@@ -735,8 +735,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	constexpr bool is_trivially_copyable_v =
-		::std::is_trivially_copyable_v<T>; // Uses compiler magic behind the scenes.
+	constexpr bool is_trivially_copyable_v = __is_trivially_copyable(T); // Compiler magic.
 
 	template <typename T>
 	struct is_trivially_copyable : bool_constant<is_trivially_copyable_v<T>>
@@ -830,6 +829,31 @@ namespace rsl
 			delete[] srcData;
 			delete[] dstData;
 		}
+
+		// Might still break on some compilers if T is unsigned long long
+		template <typename T>
+			requires is_trivially_constructible_v<T>
+		constexpr void constexpr_memset_impl(T* dst, const byte val, const size_type count)
+		{
+			const size_type itemCount = count / sizeof(T);
+			constexpr size_type stepSize = sizeof(T);
+
+			struct converter
+			{
+				byte from[stepSize];
+			};
+
+			for (size_type i = 0; i < itemCount; i++)
+			{
+				converter conv{};
+				for (size_type j = 0; j < stepSize; j++)
+				{
+					conv.from[j] = val;
+				}
+
+				dst[i] = ::std::bit_cast<T>(conv);
+			}
+		}
 	} // namespace internal
 
 	template <typename To, typename From>
@@ -876,8 +900,19 @@ namespace rsl
 	{
 		if (is_constant_evaluated())
 		{
-			internal::constexpr_memcpy_impl(dst, src, count);
-			return dst;
+			if constexpr (is_void_v<To>)
+			{
+				return constexpr_memcpy(bit_cast<byte*>(dst), src, count);
+			}
+			else if constexpr (is_void_v<From>)
+			{
+				return constexpr_memcpy(dst, bit_cast<const byte*>(src), count);
+			}
+			else
+			{
+				internal::constexpr_memcpy_impl(dst, src, count);
+				return dst;
+			}
 		}
 		else
 		{
@@ -885,16 +920,24 @@ namespace rsl
 		}
 	}
 
-	template <>
-	constexpr void* constexpr_memcpy<void, void>(void* dst, const void* src, const size_type count) noexcept
+	template <typename T>
+	constexpr void* constexpr_memset(T* dst, const byte value, const size_type count)
 	{
 		if (is_constant_evaluated())
 		{
-			return constexpr_memcpy(bit_cast<byte*>(dst), bit_cast<const byte*>(src), count);
+			if constexpr (is_void_v<T>)
+			{
+				return constexpr_memset(bit_cast<byte*>(dst), value, count);
+			}
+			else
+			{
+				internal::constexpr_memset_impl(dst, value, count);
+				return dst;
+			}
 		}
 		else
 		{
-			return memcpy(dst, src, count);
+			return memset(dst, value, count);
 		}
 	}
 
@@ -1445,6 +1488,18 @@ namespace rsl
 
 	template <typename T>
 	void as_const(const T&&) = delete;
+
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr const T* as_const_ptr(T* ptr) noexcept
+	{
+		return ptr;
+	}
+
+	template <typename T>
+	[[nodiscard]] [[rythe_always_inline]] constexpr const T* as_const_ptr(const T* ptr) noexcept
+	{
+		return ptr;
+	}
 
 	template <template <typename...> typename T, typename U, size_type I, typename... Args>
 	struct make_sequence : make_sequence<T, U, I - 1, Args..., U>

@@ -167,6 +167,13 @@ namespace rsl
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	constexpr T* typed_allocator<T, Alloc, Factory>::copy(T* dst, const T* src, size_type count)
+		noexcept(factory_traits<Factory>::noexcept_moveable)
+	{
+		return m_factory->copy(dst, src, count);
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	inline constexpr T* typed_allocator<T, Alloc, Factory>::move(T* dst, T* src, size_type count)
 		noexcept(factory_traits<Factory>::noexcept_moveable)
 	{

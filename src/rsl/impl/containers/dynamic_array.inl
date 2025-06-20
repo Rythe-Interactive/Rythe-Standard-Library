@@ -55,7 +55,7 @@ namespace rsl
 		result.allocate(N);
 		result.m_size = N;
 		result.m_capacity = N;
-		result.copy_construct_from_unsafe_impl(0, container_base::m_size, &arr[0]);
+		result.copy_construct_from_unsafe_impl(0, result.m_size, &arr[0]);
 
 		return result;
 	}
@@ -69,7 +69,7 @@ namespace rsl
 		result.allocate(N);
 		result.m_size = N;
 		result.m_capacity = N;
-		result.move_construct_from_unsafe_impl(0, container_base::m_size, &arr[0]);
+		result.move_construct_from_unsafe_impl(0, result.m_size, &arr[0]);
 
 		return result;
 	}
@@ -82,7 +82,7 @@ namespace rsl
 		result.allocate(count);
 		result.m_size = count;
 		result.m_capacity = count;
-		result.copy_construct_from_unsafe_impl(0, container_base::m_size, ptr);
+		result.copy_construct_from_unsafe_impl(0, result.m_size, ptr);
 
 		return result;
 	}
@@ -95,7 +95,7 @@ namespace rsl
 		result.allocate(src.size());
 		result.m_size = src.size();
 		result.m_capacity = src.size();
-		result.copy_construct_from_unsafe_impl(0, container_base::m_size, src.data());
+		result.copy_construct_from_unsafe_impl(0, result.m_size, src.data());
 
 		return result;
 	}
@@ -327,6 +327,22 @@ inline constexpr bool dynamic_array<T, Alloc, Factory>::operator!=(const dynamic
 	}
 
 	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	template <size_type N>
+	constexpr void dynamic_array<T, Alloc, Factory>::assign(const value_type(& src)[N])
+	{
+		clear();
+		insert<N>(0, src);
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	template <size_type N>
+	constexpr void dynamic_array<T, Alloc, Factory>::assign(value_type(&& src)[N])
+	{
+		clear();
+		insert<N>(0, rsl::move(src));
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
 	constexpr typename dynamic_array<T, Alloc, Factory>::iterator_type
 	dynamic_array<T, Alloc, Factory>::iterator_at(size_type i) noexcept
 	{
@@ -403,6 +419,30 @@ inline constexpr bool dynamic_array<T, Alloc, Factory>::operator!=(const dynamic
 		split_reserve(pos, count, container_base::m_size + count);
 
 		container_base::copy_construct_from_unsafe_impl(pos, pos + count, ptr);
+
+		return pos;
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	template <size_type N>
+	constexpr size_type dynamic_array<T, Alloc, Factory>::insert(size_type pos, const value_type(& src)[N])
+		noexcept(container_base::move_construct_noexcept && container_base::copy_construct_noexcept)
+	{
+		split_reserve(pos, N, container_base::m_size + N);
+
+		container_base::copy_construct_from_unsafe_impl(pos, pos + N, src);
+
+		return pos;
+	}
+
+	template <typename T, allocator_type Alloc, typed_factory_type Factory>
+	template <size_type N>
+	constexpr size_type dynamic_array<T, Alloc, Factory>::insert(size_type pos, value_type(&& src)[N])
+		noexcept(container_base::move_construct_noexcept)
+	{
+		split_reserve(pos, N, container_base::m_size + N);
+
+		container_base::move_construct_from_unsafe_impl(pos, pos + N, src);
 
 		return pos;
 	}
