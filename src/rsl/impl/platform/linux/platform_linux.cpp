@@ -2,7 +2,13 @@
 
 #if RYTHE_PLATFORM_LINUX
 
-	#include <dlfcn.h>
+#include <dlfcn.h>
+#include <errno.h>
+#include <sched.h>
+#include <pthread.h>
+#include <utmpx.h>
+#include <sys/syscall.h>
+#include <sys/prctl.h>
 
 namespace rsl
 {
@@ -13,15 +19,51 @@ namespace rsl
 		return result;
 	}
 
+	void platform::release_library(const dynamic_library library)
+	{
+		dlclose(library.m_handle);
+	}
+
 	void* platform::get_symbol(dynamic_library library, cstring symbolName)
 	{
 		return dlsym(library.m_handle, symbolName);
 	}
 
-	void dynamic_library::release()
+	thread_id platform::get_current_thread_id()
 	{
-		dlclose(m_handle);
-		m_handle = nullptr;
+        // return thread_id{ .nativeId = static_cast<id_type>(syscall( SYS_gettid ) );
+		return thread_id{ .nativeId = static_cast<id_type>(gettid()) };
+	}
+
+	void platform::yield_current_thread()
+	{
+		sched_yield();
+	}
+
+	void platform::sleep_current_thread(uint64 milliseconds)
+	{
+		timespec sleepTime;
+		timespec remainingTime;
+		sleepTime.tv_sec = milliseconds / 1000u;
+		sleepTime.tv_nsec = ( milliseconds - ( sleepTime.tv_sec * 1000u ) ) * 1000000u;
+
+		while( true )
+		{
+			int32 result = nanosleep (&sleepTime, &remainingTime );
+
+			int error = 0;
+			if (result == -1)
+			{
+				error = errno;
+			}
+
+			if( result == 0 || error != EINTR )
+			{
+				break;
+			}
+
+			sleepTime = remainingTime;
+		}
 	}
 } // namespace rsl
 
