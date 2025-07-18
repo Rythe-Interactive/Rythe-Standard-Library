@@ -10,7 +10,7 @@ namespace rsl::log
 	{
 	public:
 
-		virtual void log(const  &msg) = 0;
+		virtual void log(const message& msg) = 0;
 		virtual void flush() = 0;
 
         void filter(severity s) noexcept;

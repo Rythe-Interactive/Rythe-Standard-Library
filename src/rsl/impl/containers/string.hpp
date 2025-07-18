@@ -4,6 +4,8 @@
 #include "../util/common.hpp"
 #include "../util/primitives.hpp"
 
+#include "../memory/allocator.hpp"
+
 namespace rsl
 {
 	// TODO(Rowan): constexpr strings are still useful if the string never leaks from constant evaluation time to runtime. constexpr_string is needed if you want to be able to read the results of a string at runtime.

@@ -14,6 +14,7 @@ namespace rsl::log
 		fatal // highest severity
 	};
 
+	// TODO(Glyn): Remove
 	namespace internal
 	{
 		[[nodiscard]] [[rythe_always_inline]] constexpr static spdlog::level::level_enum rythe_to_spdlog(const severity s)

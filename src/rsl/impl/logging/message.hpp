@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "../containers/string_view.hpp"
 #include "../time/time_point.hpp"
 #include "../threading/thread_id.hpp"
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <bit>
-
 #include "../defines.hpp"
 #include "../util/common.hpp"
 #include "../util/primitives.hpp"
