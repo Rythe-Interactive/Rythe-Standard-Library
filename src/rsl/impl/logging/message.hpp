@@ -15,5 +15,6 @@ namespace rsl::log
 		time::point32 timestamp;
 		log::severity severity;
 		string_view msg;
+		fmt::format_args formatArgs;
 	};
 }

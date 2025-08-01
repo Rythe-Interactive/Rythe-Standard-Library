@@ -542,16 +542,14 @@ namespace rsl
 	}
 
 	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] constexpr T&& forward(remove_reference_t<T>&& val) noexcept
-	// NOLINT(cppcoreguidelines*)
+	[[nodiscard]] [[rythe_always_inline]] constexpr T&& forward(remove_reference_t<T>&& val) noexcept // NOLINT(cppcoreguidelines*)
 	{
 		static_assert(!is_lvalue_reference_v<T>, "bad forward call");
 		return static_cast<T&&>(val);
 	}
 
 	template <typename T>
-	[[nodiscard]] [[rythe_always_inline]] constexpr remove_reference_t<T>&& move(T&& val) noexcept
-	// NOLINT(cppcoreguidelines*)
+	[[nodiscard]] [[rythe_always_inline]] constexpr remove_reference_t<T>&& move(T&& val) noexcept // NOLINT(cppcoreguidelines*)
 	{
 		return static_cast<remove_reference_t<T>&&>(val);
 	}

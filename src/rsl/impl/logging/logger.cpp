@@ -3,7 +3,10 @@
 #include "time/time_point.hpp"
 #include "time/stopwatch.hpp"
 
+#include "severity.hpp"
+
 #include "logging.hpp"
+#include "containers/string.hpp"
 
 namespace rsl
 {
@@ -92,5 +95,37 @@ namespace rsl
 				return spdlog::details::make_unique<thread_name_formatter_flag>();
 			}
 		};
+	}
+
+	struct logger::impl : public spdlog::logger
+	{
+		dynamic_string name;
+		log::severity logLevel;
+
+		void log(log::severity s, const source_location& location, string_view format, fmt::format_args args) noexcept
+		{
+			spdlog::level::level_enum lvl = rsl::log::internal::rythe_to_spdlog(s);
+			bool log_enabled = should_log(lvl);
+			bool traceback_enabled = tracer_.enabled();
+			if (!log_enabled && !traceback_enabled)
+			{
+				return;
+			}
+
+			spdlog::memory_buf_t buf;
+			fmt::vformat_to(fmt::appender(buf), fmt::string_view(format.data(), format.size()), args);
+
+			spdlog::details::log_msg log_msg(
+				spdlog::source_loc(location.file_name(), static_cast<int>(location.line()), location.file_name()),
+				name_,
+				lvl,
+				spdlog::string_view_t(buf.data(), buf.size()));
+			log_it_(log_msg, log_enabled, traceback_enabled);
+		}
+	};
+
+	void logger::log(log::severity s, format_string format, fmt::format_args args) noexcept
+	{
+		m_impl->log(s, format.srcLoc, format.str, args);
 	}
 } // namespace rsl

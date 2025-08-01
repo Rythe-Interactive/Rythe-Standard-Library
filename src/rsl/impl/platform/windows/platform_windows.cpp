@@ -41,7 +41,7 @@ namespace rsl
 			pmu_allocator* allocator = context.allocator;
 
 			dynamic_wstring wideName = to_utf16(context.name);
-			[[maybe_unused]] HRESULT _ = ::SetThreadDescription(::GetCurrentThread(), wideName.data());
+			[[maybe_unused]] HRESULT _ = ::SetThreadDescription(::GetCurrentThread(), wideName.data()); // TODO: move into platform function
 
 			const uint32 result = context.function(context.userData);
 
