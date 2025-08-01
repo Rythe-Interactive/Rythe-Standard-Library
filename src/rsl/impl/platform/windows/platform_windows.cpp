@@ -41,7 +41,8 @@ namespace rsl
 			pmu_allocator* allocator = context.allocator;
 
 			dynamic_wstring wideName = to_utf16(context.name);
-			[[maybe_unused]] HRESULT _ = ::SetThreadDescription(::GetCurrentThread(), wideName.data()); // TODO: move into platform function
+			[[maybe_unused]] HRESULT _ = ::SetThreadDescription(::GetCurrentThread(), wideName.data());
+			// TODO: move into platform function
 
 			const uint32 result = context.function(context.userData);
 
@@ -69,7 +70,8 @@ namespace rsl
 		return bit_cast<void*>(::GetProcAddress(library.m_handle, symbolName));
 	}
 
-	thread platform::create_thread(const native_thread_start startFunction, void* userData, string_view name, pmu_allocator& allocator)
+	thread platform::create_thread(const native_thread_start startFunction, void* userData, string_view name,
+	                               pmu_allocator& allocator)
 	{
 		rsl_assert_always(startFunction);
 
@@ -88,7 +90,8 @@ namespace rsl
 		threadContext->function = startFunction;
 		threadContext->userData = userData;
 
-		const HANDLE threadHandle = ::CreateThread(nullptr, 0, &internal_native_thread_start, threadContext, CREATE_SUSPENDED | STACK_SIZE_PARAM_IS_A_RESERVATION, nullptr);
+		const HANDLE threadHandle = ::CreateThread(nullptr, 0, &internal_native_thread_start, threadContext,
+		                                           CREATE_SUSPENDED | STACK_SIZE_PARAM_IS_A_RESERVATION, nullptr);
 
 		if (!threadHandle)
 		{
@@ -99,19 +102,19 @@ namespace rsl
 
 		result.m_handle = threadHandle;
 
-		::ResumeThread( threadHandle );
+		::ResumeThread(threadHandle);
 
 		return result;
 	}
 
 	uint32 platform::destroy_thread(const thread thread)
 	{
-		::WaitForSingleObject( thread.m_handle, INFINITE );
+		::WaitForSingleObject(thread.m_handle, INFINITE);
 
 		DWORD exitCode = 0u;
-		::GetExitCodeThread( thread.m_handle, &exitCode );
+		::GetExitCodeThread(thread.m_handle, &exitCode);
 
-		::CloseHandle( thread.m_handle );
+		::CloseHandle(thread.m_handle);
 
 		return static_cast<uint32>(exitCode);
 	}
@@ -123,22 +126,23 @@ namespace rsl
 			return false;
 		}
 
-		const DWORD waitResult = ::WaitForSingleObject( thread.m_handle, 0 );
+		const DWORD waitResult = ::WaitForSingleObject(thread.m_handle, 0);
 		DWORD exitCode = 0u;
-		const bool exitCodeResult = ::GetExitCodeThread( thread.m_handle, &exitCode );
+		const bool exitCodeResult = ::GetExitCodeThread(thread.m_handle, &exitCode);
 
-		const bool threadIsInactive = (waitResult == WAIT_OBJECT_0 || waitResult == WAIT_FAILED) && (exitCode != STILL_ACTIVE || !exitCodeResult);
+		const bool threadIsInactive = (waitResult == WAIT_OBJECT_0 || waitResult == WAIT_FAILED) && (
+			                              exitCode != STILL_ACTIVE || !exitCodeResult);
 		return !threadIsInactive;
 	}
 
 	thread_id platform::get_current_thread_id()
 	{
-		return thread_id{ .nativeId = static_cast<id_type>(::GetCurrentThreadId()) };
+		return thread_id{.nativeId = static_cast<id_type>(::GetCurrentThreadId())};
 	}
 
 	thread_id platform::get_thread_id(const thread thread)
 	{
-		return thread_id{ .nativeId = static_cast<id_type>(::GetThreadId(thread.m_handle)) };
+		return thread_id{.nativeId = static_cast<id_type>(::GetThreadId(thread.m_handle))};
 	}
 
 	void platform::yield_current_thread()
@@ -146,9 +150,9 @@ namespace rsl
 		::SwitchToThread();
 	}
 
-	void platform::sleep_current_thread(const uint64 milliseconds)
+	void platform::sleep_current_thread(const uint32 milliseconds)
 	{
-		::Sleep( milliseconds );
+		::Sleep(milliseconds);
 	}
 } // namespace rsl
 

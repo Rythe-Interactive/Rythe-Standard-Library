@@ -27,7 +27,7 @@ namespace rsl
 		static thread_id get_current_thread_id();
 		static thread_id get_thread_id(thread thread);
 		static void yield_current_thread();
-		static void sleep_current_thread(uint64 milliseconds);
+		static void sleep_current_thread(uint32 milliseconds);
 	};
 
 #if !defined(RYTHE_DYNAMIC_LIBRARY_HANDLE_IMPL)

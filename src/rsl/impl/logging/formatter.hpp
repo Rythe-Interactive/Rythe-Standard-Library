@@ -1,17 +1,33 @@
 #pragma once
-#include "spdlog_include.hpp"
+#include "time/time_point.hpp"
 
-namespace rsl
+#include "fmt_include.hpp"
+
+#include <iterator>
+
+namespace rsl::log
 {
-	class genesis_formatter_flag : public spdlog::custom_flag_formatter
+	struct message;
+
+	class formatter
 	{
 	public:
-		void format(const spdlog::details::log_msg& msg, const std::tm& tm_time, spdlog::memory_buf_t& dest) override;
+		NO_DTOR_RULE5_CONSTEXPR_NOEXCEPT(formatter)
+		virtual ~formatter() = default;
+		virtual void format(const message& msg, fmt::memory_buffer& dest) = 0;
+	};
 
-		// generates a new formatter flag
-		[[nodiscard]] std::unique_ptr<custom_flag_formatter> clone() const override
-		{
-			return spdlog::details::make_unique<genesis_formatter_flag>();
-		}
+	class flag_formatter
+	{
+	public:
+		NO_DTOR_RULE5_CONSTEXPR_NOEXCEPT(flag_formatter)
+		virtual ~flag_formatter() = default;
+		virtual void format(const message& msg, const time::point32 time, fmt::memory_buffer& dest) = 0;
+	};
+
+	class genesis_flag_formatter : public flag_formatter
+	{
+	public:
+		void format(const message& msg, const time::point32 time, fmt::memory_buffer& dest) override;
 	};
 } // namespace rsl

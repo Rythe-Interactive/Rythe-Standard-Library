@@ -15,9 +15,7 @@ namespace rsl
 	} // namespace internal
 
 	template <typename>
-	struct incrementable_traits
-	{
-	};
+	struct incrementable_traits {};
 
 	template <typename T>
 		requires is_object_v<T>
@@ -27,9 +25,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	struct incrementable_traits<const T> : incrementable_traits<T>
-	{
-	};
+	struct incrementable_traits<const T> : incrementable_traits<T> {};
 
 	template <internal::has_member_difference_type T>
 	struct incrementable_traits<T>
@@ -65,9 +61,7 @@ namespace rsl
 		concept pointable = requires(T& val) { { val.operator->() } -> dereferenceable; } || (is_pointer_v<T>);
 
 		template <typename>
-		struct cond_value_type
-		{
-		};
+		struct cond_value_type {};
 
 		template <typename T>
 			requires is_object_v<T>
@@ -78,9 +72,7 @@ namespace rsl
 	} // namespace internal
 
 	template <typename>
-	struct indirectly_readable_traits
-	{
-	};
+	struct indirectly_readable_traits {};
 
 	template <typename T>
 		requires is_object_v<T>
@@ -97,9 +89,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	struct indirectly_readable_traits<const T> : indirectly_readable_traits<T>
-	{
-	};
+	struct indirectly_readable_traits<const T> : indirectly_readable_traits<T> {};
 
 	template <typename T>
 		requires requires { typename T::value_type; } && is_object_v<typename T::value_type>
@@ -116,20 +106,20 @@ namespace rsl
 	};
 
 	template <typename T>
-		requires requires {
+		requires requires
+		{
 			typename T::value_type;
 			typename T::element_type;
 		}
-	struct indirectly_readable_traits<T>
-	{
-	};
+	struct indirectly_readable_traits<T> {};
 
 	template <typename T>
-		requires requires {
-			typename T::value_type;
-			typename T::element_type;
-		} && same_as<remove_cv_t<typename T::value_type>, remove_cv_t<typename T::element_type>> &&
-				 is_object_v<typename T::value_type>
+		requires requires
+		         {
+			         typename T::value_type;
+			         typename T::element_type;
+		         } && same_as<remove_cv_t<typename T::value_type>, remove_cv_t<typename T::element_type>> &&
+		         is_object_v<typename T::value_type>
 	struct indirectly_readable_traits<T>
 	{
 		using value_type = remove_cv_t<typename T::value_type>;
@@ -209,7 +199,7 @@ namespace rsl
 
 	template <typename It, typename T>
 	concept output_iterator = input_or_output_iterator<It> && indirectly_writable<It, T> &&
-							  requires(It iter, T&& val) { *iter++ = static_cast<T&&>(val); };
+	                          requires(It iter, T&& val) { *iter++ = static_cast<T&&>(val); };
 
 	template <typename It>
 	concept forward_iterator = input_iterator<It> && incrementable<It> && sentinel_for<It, It>;
@@ -223,14 +213,14 @@ namespace rsl
 
 	template <typename It>
 	concept random_access_iterator = bidirectional_iterator<It> && totally_ordered<It> && sized_sentinel_for<It, It> &&
-									 requires(It iter, const It constIter, const iter_difference_t<It> n)
-									 {
-										 { iter += n } -> same_as<It&>;
-										 { constIter + n } -> same_as<It>;
-										 { iter -= n } -> same_as<It&>;
-										 { constIter - n } -> same_as<It>;
-										 { constIter[n] } -> same_as<iter_reference_t<It>>;
-									 };
+	                                 requires(It iter, const It constIter, const iter_difference_t<It> n)
+	                                 {
+		                                 { iter += n } -> same_as<It&>;
+		                                 { constIter + n } -> same_as<It>;
+		                                 { iter -= n } -> same_as<It&>;
+		                                 { constIter - n } -> same_as<It>;
+		                                 { constIter[n] } -> same_as<iter_reference_t<It>>;
+	                                 };
 
 	template <typename It>
 	concept contiguous_iterator =
@@ -297,16 +287,12 @@ namespace rsl
 		template <bidirectional_iterator OtherNodeIter>
 		constexpr reverse_iterator(const reverse_iterator<OtherNodeIter>& other) noexcept
 			requires constructible_from<underlying_iter, OtherNodeIter> && not_same_as<underlying_iter, OtherNodeIter>
-			: m_iter(other.m_iter)
-		{
-		}
+			: m_iter(other.m_iter) {}
 
 		template <bidirectional_iterator OtherNodeIter>
 		constexpr reverse_iterator(reverse_iterator<OtherNodeIter>&& other) noexcept
 			requires constructible_from<underlying_iter, OtherNodeIter&&> && not_same_as<underlying_iter, OtherNodeIter>
-			: m_iter(rsl::move(other.m_iter))
-		{
-		}
+			: m_iter(rsl::move(other.m_iter)) {}
 
 		template <bidirectional_iterator OtherNodeIter>
 		constexpr reverse_iterator& operator=(const reverse_iterator<OtherNodeIter>& other) noexcept
@@ -382,7 +368,12 @@ namespace rsl
 			return m_iter[-n];
 		}
 
-		constexpr ref_type operator*() const noexcept { underlying_iter tmp = m_iter; return *--tmp; }
+		constexpr ref_type operator*() const noexcept
+		{
+			underlying_iter tmp = m_iter;
+			return *--tmp;
+		}
+
 		constexpr ptr_type operator->() const noexcept { return &operator*(); }
 
 		template <bidirectional_iterator OtherNodeIter>
@@ -437,267 +428,271 @@ namespace rsl
 	}
 
 	template <input_iterator Iter>
-	class basic_const_iterator {
+	class basic_const_iterator
+	{
 	public:
-	    using reference_type   = iter_const_reference_t<Iter>;
-	    using value_type       = iter_value_t<Iter>;
-	    using difference_type  = iter_difference_t<Iter>;
+		using reference_type = iter_const_reference_t<Iter>;
+		using value_type = iter_value_t<Iter>;
+		using difference_type = iter_difference_t<Iter>;
 
-	    basic_const_iterator() requires default_initializable<Iter> = default;
+		basic_const_iterator() requires default_initializable<Iter> = default;
 
-	    constexpr basic_const_iterator(Iter src) noexcept(is_nothrow_move_constructible_v<Iter>)
-	        : m_underlying( move(src)) {}
+		constexpr basic_const_iterator(Iter src) noexcept(is_nothrow_move_constructible_v<Iter>)
+			: m_underlying(move(src)) {}
 
-	    template <convertible_to<Iter> Other>
-	    constexpr basic_const_iterator(basic_const_iterator<Other> src)
-	        noexcept(is_nothrow_constructible_v<Iter, Other>)
-	        : m_underlying( move(src.m_underlying)) {}
+		template <convertible_to<Iter> Other>
+		constexpr basic_const_iterator(basic_const_iterator<Other> src)
+			noexcept(is_nothrow_constructible_v<Iter, Other>)
+			: m_underlying(move(src.m_underlying)) {}
 
-	    template <distinct_from<basic_const_iterator> Other>
-	        requires convertible_to<Other, Iter>
-	    constexpr basic_const_iterator(Other&& src)
-	        noexcept(is_nothrow_constructible_v<Iter, Other>)
-	        : m_underlying( forward<Other>(src)) {}
+		template <distinct_from<basic_const_iterator> Other>
+			requires convertible_to<Other, Iter>
+		constexpr basic_const_iterator(Other&& src)
+			noexcept(is_nothrow_constructible_v<Iter, Other>)
+			: m_underlying(forward<Other>(src)) {}
 
-	    [[nodiscard]] constexpr const Iter& base() const& noexcept
+		[[nodiscard]] constexpr const Iter& base() const & noexcept
 		{
-	        return m_underlying;
-	    }
+			return m_underlying;
+		}
 
-	    [[nodiscard]] constexpr Iter base() && noexcept(is_nothrow_move_constructible_v<Iter>)
+		[[nodiscard]] constexpr Iter base() && noexcept(is_nothrow_move_constructible_v<Iter>)
 		{
-	        return  move(m_underlying);
-	    }
+			return move(m_underlying);
+		}
 
-	    [[nodiscard]] constexpr reference_type operator*() const
-	        noexcept(noexcept(static_cast<reference_type>(*m_underlying)))
+		[[nodiscard]] constexpr reference_type operator*() const
+			noexcept(noexcept(static_cast<reference_type>(*m_underlying)))
 		{
-	        return static_cast<reference_type>(*m_underlying);
-	    }
+			return static_cast<reference_type>(*m_underlying);
+		}
 
-	    [[nodiscard]] constexpr const auto* operator->() const
-	        noexcept(contiguous_iterator<Iter> || noexcept(*m_underlying))
-	        requires is_lvalue_reference_v<iter_reference_t<Iter>>
-	              && same_as<remove_cvr_t<iter_reference_t<Iter>>, value_type>
-	    {
-	        if constexpr (contiguous_iterator<Iter>)
-	        {
-	            return  rsl::to_address(m_underlying);
-	        }
-	    	else
-	        {
-	            return  addressof(*m_underlying);
-	        }
-	    }
-
-	    constexpr basic_const_iterator& operator++() noexcept(noexcept(++m_underlying))
+		[[nodiscard]] constexpr const auto* operator->() const
+			noexcept(contiguous_iterator<Iter> || noexcept(*m_underlying))
+			requires is_lvalue_reference_v<iter_reference_t<Iter>>
+			         && same_as<remove_cvr_t<iter_reference_t<Iter>>, value_type>
 		{
-	        ++m_underlying;
-	        return *this;
-	    }
+			if constexpr (contiguous_iterator<Iter>)
+			{
+				return rsl::to_address(m_underlying);
+			}
+			else
+			{
+				return addressof(*m_underlying);
+			}
+		}
 
-	    constexpr void operator++(int) noexcept(noexcept(++m_underlying))
+		constexpr basic_const_iterator& operator++() noexcept(noexcept(++m_underlying))
 		{
-	        ++m_underlying;
-	    }
+			++m_underlying;
+			return *this;
+		}
 
-	    constexpr basic_const_iterator operator++(int)
-	        noexcept(noexcept(++*this) && is_nothrow_copy_constructible_v<basic_const_iterator>)
-	        requires forward_iterator<Iter>
-	    {
-	        auto tmp = *this;
-	        ++*this;
-	        return tmp;
-	    }
-
-	    constexpr basic_const_iterator& operator--() noexcept(noexcept(--m_underlying))
-	        requires bidirectional_iterator<Iter>
-	    {
-	        --m_underlying;
-	        return *this;
-	    }
-
-	    constexpr basic_const_iterator operator--(int)
-	        noexcept(noexcept(--*this) && is_nothrow_copy_constructible_v<basic_const_iterator>)
-	        requires bidirectional_iterator<Iter>
-	    {
-	        auto tmp = *this;
-	        --*this;
-	        return tmp;
-	    }
-
-	    constexpr basic_const_iterator& operator+=(const difference_type offset)
-	        noexcept(noexcept(m_underlying += offset))
-	        requires random_access_iterator<Iter>
-	    {
-	        m_underlying += offset;
-	        return *this;
-	    }
-
-	    constexpr basic_const_iterator& operator-=(const difference_type offset)
-	        noexcept(noexcept(m_underlying -= offset))
-	        requires random_access_iterator<Iter>
-	    {
-	        m_underlying -= offset;
-	        return *this;
-	    }
-
-	    [[nodiscard]] constexpr reference_type operator[](const difference_type idx) const
-	        noexcept(noexcept(static_cast<reference_type>(m_underlying[idx])))
-	        requires random_access_iterator<Iter>
-	    {
-	        return static_cast<reference_type>(m_underlying[idx]);
-	    }
-
-	    template <sentinel_for<Iter> Sent>
-	    [[nodiscard]] constexpr bool operator==(const Sent& sentinel) const
-	        noexcept(noexcept( fake_copy_init<bool>(m_underlying == sentinel)))
+		constexpr void operator++(int) noexcept(noexcept(++m_underlying))
 		{
-	        return m_underlying == sentinel;
-	    }
+			++m_underlying;
+		}
 
-	    template <internal::not_a_const_iterator Other>
-	        requires constant_iterator_type<Other> && convertible_to<const Iter&, Other>
-	    [[nodiscard]] constexpr operator Other() const& noexcept(
-	        is_nothrow_convertible_v<const Iter&, Other>)
+		constexpr basic_const_iterator operator++(int)
+			noexcept(noexcept(++*this) && is_nothrow_copy_constructible_v<basic_const_iterator>)
+			requires forward_iterator<Iter>
 		{
-	        return m_underlying;
-	    }
+			auto tmp = *this;
+			++*this;
+			return tmp;
+		}
 
-	    template <internal::not_a_const_iterator Other>
-	        requires constant_iterator_type<Other> && convertible_to<Iter, Other>
-	    [[nodiscard]] constexpr operator Other() && noexcept(is_nothrow_convertible_v<Iter, Other>)
+		constexpr basic_const_iterator& operator--() noexcept(noexcept(--m_underlying))
+			requires bidirectional_iterator<Iter>
 		{
-	        return  move(m_underlying);
-	    }
+			--m_underlying;
+			return *this;
+		}
 
-	    [[nodiscard]] constexpr bool operator<(const basic_const_iterator& rhs) const
-	        noexcept(noexcept( fake_copy_init<bool>(m_underlying < rhs.m_underlying)))
-	        requires random_access_iterator<Iter>
-	    {
-	        return m_underlying < rhs.m_underlying;
-	    }
-
-	    [[nodiscard]] constexpr bool operator>(const basic_const_iterator& rhs) const
-	        noexcept(noexcept( fake_copy_init<bool>(m_underlying > rhs.m_underlying)))
-	        requires random_access_iterator<Iter>
-	    {
-	        return m_underlying > rhs.m_underlying;
-	    }
-
-	    [[nodiscard]] constexpr bool operator<=(const basic_const_iterator& rhs) const
-	        noexcept(noexcept( fake_copy_init<bool>(m_underlying <= rhs.m_underlying)))
-	        requires random_access_iterator<Iter>
-	    {
-	        return m_underlying <= rhs.m_underlying;
-	    }
-
-	    [[nodiscard]] constexpr bool operator>=(const basic_const_iterator& rhs) const
-	        noexcept(noexcept( fake_copy_init<bool>(m_underlying >= rhs.m_underlying)))
-	        requires random_access_iterator<Iter>
-	    {
-	        return m_underlying >= rhs.m_underlying;
-	    }
-
-	    template <distinct_from<basic_const_iterator> Other>
-	        requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
-	    [[nodiscard]] constexpr bool operator<(const Other& rhs) const
-	        noexcept(noexcept( fake_copy_init<bool>(m_underlying < rhs)))
+		constexpr basic_const_iterator operator--(int)
+			noexcept(noexcept(--*this) && is_nothrow_copy_constructible_v<basic_const_iterator>)
+			requires bidirectional_iterator<Iter>
 		{
-	        return m_underlying < rhs;
-	    }
+			auto tmp = *this;
+			--*this;
+			return tmp;
+		}
 
-	    template <distinct_from<basic_const_iterator> Other>
-	        requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
-	    [[nodiscard]] constexpr bool operator>(const Other& rhs) const
-	        noexcept(noexcept( fake_copy_init<bool>(m_underlying > rhs)))
+		constexpr basic_const_iterator& operator+=(const difference_type offset)
+			noexcept(noexcept(m_underlying += offset))
+			requires random_access_iterator<Iter>
 		{
-	        return m_underlying > rhs;
-	    }
+			m_underlying += offset;
+			return *this;
+		}
 
-	    template <distinct_from<basic_const_iterator> Other>
-	        requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
-	    [[nodiscard]] constexpr bool operator<=(const Other& rhs) const
-	        noexcept(noexcept( fake_copy_init<bool>(m_underlying <= rhs)))
+		constexpr basic_const_iterator& operator-=(const difference_type offset)
+			noexcept(noexcept(m_underlying -= offset))
+			requires random_access_iterator<Iter>
 		{
-	        return m_underlying <= rhs;
-	    }
+			m_underlying -= offset;
+			return *this;
+		}
 
-	    template <distinct_from<basic_const_iterator> Other>
-	        requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
-	    [[nodiscard]] constexpr bool operator>=(const Other& rhs) const
-	        noexcept(noexcept( fake_copy_init<bool>(m_underlying >= rhs)))
+		[[nodiscard]] constexpr reference_type operator[](const difference_type idx) const
+			noexcept(noexcept(static_cast<reference_type>(m_underlying[idx])))
+			requires random_access_iterator<Iter>
 		{
-	        return m_underlying >= rhs;
-	    }
+			return static_cast<reference_type>(m_underlying[idx]);
+		}
 
-	    template <internal::not_a_const_iterator Other>
-	        requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
-	    [[nodiscard]] friend constexpr bool operator<(const Other& lhs, const basic_const_iterator& rhs)
-	        noexcept(noexcept( fake_copy_init<bool>(lhs < rhs.m_underlying)))
+		template <sentinel_for<Iter> Sent>
+		[[nodiscard]] constexpr bool operator==(const Sent& sentinel) const
+			noexcept(noexcept( fake_copy_init<bool>(m_underlying == sentinel)))
 		{
-	        return lhs < rhs.m_underlying;
-	    }
+			return m_underlying == sentinel;
+		}
 
-	    template <internal::not_a_const_iterator Other>
-	        requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
-	    [[nodiscard]] friend constexpr bool operator>(const Other& lhs, const basic_const_iterator& rhs)
-	        noexcept(noexcept( fake_copy_init<bool>(lhs > rhs.m_underlying)))
+		template <internal::not_a_const_iterator Other>
+			requires constant_iterator_type<Other> && convertible_to<const Iter&, Other>
+		[[nodiscard]] constexpr operator Other() const & noexcept(
+			is_nothrow_convertible_v<const Iter&, Other>)
 		{
-	        return lhs > rhs.m_underlying;
-	    }
+			return m_underlying;
+		}
 
-	    template <internal::not_a_const_iterator Other>
-	        requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
-	    [[nodiscard]] friend constexpr bool operator<=(const Other& lhs, const basic_const_iterator& rhs)
-	        noexcept(noexcept( fake_copy_init<bool>(lhs <= rhs.m_underlying)))
+		template <internal::not_a_const_iterator Other>
+			requires constant_iterator_type<Other> && convertible_to<Iter, Other>
+		[[nodiscard]] constexpr operator Other() && noexcept(is_nothrow_convertible_v<Iter, Other>)
 		{
-	        return lhs <= rhs.m_underlying;
-	    }
+			return move(m_underlying);
+		}
 
-	    template <internal::not_a_const_iterator Other>
-	        requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
-	    [[nodiscard]] friend constexpr bool operator>=(const Other& lhs, const basic_const_iterator& rhs)
-	        noexcept(noexcept( fake_copy_init<bool>(lhs >= rhs.m_underlying)))
+		[[nodiscard]] constexpr bool operator<(const basic_const_iterator& rhs) const
+			noexcept(noexcept( fake_copy_init<bool>(m_underlying < rhs.m_underlying)))
+			requires random_access_iterator<Iter>
 		{
-	        return lhs >= rhs.m_underlying;
-	    }
+			return m_underlying < rhs.m_underlying;
+		}
 
-	    [[nodiscard]] friend constexpr basic_const_iterator operator+(const basic_const_iterator& iter,
-	        const difference_type offset) noexcept(noexcept(basic_const_iterator{iter.m_underlying + offset}))
-	        requires random_access_iterator<Iter>
-	    {
-	        return basic_const_iterator{ iter.m_underlying + offset };
-	    }
-
-	    [[nodiscard]] friend constexpr basic_const_iterator operator+(const difference_type offset,
-	        const basic_const_iterator& iter) noexcept(noexcept(basic_const_iterator{iter.m_underlying + offset}))
-	        requires random_access_iterator<Iter>
-	    {
-	        return basic_const_iterator{ iter.m_underlying + offset };
-	    }
-
-	    [[nodiscard]] friend constexpr basic_const_iterator operator-(const basic_const_iterator& iter,
-	        const difference_type offset) noexcept(noexcept(basic_const_iterator{iter.m_underlying - offset}))
-	        requires random_access_iterator<Iter>
-	    {
-	        return basic_const_iterator{ iter.m_underlying - offset };
-	    }
-
-	    template <sized_sentinel_for<Iter> Sent>
-	    [[nodiscard]] constexpr difference_type operator-(const Sent& sentinel) const
-	        noexcept(noexcept(m_underlying - sentinel))
+		[[nodiscard]] constexpr bool operator>(const basic_const_iterator& rhs) const
+			noexcept(noexcept( fake_copy_init<bool>(m_underlying > rhs.m_underlying)))
+			requires random_access_iterator<Iter>
 		{
-	        return m_underlying - sentinel;
-	    }
+			return m_underlying > rhs.m_underlying;
+		}
 
-	    template <internal::not_a_const_iterator Sent>
-	        requires sized_sentinel_for<Sent, Iter>
-	    [[nodiscard]] friend constexpr difference_type operator-(const Sent& sentinel, const basic_const_iterator& iter)
-	        noexcept(noexcept(sentinel - iter.m_underlying))
+		[[nodiscard]] constexpr bool operator<=(const basic_const_iterator& rhs) const
+			noexcept(noexcept( fake_copy_init<bool>(m_underlying <= rhs.m_underlying)))
+			requires random_access_iterator<Iter>
 		{
-	        return sentinel - iter.m_underlying;
-	    }
+			return m_underlying <= rhs.m_underlying;
+		}
+
+		[[nodiscard]] constexpr bool operator>=(const basic_const_iterator& rhs) const
+			noexcept(noexcept( fake_copy_init<bool>(m_underlying >= rhs.m_underlying)))
+			requires random_access_iterator<Iter>
+		{
+			return m_underlying >= rhs.m_underlying;
+		}
+
+		template <distinct_from<basic_const_iterator> Other>
+			requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
+		[[nodiscard]] constexpr bool operator<(const Other& rhs) const
+			noexcept(noexcept( fake_copy_init<bool>(m_underlying < rhs)))
+		{
+			return m_underlying < rhs;
+		}
+
+		template <distinct_from<basic_const_iterator> Other>
+			requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
+		[[nodiscard]] constexpr bool operator>(const Other& rhs) const
+			noexcept(noexcept( fake_copy_init<bool>(m_underlying > rhs)))
+		{
+			return m_underlying > rhs;
+		}
+
+		template <distinct_from<basic_const_iterator> Other>
+			requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
+		[[nodiscard]] constexpr bool operator<=(const Other& rhs) const
+			noexcept(noexcept( fake_copy_init<bool>(m_underlying <= rhs)))
+		{
+			return m_underlying <= rhs;
+		}
+
+		template <distinct_from<basic_const_iterator> Other>
+			requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
+		[[nodiscard]] constexpr bool operator>=(const Other& rhs) const
+			noexcept(noexcept( fake_copy_init<bool>(m_underlying >= rhs)))
+		{
+			return m_underlying >= rhs;
+		}
+
+		template <internal::not_a_const_iterator Other>
+			requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
+		[[nodiscard]] friend constexpr bool operator<(const Other& lhs, const basic_const_iterator& rhs)
+			noexcept(noexcept( fake_copy_init<bool>(lhs < rhs.m_underlying)))
+		{
+			return lhs < rhs.m_underlying;
+		}
+
+		template <internal::not_a_const_iterator Other>
+			requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
+		[[nodiscard]] friend constexpr bool operator>(const Other& lhs, const basic_const_iterator& rhs)
+			noexcept(noexcept( fake_copy_init<bool>(lhs > rhs.m_underlying)))
+		{
+			return lhs > rhs.m_underlying;
+		}
+
+		template <internal::not_a_const_iterator Other>
+			requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
+		[[nodiscard]] friend constexpr bool operator<=(const Other& lhs, const basic_const_iterator& rhs)
+			noexcept(noexcept( fake_copy_init<bool>(lhs <= rhs.m_underlying)))
+		{
+			return lhs <= rhs.m_underlying;
+		}
+
+		template <internal::not_a_const_iterator Other>
+			requires random_access_iterator<Iter> && totally_ordered_with<Iter, Other>
+		[[nodiscard]] friend constexpr bool operator>=(const Other& lhs, const basic_const_iterator& rhs)
+			noexcept(noexcept( fake_copy_init<bool>(lhs >= rhs.m_underlying)))
+		{
+			return lhs >= rhs.m_underlying;
+		}
+
+		[[nodiscard]] friend constexpr basic_const_iterator operator+(const basic_const_iterator& iter,
+		                                                              const difference_type offset) noexcept(noexcept(
+			basic_const_iterator{iter.m_underlying + offset}))
+			requires random_access_iterator<Iter>
+		{
+			return basic_const_iterator{iter.m_underlying + offset};
+		}
+
+		[[nodiscard]] friend constexpr basic_const_iterator operator+(const difference_type offset,
+		                                                              const basic_const_iterator& iter) noexcept(noexcept(
+			basic_const_iterator{iter.m_underlying + offset}))
+			requires random_access_iterator<Iter>
+		{
+			return basic_const_iterator{iter.m_underlying + offset};
+		}
+
+		[[nodiscard]] friend constexpr basic_const_iterator operator-(const basic_const_iterator& iter,
+		                                                              const difference_type offset) noexcept(noexcept(
+			basic_const_iterator{iter.m_underlying - offset}))
+			requires random_access_iterator<Iter>
+		{
+			return basic_const_iterator{iter.m_underlying - offset};
+		}
+
+		template <sized_sentinel_for<Iter> Sent>
+		[[nodiscard]] constexpr difference_type operator-(const Sent& sentinel) const
+			noexcept(noexcept(m_underlying - sentinel))
+		{
+			return m_underlying - sentinel;
+		}
+
+		template <internal::not_a_const_iterator Sent>
+			requires sized_sentinel_for<Sent, Iter>
+		[[nodiscard]] friend constexpr difference_type operator-(const Sent& sentinel, const basic_const_iterator& iter)
+			noexcept(noexcept(sentinel - iter.m_underlying))
+		{
+			return sentinel - iter.m_underlying;
+		}
 
 	private:
 		Iter m_underlying{};
@@ -742,20 +737,66 @@ namespace rsl
 		}
 	}
 
+	template <typename Container>
+	class back_insert_iterator
+	{
+	public:
+		using value_type = typename Container::value_type;
+		using reference_type = typename Container::value_type&;
+		using difference_type = diff_type;
+		using container_type = Container;
+
+		constexpr explicit back_insert_iterator(Container& container) noexcept : m_container(addressof(container)) {}
+
+		[[rythe_always_inline]] constexpr back_insert_iterator& operator=(const value_type& value)
+		{
+			m_container->push_back(value);
+			return *this;
+		}
+
+		[[rythe_always_inline]] constexpr back_insert_iterator& operator=(value_type&& value)
+		{
+			m_container->push_back(rsl::move(value));
+			return *this;
+		}
+
+		[[nodiscard]] [[rythe_always_inline]] constexpr back_insert_iterator& operator*() noexcept
+		{
+			return *this;
+		}
+
+		[[rythe_always_inline]] constexpr back_insert_iterator& operator++() noexcept
+		{
+			return *this;
+		}
+
+		[[rythe_always_inline]] constexpr back_insert_iterator operator++(int) noexcept
+		{
+			return *this;
+		}
+
+	private:
+		Container* m_container;
+	};
+
+	template <typename Container>
+	[[nodiscard]] [[rythe_always_inline]] constexpr back_insert_iterator<Container> back_inserter(
+		Container& container) noexcept
+	{
+		return back_insert_iterator<Container>(container);
+	}
+
 	template <typename T>
 	struct pair_range
 	{
 		using iterator = T;
+
 		pair_range(const pair<T, T> r) noexcept
-			: range(r)
-		{
-		}
+			: range(r) {}
 
 		template <typename ItType>
 		pair_range(ItType begin, ItType end) noexcept
-			: range(move(begin), move(end))
-		{
-		}
+			: range(move(begin), move(end)) {}
 
 		[[nodiscard]] [[rythe_always_inline]] auto& begin() const { return range.first; }
 
@@ -796,9 +837,7 @@ namespace rsl
 
 		explicit key_value_pair_iterator(keys_proxy_type keys, values_proxy_type values)
 			: m_key(keys),
-			  m_value(values)
-		{
-		}
+			  m_value(values) {}
 
 		pair_type operator*() { return {ref(key()), ref(value())}; }
 		const_pair_type operator*() const { return {cref(key()), cref(value())}; }
@@ -815,6 +854,7 @@ namespace rsl
 		{
 			return rhs.m_key == lhs.m_key && rhs.m_value == lhs.m_value;
 		}
+
 		friend auto operator!=(const key_value_pair_iterator& rhs, const key_value_pair_iterator& lhs)
 		{
 			return rhs.m_key != lhs.m_key || rhs.m_value != lhs.m_value;
@@ -848,10 +888,9 @@ namespace rsl
 	{
 	public:
 		using self_proxy_type = typename PairIteratorContainer::iterator;
+
 		explicit key_only_iterator(self_proxy_type self)
-			: m_self(self)
-		{
-		}
+			: m_self(self) {}
 
 		auto& operator*() { return key(); }
 		const auto& operator*() const { return key(); }
@@ -860,10 +899,12 @@ namespace rsl
 		const auto& operator->() const { return key(); }
 		auto& key() { return m_self->first; }
 		const auto& key() const { return m_self->first; }
+
 		friend auto operator==(const key_only_iterator& rhs, const key_only_iterator& lhs)
 		{
 			return rhs.m_self == lhs.m_self;
 		}
+
 		friend auto operator!=(const key_only_iterator& rhs, const key_only_iterator& lhs)
 		{
 			return rhs.m_self != lhs.m_self;
@@ -881,10 +922,9 @@ namespace rsl
 	{
 	public:
 		using self_proxy_type = typename PairIteratorContainer::iterator;
+
 		explicit value_only_iterator(self_proxy_type self)
-			: m_self(move(self))
-		{
-		}
+			: m_self(move(self)) {}
 
 		auto& operator*() { return value(); }
 		const auto& operator*() const { return value(); }
@@ -895,10 +935,12 @@ namespace rsl
 		const auto& value() const { return m_self->second; }
 		auto operator++() { return value_only_iterator(m_self++); }
 		auto operator++() const { return value_only_iterator(m_self++); }
+
 		friend auto operator==(const value_only_iterator& rhs, const value_only_iterator& lhs)
 		{
 			return rhs.m_self == lhs.m_self;
 		}
+
 		friend auto operator!=(const value_only_iterator& rhs, const value_only_iterator& lhs)
 		{
 			return rhs.m_self != lhs.m_self;
@@ -913,9 +955,8 @@ namespace rsl
 	{
 	public:
 		explicit keys_only_view(PairIteratorContainer& cont)
-			: m_container(cont)
-		{
-		}
+			: m_container(cont) {}
+
 		[[nodiscard]] auto begin() const { return key_only_iterator<PairIteratorContainer>(m_container.begin()); }
 		[[nodiscard]] auto end() const { return key_only_iterator<PairIteratorContainer>(m_container.end()); }
 
@@ -931,9 +972,7 @@ namespace rsl
 	{
 	public:
 		explicit values_only_view(PairIteratorContainer& cont)
-			: m_container(cont)
-		{
-		}
+			: m_container(cont) {}
 
 		[[nodiscard]] auto begin() const { return value_only_iterator<PairIteratorContainer>(m_container.begin()); }
 		[[nodiscard]] auto end() const { return value_only_iterator<PairIteratorContainer>(m_container.end()); }

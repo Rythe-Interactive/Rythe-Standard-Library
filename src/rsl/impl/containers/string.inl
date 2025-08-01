@@ -1,5 +1,5 @@
 #pragma once
-#include "string.hpp"
+#include "../logging/fmt_include.hpp"
 
 namespace rsl
 {
@@ -98,5 +98,11 @@ namespace rsl
 	inline basic_dynamic_string<CharType, Alloc>& basic_dynamic_string<CharType, Alloc>::replace([[maybe_unused]] size_type pos, [[maybe_unused]] size_type count, [[maybe_unused]] const_view_type view)
 	{
 		return *this;
+	}
+
+	template <typename T>
+	result<dynamic_string> to_string(const T& value)
+	{
+		return fmt::format("{}", value);
 	}
 }

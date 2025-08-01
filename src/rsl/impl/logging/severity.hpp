@@ -4,14 +4,19 @@
 
 namespace rsl::log
 {
-	enum struct severity
+	enum struct severity : uint8
 	{
-		trace, // lowest severity
+		trace = 0, // lowest severity
 		debug,
 		info,
 		warn,
 		error,
-		fatal // highest severity
+		fatal, // highest severity
+		#if defined(RYTHE_DEBUG)
+		default_severity = debug
+		#else
+		default_severity = info
+		#endif
 	};
 
 	namespace internal
@@ -27,7 +32,8 @@ namespace rsl::log
 				case severity::error: return spdlog::level::err;
 				case severity::fatal: return spdlog::level::critical;
 			}
-			return spdlog::level::err;
+			rsl_assert_unreachable();
+			return spdlog::level::critical;
 		}
 	}
 }

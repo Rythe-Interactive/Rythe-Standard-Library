@@ -40,16 +40,16 @@ namespace rsl
 		sched_yield();
 	}
 
-	void platform::sleep_current_thread(uint64 milliseconds)
+	void platform::sleep_current_thread(uint32 milliseconds)
 	{
 		timespec sleepTime;
 		timespec remainingTime;
 		sleepTime.tv_sec = milliseconds / 1000u;
-		sleepTime.tv_nsec = ( milliseconds - ( sleepTime.tv_sec * 1000u ) ) * 1000000u;
+		sleepTime.tv_nsec = (milliseconds - (sleepTime.tv_sec * 1000u)) * 1000000u;
 
-		while( true )
+		while (true)
 		{
-			int32 result = nanosleep (&sleepTime, &remainingTime );
+			int32 result = nanosleep(&sleepTime, &remainingTime);
 
 			int error = 0;
 			if (result == -1)
@@ -57,7 +57,7 @@ namespace rsl
 				error = errno;
 			}
 
-			if( result == 0 || error != EINTR )
+			if (result == 0 || error != EINTR)
 			{
 				break;
 			}

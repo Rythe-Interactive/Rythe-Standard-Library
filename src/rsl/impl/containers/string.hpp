@@ -3,11 +3,13 @@
 #include "../util/assert.hpp"
 #include "../util/common.hpp"
 #include "../util/primitives.hpp"
+#include "../util/error_handling.hpp"
 
 #include "../memory/allocator.hpp"
 
 namespace rsl
 {
+	// TODO: should probably automatically make sure the last value is always `\0`
 	// TODO(Rowan): constexpr strings are still useful if the string never leaks from constant evaluation time to runtime. constexpr_string is needed if you want to be able to read the results of a string at runtime.
 	template <typename CharType = char, allocator_type Alloc = default_allocator>
 	class basic_dynamic_string final : public dynamic_array<CharType, Alloc>
@@ -57,6 +59,9 @@ namespace rsl
 	using dynamic_wstring = basic_dynamic_string<utf16>;
 
 	dynamic_wstring to_utf16(dynamic_string::const_view_type str);
+
+	template<typename T>
+	[[nodiscard]] [[rythe_always_inline]] result<dynamic_string> to_string(const T& value) noexcept;
 
 } // namespace rsl
 

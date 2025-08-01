@@ -529,7 +529,7 @@ namespace rsl
 	template <typename T>
 	[[nodiscard]] [[rythe_always_inline]] constexpr T* addressof(T& val) noexcept
 	{
-		return ::std::addressof(val); // Compiler magic behind the scenes.
+		return __builtin_addressof(val); // Compiler magic.
 	}
 
 	template <typename T>
