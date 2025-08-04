@@ -1,9 +1,7 @@
 #pragma once
-#include "time/time_point.hpp"
-
+#include "../time/time_point.hpp"
+#include "../containers/string.hpp"
 #include "fmt_include.hpp"
-
-#include <iterator>
 
 namespace rsl::log
 {

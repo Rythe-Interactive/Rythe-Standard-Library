@@ -1,6 +1,4 @@
 #include "formatter.hpp"
-#include "../time/stopwatch.hpp"
-#include "../containers/string.hpp"
 
 namespace rsl::log
 {
@@ -15,6 +13,6 @@ namespace rsl::log
 		const auto str = to_string(seconds);
 
 		// append to data
-		dest.append(str., str.data() + str.size());
+		dest.append(str.data(), str.data() + str.size());
 	}
 } // namespace rsl

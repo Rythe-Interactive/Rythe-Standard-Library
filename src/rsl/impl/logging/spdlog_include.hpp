@@ -1,4 +1,5 @@
 #pragma once
+#include "../containers/string.hpp"
 
 #include "fmt_include.hpp"
 

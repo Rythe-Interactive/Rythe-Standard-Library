@@ -44,11 +44,11 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::float2& p, FormatContext& ctx)
+		constexpr auto format(const rsl::math::float2& p, FormatContext& ctx)
 		{
 			return format_to(
 				ctx.out(),
-				format_string<rsl::math::float2>(presentation == 'f' ? "({:.1f}, {:.1f})" : "({:.1e}, {:.1e})"), p.x,
+				format_string<float, float>(presentation == 'f' ? "({:.1f}, {:.1f})" : "({:.1e}, {:.1e})"), p.x,
 				p.y
 			);
 		}
@@ -77,11 +77,11 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::float3& p, FormatContext& ctx)
+		constexpr auto format(const rsl::math::float3& p, FormatContext& ctx)
 		{
 			return format_to(
 				ctx.out(),
-				format_string<rsl::math::float3>(
+				format_string<float, float, float>(
 					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e})"
 				),
 				p.x, p.y, p.z
@@ -95,7 +95,7 @@ namespace fmt
 		constexpr const char* parse(format_parse_context& ctx) { return formatter<int>{}.parse(ctx); }
 
 		template <typename FormatContext>
-		auto format(const rsl::math::int3& p, FormatContext& ctx)
+		constexpr auto format(const rsl::math::int3& p, FormatContext& ctx)
 		{
 			return format_to(ctx.out(), "({}, {}, {})", p.x, p.y, p.z);
 		}
@@ -112,11 +112,11 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::float4& p, FormatContext& ctx)
+		constexpr auto format(const rsl::math::float4& p, FormatContext& ctx)
 		{
 			return format_to(
 				ctx.out(),
-				format_string<rsl::math::float4>(
+				format_string<float, float, float, float>(
 					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})"
 				),
 				p.x, p.y, p.z, p.w
@@ -135,11 +135,11 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::float3x3& p, FormatContext& ctx) const -> decltype(ctx.out())
+		constexpr auto format(const rsl::math::float3x3& p, FormatContext& ctx) const -> decltype(ctx.out())
 		{
 			return format_to(
 				ctx.out(),
-				format_string<rsl::math::float3x3>(
+				format_string<float, float, float, float, float, float, float, float, float>(
 					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f})\n"
 										  "({:.1f}, {:.1f}, {:.1f})\n"
 										  "({:.1f}, {:.1f}, {:.1f})"
@@ -163,11 +163,11 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::float4x4& p, FormatContext& ctx) const -> decltype(ctx.out())
+		constexpr auto format(const rsl::math::float4x4& p, FormatContext& ctx) const -> decltype(ctx.out())
 		{
 			return format_to(
 				ctx.out(),
-				format_string<rsl::math::float4x4>(
+				format_string<float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float>(
 					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
 										  "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
 										  "({:.1f}, {:.1f}, {:.1f}, {:.1f})\n"
@@ -194,11 +194,11 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::color& p, FormatContext& ctx)
+		constexpr auto format(const rsl::math::color& p, FormatContext& ctx)
 		{
 			return format_to(
 				ctx.out(),
-				format_string<rsl::math::color>(
+				format_string<float, float, float, float>(
 					presentation == 'f' ? "({:.1f}, {:.1f}, {:.1f}, {:.1f})" : "({:.1e}, {:.1e}, {:.1e}, {:.1e})"
 				),
 				p.r, p.g, p.b, p.a
@@ -217,11 +217,11 @@ namespace fmt
 		}
 
 		template <typename FormatContext>
-		auto format(const rsl::math::quat& p, FormatContext& ctx)
+		constexpr auto format(const rsl::math::quat& p, FormatContext& ctx)
 		{
 			return format_to(
 				ctx.out(),
-				format_string<rsl::math::quat>(
+				format_string<float, float, float, float>(
 					presentation == 'f' ? "(({:.1f}, {:.1f}, {:.1f}), w: {:.1f})"
 										: "(({:.1e}, {:.1e}, {:.1e}), w: {:.1e})"
 				),

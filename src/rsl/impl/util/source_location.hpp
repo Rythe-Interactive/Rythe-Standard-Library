@@ -6,7 +6,7 @@ namespace rsl
 {
 	struct source_location
 	{
-		[[no_discard]] static consteval source_location current(
+		[[nodiscard]] static consteval source_location current(
 			const uint32 line = __builtin_LINE(),
 			const uint32 column = __builtin_COLUMN(),
 			cstring const file = __builtin_FILE(),
@@ -21,24 +21,24 @@ namespace rsl
 			return result;
 		}
 
-		[[no_discard]] constexpr source_location() noexcept = default;
+		[[nodiscard]] constexpr source_location() noexcept = default;
 
-		[[no_discard]] constexpr uint32 line() const noexcept
+		[[nodiscard]] constexpr uint32 line() const noexcept
 		{
 			return m_line;
 		}
 
-		[[no_discard]] constexpr uint32 column() const noexcept
+		[[nodiscard]] constexpr uint32 column() const noexcept
 		{
 			return m_column;
 		}
 
-		[[no_discard]] constexpr cstring file_name() const noexcept
+		[[nodiscard]] constexpr cstring file_name() const noexcept
 		{
 			return m_file;
 		}
 
-		[[no_discard]] constexpr cstring function_name() const noexcept
+		[[nodiscard]] constexpr cstring function_name() const noexcept
 		{
 			return m_function;
 		}

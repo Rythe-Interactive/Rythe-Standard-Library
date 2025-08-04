@@ -26,7 +26,7 @@ namespace rsl
 
 		[[rythe_always_inline]] constexpr contiguous_container_base()
 			noexcept(is_nothrow_constructible_v<mem_rsc>) = default;
-		virtual ~contiguous_container_base() = default;
+		constexpr virtual ~contiguous_container_base() = default;
 
 		[[rythe_always_inline]] explicit constexpr contiguous_container_base(const allocator_storage_type& allocStorage)
 			noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>);
