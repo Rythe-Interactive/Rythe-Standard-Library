@@ -2,12 +2,17 @@
 
 #include "../util/common.hpp"
 #include "../util/primitives.hpp"
-#include "../util/string_util.hpp"
 #include "iterators.hpp"
 
 namespace rsl
 {
-	template <typename T, contiguous_iterator Iter = T*>
+	namespace internal
+	{
+		template <typename T, contiguous_iterator Iter>
+		using select_const_iter = conditional_t<is_const_v<T>, Iter, conditional_t<same_as<Iter, T*>, const T*, const_iterator<Iter>>>;
+	}
+
+	template <typename T, contiguous_iterator Iter = T*, contiguous_iterator ConstIter = internal::select_const_iter<T, Iter>>
 	struct view
 	{
 	public:
@@ -17,14 +22,16 @@ namespace rsl
 		using reference = T&;
 		using const_reference = add_const_t<T>&;
 		using iterator_type = Iter;
-		using const_iterator_type = const_iterator<Iter>;
+		using const_iterator_type = ConstIter;
 		using reverse_iterator_type = reverse_iterator<iterator_type>;
 		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
 
+		using const_view_type = conditional_t<is_const_v<T>, view, view<const value_type, const_iterator_type>>;
+
 		[[rythe_always_inline]] constexpr view() noexcept;
-		[[rythe_always_inline]] constexpr view(pointer ptr, size_type count);
-		template <typename It>
-		[[rythe_always_inline]] constexpr view(It, It);
+		[[rythe_always_inline]] constexpr view(pointer ptr, size_type count) noexcept;
+		template <contiguous_iterator It>
+		[[rythe_always_inline]] constexpr view(It first, It last) noexcept(iter_noexcept_deref<It> && iter_noexcept_diff<It>) requires same_as<iter_pointer_t<It>, pointer>;
 		template <size_type N>
 		[[rythe_always_inline]] constexpr view(value_type (&)[N]) noexcept;
 		[[rythe_always_inline]] constexpr view(const view&) noexcept;
@@ -34,7 +41,6 @@ namespace rsl
 
 		[[rythe_always_inline]] constexpr static view from_string_length(T* str, T terminator = T{}) noexcept requires char_type<T>;
 
-	public:
 		[[rythe_always_inline]] constexpr view& operator=(const view&) = default;
 
 		[[rythe_always_inline]] constexpr bool operator==(const view&);

@@ -12,10 +12,13 @@ namespace rsl::log
 		warn,
 		error,
 		fatal, // highest severity
+		off,
 		#if defined(RYTHE_DEBUG)
-		default_severity = debug
+		default_severity = debug,
+		default_flush_severity = debug,
 		#else
-		default_severity = info
+		default_severity = info,
+		default_flush_severity = off,
 		#endif
 	};
 
@@ -31,6 +34,7 @@ namespace rsl::log
 				case severity::warn: return spdlog::level::warn;
 				case severity::error: return spdlog::level::err;
 				case severity::fatal: return spdlog::level::critical;
+				case severity::off: return spdlog::level::off;
 			}
 			rsl_assert_unreachable();
 			return spdlog::level::critical;

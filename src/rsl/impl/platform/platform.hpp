@@ -28,6 +28,11 @@ namespace rsl
 		static thread_id get_thread_id(thread thread);
 		static void yield_current_thread();
 		static void sleep_current_thread(uint32 milliseconds);
+
+		static void set_thread_name(thread thread, string_view name);
+		static void set_thread_name(thread_id threadId, string_view name);
+		static string_view get_thread_name(thread thread);
+		static string_view get_thread_name(thread_id threadId);
 	};
 
 #if !defined(RYTHE_DYNAMIC_LIBRARY_HANDLE_IMPL)

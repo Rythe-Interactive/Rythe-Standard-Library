@@ -1,6 +1,5 @@
 #pragma once
 
-#define FMT_EXCEPTIONS 0
 #define FMT_HEADER_ONLY
 #include <spdlog/fmt/fmt.h>
 

@@ -137,6 +137,12 @@ namespace rsl
 	template <internal::pointable T>
 	using iter_pointer_t = decltype(&*declval<T&>());
 
+	template <internal::dereferenceable T>
+	constexpr bool iter_noexcept_deref = noexcept(*declval<T&>());
+
+	template <internal::can_difference T>
+	constexpr bool iter_noexcept_diff = requires(const T& lhs, const T& rhs) { { lhs - rhs } noexcept -> integral_type; };
+
 	namespace internal
 	{
 		template <typename T>

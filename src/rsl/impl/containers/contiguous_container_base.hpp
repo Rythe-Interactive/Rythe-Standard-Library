@@ -7,7 +7,7 @@ namespace rsl
 {
 	template <
 		typename T, allocator_type Alloc = default_allocator, factory_type Factory = default_factory<T>,
-		contiguous_iterator Iter = T*, contiguous_iterator ConstIter = const T*>
+		contiguous_iterator Iter = T*, contiguous_iterator ConstIter = const_iterator<Iter>>
 	class contiguous_container_base : public internal::select_memory_resource<T, Alloc, Factory>::type
 	{
 	public:
@@ -17,8 +17,8 @@ namespace rsl
 		using const_iterator_type = ConstIter;
 		using reverse_iterator_type = reverse_iterator<iterator_type>;
 		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
-		using view_type = rsl::view<value_type>;
-		using const_view_type = view<const value_type>;
+		using view_type = rsl::view<value_type, iterator_type, const_iterator_type>;
+		using const_view_type = rsl::view<const value_type, const_iterator_type>;
 		using allocator_storage_type = typename mem_rsc::allocator_storage_type;
 		using allocator_t = typename mem_rsc::allocator_t;
 		using factory_storage_type = typename mem_rsc::factory_storage_type;

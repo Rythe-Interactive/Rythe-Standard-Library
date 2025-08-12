@@ -28,4 +28,16 @@ namespace rsl::log
 	public:
 		void format(const message& msg, const time::point32 time, fmt::memory_buffer& dest) override;
 	};
+
+	class logger_name_formatter : public flag_formatter
+	{
+	public:
+		void format(const message& msg, const time::point32 time, fmt::memory_buffer& dest) override;
+	};
+
+	class thread_name_formatter_flag : public flag_formatter
+	{
+	public:
+		void format(const message& msg, const time::point32 time, fmt::memory_buffer& dest) override;
+	};
 } // namespace rsl

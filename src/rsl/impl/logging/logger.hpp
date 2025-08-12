@@ -1,13 +1,15 @@
 #pragma once
 
 #include "../util/source_location.hpp"
-#include "../memory/unique_object.hpp"
 #include "../containers/string.hpp"
 
 #include "severity.hpp"
 
-namespace rsl
+namespace rsl::log
 {
+	class sink;
+	struct message;
+
 	struct format_string
 	{
 		[[rythe_always_inline]] constexpr format_string(
@@ -19,26 +21,48 @@ namespace rsl
 		source_location srcLoc;
 	};
 
-	class logger
+	class basic_logger
 	{
 	public:
-		explicit logger(string_view name) : m_name(dynamic_string::from_view(name)) {}
+		explicit basic_logger(string_view name, log::severity severity = log::severity::default_severity,
+		                      log::severity flushSeverity = log::severity::default_flush_severity);
+
+		virtual ~basic_logger() = default;
 
 		template <typename... Args>
 		[[rythe_always_inline]] constexpr void log(log::severity s, format_string format, Args&&... args) noexcept;
 
 		void log(log::severity s, format_string format, fmt::format_args args) noexcept;
 
-	private:
-		dynamic_string m_name;
+		void flush();
 
-		struct impl;
-		unique_object<impl> m_impl;
+		[[rythe_always_inline]] void set_sinks(view<sink*> sinks);
+		[[nodiscard]] [[rythe_always_inline]] view<sink* const> view_sinks() const noexcept;
+
+		[[rythe_always_inline]] void filter(severity s) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] severity filter_severity() const noexcept;
+
+		[[rythe_always_inline]] void flush_at(severity s) noexcept;
+		[[nodiscard]] [[rythe_always_inline]] severity flush_severity() const noexcept;
+	protected:
+		virtual void log(const log::message& message) = 0;
+
+		dynamic_string m_name;
+		log::severity m_severity;
+		log::severity m_flushSeverity;
+		dynamic_array<sink*> m_sinks;
 	};
 
-	template <typename... Args>
-	constexpr void logger::log(const log::severity s, format_string format, Args&&... args) noexcept
+	class synchronous_logger final : public basic_logger
 	{
-		log(s, format, fmt::make_format_args(rsl::forward<Args>(args)...));
-	}
-} // namespace rsl
+	public:
+		using basic_logger::basic_logger;
+
+	protected:
+		void log(const log::message& message) override;
+	};
+
+	using logger = synchronous_logger;
+} // namespace rsl::log
+
+#include "logger.inl"

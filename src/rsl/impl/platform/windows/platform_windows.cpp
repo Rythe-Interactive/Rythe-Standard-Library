@@ -21,12 +21,21 @@
 #define RYTHE_THREAD_HANDLE_IMPL HANDLE
 
 #include "containers/string.hpp"
+#include "threading/current_thread.inl"
 #include "threading/thread.hpp"
 
 namespace rsl
 {
 	namespace
 	{
+		struct native_thread_name
+		{
+			dynamic_wstring wideName;
+			dynamic_string name;
+		};
+
+		dynamic_map<thread_id, native_thread_name> thread_names;
+
 		struct native_thread_context
 		{
 			pmu_allocator* allocator;
@@ -40,9 +49,7 @@ namespace rsl
 			native_thread_context& context = *static_cast<native_thread_context*>(args);
 			pmu_allocator* allocator = context.allocator;
 
-			dynamic_wstring wideName = to_utf16(context.name);
-			[[maybe_unused]] HRESULT _ = ::SetThreadDescription(::GetCurrentThread(), wideName.data());
-			// TODO: move into platform function
+			current_thread::set_name(context.name);
 
 			const uint32 result = context.function(context.userData);
 
@@ -153,6 +160,32 @@ namespace rsl
 	void platform::sleep_current_thread(const uint32 milliseconds)
 	{
 		::Sleep(milliseconds);
+	}
+
+	void platform::set_thread_name(const thread thread, const string_view name)
+	{
+		set_thread_name(thread.get_id(), name);
+	}
+
+	void platform::set_thread_name(const thread_id threadId, const string_view name)
+	{
+		dynamic_wstring& wideName = thread_names.emplace_or_replace(threadId, native_thread_name{ .wideName = to_utf16(name), .name = dynamic_string::from_view(name) }).wideName;
+		[[maybe_unused]] HRESULT _ = ::SetThreadDescription(::GetCurrentThread(), wideName.data());
+	}
+
+	string_view platform::get_thread_name(const thread thread)
+	{
+		return get_thread_name(thread.get_id());
+	}
+
+	string_view platform::get_thread_name(const thread_id threadId)
+	{
+		if (native_thread_name* result = thread_names.find(threadId))
+		{
+			return result->name;
+		}
+
+		return thread_names.emplace(threadId, to_string(threadId.nativeId)).name;
 	}
 } // namespace rsl
 

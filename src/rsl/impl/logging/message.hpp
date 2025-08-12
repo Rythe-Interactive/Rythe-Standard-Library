@@ -2,6 +2,7 @@
 
 #include "../time/time_point.hpp"
 #include "../threading/thread_id.hpp"
+#include "../util/source_location.hpp"
 
 #include "severity.hpp"
 
@@ -13,6 +14,7 @@ namespace rsl::log
 		thread_id threadId;
 
 		time::point32 timestamp;
+		source_location sourceLocation;
 		log::severity severity;
 		string_view msg;
 		fmt::format_args formatArgs;
