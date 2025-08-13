@@ -69,6 +69,9 @@ namespace rsl
 		using reverse_iterator_type = hash_map_iterator<hash_map_base, typename value_container::reverse_iterator_type>;
 		using const_reverse_iterator_type = hash_map_iterator<hash_map_base, typename value_container::const_reverse_iterator_type>;
 
+		using view_type = iterator_view<value_type, iterator_type, const_iterator_type>;
+		using const_view_type = typename view_type::const_view_type;
+
 		[[rythe_always_inline]] constexpr hash_map_base() noexcept(MapInfo::nothrow_constructible);
 
 		[[rythe_always_inline]] constexpr hash_map_base(const hasher_type& h, const key_comparer_type& equal)
@@ -95,22 +98,25 @@ namespace rsl
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool empty() const noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr size_type capacity() const noexcept;
 
+		[[nodiscard]] [[rythe_always_inline]] constexpr const_view_type view() const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] constexpr view_type view() noexcept;
+
 		void reserve(size_type newCapacity)
 			noexcept(noexcept(declval<bucket_container>().reserve(0)) && noexcept(declval<value_container>().reserve(0))
 			);
 
 		void clear() noexcept;
 
-		bool contains(const key_type& key) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] bool contains(const key_type& key) const noexcept;
 
-		const mapped_type* find(const key_type& key) const noexcept
+		[[nodiscard]] [[rythe_always_inline]] const mapped_type* find(const key_type& key) const noexcept
 			requires (MapInfo::is_map);
-		mapped_type* find(const key_type& key) noexcept
+		[[nodiscard]] [[rythe_always_inline]] mapped_type* find(const key_type& key) noexcept
 		requires (MapInfo::is_map);
 
-		const mapped_type& at(const key_type& key) const
+		[[nodiscard]] [[rythe_always_inline]] const mapped_type& at(const key_type& key) const
 			requires (MapInfo::is_map);
-		mapped_type& at(const key_type& key)
+		[[nodiscard]] [[rythe_always_inline]] mapped_type& at(const key_type& key)
 			requires (MapInfo::is_map);
 
 		template <typename... Args>

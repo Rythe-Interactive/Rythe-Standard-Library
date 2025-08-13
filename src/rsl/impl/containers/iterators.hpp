@@ -182,11 +182,14 @@ namespace rsl
 	};
 
 	template <typename It>
-	concept input_or_output_iterator = internal::dereferenceable<It> && internal::pointable<It> && weakly_incrementable<It>;
+	concept weak_input_or_output_iterator = internal::dereferenceable<It> && internal::pointable<It> && weakly_incrementable<It>;
+
+	template <typename It, typename T>
+	concept input_or_output_iterator = internal::dereferenceable<It> && internal::pointable<It> && weakly_incrementable<It> && (indirectly_readable<It> || indirectly_writable<It, T>);
 
 	template <typename Se, typename It>
 	concept sentinel_for =
-		semiregular<Se> && input_or_output_iterator<It> && internal::weakly_equality_comparable_with<Se, It>;
+		semiregular<Se> && weak_input_or_output_iterator<It> && internal::weakly_equality_comparable_with<Se, It>;
 
 	template <typename Se, typename It>
 	constexpr bool disable_sized_sentinel_for = false;
@@ -201,10 +204,10 @@ namespace rsl
 		};
 
 	template <typename It>
-	concept input_iterator = input_or_output_iterator<It> && indirectly_readable<It>;
+	concept input_iterator = weak_input_or_output_iterator<It> && indirectly_readable<It>;
 
 	template <typename It, typename T>
-	concept output_iterator = input_or_output_iterator<It> && indirectly_writable<It, T> &&
+	concept output_iterator = weak_input_or_output_iterator<It> && indirectly_writable<It, T> &&
 	                          requires(It iter, T&& val) { *iter++ = static_cast<T&&>(val); };
 
 	template <typename It>
@@ -244,9 +247,9 @@ namespace rsl
 		template <forward_iterator It>
 		struct iterator_diff_impl<It>
 		{
-			[[nodiscard]] [[rythe_always_inline]] constexpr size_type operator()(It first, It last) const noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr iter_difference_t<It> operator()(It first, It last) const noexcept
 			{
-				size_type diff = 0;
+				iter_difference_t<It> diff = 0;
 				while (first != last)
 				{
 					++first;
@@ -261,7 +264,7 @@ namespace rsl
 			requires sized_sentinel_for<It, It>
 		struct iterator_diff_impl<It>
 		{
-			[[nodiscard]] [[rythe_always_inline]] constexpr size_type operator()(It first, It last) const noexcept
+			[[nodiscard]] [[rythe_always_inline]] constexpr iter_difference_t<It> operator()(It first, It last) const noexcept
 			{
 				return last - first;
 			}
@@ -269,7 +272,7 @@ namespace rsl
 	} // namespace internal
 
 	template <typename It>
-	[[nodiscard]] [[rythe_always_inline]] constexpr size_type iterator_diff(It first, It last) noexcept
+	[[nodiscard]] [[rythe_always_inline]] constexpr iter_difference_t<It> iterator_diff(It first, It last) noexcept
 	{
 		return internal::iterator_diff_impl<It>{}(first, last);
 	}

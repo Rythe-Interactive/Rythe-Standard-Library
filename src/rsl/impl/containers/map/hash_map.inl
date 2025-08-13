@@ -122,6 +122,18 @@ namespace rsl
 	}
 
 	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::const_view_type hash_map_base<MapInfo>::view() const noexcept
+	{
+		return const_view_type(begin(), end());
+	}
+
+	template <typename MapInfo>
+	constexpr typename hash_map_base<MapInfo>::view_type hash_map_base<MapInfo>::view() noexcept
+	{
+		return view_type(begin(), end());
+	}
+
+	template <typename MapInfo>
 	constexpr void hash_map_base<MapInfo>::erase(const key_type& key) noexcept
 	{
 		if (empty())

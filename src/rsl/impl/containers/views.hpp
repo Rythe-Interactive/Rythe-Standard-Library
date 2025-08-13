@@ -28,14 +28,14 @@ namespace rsl
 
 		using const_view_type = conditional_t<is_const_v<T>, view, view<const value_type, const_iterator_type>>;
 
-		[[rythe_always_inline]] constexpr view() noexcept;
+		[[rythe_always_inline]] constexpr view() noexcept = default;
 		[[rythe_always_inline]] constexpr view(pointer ptr, size_type count) noexcept;
 		template <contiguous_iterator It>
 		[[rythe_always_inline]] constexpr view(It first, It last) noexcept(iter_noexcept_deref<It> && iter_noexcept_diff<It>) requires same_as<iter_pointer_t<It>, pointer>;
 		template <size_type N>
-		[[rythe_always_inline]] constexpr view(value_type (&)[N]) noexcept;
-		[[rythe_always_inline]] constexpr view(const view&) noexcept;
-		[[rythe_always_inline]] constexpr view(value_type&&) noexcept;
+		[[rythe_always_inline]] constexpr view(value_type (&arr)[N]) noexcept;
+		[[rythe_always_inline]] constexpr view(const view& other) noexcept;
+		[[rythe_always_inline]] constexpr view(value_type& src) noexcept;
 
 		[[rythe_always_inline]] constexpr operator view<const value_type, const_iterator_type>() noexcept requires (!is_const_v<value_type>);
 
@@ -43,12 +43,12 @@ namespace rsl
 
 		[[rythe_always_inline]] constexpr view& operator=(const view&) = default;
 
-		[[rythe_always_inline]] constexpr bool operator==(const view&);
-		[[rythe_always_inline]] constexpr bool operator!=(const view&);
+		[[rythe_always_inline]] constexpr bool operator==(const view& rhs);
+		[[rythe_always_inline]] constexpr bool operator!=(const view& rhs);
 		template <size_type N>
-		[[rythe_always_inline]] constexpr bool operator==(const value_type (&)[N]);
+		[[rythe_always_inline]] constexpr bool operator==(const value_type (&rhs)[N]);
 		template <size_type N>
-		[[rythe_always_inline]] constexpr bool operator!=(const value_type (&)[N]);
+		[[rythe_always_inline]] constexpr bool operator!=(const value_type (&rhs)[N]);
 
 		[[rythe_always_inline]] constexpr iterator_type begin() noexcept;
 		[[rythe_always_inline]] constexpr const_iterator_type begin() const noexcept;
@@ -138,6 +138,66 @@ namespace rsl
 	template <typename T, contiguous_iterator Iter, same_as<T> C>
 	constexpr size_type find_last_not_of(view<const T, Iter> str, const C& key,
 	                                     [[maybe_unused]] size_type pos = 0) noexcept;
+
+	template <typename T, input_or_output_iterator<T> Iter = T*, input_or_output_iterator<T> ConstIter = internal::select_const_iter<T, Iter>>
+	struct iterator_view
+	{
+	public:
+		using value_type = T;
+		using pointer = T*;
+		using const_pointer = add_const_t<T>*;
+		using reference = T&;
+		using const_reference = add_const_t<T>&;
+		using iterator_type = Iter;
+		using const_iterator_type = ConstIter;
+		using reverse_iterator_type = reverse_iterator<iterator_type>;
+		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
+
+		using const_view_type = conditional_t<is_const_v<T>, iterator_view, iterator_view<const value_type, const_iterator_type>>;
+
+		[[rythe_always_inline]] constexpr iterator_view() noexcept = default;
+		[[rythe_always_inline]] constexpr iterator_view(iterator_type start, iterator_type end) noexcept;
+		[[rythe_always_inline]] constexpr iterator_view(pointer ptr, size_type count) noexcept requires same_as<iterator_type, pointer>;
+		template <size_type N>
+		[[rythe_always_inline]] constexpr iterator_view(value_type (&arr)[N]) noexcept requires same_as<iterator_type, pointer>;
+		[[rythe_always_inline]] constexpr iterator_view(const value_type& other) noexcept requires same_as<iterator_type, pointer>;
+
+		[[rythe_always_inline]] constexpr operator iterator_view<const value_type, const_iterator_type>() noexcept requires (!is_const_v<value_type>);
+		[[rythe_always_inline]] constexpr operator view<value_type, iterator_type, const_iterator_type>() noexcept requires (contiguous_iterator<Iter> && contiguous_iterator<ConstIter>);
+
+		[[rythe_always_inline]] constexpr static iterator_view from_string_length(T* str, T terminator = T{}) noexcept requires (char_type<T> && same_as<iterator_type, pointer>);
+
+		[[rythe_always_inline]] constexpr iterator_view& operator=(const iterator_view&) = default;
+
+		[[rythe_always_inline]] constexpr bool operator==(const iterator_view& rhs);
+		[[rythe_always_inline]] constexpr bool operator!=(const iterator_view& rhs);
+
+		[[rythe_always_inline]] constexpr iterator_type begin() noexcept;
+		[[rythe_always_inline]] constexpr const_iterator_type begin() const noexcept;
+		[[rythe_always_inline]] constexpr const_iterator_type cbegin() const noexcept;
+		[[rythe_always_inline]] constexpr iterator_type end() noexcept;
+		[[rythe_always_inline]] constexpr const_iterator_type end() const noexcept;
+		[[rythe_always_inline]] constexpr const_iterator_type cend() const noexcept;
+
+		[[rythe_always_inline]] constexpr reverse_iterator_type rbegin() noexcept;
+		[[rythe_always_inline]] constexpr const_reverse_iterator_type rbegin() const noexcept;
+		[[rythe_always_inline]] constexpr const_reverse_iterator_type crbegin() const noexcept;
+		[[rythe_always_inline]] constexpr reverse_iterator_type rend() noexcept;
+		[[rythe_always_inline]] constexpr const_reverse_iterator_type rend() const noexcept;
+		[[rythe_always_inline]] constexpr const_reverse_iterator_type crend() const noexcept;
+
+		[[rythe_always_inline]] constexpr reference front();
+		[[rythe_always_inline]] constexpr reference front() const;
+		[[rythe_always_inline]] constexpr reference back();
+		[[rythe_always_inline]] constexpr reference back() const;
+
+		[[rythe_always_inline]] constexpr size_type size() const noexcept;
+		[[rythe_always_inline]] constexpr bool empty() const noexcept;
+
+	private:
+		iterator_type m_start;
+		iterator_type m_end;
+	};
 }
 
 #include "views.inl"
