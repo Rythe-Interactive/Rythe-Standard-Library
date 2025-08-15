@@ -442,7 +442,7 @@ namespace rsl
 
 #define NO_DTOR_RULE5_CONSTEXPR_NOEXCEPT(type)                                                                         \
 	constexpr type() noexcept = default;                                                                               \
-	constexpr type(const type&) noexcept = default;                                                                    \
+	constexpr type(const type&) noexcept = default;																	   \
 	constexpr type(type&&) noexcept = default;                                                                         \
 	constexpr type& operator=(const type&) noexcept = default;                                                         \
 	constexpr type& operator=(type&&) noexcept = default;

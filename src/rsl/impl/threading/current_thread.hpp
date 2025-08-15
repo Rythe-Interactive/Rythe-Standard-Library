@@ -3,6 +3,7 @@
 #include "../time/stopwatch.hpp"
 
 #include "thread_id.hpp"
+#include "../platform/platform.hpp"
 
 namespace rsl::current_thread
 {

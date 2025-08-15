@@ -51,10 +51,7 @@ namespace rsl::log
 
 		for (auto* sink : m_sinks)
 		{
-			if (sink->should_log(message.severity))
-			{
-				sink->log(message);
-			}
+			sink->log(message);
 		}
 
 		if (message.severity >= m_flushSeverity)

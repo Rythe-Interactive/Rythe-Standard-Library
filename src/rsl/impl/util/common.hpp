@@ -908,7 +908,15 @@ namespace rsl
 			}
 			else
 			{
-				internal::constexpr_memcpy_impl(dst, src, count);
+				if constexpr (sizeof(To) >= sizeof(From))
+				{
+					internal::constexpr_memcpy_impl(dst, src, count);
+				}
+				else
+				{
+					internal::constexpr_memcpy_impl_unrestricted(dst, src, count);
+				}
+
 				return dst;
 			}
 		}

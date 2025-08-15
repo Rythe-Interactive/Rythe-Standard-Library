@@ -185,7 +185,11 @@ namespace rsl
 			return result->name;
 		}
 
-		return thread_names.emplace(threadId, to_string(threadId.nativeId)).name;
+		native_thread_name nativeThreadName;
+		nativeThreadName.name = to_string(threadId.nativeId);
+		nativeThreadName.wideName = to_utf16(nativeThreadName.name);
+
+		return thread_names.emplace(threadId, rsl::move(nativeThreadName) ).name;
 	}
 } // namespace rsl
 

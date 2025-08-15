@@ -8,7 +8,7 @@ namespace rsl
 {
 	namespace internal
 	{
-		template <typename T, contiguous_iterator Iter>
+		template <typename T, typename Iter>
 		using select_const_iter = conditional_t<is_const_v<T>, Iter, conditional_t<same_as<Iter, T*>, const T*, const_iterator<Iter>>>;
 	}
 
@@ -139,6 +139,25 @@ namespace rsl
 	constexpr size_type find_last_not_of(view<const T, Iter> str, const C& key,
 	                                     [[maybe_unused]] size_type pos = 0) noexcept;
 
+	namespace internal
+	{
+		template<typename T, input_or_output_iterator<T> Iter, input_or_output_iterator<T> ConstIter>
+		struct select_contiguous_view_impl
+		{
+			using contiguous_view = void;
+		};
+
+
+		template<typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+		struct select_contiguous_view_impl<T, Iter, ConstIter>
+		{
+			using contiguous_view = view<T, Iter, ConstIter>;
+		};
+
+		template<typename T, input_or_output_iterator<T> Iter, input_or_output_iterator<T> ConstIter>
+		using select_contiguous_view = typename select_contiguous_view_impl<T, Iter, ConstIter>::contiguous_view;
+	}
+
 	template <typename T, input_or_output_iterator<T> Iter = T*, input_or_output_iterator<T> ConstIter = internal::select_const_iter<T, Iter>>
 	struct iterator_view
 	{
@@ -154,6 +173,7 @@ namespace rsl
 		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
 
 		using const_view_type = conditional_t<is_const_v<T>, iterator_view, iterator_view<const value_type, const_iterator_type>>;
+		using contiguous_view_type = internal::select_contiguous_view<T, iterator_type, const_iterator_type>;
 
 		[[rythe_always_inline]] constexpr iterator_view() noexcept = default;
 		[[rythe_always_inline]] constexpr iterator_view(iterator_type start, iterator_type end) noexcept;
@@ -163,7 +183,7 @@ namespace rsl
 		[[rythe_always_inline]] constexpr iterator_view(const value_type& other) noexcept requires same_as<iterator_type, pointer>;
 
 		[[rythe_always_inline]] constexpr operator iterator_view<const value_type, const_iterator_type>() noexcept requires (!is_const_v<value_type>);
-		[[rythe_always_inline]] constexpr operator view<value_type, iterator_type, const_iterator_type>() noexcept requires (contiguous_iterator<Iter> && contiguous_iterator<ConstIter>);
+		[[rythe_always_inline]] constexpr operator contiguous_view_type() noexcept requires (contiguous_iterator<iterator_type> && contiguous_iterator<const_iterator_type>);
 
 		[[rythe_always_inline]] constexpr static iterator_view from_string_length(T* str, T terminator = T{}) noexcept requires (char_type<T> && same_as<iterator_type, pointer>);
 

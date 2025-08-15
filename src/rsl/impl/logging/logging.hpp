@@ -30,16 +30,16 @@ namespace rsl
 
 
 	[[rythe_always_inline]] static void
-	initLogger(logger_ptr& logger, [[maybe_unused]] std::string_view loggerName = "")
+	initLogger([[maybe_unused]] logger_ptr& logger, [[maybe_unused]] std::string_view loggerName = "")
 	{
-		auto f = std::make_unique<spdlog::pattern_formatter>();
-
-		f->add_flag<thread_name_formatter_flag>('f');
-		f->add_flag<genesis_formatter_flag>('*');
-
-		f->set_pattern("T+ %* [%^%=7l%$] [%=13!f] : %v");
-
-		logger->set_formatter(std::move(f));
+		// auto f = std::make_unique<spdlog::pattern_formatter>();
+		//
+		// f->add_flag<log::thread_name_formatter_flag>('f');
+		// f->add_flag<log::genesis_formatter_flag>('*');
+		//
+		// f->set_pattern("T+ %* [%^%=7l%$] [%=13!f] : %v");
+		//
+		// logger->set_formatter(std::move(f));
 	}
 
 	[[maybe_unused]] [[rythe_always_inline]] static void setDefaultLogger(const logger_ptr& newLogger)
@@ -57,17 +57,17 @@ namespace rsl
 		 *         https://fmt.dev/latest/syntax.html
 		 */
 		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void println(severity s, const FormatString& format, Args&&... a)
+		[[rythe_always_inline]] void println([[maybe_unused]] severity s, [[maybe_unused]] const FormatString& format, [[maybe_unused]] Args&&... a)
 		{
-			logging_context::get().logger->log(rythe2spdlog(s), format, std::forward<Args>(a)...);
+			//logging_context::get().logger->log(internal::rythe_to_spdlog(s), format, std::forward<Args>(a)...);
 		}
 
 		/** @brief same as println but uses the undecorated logger */
 		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void undecoratedln(severity s, const FormatString& format, Args&&... a)
+		[[rythe_always_inline]] void undecoratedln([[maybe_unused]] severity s, [[maybe_unused]] const FormatString& format, [[maybe_unused]] Args&&... a)
 		{
 			// I need to get back to this
-			logging_context::get().undecoratedLogger->log(rythe2spdlog(s), format, std::forward<Args>(a)...);
+			//logging_context::get().undecoratedLogger->log(internal::rythe_to_spdlog(s), format, std::forward<Args>(a)...);
 		}
 
 		/** @brief prints a log line, using the specified `severity`
@@ -76,8 +76,8 @@ namespace rsl
 		[[rythe_always_inline]] static void filter(const severity level)
 		{
 			auto& inst = logging_context::get();
-			inst.logger->set_level(rythe2spdlog(level));
-			inst.undecoratedLogger->set_level(rythe2spdlog(level));
+			inst.logger->set_level(internal::rythe_to_spdlog(level));
+			inst.undecoratedLogger->set_level(internal::rythe_to_spdlog(level));
 		}
 
 		/** @brief same as println but with severity = trace */

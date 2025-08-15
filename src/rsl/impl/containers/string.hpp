@@ -15,7 +15,10 @@ namespace rsl
 		using value_type = typename base::value_type;
 		using view_type = typename base::view_type;
 		using const_view_type = typename base::const_view_type;
-
+		
+		[[rythe_always_inline]] constexpr basic_dynamic_string()
+					noexcept(is_nothrow_constructible_v<container_base>) = default;
+		
 		using dynamic_array<CharType, Alloc, default_factory<CharType>, true>::dynamic_array;
 		using dynamic_array<CharType, Alloc, default_factory<CharType>, true>::operator=;
 

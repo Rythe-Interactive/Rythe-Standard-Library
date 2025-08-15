@@ -111,6 +111,12 @@ namespace rsl
 
 		factory_storage_type m_factory;
 	};
+
+	// TODO(Glyn): Create `temporary_object` that when moved from will invalidate itself.
+	// Effectively the same as `unique_object&&` but with clearer ownership transfer.
+	// Crucially allows for `view<temporary_object>` to be used to move `unique_object`s into containers.
+	template <typename T, allocator_type Alloc = default_allocator, statically_optional_typed_factory_type Factory = default_factory<T>>
+	using temporary_object = unique_object<T, Alloc, Factory>;
 }
 
 #include "unique_object.inl"

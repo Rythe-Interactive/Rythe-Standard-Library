@@ -353,6 +353,41 @@ namespace rsl
 		return find_first_of(str, view(&key, 1), pos);
 	}
 
+	template <typename T, contiguous_iterator Iter>
+	constexpr size_type find_first_of([[maybe_unused]] view<const T, Iter> str, [[maybe_unused]] view<const T, Iter> key, [[maybe_unused]] size_type pos) noexcept
+	{
+		rsl_assert_unimplemented();
+		return 0;
+	}
+
+	template <typename T, contiguous_iterator Iter>
+	constexpr size_type find_first_not_of([[maybe_unused]] view<const T, Iter> str, [[maybe_unused]] view<const T, Iter> key, [[maybe_unused]] size_type pos) noexcept
+	{
+		rsl_assert_unimplemented();
+		return 0;
+	}
+
+	template <typename T, contiguous_iterator Iter>
+	constexpr size_type find_last_of([[maybe_unused]] view<const T, Iter> str, [[maybe_unused]] view<const T, Iter> key, [[maybe_unused]] size_type pos) noexcept
+	{
+		rsl_assert_unimplemented();
+		return 0;
+	}
+
+	template <typename T, contiguous_iterator Iter>
+	constexpr size_type find_last_not_of([[maybe_unused]] view<const T, Iter> str, [[maybe_unused]] view<const T, Iter> key, [[maybe_unused]] size_type pos) noexcept
+	{
+		rsl_assert_unimplemented();
+		return 0;
+	}
+
+	template <typename T, contiguous_iterator Iter>
+	constexpr size_type find_first_of([[maybe_unused]] view<const T, Iter> str, [[maybe_unused]] const T& key, [[maybe_unused]] size_type pos) noexcept
+	{
+		rsl_assert_unimplemented();
+		return 0;
+	}
+
 	template <typename T, contiguous_iterator Iter, same_as<T> C>
 	constexpr size_type find_first_not_of(view<const T, Iter> str, const C& key, size_type pos) noexcept
 	{
@@ -399,10 +434,17 @@ namespace rsl
 	}
 
 	template <typename T, input_or_output_iterator<T> Iter, input_or_output_iterator<T> ConstIter>
-	constexpr iterator_view<T, Iter, ConstIter>::operator view<T, Iter, ConstIter>() noexcept
+	constexpr iterator_view<T, Iter, ConstIter>::operator contiguous_view_type() noexcept
 		requires (contiguous_iterator<Iter> && contiguous_iterator<ConstIter>)
 	{
-		return view<T, Iter, ConstIter>(&*m_start, size());
+		if constexpr (!is_void_v<contiguous_view_type>)
+		{
+			return contiguous_view_type(&*m_start, size());
+		}
+		else
+		{
+			return contiguous_view_type();
+		}
 	}
 
 	template <typename T, input_or_output_iterator<T> Iter, input_or_output_iterator<T> ConstIter>

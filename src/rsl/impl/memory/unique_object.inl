@@ -30,7 +30,7 @@ namespace rsl
 		noexcept(is_nothrow_constructible_v<mem_rsc> && is_nothrow_constructible_v<T, Args...>)
 	{
 		unique_object ret;
-		ret.arm(forward<Args>(args)...);
+		ret.arm(rsl::forward<Args>(args)...);
 		return ret;
 	}
 
