@@ -27,13 +27,13 @@ namespace rsl
 
 	template <typename T, allocator_type Alloc = default_allocator, typed_factory_type Factory = default_factory<T>>
 	class unique_resource : public internal::select_memory_resource<
-			internal::unique_payload_base, Alloc, type_erased_factory>::type
+			internal::unique_payload_base, Alloc, type_erased_factory, 0ull, true>::type
 	{
 	public:
 		constexpr static bool untyped_memory_resource =
-			internal::select_memory_resource<internal::unique_payload_base, Alloc, type_erased_factory>::is_untyped;
+			internal::select_memory_resource<internal::unique_payload_base, Alloc, type_erased_factory, 0ull, true>::is_untyped;
 		using mem_rsc = typename internal::select_memory_resource<
-			internal::unique_payload_base, Alloc, type_erased_factory>::type;
+			internal::unique_payload_base, Alloc, type_erased_factory, 0ull, true>::type;
 		using allocator_storage_type = typename mem_rsc::allocator_storage_type;
 		using allocator_t = typename mem_rsc::allocator_t;
 		using factory_storage_type = factory_storage<Factory>;

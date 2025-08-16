@@ -6,33 +6,24 @@
 
 namespace rsl
 {
-    template <bool UsePostFix, size_type StaticCapacity, bool CanReallocate, bool CanResize>
+    template <bool UsePostFix, size_type StaticCapacity, bool CanAllocate, bool CanResize>
     struct contiguous_container_info
     {
-        static_assert(!CanReallocate || (CanReallocate && CanResize), "Reallocation without resizing is not possible");
+        static_assert(!CanAllocate || (CanAllocate && CanResize), "Allocation without resizing is not possible");
         constexpr static bool use_post_fix = UsePostFix;
         constexpr static size_type static_capacity = StaticCapacity;
-        constexpr static bool can_reallocate = CanReallocate;
+        constexpr static bool can_allocate = CanAllocate;
         constexpr static bool can_resize = CanResize;
     };
-
-    template <typename T, size_type Capacity>
-    struct static_capacity_storage
-    {
-        T data[Capacity];
-    };
-
-    template <typename T>
-    struct static_capacity_storage<T, 0ull> {};
 
     // TODO(Glyn): No need for an allocator to be stored in the object if can_reallocate is false.
     // TODO(Glyn): The static capacity array and the dynamic allocation pointer can share the same address
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    class contiguous_container_base : public internal::select_memory_resource<T, Alloc, Factory>::type
+    class contiguous_container_base : public internal::select_memory_resource<T, Alloc, Factory, ContiguousContainerInfo::static_capacity, ContiguousContainerInfo::can_allocate>::type
     {
     public:
-        using mem_rsc = typename internal::select_memory_resource<T, Alloc, Factory>::type;
+        using mem_rsc = internal::select_memory_resource<T, Alloc, Factory, ContiguousContainerInfo::static_capacity, ContiguousContainerInfo::can_allocate>::type;
         using value_type = T;
         using iterator_type = Iter;
         using const_iterator_type = ConstIter;
@@ -40,14 +31,14 @@ namespace rsl
         using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
         using view_type = rsl::view<value_type, iterator_type, const_iterator_type>;
         using const_view_type = rsl::view<const value_type, const_iterator_type>;
-        using allocator_storage_type = typename mem_rsc::allocator_storage_type;
-        using allocator_t = typename mem_rsc::allocator_t;
-        using factory_storage_type = typename mem_rsc::factory_storage_type;
-        using factory_t = typename mem_rsc::factory_t;
+        using allocator_storage_type = mem_rsc::allocator_storage_type;
+        using allocator_t = mem_rsc::allocator_t;
+        using factory_storage_type = mem_rsc::factory_storage_type;
+        using factory_t = mem_rsc::factory_t;
 
         constexpr static bool use_post_fix = ContiguousContainerInfo::use_post_fix;
         constexpr static size_type static_capacity = ContiguousContainerInfo::static_capacity;
-        constexpr static bool can_reallocate = ContiguousContainerInfo::can_reallocate;
+        constexpr static bool can_reallocate = ContiguousContainerInfo::can_allocate;
         constexpr static bool can_resize = ContiguousContainerInfo::can_resize;
 
     protected:
@@ -375,7 +366,7 @@ namespace rsl
         [[rythe_always_inline]] constexpr void copy_assign_impl(
                 const value_type* src,
                 size_type srcSize,
-                typename mem_rsc::typed_alloc_type* alloc = nullptr
+                mem_rsc::typed_alloc_type* alloc = nullptr
                 )
             noexcept(copy_assign_noexcept && copy_construct_noexcept);
 

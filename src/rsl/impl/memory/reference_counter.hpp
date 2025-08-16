@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../util/primitives.hpp"
-#include "../util/assert.hpp"
 #include "memory_resource_base.hpp"
 
 namespace rsl
@@ -48,16 +47,16 @@ namespace rsl
 	template <
 		reference_counted Counter = manual_reference_counter, allocator_type Alloc = default_allocator,
 		factory_type Factory = default_factory<Counter>>
-	class basic_reference_counter : public internal::select_memory_resource<Counter, Alloc, Factory>::type
+	class basic_reference_counter : public internal::select_memory_resource<Counter, Alloc, Factory, 0ull, true>::type
 	{
 	protected:
 		constexpr static bool untyped_memory_resource =
-			internal::select_memory_resource<Counter, Alloc, Factory>::is_untyped;
-		using mem_rsc = typename internal::select_memory_resource<Counter, Alloc, Factory>::type;
-		using allocator_storage_type = typename mem_rsc::allocator_storage_type;
-		using allocator_t = typename mem_rsc::allocator_t;
-		using factory_storage_type = typename mem_rsc::factory_storage_type;
-		using factory_t = typename mem_rsc::factory_t;
+			internal::select_memory_resource<Counter, Alloc, Factory, 0ull, true>::is_untyped;
+		using mem_rsc = internal::select_memory_resource<Counter, Alloc, Factory, 0ull, true>::type;
+		using allocator_storage_type = mem_rsc::allocator_storage_type;
+		using allocator_t = mem_rsc::allocator_t;
+		using factory_storage_type = mem_rsc::factory_storage_type;
+		using factory_t = mem_rsc::factory_t;
 
 	public:
 		[[rythe_always_inline]] constexpr basic_reference_counter()
