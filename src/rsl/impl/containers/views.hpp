@@ -81,6 +81,9 @@ namespace rsl
 
 		[[rythe_always_inline]] constexpr view subview(size_type, size_type) const;
 
+		[[rythe_always_inline]] constexpr void set_data(pointer data, size_type count) noexcept;
+		[[rythe_always_inline]] constexpr void reset() noexcept;
+
 	private:
 		pointer m_src = nullptr;
 		size_type m_count = 0; //the length of our view relative to m_position

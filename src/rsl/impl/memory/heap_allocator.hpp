@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../util/common.hpp"
 #include "../util/primitives.hpp"
 
 namespace rsl

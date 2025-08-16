@@ -252,6 +252,20 @@ namespace rsl
 		return view<T, Iter, ConstIter>(m_src + pos, n);
 	}
 
+	template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr void view<T, Iter, ConstIter>::set_data(const pointer data, const size_type count) noexcept
+	{
+		m_src = count == 0ull ? nullptr : data;
+		m_count = data == nullptr ? 0ull : count;
+	}
+
+	template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+	constexpr void view<T, Iter, ConstIter>::reset() noexcept
+	{
+		m_src = nullptr;
+		m_count = 0ull;
+	}
+
 	//TODO(Rowan): Implement a better search algo
 	template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
 	constexpr size_type find_first_of(view<const T, Iter> str, view<const T, Iter> key, size_type pos) noexcept
@@ -354,35 +368,42 @@ namespace rsl
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_of([[maybe_unused]] view<const T, Iter> str, [[maybe_unused]] view<const T, Iter> key, [[maybe_unused]] size_type pos) noexcept
+	constexpr size_type find_first_of([[maybe_unused]] view<const T, Iter> str,
+	                                  [[maybe_unused]] view<const T, Iter> key, [[maybe_unused]] size_type pos) noexcept
 	{
 		rsl_assert_unimplemented();
 		return 0;
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_not_of([[maybe_unused]] view<const T, Iter> str, [[maybe_unused]] view<const T, Iter> key, [[maybe_unused]] size_type pos) noexcept
+	constexpr size_type find_first_not_of([[maybe_unused]] view<const T, Iter> str,
+	                                      [[maybe_unused]] view<const T, Iter> key,
+	                                      [[maybe_unused]] size_type pos) noexcept
 	{
 		rsl_assert_unimplemented();
 		return 0;
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_of([[maybe_unused]] view<const T, Iter> str, [[maybe_unused]] view<const T, Iter> key, [[maybe_unused]] size_type pos) noexcept
+	constexpr size_type find_last_of([[maybe_unused]] view<const T, Iter> str, [[maybe_unused]] view<const T, Iter> key,
+	                                 [[maybe_unused]] size_type pos) noexcept
 	{
 		rsl_assert_unimplemented();
 		return 0;
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_not_of([[maybe_unused]] view<const T, Iter> str, [[maybe_unused]] view<const T, Iter> key, [[maybe_unused]] size_type pos) noexcept
+	constexpr size_type find_last_not_of([[maybe_unused]] view<const T, Iter> str,
+	                                     [[maybe_unused]] view<const T, Iter> key,
+	                                     [[maybe_unused]] size_type pos) noexcept
 	{
 		rsl_assert_unimplemented();
 		return 0;
 	}
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_of([[maybe_unused]] view<const T, Iter> str, [[maybe_unused]] const T& key, [[maybe_unused]] size_type pos) noexcept
+	constexpr size_type find_first_of([[maybe_unused]] view<const T, Iter> str, [[maybe_unused]] const T& key,
+	                                  [[maybe_unused]] size_type pos) noexcept
 	{
 		rsl_assert_unimplemented();
 		return 0;
@@ -565,7 +586,7 @@ namespace rsl
 
 	namespace internal
 	{
-		template<weakly_incrementable Iter>
+		template <weakly_incrementable Iter>
 		constexpr Iter find_last_iter(Iter start, Iter end) noexcept
 		{
 			if constexpr (bidirectional_iterator<Iter>)

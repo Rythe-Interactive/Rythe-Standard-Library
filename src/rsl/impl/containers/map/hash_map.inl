@@ -104,6 +104,44 @@ namespace rsl
 		  m_memoryPool(allocStorage) {}
 
 	template <typename MapInfo>
+	template <typename Iter, typename ConstIter>
+	constexpr hash_map_base<MapInfo> hash_map_base<MapInfo>::from_view(const iterator_view<value_type, Iter, ConstIter> src)
+	{
+		hash_map_base result;
+
+		for (auto& [key, value] : src)
+		{
+			result.emplace(key, value);
+		}
+
+		return result;
+	}
+
+	template <typename MapInfo>
+	template <typename Iter, typename ConstIter>
+	constexpr hash_map_base<MapInfo> hash_map_base<MapInfo>::move_from_view(iterator_view<value_type, Iter, ConstIter> src)
+	{
+		hash_map_base result;
+
+		for (auto& [key, value] : src)
+		{
+			result.emplace(rsl::move(key), rsl::move(value));
+		}
+
+		return result;
+	}
+
+	template <typename MapInfo>
+	constexpr hash_map_base<MapInfo> hash_map_base<MapInfo>::create_reserved(const size_type capacity)
+		noexcept(noexcept(declval<hash_map_base>().reserve(0)))
+	{
+		hash_map_base result;
+		result.reserve(capacity);
+
+		return result;
+	}
+
+	template <typename MapInfo>
 	constexpr size_type hash_map_base<MapInfo>::size() const noexcept
 	{
 		return m_values.size();

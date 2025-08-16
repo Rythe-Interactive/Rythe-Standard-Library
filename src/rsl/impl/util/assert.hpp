@@ -168,6 +168,8 @@ namespace rsl::asserts
 
 #endif // RYTHE_VALIDATE
 
+#define rsl_ensure(expr) rsl_assert_always(expr)
+
 #define rsl_assert_unimplemented() rsl_assert_msg_always(false, "function not implemented")
 #define rsl_assert_unreachable() rsl_assert_msg_always(false, "reached unreachable code")
 #define rsl_assert_ptr_out_of_range(ptr, begin, end) rsl_assert_msg_frequent(((ptr) > (begin)) && ((ptr) < (end)), "pointer out of range")
@@ -181,5 +183,6 @@ namespace rsl::asserts
 #define rsl_assert_duplicate_object(expr) rsl_assert_msg_consistent(expr, "duplicate object")
 #define rsl_assert_borrow_release_mismatch(expr) rsl_assert_msg_consistent(expr, "borrow release mismatch")
 #define rsl_assert_invalid_cast(expr) rsl_assert_msg_rarely(expr, "invalid cast")
+#define rsl_assert_invalid_pattern(expr) rsl_assert_msg_rarely(expr, "invalid pattern")
 #define rsl_assert_alignment(ptr, alignment)                                                                           \
 	rsl_assert_msg_rarely((reinterpret_cast<size_type>(ptr) & ((alignment) - 1)) == 0, "wrong alignment")

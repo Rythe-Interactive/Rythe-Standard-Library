@@ -3,6 +3,7 @@
 #include "map_iterator.hpp"
 #include "../../memory/memory_pool.hpp"
 #include "../any.hpp"
+#include "../views.hpp"
 #include "../dynamic_array.hpp"
 #include "../optional.hpp"
 #include "../util/comparers.hpp"
@@ -93,6 +94,15 @@ namespace rsl
 			const allocator_storage_type& allocStorage,
 			const factory_storage_type& factoryStorage
 		) noexcept(nothrow_constructible_alloc_fact);
+
+		template <typename Iter, typename ConstIter>
+		[[rythe_always_inline]] constexpr static hash_map_base from_view(iterator_view<value_type, Iter, ConstIter> src);
+
+		template <typename Iter, typename ConstIter>
+		[[rythe_always_inline]] constexpr static hash_map_base move_from_view(iterator_view<value_type, Iter, ConstIter> src);
+
+		[[rythe_always_inline]] constexpr static hash_map_base create_reserved(size_type capacity)
+			noexcept(noexcept(declval<hash_map_base>().reserve(0)));
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr size_type size() const noexcept;
 		[[nodiscard]] [[rythe_always_inline]] constexpr bool empty() const noexcept;
