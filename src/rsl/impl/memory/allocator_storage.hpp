@@ -3,45 +3,62 @@
 
 namespace rsl
 {
-	template <allocator_type Alloc>
-	struct allocator_storage final
-	{
-		[[rythe_always_inline]] constexpr allocator_storage() noexcept(is_nothrow_constructible_v<Alloc>) = default;
+    template <allocator_type Alloc>
+    struct allocator_storage;
 
-		[[rythe_always_inline]] constexpr allocator_storage(const Alloc& alloc)
-			noexcept(is_nothrow_copy_constructible_v<Alloc>);
-		[[rythe_always_inline]] constexpr allocator_storage(Alloc&& alloc)
-			noexcept(is_nothrow_move_constructible_v<Alloc>);
+    template <allocator_type Alloc>
+        requires !is_empty_v<Alloc>
+    struct allocator_storage<Alloc> final
+    {
+        [[rythe_always_inline]] constexpr allocator_storage() noexcept(is_nothrow_constructible_v<Alloc>) = default;
 
-		[[rythe_always_inline]] constexpr Alloc& operator*() noexcept { return value; }
-		[[rythe_always_inline]] constexpr const Alloc& operator*() const noexcept { return value; }
-		[[rythe_always_inline]] constexpr Alloc* operator->() noexcept { return &value; }
-		[[rythe_always_inline]] constexpr const Alloc* operator->() const noexcept { return &value; }
+        [[rythe_always_inline]] constexpr allocator_storage(const Alloc& alloc)
+            noexcept(is_nothrow_copy_constructible_v<Alloc>) : value(alloc) {}
 
-		[[rythe_always_inline]] constexpr operator bool() const noexcept { return value.is_valid(); }
+        [[rythe_always_inline]] constexpr allocator_storage(Alloc&& alloc)
+            noexcept(is_nothrow_move_constructible_v<Alloc>) : value(rsl::move(alloc)) {}
 
-		Alloc value;
-	};
+        [[rythe_always_inline]] constexpr Alloc& operator*() noexcept { return value; }
+        [[rythe_always_inline]] constexpr const Alloc& operator*() const noexcept { return value; }
+        [[rythe_always_inline]] constexpr Alloc* operator->() noexcept { return &value; }
+        [[rythe_always_inline]] constexpr const Alloc* operator->() const noexcept { return &value; }
 
-	template <>
-	struct allocator_storage<polymorphic_allocator> final
-	{
-		allocator_storage() noexcept;
-		[[rythe_always_inline]] constexpr allocator_storage(const allocator_storage& other) noexcept = default;
-		[[rythe_always_inline]] constexpr allocator_storage& operator=(const allocator_storage& other
-		) noexcept = default;
+        [[rythe_always_inline]] constexpr operator bool() const noexcept { return value.is_valid(); }
 
-		[[rythe_always_inline]] constexpr allocator_storage(polymorphic_allocator* alloc) noexcept;
+        Alloc value;
+    };
 
-		[[rythe_always_inline]] constexpr polymorphic_allocator& operator*() noexcept { return *value; }
-		[[rythe_always_inline]] constexpr const polymorphic_allocator& operator*() const noexcept { return *value; }
-		[[rythe_always_inline]] constexpr polymorphic_allocator* operator->() noexcept { return value; }
-		[[rythe_always_inline]] constexpr const polymorphic_allocator* operator->() const noexcept { return value; }
+    template <allocator_type Alloc>
+        requires is_empty_v<Alloc>
+    struct allocator_storage<Alloc> final
+    {
+        [[rythe_always_inline]] constexpr allocator_storage() noexcept = default;
 
-		[[rythe_always_inline]] constexpr operator bool() const noexcept { return value && value->is_valid(); }
+        [[rythe_always_inline]] constexpr allocator_storage(const Alloc&) noexcept {}
+        [[rythe_always_inline]] constexpr allocator_storage(Alloc&&) noexcept {}
 
-		mutable polymorphic_allocator* value;
-	};
+        [[rythe_always_inline]] constexpr Alloc operator*() const noexcept { return Alloc{}; }
+        [[rythe_always_inline]] constexpr Alloc operator->() const noexcept { return Alloc{}; }
+
+        [[rythe_always_inline]] constexpr operator bool() const noexcept { return Alloc{}.is_valid(); }
+    };
+
+    template <>
+    struct allocator_storage<polymorphic_allocator> final
+    {
+        allocator_storage() noexcept;
+        [[rythe_always_inline]] constexpr allocator_storage(const allocator_storage& other) noexcept = default;
+        [[rythe_always_inline]] constexpr allocator_storage& operator=(const allocator_storage& other) noexcept = default;
+
+        [[rythe_always_inline]] constexpr allocator_storage(polymorphic_allocator* alloc) noexcept : value(alloc) {}
+
+        [[rythe_always_inline]] constexpr polymorphic_allocator& operator*() noexcept { return *value; }
+        [[rythe_always_inline]] constexpr const polymorphic_allocator& operator*() const noexcept { return *value; }
+        [[rythe_always_inline]] constexpr polymorphic_allocator* operator->() noexcept { return value; }
+        [[rythe_always_inline]] constexpr const polymorphic_allocator* operator->() const noexcept { return value; }
+
+        [[rythe_always_inline]] constexpr operator bool() const noexcept { return value && value->is_valid(); }
+
+        mutable polymorphic_allocator* value;
+    };
 } // namespace rsl
-
-#include "allocator_storage.inl"

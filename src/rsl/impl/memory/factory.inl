@@ -214,10 +214,10 @@ namespace rsl
 	bool can_trivially_copy(Factory& factory) noexcept
 	{
 		if constexpr (requires(Factory& f) {
-						  { f.trivialCopy() } noexcept -> convertible_to<bool>;
+						  { f.trivial_copy() } noexcept -> convertible_to<bool>;
 					  })
 		{
-			return factory.trivialCopy();
+			return factory.trivial_copy();
 		}
 		else
 		{
