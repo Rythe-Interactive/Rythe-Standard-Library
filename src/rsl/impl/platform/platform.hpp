@@ -2,6 +2,7 @@
 
 #include "../util/common.hpp"
 #include "../util/primitives.hpp"
+
 #include "../threading/thread_id.hpp"
 
 namespace rsl

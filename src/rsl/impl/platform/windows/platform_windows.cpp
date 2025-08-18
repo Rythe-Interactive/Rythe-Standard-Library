@@ -1,3 +1,4 @@
+// ReSharper disable CppWrongIncludesOrder
 #include "../../defines.hpp"
 
 #if RYTHE_PLATFORM_WINDOWS

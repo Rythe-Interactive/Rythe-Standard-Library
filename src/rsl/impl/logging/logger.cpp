@@ -1,7 +1,7 @@
 #include "logger.hpp"
 
-#include "time/time_point.hpp"
 #include "time/stopwatch.hpp"
+#include "time/time_point.hpp"
 
 #include "severity.hpp"
 

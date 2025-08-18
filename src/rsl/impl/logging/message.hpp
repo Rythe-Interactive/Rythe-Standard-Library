@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "../time/time_point.hpp"
 #include "../threading/thread_id.hpp"
+#include "../time/time_point.hpp"
 #include "../util/source_location.hpp"
 
 #include "severity.hpp"
