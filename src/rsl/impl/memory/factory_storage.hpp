@@ -47,8 +47,10 @@ namespace rsl
         template <factory_type Other>
         [[rythe_always_inline]] constexpr factory_storage(factory_storage<Other>&&) noexcept {}
 
-        [[rythe_always_inline]] constexpr Factory operator*() const noexcept { return Factory{}; }
-        [[rythe_always_inline]] constexpr Factory operator->() const noexcept { return Factory{}; }
+        [[rythe_always_inline]] constexpr Factory& operator*() noexcept { return *address_of_empty<Factory>(); }
+        [[rythe_always_inline]] constexpr const Factory& operator*() const noexcept { return *address_of_empty<Factory>(); }
+        [[rythe_always_inline]] constexpr Factory* operator->() noexcept { return address_of_empty<Factory>(); }
+        [[rythe_always_inline]] constexpr const Factory* operator->() const noexcept { return address_of_empty<Factory>(); }
 
         [[rythe_always_inline]] constexpr operator bool() const noexcept { return Factory{}.is_valid(); }
     };

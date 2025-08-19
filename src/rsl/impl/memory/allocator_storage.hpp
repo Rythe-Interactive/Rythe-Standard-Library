@@ -37,8 +37,10 @@ namespace rsl
         [[rythe_always_inline]] constexpr allocator_storage(const Alloc&) noexcept {}
         [[rythe_always_inline]] constexpr allocator_storage(Alloc&&) noexcept {}
 
-        [[rythe_always_inline]] constexpr Alloc operator*() const noexcept { return Alloc{}; }
-        [[rythe_always_inline]] constexpr Alloc operator->() const noexcept { return Alloc{}; }
+        [[rythe_always_inline]] constexpr Alloc& operator*() noexcept { return *address_of_empty<Alloc>(); }
+        [[rythe_always_inline]] constexpr const Alloc& operator*() const noexcept { return *address_of_empty<Alloc>(); }
+        [[rythe_always_inline]] constexpr Alloc* operator->() noexcept { return address_of_empty<Alloc>(); }
+        [[rythe_always_inline]] constexpr const Alloc* operator->() const noexcept { return address_of_empty<Alloc>(); }
 
         [[rythe_always_inline]] constexpr operator bool() const noexcept { return Alloc{}.is_valid(); }
     };

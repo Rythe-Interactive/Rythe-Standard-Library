@@ -1957,4 +1957,23 @@ namespace rsl
 
 	template <typename T, typename... DecorationSignals>
 	using decorate_type_t = typename decorate_type<T, DecorationSignals...>::type;
+
+    namespace internal
+    {
+        void* get_global_empty_type_placeholder_ptr();
+    }
+
+    template <typename T>
+        requires (is_empty_v<T>)
+    constexpr T* address_of_empty() noexcept
+    {
+        if (is_constant_evaluated())
+        {
+            return bit_cast<T*>(ptr_type{0x10});
+        }
+        else
+        {
+            return static_cast<T*>(internal::get_global_empty_type_placeholder_ptr());
+        }
+    }
 } // namespace rsl

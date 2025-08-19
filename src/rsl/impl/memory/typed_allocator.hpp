@@ -72,6 +72,7 @@ namespace rsl
         [[nodiscard]] [[rythe_always_inline]] constexpr TypedAllocator& self() noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const TypedAllocator& self() const noexcept;
     };
+
     template <typename T, allocator_type Alloc = default_allocator, typed_factory_type Factory = default_factory<T>>
     class typed_allocator;
 
@@ -158,16 +159,23 @@ namespace rsl
 		[[rythe_always_inline]] typed_allocator(const allocator_storage_type&, const factory_storage_type&) noexcept {}
 
 		template <not_same_as<T> Other>
-		[[rythe_always_inline]] typed_allocator(const retarget<Other>&) noexcept {}
+	    [[rythe_always_inline]] typed_allocator(const retarget<Other>&) noexcept {}
 
-		[[rythe_always_inline]] static constexpr void set_allocator(const allocator_storage_type&) noexcept {}
-		[[nodiscard]] [[rythe_always_inline]] static constexpr allocator_t get_allocator() noexcept { return {}; }
+	    [[rythe_always_inline]] static constexpr void set_allocator(const allocator_storage_type&) noexcept {}
 
-		[[rythe_always_inline]] static constexpr void set_factory(const factory_storage_type&) noexcept {}
-		[[nodiscard]] [[rythe_always_inline]] static constexpr factory_t get_factory() noexcept { return {}; }
+	    [[nodiscard]] [[rythe_always_inline]] constexpr allocator_t& get_allocator() noexcept { return *address_of_empty<allocator_t>(); }
+	    [[nodiscard]] [[rythe_always_inline]] constexpr const allocator_t& get_allocator() const noexcept { return *address_of_empty<allocator_t>(); }
 
-		[[rythe_always_inline]] static constexpr allocator_storage_type get_allocator_storage() noexcept { return {}; }
-		[[rythe_always_inline]] static constexpr factory_storage_type get_factory_storage() noexcept { return {}; }
+	    [[rythe_always_inline]] static constexpr void set_factory(const factory_storage_type&) noexcept {}
+
+	    [[nodiscard]] [[rythe_always_inline]] constexpr factory_t& get_factory() noexcept { return *address_of_empty<factory_t>(); }
+	    [[nodiscard]] [[rythe_always_inline]] constexpr const factory_t& get_factory() const noexcept { return *address_of_empty<factory_t>(); }
+
+	    [[rythe_always_inline]] constexpr allocator_storage_type& get_allocator_storage() noexcept { return *address_of_empty<allocator_storage_type>(); }
+	    [[rythe_always_inline]] constexpr const allocator_storage_type& get_allocator_storage() const noexcept { return *address_of_empty<allocator_storage_type>(); }
+
+	    [[rythe_always_inline]] constexpr factory_storage_type& get_factory_storage() noexcept { return *address_of_empty<factory_storage_type>(); }
+	    [[rythe_always_inline]] constexpr const factory_storage_type& get_factory_storage() const noexcept { return *address_of_empty<factory_storage_type>(); }
 	};
 
     // TODO(Glyn): type_erased_allocator with empty allocators and factories, but this is such an unlikely edge case...

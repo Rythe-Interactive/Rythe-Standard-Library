@@ -5,32 +5,35 @@ namespace rsl
 	template <typename TypedAllocator>
     [[nodiscard]] [[rythe_always_inline]] constexpr size_type typed_allocator_impl<TypedAllocator>::type_size() const noexcept
     {
-        return self().get_factory()->type_size();
+        return self().get_factory().type_size();
     }
 
 	template <typename TypedAllocator>
     constexpr TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::allocate(const size_type count) noexcept
     {
-        return bit_cast<value_type*>(self().get_allocator().allocate(count * type_size()));
+	    allocator_t& allocator = self().get_allocator();
+        return bit_cast<value_type*>(allocator.allocate(count * type_size()));
     }
 
 	template <typename TypedAllocator>
     constexpr TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::allocate(const size_type count, size_type alignment) noexcept
     {
-        return bit_cast<value_type*>(self().get_allocator().allocate(count * type_size(), alignment));
+	    allocator_t& allocator = self().get_allocator();
+        return bit_cast<value_type*>(allocator.allocate(count * type_size(), alignment));
     }
 
 	template <typename TypedAllocator>
     constexpr TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::reallocate(
             value_type* ptr,
-            size_type oldCount,
+            const size_type oldCount,
             const size_type newCount
             )
         noexcept(factory_traits<factory_t>::noexcept_moveable)
     {
         if constexpr (is_trivially_copyable_v<value_type>)
         {
-            value_type* mem = bit_cast<value_type*>(self().get_allocator().reallocate(ptr, oldCount * type_size(), newCount * type_size()));
+	        allocator_t& allocator = self().get_allocator();
+            value_type* mem = bit_cast<value_type*>(allocator.reallocate(ptr, oldCount * type_size(), newCount * type_size()));
 
             return mem;
         }
@@ -40,14 +43,14 @@ namespace rsl
 
             if (newCount != 0)
             {
-                mem = bit_cast<value_type*>(self().get_allocator().allocate(newCount * type_size()));
+                mem = allocate(newCount);
                 if (mem)
                 {
-                    self().get_factory().move(mem, ptr, oldCount);
+                    move(mem, ptr, oldCount);
                 }
             }
 
-            self().get_allocator().deallocate(ptr, oldCount * type_size());
+            deallocate(ptr, oldCount);
 
             return mem;
         }
@@ -57,7 +60,7 @@ namespace rsl
     constexpr TypedAllocator::value_type*
     typed_allocator_impl<TypedAllocator>::reallocate(
             value_type* ptr,
-            size_type oldCount,
+            const size_type oldCount,
             const size_type newCount,
             size_type alignment
             )
@@ -65,7 +68,8 @@ namespace rsl
     {
         if constexpr (is_trivially_copyable_v<value_type>)
         {
-            value_type* mem = static_cast<value_type*>(self().get_allocator().reallocate(
+	        allocator_t& allocator = self().get_allocator();
+            value_type* mem = static_cast<value_type*>(allocator.reallocate(
                     ptr,
                     oldCount * type_size(),
                     newCount * type_size(),
@@ -80,14 +84,14 @@ namespace rsl
 
             if (newCount != 0)
             {
-                mem = static_cast<value_type*>(self().get_allocator().allocate(newCount * type_size(), alignment));
+                mem = allocate(newCount, alignment);
                 if (mem)
                 {
-                    self().get_factory().move(mem, ptr, oldCount);
+                    move(mem, ptr, oldCount);
                 }
             }
 
-            self().get_allocator().deallocate(ptr, oldCount * type_size(), alignment);
+            deallocate(ptr, oldCount, alignment);
 
             return mem;
         }
@@ -155,20 +159,20 @@ namespace rsl
             )
         noexcept(factory_traits<factory_t>::template noexcept_constructable<Args...>)
     {
-        void* mem = self().get_allocator().allocate(count * type_size());
-        return self().get_factory().construct(mem, count, forward<Args>(args)...);
+        value_type* mem = allocate(count);
+        return construct(mem, count, forward<Args>(args)...);
     }
 
     template <typename TypedAllocator>
     template <typename... Args>
     constexpr TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::allocate_aligned_and_construct(
-            size_type count,
-            size_type alignment,
+            const size_type count,
+            const size_type alignment,
             Args&&... args
             ) noexcept(factory_traits<factory_t>::template noexcept_constructable<Args...>)
     {
-        void* mem = self().get_allocator().allocate(count * type_size(), alignment);
-        return self().get_factory().construct(mem, count, forward<Args>(args)...);
+        value_type* mem = allocate(count, alignment);
+        return construct(mem, count, forward<Args>(args)...);
     }
 
     template <typename TypedAllocator>
@@ -186,11 +190,12 @@ namespace rsl
     {
         if constexpr (is_trivially_copyable_v<value_type>)
         {
-            value_type* mem = static_cast<value_type*>(self().get_allocator().reallocate(ptr, oldCount * type_size(), newCount * type_size()));
+	        allocator_t& allocator = self().get_allocator();
+            value_type* mem = static_cast<value_type*>(allocator.reallocate(ptr, oldCount * type_size(), newCount * type_size()));
 
             if (newCount > oldCount)
             {
-                self().get_factory().construct(mem + oldCount, oldCount - newCount, forward<Args>(args)...);
+                construct(mem + oldCount, oldCount - newCount, forward<Args>(args)...);
             }
 
             return mem;
@@ -201,18 +206,18 @@ namespace rsl
 
             if (newCount != 0)
             {
-                mem = static_cast<value_type*>(self().get_allocator().allocate(newCount * type_size()));
+                mem = allocate(newCount);
                 if (mem)
                 {
-                    self().get_factory().move(mem, ptr, oldCount);
+                    move(mem, ptr, oldCount);
                 }
             }
 
-            self().get_allocator().deallocate(ptr, oldCount * type_size());
+            deallocate(ptr, oldCount);
 
             if (newCount > oldCount)
             {
-                self().get_factory().construct(mem + oldCount, oldCount - newCount, forward<Args>(args)...);
+                construct(mem + oldCount, oldCount - newCount, forward<Args>(args)...);
             }
 
             return mem;
@@ -235,7 +240,8 @@ namespace rsl
     {
         if constexpr (is_trivially_copyable_v<value_type>)
         {
-            value_type* mem = static_cast<value_type*>(self().get_allocator().reallocate(
+	        allocator_t& allocator = self().get_allocator();
+            value_type* mem = static_cast<value_type*>(allocator.reallocate(
                     ptr,
                     oldCount * type_size(),
                     newCount * type_size(),
@@ -244,7 +250,7 @@ namespace rsl
 
             if (newCount > oldCount)
             {
-                self().get_factory().construct(mem + oldCount, oldCount - newCount, forward<Args>(args)...);
+                construct(mem + oldCount, oldCount - newCount, forward<Args>(args)...);
             }
 
             return mem;
@@ -255,18 +261,18 @@ namespace rsl
 
             if (newCount != 0)
             {
-                mem = static_cast<value_type*>(self().get_allocator().allocate(newCount * type_size(), alignment));
+                mem = allocate(newCount, alignment);
                 if (mem)
                 {
-                    self().get_factory().move(mem, ptr, oldCount);
+                    move(mem, ptr, oldCount);
                 }
             }
 
-            self().get_allocator().deallocate(ptr, oldCount * type_size(), alignment);
+            deallocate(ptr, oldCount, alignment);
 
             if (newCount > oldCount)
             {
-                self().get_factory().construct(mem + oldCount, oldCount - newCount, forward<Args>(args)...);
+                construct(mem + oldCount, oldCount - newCount, forward<Args>(args)...);
             }
 
             return mem;
@@ -275,21 +281,21 @@ namespace rsl
 
     template <typename TypedAllocator>
     constexpr void
-        typed_allocator_impl<TypedAllocator>::destroy_and_deallocate(value_type* ptr, size_type count) noexcept
+        typed_allocator_impl<TypedAllocator>::destroy_and_deallocate(value_type* ptr, const size_type count) noexcept
     {
-        self().get_factory().destroy(ptr, count);
-        self().get_allocator().deallocate(ptr, count * type_size());
+        destroy(ptr, count);
+        deallocate(ptr, count);
     }
 
     template <typename TypedAllocator>
     constexpr void typed_allocator_impl<TypedAllocator>::destroy_and_deallocate_aligned(
             value_type* ptr,
-            size_type count,
-            size_type alignment
+            const size_type count,
+            const size_type alignment
             ) noexcept
     {
-        self().get_factory().destroy(ptr, count);
-        self().get_allocator().deallocate(ptr, count * type_size(), alignment);
+        destroy(ptr, count);
+        deallocate(ptr, count, alignment);
     }
 
     template <typename TypedAllocator>
