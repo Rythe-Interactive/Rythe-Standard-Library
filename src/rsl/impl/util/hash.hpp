@@ -16,9 +16,9 @@ namespace rsl
 	};
 
 	template <hash_mode Mode>
-	[[rythe_always_inline]] constexpr id_type hash_bytes(view<const byte> bytes) noexcept;
+	[[rythe_always_inline]] constexpr id_type hash_bytes(array_view<const byte> bytes) noexcept;
 
-	[[rythe_always_inline]] constexpr id_type hash_bytes(view<const byte> bytes) noexcept;
+	[[rythe_always_inline]] constexpr id_type hash_bytes(array_view<const byte> bytes) noexcept;
 
 	template <hash_mode Mode>
 	[[rythe_always_inline]] constexpr id_type hash_string(rsl::string_view str) noexcept;
@@ -44,7 +44,7 @@ namespace rsl
 	{
 		[[rythe_always_inline]] constexpr static id_type hash(const T& val) noexcept
 		{
-			return hash_bytes<Mode>(view(bit_cast<const byte*>(&val), sizeof(T)));
+			return hash_bytes<Mode>(array_view(bit_cast<const byte*>(&val), sizeof(T)));
 		}
 	};
 

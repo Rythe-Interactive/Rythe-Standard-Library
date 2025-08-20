@@ -40,7 +40,7 @@ namespace rsl::log
 		void set_pattern(string_view pattern, Formatters&&... formatters);
 
 	private:
-		void compile_pattern(view<temporary_object<flag_formatter>> formatters);
+		void compile_pattern(array_view<temporary_object<flag_formatter>> formatters);
 
 		dynamic_string m_pattern;
 

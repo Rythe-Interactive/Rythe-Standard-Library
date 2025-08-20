@@ -29,8 +29,8 @@ namespace rsl
         using const_iterator_type = ConstIter;
         using reverse_iterator_type = reverse_iterator<iterator_type>;
         using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
-        using view_type = rsl::view<value_type, iterator_type, const_iterator_type>;
-        using const_view_type = rsl::view<const value_type, const_iterator_type>;
+        using view_type = rsl::array_view<value_type, iterator_type, const_iterator_type>;
+        using const_view_type = rsl::array_view<const value_type, const_iterator_type>;
         using allocator_storage_type = mem_rsc::allocator_storage_type;
         using allocator_t = mem_rsc::allocator_t;
         using factory_storage_type = mem_rsc::factory_storage_type;

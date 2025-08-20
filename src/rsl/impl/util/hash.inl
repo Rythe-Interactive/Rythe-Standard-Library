@@ -100,7 +100,7 @@ namespace rsl
 
 			template <hash_mode Mode>
 			[[nodiscard]] constexpr uint64
-			hash_bytes(const view<const byte> bytes, uint64 seed, const uint64 (&secret)[3]) noexcept
+			hash_bytes(const array_view<const byte> bytes, uint64 seed, const uint64 (&secret)[3]) noexcept
 			{
 				const byte* data = bytes.data();
 				const size_type dataSize = bytes.size();
@@ -272,13 +272,13 @@ namespace rsl
 	};
 
 	template <hash_mode Mode>
-	constexpr id_type hash_bytes(const view<const byte> bytes) noexcept
+	constexpr id_type hash_bytes(const array_view<const byte> bytes) noexcept
 	{
 		static_assert(internal::hash_static_assert_check<Mode>, "unknown hash mode.");
 		return internal::hash::hash_bytes<Mode>(bytes, internal::hash::default_seed, internal::hash::default_secret);
 	}
 
-	constexpr id_type hash_bytes(const view<const byte> bytes) noexcept
+	constexpr id_type hash_bytes(const array_view<const byte> bytes) noexcept
 	{
 		return hash_bytes<hash_mode::default_hash>(bytes);
 	}
@@ -291,7 +291,7 @@ namespace rsl
 			byte* data = new byte[str.size()];
 			constexpr_memcpy(data, str.data(), str.size());
 
-			const id_type result = hash_bytes<Mode>(view<const byte>(data, str.size()));
+			const id_type result = hash_bytes<Mode>(array_view<const byte>(data, str.size()));
 
 			delete[] data;
 
@@ -299,7 +299,7 @@ namespace rsl
 		}
 		else
 		{
-			return hash_bytes<Mode>(view<const byte>(bit_cast<const byte*>(str.data()), str.size()));
+			return hash_bytes<Mode>(array_view<const byte>(bit_cast<const byte*>(str.data()), str.size()));
 		}
 	}
 
