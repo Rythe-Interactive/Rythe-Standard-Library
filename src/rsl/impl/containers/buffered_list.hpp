@@ -18,8 +18,8 @@ namespace rsl
 		using const_iterator_type = const value_type*;
 		using reverse_iterator_type = reverse_iterator<iterator_type>;
 		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
-		using view_type = view<value_type>;
-		using const_view_type = view<const value_type>;
+		using view_type = array_view<value_type>;
+		using const_view_type = array_view<const value_type>;
 
 		[[rythe_always_inline]] constexpr buffered_list() noexcept = default;
 		[[rythe_always_inline]] constexpr buffered_list(const buffered_list& src) noexcept(copy_construct_noexcept);

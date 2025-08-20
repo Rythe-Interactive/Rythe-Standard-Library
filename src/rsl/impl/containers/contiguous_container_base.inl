@@ -1179,6 +1179,7 @@ namespace rsl
             return;
         }
 
+        // TODO(Glyn): make mem_rsc aware of static data to handle this internally.
         mem_rsc::set_ptr(m_staticStorage.data);
         mem_rsc::move(m_size, 0ull, oldData);
 

@@ -6,12 +6,12 @@ namespace rsl::log
 		: m_name(dynamic_string::from_view(name)), m_severity(severity), m_flushSeverity(flushSeverity)
 	{}
 
-	inline void basic_logger::set_sinks(view<sink*> sinks)
+	inline void basic_logger::set_sinks(array_view<sink*> sinks)
 	{
 		m_sinks = dynamic_array<sink*>::from_view(sinks);
 	}
 
-	inline view<sink* const> basic_logger::view_sinks() const noexcept { return m_sinks.view(); }
+	inline array_view<sink* const> basic_logger::view_sinks() const noexcept { return m_sinks.view(); }
 
 	template <typename... Args>
 	constexpr void basic_logger::log(const log::severity s, const format_string format, Args&&... args) noexcept
