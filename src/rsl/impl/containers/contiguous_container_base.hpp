@@ -16,14 +16,15 @@ namespace rsl
         constexpr static bool can_resize = CanResize;
     };
 
-    // TODO(Glyn): No need for an allocator to be stored in the object if can_reallocate is false.
-    // TODO(Glyn): The static capacity array and the dynamic allocation pointer can share the same address
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    class contiguous_container_base : public internal::select_memory_resource<T, Alloc, Factory, ContiguousContainerInfo::static_capacity, ContiguousContainerInfo::can_allocate>::type
+    class contiguous_container_base
+            : public internal::select_memory_resource<T, Alloc, Factory, ContiguousContainerInfo::static_capacity,
+                                                      ContiguousContainerInfo::can_allocate>::type
     {
     public:
-        using mem_rsc = internal::select_memory_resource<T, Alloc, Factory, ContiguousContainerInfo::static_capacity, ContiguousContainerInfo::can_allocate>::type;
+        using mem_rsc = internal::select_memory_resource<
+            T, Alloc, Factory, ContiguousContainerInfo::static_capacity, ContiguousContainerInfo::can_allocate>::type;
         using value_type = T;
         using iterator_type = Iter;
         using const_iterator_type = ConstIter;
@@ -48,41 +49,62 @@ namespace rsl
         constexpr static bool move_construct_noexcept = is_nothrow_move_constructible_v<value_type>;
 
     public:
-        [[rythe_always_inline]] constexpr contiguous_container_base() noexcept(is_nothrow_constructible_v<mem_rsc>) = default;
-        constexpr virtual ~contiguous_container_base() = default;
+        [[rythe_always_inline]] constexpr contiguous_container_base() noexcept(is_nothrow_constructible_v<mem_rsc>);
+        constexpr virtual ~contiguous_container_base();
 
-        [[rythe_always_inline]] explicit constexpr contiguous_container_base(const allocator_storage_type& allocStorage)
-                noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>);
-        [[rythe_always_inline]] explicit constexpr contiguous_container_base(const factory_storage_type& factoryStorage)
-                noexcept(is_nothrow_constructible_v<mem_rsc, const factory_storage_type&>);
+        [[rythe_always_inline]] explicit constexpr contiguous_container_base(
+                const allocator_storage_type& allocStorage
+                )
+            noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>);
+        [[rythe_always_inline]] explicit constexpr contiguous_container_base(
+                const factory_storage_type& factoryStorage
+                )
+            noexcept(is_nothrow_constructible_v<mem_rsc, const factory_storage_type&>);
         [[rythe_always_inline]] constexpr contiguous_container_base(
-                const allocator_storage_type& allocStorage, const factory_storage_type& factoryStorage)
-                noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&, const factory_storage_type&>);
+                const allocator_storage_type& allocStorage,
+                const factory_storage_type& factoryStorage
+                )
+            noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&, const factory_storage_type&>);
 
         [[nodiscard]] [[rythe_always_inline]] constexpr size_type size() const noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr bool empty() const noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr size_type capacity() const noexcept;
 
-        [[rythe_always_inline]] constexpr contiguous_container_base& operator=(const contiguous_container_base& src)
-                noexcept(copy_assign_noexcept && copy_construct_noexcept);
+        [[rythe_always_inline]] constexpr contiguous_container_base& operator=(
+                const contiguous_container_base& src
+                )
+            noexcept(copy_assign_noexcept && copy_construct_noexcept);
         [[rythe_always_inline]] constexpr contiguous_container_base& operator=(contiguous_container_base&& src) noexcept;
         template <size_type N>
-        [[rythe_always_inline]] constexpr contiguous_container_base& operator=(const value_type (&arr)[N])
-                noexcept(copy_assign_noexcept && copy_construct_noexcept);
+        [[rythe_always_inline]] constexpr contiguous_container_base& operator=(
+                const value_type (& arr)[N]
+                )
+            noexcept(copy_assign_noexcept && copy_construct_noexcept);
         template <size_type N>
-        [[rythe_always_inline]] constexpr contiguous_container_base& operator=(value_type (&&arr)[N])
-                noexcept(move_assign_noexcept && move_construct_noexcept);
-        [[rythe_always_inline]] constexpr contiguous_container_base& operator=(view_type src)
-                noexcept(copy_assign_noexcept && copy_construct_noexcept);
+        [[rythe_always_inline]] constexpr contiguous_container_base& operator=(
+                value_type (&& arr)[N]
+                )
+            noexcept(move_assign_noexcept && move_construct_noexcept);
+        [[rythe_always_inline]] constexpr contiguous_container_base& operator=(
+                view_type src
+                )
+            noexcept(copy_assign_noexcept && copy_construct_noexcept);
 
         [[rythe_always_inline]] constexpr bool operator==(const contiguous_container_base& rhs);
         [[rythe_always_inline]] constexpr bool operator!=(const contiguous_container_base& rhs);
 
         template <typename... Args>
-        [[rythe_always_inline]] constexpr void resize(size_type newSize, Args&&... args)
-                noexcept(construct_noexcept<Args...> && move_construct_noexcept)
+        [[rythe_always_inline]] constexpr void resize(
+                size_type newSize,
+                Args&&... args
+                )
+            noexcept(construct_noexcept<Args...> && move_construct_noexcept)
             requires(can_resize);
         [[rythe_always_inline]] constexpr void reserve(size_type newCapacity) noexcept(move_construct_noexcept)
+            requires(can_reallocate);
+        [[rythe_always_inline]] constexpr void reset() noexcept
+            requires(can_resize);
+        [[rythe_always_inline]] constexpr void shrink_to_fit() noexcept(move_construct_noexcept)
             requires(can_reallocate);
 
         [[rythe_always_inline]] constexpr void push_back(const value_type& value) noexcept(copy_construct_noexcept)
@@ -91,8 +113,10 @@ namespace rsl
             requires(can_resize);
 
         template <typename... Args>
-        [[rythe_always_inline]] constexpr value_type& emplace_back(Args&&... args)
-                noexcept(construct_noexcept<Args...> && move_construct_noexcept)
+        [[rythe_always_inline]] constexpr value_type& emplace_back(
+                Args&&... args
+                )
+            noexcept(construct_noexcept<Args...> && move_construct_noexcept)
             requires(can_resize);
 
         [[rythe_always_inline]] constexpr void pop_back() noexcept
@@ -113,59 +137,90 @@ namespace rsl
         [[rythe_always_inline]] constexpr void assign(const value_type* ptr, size_type count)
             requires(can_resize);
         template <size_type N>
-        [[rythe_always_inline]] constexpr void assign(const value_type (&src)[N])
+        [[rythe_always_inline]] constexpr void assign(const value_type (& src)[N])
             requires(can_resize || (N == static_capacity));
         template <size_type N>
-        [[rythe_always_inline]] constexpr void assign(value_type (&&src)[N])
+        [[rythe_always_inline]] constexpr void assign(value_type (&& src)[N])
             requires(can_resize || (N == static_capacity));
 
         [[nodiscard]] [[rythe_always_inline]] constexpr iterator_type iterator_at(size_type i) noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const_iterator_type iterator_at(size_type i) const noexcept;
 
-        [[rythe_always_inline]] constexpr size_type append(const value_type& value)
-                noexcept(move_construct_noexcept && copy_construct_noexcept)
+        [[rythe_always_inline]] constexpr size_type append(
+                const value_type& value
+                )
+            noexcept(move_construct_noexcept && copy_construct_noexcept)
             requires(can_resize);
         [[rythe_always_inline]] constexpr size_type append(value_type&& value) noexcept(move_construct_noexcept)
             requires(can_resize);
-        [[rythe_always_inline]] constexpr size_type append(size_type count, const value_type& value)
-                noexcept(move_construct_noexcept && copy_construct_noexcept)
+        [[rythe_always_inline]] constexpr size_type append(
+                size_type count,
+                const value_type& value
+                )
+            noexcept(move_construct_noexcept && copy_construct_noexcept)
             requires(can_resize);
         template <input_iterator InputIt>
-        [[rythe_always_inline]] constexpr size_type append(InputIt first, InputIt last)
-                noexcept(move_construct_noexcept && construct_noexcept<iter_value_t<InputIt>>)
+        [[rythe_always_inline]] constexpr size_type append(
+                InputIt first,
+                InputIt last
+                )
+            noexcept(move_construct_noexcept && construct_noexcept<iter_value_t<InputIt>>)
             requires(can_resize);
-        [[rythe_always_inline]] constexpr size_type append(const value_type* ptr, size_type count)
-                noexcept(move_construct_noexcept && copy_construct_noexcept)
+        [[rythe_always_inline]] constexpr size_type append(
+                const value_type* ptr,
+                size_type count
+                )
+            noexcept(move_construct_noexcept && copy_construct_noexcept)
             requires(can_resize);
         template <size_type N>
-        [[rythe_always_inline]] constexpr size_type append(const value_type (&src)[N])
-                noexcept(move_construct_noexcept && copy_construct_noexcept)
+        [[rythe_always_inline]] constexpr size_type append(
+                const value_type (& src)[N]
+                )
+            noexcept(move_construct_noexcept && copy_construct_noexcept)
             requires(can_resize);
         template <size_type N>
-        [[rythe_always_inline]] constexpr size_type append(value_type (&&src)[N]) noexcept(move_construct_noexcept)
+        [[rythe_always_inline]] constexpr size_type append(value_type (&& src)[N]) noexcept(move_construct_noexcept)
             requires(can_resize);
 
-        [[rythe_always_inline]] constexpr size_type insert(size_type pos, const value_type& value)
-                noexcept(move_construct_noexcept && copy_construct_noexcept)
+        [[rythe_always_inline]] constexpr size_type insert(
+                size_type pos,
+                const value_type& value
+                )
+            noexcept(move_construct_noexcept && copy_construct_noexcept)
             requires(can_resize);
         [[rythe_always_inline]] constexpr size_type insert(size_type pos, value_type&& value) noexcept(move_construct_noexcept)
             requires(can_resize);
-        [[rythe_always_inline]] constexpr size_type insert(size_type pos, size_type count, const value_type& value)
-                noexcept(move_construct_noexcept && copy_construct_noexcept)
+        [[rythe_always_inline]] constexpr size_type insert(
+                size_type pos,
+                size_type count,
+                const value_type& value
+                )
+            noexcept(move_construct_noexcept && copy_construct_noexcept)
             requires(can_resize);
         template <input_iterator InputIt>
-        [[rythe_always_inline]] constexpr size_type insert(size_type pos, InputIt first, InputIt last)
-                noexcept(move_construct_noexcept && construct_noexcept<iter_value_t<InputIt>>)
+        [[rythe_always_inline]] constexpr size_type insert(
+                size_type pos,
+                InputIt first,
+                InputIt last
+                )
+            noexcept(move_construct_noexcept && construct_noexcept<iter_value_t<InputIt>>)
             requires(can_resize);
-        [[rythe_always_inline]] constexpr size_type insert(size_type pos, const value_type* ptr, size_type count)
-                noexcept(move_construct_noexcept && copy_construct_noexcept)
+        [[rythe_always_inline]] constexpr size_type insert(
+                size_type pos,
+                const value_type* ptr,
+                size_type count
+                )
+            noexcept(move_construct_noexcept && copy_construct_noexcept)
             requires(can_resize);
         template <size_type N>
-        [[rythe_always_inline]] constexpr size_type insert(size_type pos, const value_type (&src)[N])
-                noexcept(move_construct_noexcept && copy_construct_noexcept)
+        [[rythe_always_inline]] constexpr size_type insert(
+                size_type pos,
+                const value_type (& src)[N]
+                )
+            noexcept(move_construct_noexcept && copy_construct_noexcept)
             requires(can_resize);
         template <size_type N>
-        [[rythe_always_inline]] constexpr size_type insert(size_type pos, value_type (&&src)[N]) noexcept(move_construct_noexcept)
+        [[rythe_always_inline]] constexpr size_type insert(size_type pos, value_type (&& src)[N]) noexcept(move_construct_noexcept)
             requires(can_resize);
 
         // If it's possible to do a bulk erasure, then erase_shift in bulk might be faster. Try both and test!
@@ -254,54 +309,91 @@ namespace rsl
         template <typename... Args>
         constexpr static bool construct_noexcept = is_nothrow_constructible_v<value_type, Args...>;
 
-        [[rythe_always_inline]] constexpr void shrink_to_static_storage() noexcept(move_construct_noexcept)
+        [[rythe_always_inline]] constexpr void maybe_shrink_to_static_storage() noexcept(move_construct_noexcept)
             requires(can_reallocate);
 
         [[nodiscard]] [[rythe_always_inline]] constexpr bool maybe_grow() noexcept(move_construct_noexcept);
 
+        [[nodiscard]] [[rythe_always_inline]] constexpr bool resize_capacity_unsafe(size_type newCapacity) noexcept(move_construct_noexcept)
+            requires(can_reallocate);
+
         [[rythe_always_inline]] constexpr void
-        copy_assign_impl(const value_type* src, size_type srcSize, mem_rsc::typed_alloc_type* alloc = nullptr)
+            copy_assign_impl(
+                    const value_type* src,
+                    size_type srcSize,
+                    mem_rsc::typed_alloc_type* alloc = nullptr
+                    )
                 noexcept(copy_assign_noexcept && copy_construct_noexcept);
 
-        [[rythe_always_inline]] constexpr void move_data_assign_impl(const value_type* src, size_type srcSize)
-                noexcept(move_assign_noexcept && move_construct_noexcept);
+        [[rythe_always_inline]] constexpr void move_data_assign_impl(
+                const value_type* src,
+                size_type srcSize
+                )
+            noexcept(move_assign_noexcept && move_construct_noexcept);
 
-        [[rythe_always_inline]] constexpr void split_reserve(size_type pos, size_type count, size_type newSize)
-                noexcept(move_construct_noexcept)
+        [[rythe_always_inline]] constexpr void split_reserve(
+                size_type pos,
+                size_type count,
+                size_type newSize
+                )
+            noexcept(move_construct_noexcept)
             requires(can_resize);
 
         [[rythe_always_inline]] constexpr void erase_swap_impl(size_type pos) noexcept(move_construct_noexcept)
             requires(can_resize);
 
         template <input_iterator InputIt>
-        [[rythe_always_inline]] constexpr void copy_assign_from_unsafe_impl(size_type offset, size_type end, InputIt srcIter)
-                noexcept(copy_assign_noexcept);
+        [[rythe_always_inline]] constexpr void copy_assign_from_unsafe_impl(
+                size_type offset,
+                size_type end,
+                InputIt srcIter
+                )
+            noexcept(copy_assign_noexcept);
 
         template <input_iterator InputIt>
-        [[rythe_always_inline]] constexpr void copy_construct_from_unsafe_impl(size_type offset, size_type end, InputIt srcIter)
-                noexcept(copy_construct_noexcept);
+        [[rythe_always_inline]] constexpr void copy_construct_from_unsafe_impl(
+                size_type offset,
+                size_type end,
+                InputIt srcIter
+                )
+            noexcept(copy_construct_noexcept);
 
         template <input_iterator InputIt>
-        [[rythe_always_inline]] constexpr void move_assign_from_unsafe_impl(size_type offset, size_type end, InputIt srcIter)
-                noexcept(move_assign_noexcept);
+        [[rythe_always_inline]] constexpr void move_assign_from_unsafe_impl(
+                size_type offset,
+                size_type end,
+                InputIt srcIter
+                )
+            noexcept(move_assign_noexcept);
 
         template <input_iterator InputIt>
-        [[rythe_always_inline]] constexpr void move_construct_from_unsafe_impl(size_type offset, size_type end, InputIt srcIter)
-                noexcept(move_construct_noexcept);
+        [[rythe_always_inline]] constexpr void move_construct_from_unsafe_impl(
+                size_type offset,
+                size_type end,
+                InputIt srcIter
+                )
+            noexcept(move_construct_noexcept);
 
         template <typename... Args>
-        [[rythe_always_inline]] constexpr void emplace_unsafe_impl(size_type offset, size_type end, Args&&... args)
-                noexcept(construct_noexcept<Args...>);
+        [[rythe_always_inline]] constexpr void emplace_unsafe_impl(
+                size_type offset,
+                size_type end,
+                Args&&... args
+                )
+            noexcept(construct_noexcept<Args...>);
 
         [[rythe_always_inline]] constexpr void reset_unsafe_impl(size_type offset = 0, size_type end = npos) noexcept;
 
-        [[rythe_always_inline]] constexpr void move_shift_elements_unsafe(size_type offset, size_type end, diff_type shift)
-                noexcept(move_construct_noexcept);
+        [[rythe_always_inline]] constexpr void move_shift_elements_unsafe(
+                size_type offset,
+                size_type end,
+                diff_type shift
+                )
+            noexcept(move_construct_noexcept);
 
         [[nodiscard]] [[rythe_always_inline]] constexpr value_type* get_ptr_at(size_type i) noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const value_type* get_ptr_at(size_type i) const noexcept;
 
-        static_capacity_storage<value_type, static_capacity> m_staticStorage;
         size_type m_size = can_resize ? 0ull : static_capacity;
         size_type m_capacity = static_capacity;
     };

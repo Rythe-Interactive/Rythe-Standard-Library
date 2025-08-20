@@ -730,13 +730,13 @@ namespace rsl
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr bool hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::is_static_memory() noexcept
+    constexpr bool hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::is_static_memory() const noexcept
     {
         return m_ptr >= m_buffer.data && m_ptr < m_buffer.data + BufferSize;
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr bool hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::is_dynamic_memory() noexcept
+    constexpr bool hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::is_dynamic_memory() const noexcept
     {
         return m_ptr && !is_static_memory();
     }
@@ -807,13 +807,17 @@ namespace rsl
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr void hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::move_to_static_memory(
-            const size_type count
+    constexpr void hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::move_to_static_memory_and_deallocate(
+            const size_type count,
+            const size_type memoryCount
             )
         noexcept(factory_traits<Factory>::noexcept_moveable)
     {
         rsl_assert_invalid_operation(count * m_alloc.type_size() <= BufferSize);
-        m_alloc.move(get_static_ptr(), get_ptr(), count);
+        UtilType* dynamicPtr = get_ptr();
+        m_alloc.move(get_static_ptr(), dynamicPtr, count);
+        m_alloc.destroy(dynamicPtr, count);
+        m_alloc.deallocate(dynamicPtr, memoryCount);
         set_ptr_to_static_memory();
     }
 

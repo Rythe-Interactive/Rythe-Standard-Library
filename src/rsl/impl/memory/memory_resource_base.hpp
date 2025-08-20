@@ -164,6 +164,9 @@ namespace rsl
         [[rythe_always_inline]] constexpr void destroy_and_deallocate(size_type count = 1) noexcept;
         [[rythe_always_inline]] constexpr void destroy_and_deallocate_aligned(size_type count, size_type alignment) noexcept;
 
+        [[nodiscard]] [[rythe_always_inline]] static constexpr bool is_static_memory() noexcept { return false; }
+        [[nodiscard]] [[rythe_always_inline]] constexpr bool is_dynamic_memory() const noexcept { return m_ptr; }
+
         [[nodiscard]] [[rythe_always_inline]] constexpr UtilType* get_ptr() noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const UtilType* get_ptr() const noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr UtilType* get_ptr_at(size_type offset) noexcept;
@@ -329,6 +332,9 @@ namespace rsl
                 )
             noexcept(factory_traits<Factory>::noexcept_moveable);
         [[rythe_always_inline]] constexpr void destroy(size_type count = 1, size_type offset = 0) noexcept;
+
+        [[nodiscard]] [[rythe_always_inline]] static constexpr bool is_static_memory() noexcept { return true; }
+        [[nodiscard]] [[rythe_always_inline]] static constexpr bool is_dynamic_memory() noexcept { return false; }
 
         [[nodiscard]] [[rythe_always_inline]] constexpr UtilType* get_ptr() noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const UtilType* get_ptr() const noexcept;
@@ -520,8 +526,8 @@ namespace rsl
         [[rythe_always_inline]] constexpr void destroy_and_deallocate(size_type count = 1) noexcept;
         [[rythe_always_inline]] constexpr void destroy_and_deallocate_aligned(size_type count, size_type alignment) noexcept;
 
-        [[nodiscard]] [[rythe_always_inline]] constexpr bool is_static_memory() noexcept;
-        [[nodiscard]] [[rythe_always_inline]] constexpr bool is_dynamic_memory() noexcept;
+        [[nodiscard]] [[rythe_always_inline]] constexpr bool is_static_memory() const noexcept;
+        [[nodiscard]] [[rythe_always_inline]] constexpr bool is_dynamic_memory() const noexcept;
 
         [[nodiscard]] [[rythe_always_inline]] constexpr UtilType* get_ptr() noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const UtilType* get_ptr() const noexcept;
@@ -534,13 +540,13 @@ namespace rsl
         [[nodiscard]] [[rythe_always_inline]] constexpr UtilType* get_static_ptr_at(size_type offset) noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const UtilType* get_static_ptr_at(size_type offset) const noexcept;
 
-        [[rythe_always_inline]] constexpr void move_to_static_memory(size_type count)
+        [[rythe_always_inline]] constexpr void move_to_static_memory_and_deallocate(size_type count, size_type memoryCount)
         noexcept(factory_traits<Factory>::noexcept_moveable);
         [[rythe_always_inline]] constexpr void set_ptr_to_static_memory() noexcept;
 
-        typed_alloc_type m_alloc;
-        void* m_ptr = nullptr;
         static_capacity_storage<conditional_t<Untyped, void, UtilType>, BufferSize> m_buffer;
+        typed_alloc_type m_alloc;
+        void* m_ptr = m_buffer.data;
     };
 
     template <

@@ -5,6 +5,34 @@ namespace rsl
 {
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::
+    contiguous_container_base() noexcept(is_nothrow_constructible_v<mem_rsc>)
+    {
+        if constexpr (!can_resize)
+        {
+            mem_rsc::construct(m_size);
+        }
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::~contiguous_container_base()
+    {
+        if constexpr (!can_resize)
+        {
+            mem_rsc::destroy(m_size);
+        }
+        else
+        {
+            if (!empty())
+            {
+                reset();
+            }
+        }
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
     constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::contiguous_container_base(
             const allocator_storage_type& allocStorage
             ) noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>)
@@ -13,11 +41,6 @@ namespace rsl
         if constexpr (!can_resize)
         {
             mem_rsc::construct(m_size);
-        }
-
-        if constexpr (static_capacity != 0ull)
-        {
-            mem_rsc::set_ptr(m_staticStorage.data);
         }
     }
 
@@ -32,11 +55,6 @@ namespace rsl
         {
             mem_rsc::construct(m_size);
         }
-
-        if constexpr (static_capacity != 0ull)
-        {
-            mem_rsc::set_ptr(m_staticStorage.data);
-        }
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
@@ -50,11 +68,6 @@ namespace rsl
         if constexpr (!can_resize)
         {
             mem_rsc::construct(m_size);
-        }
-
-        if constexpr (static_capacity != 0ull)
-        {
-            mem_rsc::set_ptr(m_staticStorage.data);
         }
     }
 
@@ -223,57 +236,56 @@ namespace rsl
             return;
         }
 
-        size_type newMemorySize;
-        size_type oldMemorySize;
-        if constexpr (use_post_fix)
+        rsl_ensure(resize_capacity_unsafe(newCapacity));
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::reset() noexcept
+        requires (can_resize)
+    {
+        reset_unsafe_impl();
+        m_size = 0ull;
+        if constexpr (can_reallocate)
         {
-            newMemorySize = newCapacity + 1ull;
-            oldMemorySize = m_capacity + 1ull;
+            shrink_to_fit();
         }
-        else
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
+                                             ContiguousContainerInfo>::shrink_to_fit() noexcept(move_construct_noexcept)
+        requires (can_reallocate)
+    {
+        if (m_size == 0ull)
         {
-            newMemorySize = newCapacity;
-            oldMemorySize = m_capacity;
-        }
-
-        if (m_capacity == 0)
-        {
-            rsl_assert_invalid_object(!mem_rsc::get_ptr());
-
-            mem_rsc::allocate(newMemorySize);
-
-            m_capacity = newCapacity;
-
-            if constexpr (use_post_fix)
+            if constexpr (internal::is_dynamic_resource_v<mem_rsc>)
             {
-                mem_rsc::construct(1ull, 0);
+                mem_rsc::deallocate(m_capacity);
             }
-
+            else if constexpr (internal::is_hybrid_resource_v<mem_rsc>)
+            {
+                if (mem_rsc::is_dynamic_memory())
+                {
+                    mem_rsc::deallocate(m_capacity);
+                }
+            }
             return;
         }
 
-        if constexpr (is_trivially_copyable_v<T>)
+        if constexpr (internal::is_dynamic_resource_v<mem_rsc>)
         {
-            mem_rsc::reallocate(oldMemorySize, newMemorySize);
+            mem_rsc::deallocate(m_capacity);
         }
-        else
+        else if constexpr (internal::is_hybrid_resource_v<mem_rsc>)
         {
-            T* newMem = mem_rsc::m_alloc.allocate(newMemorySize);
-            if (newMem)
+            maybe_shrink_to_static_storage();
+            if (m_capacity != static_capacity)
             {
-                mem_rsc::m_alloc.move(newMem, mem_rsc::get_ptr(), m_size);
-            }
-
-            mem_rsc::deallocate(oldMemorySize);
-            mem_rsc::set_ptr(newMem);
-
-            if constexpr (use_post_fix)
-            {
-                mem_rsc::construct(1ull, m_size);
+                rsl_ensure(resize_capacity_unsafe(m_capacity * 2));
             }
         }
-
-        m_capacity = newCapacity;
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
@@ -331,7 +343,7 @@ namespace rsl
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
               ConstIter, typename ContiguousContainerInfo>
     template <typename... Args>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
     contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::emplace_back(
             Args&&... args
             )
@@ -475,7 +487,7 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
               ConstIter, typename ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::
     iterator_type contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::iterator_at(
             size_type i
             )
@@ -486,8 +498,8 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
               ConstIter, typename ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::const_iterator_type
-    contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::iterator_at(size_type i) const noexcept
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::const_iterator_type
+        contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::iterator_at(size_type i) const noexcept
     {
         return begin() + i;
     }
@@ -944,7 +956,7 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
     contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::at(const size_type i) noexcept
     {
         rsl_assert_out_of_range(i < m_size);
@@ -953,7 +965,7 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr const typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
+    constexpr const contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
     contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::at(const size_type i) const noexcept
     {
         rsl_assert_out_of_range(i < m_size);
@@ -962,7 +974,7 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
     contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::operator[](const size_type i) noexcept
     {
         return at(i);
@@ -970,7 +982,7 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr const typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
+    constexpr const contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
     contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::operator[](
             const size_type i
             ) const noexcept
@@ -995,16 +1007,16 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::view_type
-    contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::view() noexcept
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::view_type
+        contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::view() noexcept
     {
         return view_type(mem_rsc::get_ptr(), m_size);
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::const_view_type
-    contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::view() const noexcept
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::const_view_type
+        contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::view() const noexcept
     {
         return const_view_type(mem_rsc::get_ptr(), m_size);
     }
@@ -1027,7 +1039,7 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
     contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::front() noexcept
     {
         return at(0);
@@ -1035,7 +1047,7 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr const typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
+    constexpr const contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
     contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::front() const noexcept
     {
         return at(0);
@@ -1043,7 +1055,7 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
     contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::back() noexcept
     {
         return at(m_size - 1);
@@ -1051,7 +1063,7 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr const typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
+    constexpr const contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::value_type&
     contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::back() const noexcept
     {
         return at(m_size - 1);
@@ -1059,64 +1071,64 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::iterator_type
-    contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::begin() noexcept
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::iterator_type
+        contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::begin() noexcept
     {
         return contiguous_container_base::iterator_type(mem_rsc::m_ptr);
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::const_iterator_type
-    contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::begin() const noexcept
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::const_iterator_type
+        contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::begin() const noexcept
     {
         return cbegin();
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::const_iterator_type
-    contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::cbegin() const noexcept
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::const_iterator_type
+        contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::cbegin() const noexcept
     {
         return const_iterator_type(mem_rsc::get_ptr());
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::iterator_type
-    contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::end() noexcept
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::iterator_type
+        contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::end() noexcept
     {
         return iterator_type(mem_rsc::get_ptr() + m_size);
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::const_iterator_type
-    contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::end() const noexcept
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::const_iterator_type
+        contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::end() const noexcept
     {
         return cend();
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::const_iterator_type
-    contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::cend() const noexcept
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::const_iterator_type
+        contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::cend() const noexcept
     {
         return const_iterator_type(mem_rsc::get_ptr() + m_size);
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::reverse_iterator_type
-    contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::rbegin() noexcept
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::reverse_iterator_type
+        contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::rbegin() noexcept
     {
         return reverse_iterator_type(end());
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
-                                                 ContiguousContainerInfo>::const_reverse_iterator_type contiguous_container_base<
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
+                                        ContiguousContainerInfo>::const_reverse_iterator_type contiguous_container_base<
         T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::rbegin() const noexcept
     {
         return crbegin();
@@ -1124,8 +1136,8 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
-                                                 ContiguousContainerInfo>::const_reverse_iterator_type contiguous_container_base<
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
+                                        ContiguousContainerInfo>::const_reverse_iterator_type contiguous_container_base<
         T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::crbegin() const noexcept
     {
         return const_reverse_iterator_type(cend());
@@ -1133,16 +1145,16 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::reverse_iterator_type
-    contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::rend() noexcept
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::reverse_iterator_type
+        contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::rend() noexcept
     {
         return reverse_iterator_type(begin());
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
-                                                 ContiguousContainerInfo>::const_reverse_iterator_type contiguous_container_base<
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
+                                        ContiguousContainerInfo>::const_reverse_iterator_type contiguous_container_base<
         T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::rend() const noexcept
     {
         return crend();
@@ -1150,8 +1162,8 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr typename contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
-                                                 ContiguousContainerInfo>::const_reverse_iterator_type contiguous_container_base<
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
+                                        ContiguousContainerInfo>::const_reverse_iterator_type contiguous_container_base<
         T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::crend() const noexcept
     {
         return const_reverse_iterator_type(cbegin());
@@ -1160,10 +1172,10 @@ namespace rsl
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
     constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::
-    shrink_to_static_storage() noexcept(move_construct_noexcept)
+    maybe_shrink_to_static_storage() noexcept(move_construct_noexcept)
         requires (can_reallocate)
     {
-        if constexpr (static_capacity == 0ull)
+        if constexpr (!internal::is_static_resource_v<mem_rsc>)
         {
             return;
         }
@@ -1173,20 +1185,12 @@ namespace rsl
             return;
         }
 
-        value_type* oldData = mem_rsc::get_ptr();
-        if (oldData == m_staticStorage.data)
+        if (mem_rsc::is_static_memory())
         {
             return;
         }
 
-        // TODO(Glyn): make mem_rsc aware of static data to handle this internally.
-        mem_rsc::set_ptr(m_staticStorage.data);
-        mem_rsc::move(m_size, 0ull, oldData);
-
-        mem_rsc::set_ptr(oldData);
-        mem_rsc::deallocate(m_capacity);
-
-        mem_rsc::set_ptr(m_staticStorage.data);
+        mem_rsc::move_to_static_memory_and_deallocate(m_size, m_capacity);
         m_capacity = static_capacity;
     }
 
@@ -1199,20 +1203,97 @@ namespace rsl
         {
             if (m_capacity == 0)
             {
-                reserve(1); // TODO(Glyn): handle out of memory.
-                return true;
+                return resize_capacity_unsafe(1);
             }
 
             if (m_size == m_capacity)
             {
-                reserve(m_capacity * 2);
+                return resize_capacity_unsafe(m_capacity * 2);
             }
+
             return true;
         }
         else
         {
             return false;
         }
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr bool contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::
+    resize_capacity_unsafe(const size_type newCapacity) noexcept(move_construct_noexcept)
+        requires (can_reallocate)
+    {
+        size_type newMemorySize;
+        size_type oldMemorySize;
+        if constexpr (use_post_fix)
+        {
+            newMemorySize = newCapacity + 1ull;
+            oldMemorySize = m_capacity + 1ull;
+        }
+        else
+        {
+            newMemorySize = newCapacity;
+            oldMemorySize = m_capacity;
+        }
+
+        if (m_capacity == 0)
+        {
+            rsl_assert_invalid_object(!mem_rsc::get_ptr());
+
+            mem_rsc::allocate(newMemorySize);
+
+            if (mem_rsc::get_ptr() == nullptr)
+            {
+                m_capacity = 0ull;
+                return false;
+            }
+
+            m_capacity = newCapacity;
+
+            if constexpr (use_post_fix)
+            {
+                mem_rsc::construct(1ull, 0);
+            }
+
+            return true;
+        }
+
+        if constexpr (is_trivially_copyable_v<T>)
+        {
+            mem_rsc::reallocate(oldMemorySize, newMemorySize);
+
+            if (mem_rsc::get_ptr() == nullptr)
+            {
+                m_capacity = 0ull;
+                return false;
+            }
+        }
+        else
+        {
+            T* newMem = mem_rsc::m_alloc.allocate(newMemorySize);
+            if (!newMem)
+            {
+                m_capacity = 0ull;
+                mem_rsc::destroy(m_size);
+                mem_rsc::set_ptr(nullptr);
+                return false;
+            }
+
+            mem_rsc::m_alloc.move(newMem, mem_rsc::get_ptr(), m_size);
+            mem_rsc::destroy(m_size);
+            mem_rsc::deallocate(oldMemorySize);
+            mem_rsc::set_ptr(newMem);
+
+            if constexpr (use_post_fix)
+            {
+                mem_rsc::construct(1ull, m_size);
+            }
+        }
+
+        m_capacity = newCapacity;
+        return true;
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
@@ -1239,6 +1320,7 @@ namespace rsl
 
         if constexpr (can_reallocate)
         {
+            // TODO(Glyn): Fix this for hybrid resources!
             if (srcSize > m_capacity || alloc != nullptr)
             {
                 if (mem_rsc::get_ptr())
@@ -1328,6 +1410,7 @@ namespace rsl
 
         if constexpr (can_reallocate)
         {
+            // TODO(Glyn): Fix this for hybrid resources!
             if (srcSize > m_capacity)
             {
                 if (mem_rsc::get_ptr())
