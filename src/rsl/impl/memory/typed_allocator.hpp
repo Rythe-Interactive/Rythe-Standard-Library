@@ -232,7 +232,9 @@ namespace rsl
 		[[rythe_always_inline]] constexpr void deallocate(void* ptr, size_type count, size_type alignment) noexcept;
 
 		[[rythe_always_inline]] constexpr void* construct(void* ptr, size_type count = 1)
-			noexcept(factory_traits<Factory>::template noexcept_constructable<>);
+	    noexcept(factory_traits<Factory>::template noexcept_constructable<>);
+	    [[rythe_always_inline]] constexpr void* copy(void* dst, const void* src, size_type count = 1)
+            noexcept(factory_traits<Factory>::noexcept_copyable);
 		[[rythe_always_inline]] constexpr void* move(void* dst, void* src, size_type count = 1)
 			noexcept(factory_traits<Factory>::noexcept_moveable);
 		[[rythe_always_inline]] constexpr void destroy(void* ptr, size_type count = 1) noexcept;

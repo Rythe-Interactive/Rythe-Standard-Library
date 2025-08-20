@@ -62,7 +62,7 @@ namespace rsl
             value_type* ptr,
             const size_type oldCount,
             const size_type newCount,
-            size_type alignment
+            const size_type alignment
             )
         noexcept(factory_traits<factory_t>::noexcept_moveable)
     {
@@ -114,7 +114,7 @@ namespace rsl
     template <typename... Args>
     constexpr TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::construct(
             value_type* ptr,
-            size_type count,
+            const size_type count,
             Args&&... args
             )
         noexcept(factory_traits<factory_t>::template noexcept_constructable<Args...>)
@@ -126,7 +126,7 @@ namespace rsl
     constexpr TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::copy(
             value_type* dst,
             const value_type* src,
-            size_type count
+            const size_type count
             )
         noexcept(factory_traits<factory_t>::noexcept_moveable)
     {
@@ -137,7 +137,7 @@ namespace rsl
     constexpr TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::move(
             value_type* dst,
             value_type* src,
-            size_type count
+            const size_type count
             )
         noexcept(factory_traits<factory_t>::noexcept_moveable)
     {
@@ -154,7 +154,7 @@ namespace rsl
     template <typename... Args>
     constexpr TypedAllocator::value_type*
     typed_allocator_impl<TypedAllocator>::allocate_and_construct(
-            size_type count,
+            const size_type count,
             Args&&... args
             )
         noexcept(factory_traits<factory_t>::template noexcept_constructable<Args...>)
@@ -179,7 +179,7 @@ namespace rsl
     template <typename... Args>
     constexpr TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::reallocate_and_construct(
             value_type* ptr,
-            size_type oldCount,
+            const size_type oldCount,
             const size_type newCount,
             Args&&... args
             )
@@ -228,9 +228,9 @@ namespace rsl
     template <typename... Args>
     constexpr TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::reallocate_aligned_and_construct(
             value_type* ptr,
-            size_type oldCount,
+            const size_type oldCount,
             const size_type newCount,
-            size_type alignment,
+            const size_type alignment,
             Args&&... args
             )
         noexcept(
@@ -408,7 +408,7 @@ namespace rsl
 
     template <allocator_type Alloc, untyped_factory_type Factory>
     constexpr void*
-    type_erased_allocator<Alloc, Factory>::allocate(const size_type count, size_type alignment) noexcept
+    type_erased_allocator<Alloc, Factory>::allocate(const size_type count, const size_type alignment) noexcept
     {
         return m_alloc->allocate(count * type_size(), alignment);
     }
@@ -417,7 +417,7 @@ namespace rsl
     constexpr void*
     type_erased_allocator<Alloc, Factory>::reallocate(
             void* ptr,
-            size_type oldCount,
+            const size_type oldCount,
             const size_type newCount
             )
         noexcept(factory_traits<Factory>::noexcept_moveable)
@@ -449,9 +449,9 @@ namespace rsl
     template <allocator_type Alloc, untyped_factory_type Factory>
     constexpr void* type_erased_allocator<Alloc, Factory>::reallocate(
             void* ptr,
-            size_type oldCount,
+            const size_type oldCount,
             const size_type newCount,
-            size_type alignment
+            const size_type alignment
             ) noexcept(factory_traits<Factory>::noexcept_moveable)
     {
         size_type typeSize = type_size();
@@ -485,7 +485,7 @@ namespace rsl
 
     template <allocator_type Alloc, untyped_factory_type Factory>
     constexpr void
-        type_erased_allocator<Alloc, Factory>::deallocate(void* ptr, const size_type count, size_type alignment) noexcept
+        type_erased_allocator<Alloc, Factory>::deallocate(void* ptr, const size_type count, const size_type alignment) noexcept
     {
         m_alloc->deallocate(ptr, count * type_size(), alignment);
     }
@@ -493,7 +493,7 @@ namespace rsl
     template <allocator_type Alloc, untyped_factory_type Factory>
     constexpr void* type_erased_allocator<Alloc, Factory>::construct(
             void* ptr,
-            size_type count
+            const size_type count
             )
         noexcept(factory_traits<Factory>::template noexcept_constructable<>)
     {
@@ -501,10 +501,21 @@ namespace rsl
     }
 
     template <allocator_type Alloc, untyped_factory_type Factory>
+    constexpr void* type_erased_allocator<Alloc, Factory>::copy(
+            void* dst,
+            const void* src,
+            const size_type count
+            )
+        noexcept(factory_traits<Factory>::noexcept_copyable)
+	{
+	    return m_factory->copy(dst, src, count);
+	}
+
+    template <allocator_type Alloc, untyped_factory_type Factory>
     constexpr void* type_erased_allocator<Alloc, Factory>::move(
             void* dst,
             void* src,
-            size_type count
+            const size_type count
             )
         noexcept(factory_traits<Factory>::noexcept_moveable)
     {
@@ -519,7 +530,7 @@ namespace rsl
 
     template <allocator_type Alloc, untyped_factory_type Factory>
     constexpr void* type_erased_allocator<Alloc, Factory>::allocate_and_construct(
-            size_type count
+            const size_type count
             )
         noexcept(factory_traits<Factory>::template noexcept_constructable<>)
     {
@@ -530,8 +541,8 @@ namespace rsl
     template <allocator_type Alloc, untyped_factory_type Factory>
     constexpr void*
     type_erased_allocator<Alloc, Factory>::allocate_aligned_and_construct(
-            size_type count,
-            size_type alignment
+            const size_type count,
+            const size_type alignment
             )
         noexcept(factory_traits<Factory>::template noexcept_constructable<>)
     {
@@ -542,11 +553,11 @@ namespace rsl
     template <allocator_type Alloc, untyped_factory_type Factory>
     constexpr void* type_erased_allocator<Alloc, Factory>::reallocate_and_construct(
             void* ptr,
-            size_type oldCount,
+            const size_type oldCount,
             const size_type newCount
             ) noexcept(factory_traits<Factory>::template noexcept_constructable<> && factory_traits<Factory>::noexcept_moveable)
     {
-        size_type typeSize = type_size();
+        const size_type typeSize = type_size();
         bool canTriviallyCopy = can_trivially_copy(*m_factory);
 
         if (canTriviallyCopy)
@@ -584,9 +595,9 @@ namespace rsl
     template <allocator_type Alloc, untyped_factory_type Factory>
     constexpr void* type_erased_allocator<Alloc, Factory>::reallocate_aligned_and_construct(
             void* ptr,
-            size_type oldCount,
+            const size_type oldCount,
             const size_type newCount,
-            size_type alignment
+            const size_type alignment
             ) noexcept(factory_traits<Factory>::template noexcept_constructable<> && factory_traits<Factory>::noexcept_moveable)
     {
         size_type typeSize = type_size();
@@ -635,8 +646,8 @@ namespace rsl
     template <allocator_type Alloc, untyped_factory_type Factory>
     constexpr void type_erased_allocator<Alloc, Factory>::destroy_and_deallocate_aligned(
             void* ptr,
-            size_type count,
-            size_type alignment
+            const size_type count,
+            const size_type alignment
             ) noexcept
     {
         m_factory->destroy(ptr, count);

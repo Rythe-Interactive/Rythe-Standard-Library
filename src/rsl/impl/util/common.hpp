@@ -3,9 +3,7 @@
 
 RYTHE_MSVC_SUPPRESS_WARNING_WITH_PUSH(5046)
 #include <bit>
-#include <functional>
 #include <ratio>
-#include <cstring>
 RYTHE_MSVC_SUPPRESS_WARNING_POP
 
 #include "primitives.hpp"
@@ -134,7 +132,7 @@ namespace rsl
 	};
 
 	template <bool Test, typename TrueType, typename FalseType>
-	using conditional_t = typename conditional<Test, TrueType, FalseType>::type;
+	using conditional_t = conditional<Test, TrueType, FalseType>::type;
 
 	// Implementation details of conjunction<...> and disjunction<...>
 	namespace internal
@@ -150,7 +148,7 @@ namespace rsl
 		struct conjunction_impl<true, True, Next, Rest...>
 		{
 			// The first trait is true, try the next one.
-			using type = typename conjunction_impl<Next::value, Next, Rest...>::type;
+			using type = conjunction_impl<Next::value, Next, Rest...>::type;
 		};
 
 		template <bool FirstValue, typename First, typename... Rest>
@@ -164,7 +162,7 @@ namespace rsl
 		struct disjunction_impl<false, False, Next, Rest...>
 		{
 			// First trait is false, try the next trait.
-			using type = typename disjunction_impl<Next::value, Next, Rest...>::type;
+			using type = disjunction_impl<Next::value, Next, Rest...>::type;
 		};
 	} // namespace internal
 
@@ -233,7 +231,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	using remove_reference_t = typename remove_reference<T>::type;
+	using remove_reference_t = remove_reference<T>::type;
 
 	template <typename T>
 	struct remove_const
@@ -248,7 +246,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	using remove_const_t = typename remove_const<T>::type;
+	using remove_const_t = remove_const<T>::type;
 
 	template <typename T>
 	struct remove_cv
@@ -275,13 +273,13 @@ namespace rsl
 	};
 
 	template <typename T>
-	using remove_cv_t = typename remove_cv<T>::type;
+	using remove_cv_t = remove_cv<T>::type;
 
 	template <typename T>
 	using remove_cvr = remove_cv<remove_reference_t<T>>;
 
 	template <typename T>
-	using remove_cvr_t = typename remove_cvr<T>::type;
+	using remove_cvr_t = remove_cvr<T>::type;
 
 	template <typename T>
 	inline constexpr bool is_void_v = is_same_v<remove_cv_t<T>, void>;
@@ -435,7 +433,7 @@ namespace rsl
 		template <typename T>
 		struct add_pointer_impl<T, void_t<remove_reference_t<T>*>>
 		{
-			using type = typename remove_reference<T>::type*;
+			using type = remove_reference<T>::type*;
 		};
 
 		template <typename T>
@@ -472,20 +470,20 @@ namespace rsl
 	template <typename T>
 	struct add_pointer
 	{
-		using type = typename internal::add_pointer_impl<T>::type;
+		using type = internal::add_pointer_impl<T>::type;
 	};
 
 	template <typename T>
-	using add_pointer_t = typename internal::add_pointer_impl<T>::type;
+	using add_pointer_t = internal::add_pointer_impl<T>::type;
 
 	template <typename T>
 	struct add_const
 	{
-		using type = typename internal::add_const_impl<T>::type;
+		using type = internal::add_const_impl<T>::type;
 	};
 
 	template <typename T>
-	using add_const_t = typename add_const<T>::type;
+	using add_const_t = add_const<T>::type;
 
 	template <typename T, typename = void>
 	struct add_ref
@@ -511,20 +509,20 @@ namespace rsl
 	template <typename T>
 	struct add_lval_ref
 	{
-		using type = typename add_ref<T>::lvalue;
+		using type = add_ref<T>::lvalue;
 	};
 
 	template <typename T>
-	using add_lval_ref_t = typename add_lval_ref<T>::type;
+	using add_lval_ref_t = add_lval_ref<T>::type;
 
 	template <typename T>
 	struct add_rval_ref
 	{
-		using type = typename add_ref<T>::rvalue;
+		using type = add_ref<T>::rvalue;
 	};
 
 	template <typename T>
-	using add_rval_ref_t = typename add_rval_ref<T>::type;
+	using add_rval_ref_t = add_rval_ref<T>::type;
 
 	template <typename T>
 	[[nodiscard]] [[rythe_always_inline]] constexpr T* addressof(T& val) noexcept
@@ -857,7 +855,7 @@ namespace rsl
 	template <typename To, typename From>
 	constexpr void* constexpr_memcpy(To* dst, const From* src, const size_type count) noexcept;
 
-	// Assumes buffer size of src is larger or equal to the size of To
+	// Assumes buffer size of src is larger or equal to the size of "To"
 	template <typename To, typename From>
 		requires is_trivially_copyable_v<To> && is_trivially_copyable_v<From> && is_trivially_constructible_v<To>
 	[[nodiscard]] constexpr To unaligned_load(const From* src) noexcept
@@ -867,7 +865,7 @@ namespace rsl
 		return dst;
 	}
 
-	// Requires the size of To to be equal to the size of From
+	// Requires the size of "To" to be equal to the size of "From"
 	template <typename To, typename From>
 		requires is_trivially_copyable_v<To> && is_trivially_copyable_v<From> && (sizeof(To) == sizeof(From))
 	[[nodiscard]] constexpr To bit_cast(const From& value) noexcept
@@ -880,7 +878,7 @@ namespace rsl
 		}
 		else
 		{
-			return ::std::bit_cast<To>(value);
+			return __builtin_bit_cast(To, value);
 		}
 	}
 
@@ -1012,7 +1010,7 @@ namespace rsl
 	};
 
 	template <typename T>
-	using remove_extent_t = typename remove_extent<T>::type;
+	using remove_extent_t = remove_extent<T>::type;
 
 	// Implementation details of decay_t<...>
 	namespace internal
@@ -1022,7 +1020,7 @@ namespace rsl
 		{
 			using T1 = remove_reference_t<T>;
 			using T2 = conditional_t<is_function_v<T1>, add_pointer<T1>, remove_cv<T1>>;
-			using type = typename conditional_t<is_array_v<T1>, add_pointer<remove_extent_t<T1>>, T2>::type;
+			using type = conditional_t<is_array_v<T1>, add_pointer<remove_extent_t<T1>>, T2>::type;
 		};
 	} // namespace internal
 
@@ -1046,11 +1044,11 @@ namespace rsl
 	template <typename T>
 	struct decay
 	{
-		using type = typename internal::decay_impl<T>::type;
+		using type = internal::decay_impl<T>::type;
 	};
 
 	template <typename T>
-	using decay_t = typename internal::decay_impl<T>::type;
+	using decay_t = internal::decay_impl<T>::type;
 
 	template <typename T, typename... Types>
 	concept in_place_constructable =
@@ -1173,7 +1171,7 @@ namespace rsl
 	struct common_type;
 
 	template <typename... T>
-	using common_type_t = typename common_type<T...>::type;
+	using common_type_t = common_type<T...>::type;
 
 	template <>
 	struct common_type<>
@@ -1282,12 +1280,12 @@ namespace rsl
 	} // namespace internal
 
 	template <typename From, typename To>
-	using copy_qualifiers_t = typename internal::copy_qualifiers_impl<From>::template result<To>;
+	using copy_qualifiers_t = internal::copy_qualifiers_impl<From>::template result<To>;
 
 	template <typename From, typename To>
 	struct copy_qualifiers
 	{
-		using type = typename internal::copy_qualifiers_impl<From>::template result<To>;
+		using type = internal::copy_qualifiers_impl<From>::template result<To>;
 	};
 
 	template <typename, typename, template <typename> typename, template <typename> typename>
@@ -1299,7 +1297,7 @@ namespace rsl
 	struct common_reference;
 
 	template <typename... Types>
-	using common_reference_t = typename common_reference<Types...>::type;
+	using common_reference_t = common_reference<Types...>::type;
 
 	template <>
 	struct common_reference<>
@@ -1353,7 +1351,7 @@ namespace rsl
 		};
 
 		template <typename T1, typename T2>
-		using basic_specialization = typename basic_common_reference<
+		using basic_specialization = basic_common_reference<
 			remove_cvr_t<T1>, remove_cvr_t<T2>, add_qualifiers<T1>::template apply,
 			add_qualifiers<T2>::template apply>::type;
 
@@ -1422,7 +1420,7 @@ namespace rsl
 		};
 
 		template <typename T1, typename T2>
-		using common_ref_2_ax_t = typename common_reference2_ax<T1, T2>::type;
+		using common_ref_2_ax_t = common_reference2_ax<T1, T2>::type;
 
 		template <typename T1, typename T2>
 			requires is_convertible_v<add_pointer_t<T1>, add_pointer_t<common_ref_2_ax_t<T1, T2>>> &&
@@ -1519,7 +1517,7 @@ namespace rsl
 	};
 
 	template <template <typename...> typename T, typename U, size_type I, typename... Args>
-	using make_sequence_t = typename make_sequence<T, U, I, Args...>::type;
+	using make_sequence_t = make_sequence<T, U, I, Args...>::type;
 
 	template <rsl::size_type I, typename Type, typename... Types>
 	struct element_at : element_at<I - 1, Types...>
@@ -1533,7 +1531,7 @@ namespace rsl
 	};
 
 	template <rsl::size_type I, typename... Types>
-	using element_at_t = typename element_at<I, Types...>::type;
+	using element_at_t = element_at<I, Types...>::type;
 
 	namespace internal
 	{
@@ -1580,7 +1578,7 @@ namespace rsl
 	template <typename... A, typename... B, type_sequence_c C, type_sequence_c... Rest>
 	struct concat_sequence<type_sequence<A...>, type_sequence<B...>, C, Rest...>
 	{
-		using type = typename concat_sequence<type_sequence<A..., B...>, C, Rest...>::type;
+		using type = concat_sequence<type_sequence<A..., B...>, C, Rest...>::type;
 	};
 
 	template <typename... A, typename... B>
@@ -1590,7 +1588,7 @@ namespace rsl
 	};
 
 	template <type_sequence_c... Sequences>
-	using concat_sequence_t = typename concat_sequence<Sequences...>::type;
+	using concat_sequence_t = concat_sequence<Sequences...>::type;
 
 	template <type_sequence_c Sequence, typename T>
 	constexpr bool type_sequence_contains_v = Sequence::template contains<T>;
@@ -1634,7 +1632,7 @@ namespace rsl
 		template <class T, T I, T N, T... Integers>
 		struct make_integer_seq_impl
 		{
-			using type = typename make_integer_seq_impl<T, I + 1, N, Integers..., I>::type;
+			using type = make_integer_seq_impl<T, I + 1, N, Integers..., I>::type;
 		};
 
 		template <class T, T N, T... Integers>
@@ -1645,7 +1643,7 @@ namespace rsl
 	} // namespace internal
 
 	template <typename T, T Size>
-	using make_integer_sequence = typename internal::make_integer_seq_impl<T, 0, Size>::type;
+	using make_integer_sequence = internal::make_integer_seq_impl<T, 0, Size>::type;
 
 	template <size_type... Vals>
 	using index_sequence = integer_sequence<size_type, Vals...>;
@@ -1747,11 +1745,11 @@ namespace rsl
 
 		template <typename ReturnType, typename Callable, typename... Args>
 		using is_invocable_ret_impl =
-			typename select_invoke_traits<Callable, Args...>::template is_invocable_ret<ReturnType>;
+        select_invoke_traits<Callable, Args...>::template is_invocable_ret<ReturnType>;
 	} // namespace internal
 
 	template <typename Callable, typename... Args>
-	using invoke_result_t = typename internal::select_invoke_traits<Callable, Args...>::type;
+	using invoke_result_t = internal::select_invoke_traits<Callable, Args...>::type;
 
 	template <typename Callable, typename... Args>
 	struct invoke_result
@@ -1887,6 +1885,30 @@ namespace rsl
 		return bit_cast<byte*>(ptr) + count;
 	}
 
+    template<typename T>
+    [[rythe_always_inline]] constexpr const T* advance(const T* ptr, const size_type count) noexcept
+	{
+	    return bit_cast<const T*>(advance(static_cast<const void*>(ptr), count));
+	}
+
+    template<typename T>
+    [[rythe_always_inline]] constexpr T* advance(T* ptr, const size_type count) noexcept
+	{
+	    return bit_cast<const T*>(advance(static_cast<void*>(ptr), count));
+	}
+
+    template<typename T>
+    [[rythe_always_inline]] constexpr const T* advance(const T* ptr, const diff_type count) noexcept
+	{
+	    return bit_cast<const T*>(advance(static_cast<const void*>(ptr), count));
+	}
+
+    template<typename T>
+    [[rythe_always_inline]] constexpr T* advance(T* ptr, const diff_type count) noexcept
+	{
+	    return bit_cast<const T*>(advance(static_cast<void*>(ptr), count));
+	}
+
 	template <typename LHS, typename RHS>
 	constexpr bool is_pointer_assignable_v = requires(LHS* lhs, RHS* rhs) { lhs = rhs; };
 
@@ -1928,35 +1950,35 @@ namespace rsl
 	template <typename T, typename DecorationSignal, typename... Rest>
 	struct decorate_type<T, DecorationSignal, Rest...>
 	{
-		using type = typename decorate_type<typename decorate_type<T, DecorationSignal>::type, Rest...>::type;
+		using type = decorate_type<typename decorate_type<T, DecorationSignal>::type, Rest...>::type;
 	};
 
 	template <typename T>
 	struct decorate_type<T, lval_ref_signal>
 	{
-		using type = typename add_lval_ref<T>::type;
+		using type = add_lval_ref<T>::type;
 	};
 
 	template <typename T>
 	struct decorate_type<T, rval_ref_signal>
 	{
-		using type = typename add_rval_ref<T>::type;
+		using type = add_rval_ref<T>::type;
 	};
 
 	template <typename T>
 	struct decorate_type<T, const_signal>
 	{
-		using type = typename add_const<T>::type;
+		using type = add_const<T>::type;
 	};
 
 	template <typename T>
 	struct decorate_type<T, pointer_signal>
 	{
-		using type = typename add_pointer<T>::type;
+		using type = add_pointer<T>::type;
 	};
 
 	template <typename T, typename... DecorationSignals>
-	using decorate_type_t = typename decorate_type<T, DecorationSignals...>::type;
+	using decorate_type_t = decorate_type<T, DecorationSignals...>::type;
 
     namespace internal
     {
