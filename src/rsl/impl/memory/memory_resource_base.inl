@@ -70,28 +70,28 @@ namespace rsl
     }
 
     template <allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr dynamic_memory_resource_base<Alloc, Factory, UtilType, Untyped>::allocator_storage_type&
+    constexpr typename dynamic_memory_resource_base<Alloc, Factory, UtilType, Untyped>::allocator_storage_type&
     dynamic_memory_resource_base<Alloc, Factory, UtilType, Untyped>::get_allocator_storage() noexcept
     {
         return m_alloc.get_allocator_storage();
     }
 
     template <allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr const dynamic_memory_resource_base<Alloc, Factory, UtilType, Untyped>::allocator_storage_type&
+    constexpr const typename dynamic_memory_resource_base<Alloc, Factory, UtilType, Untyped>::allocator_storage_type&
     dynamic_memory_resource_base<Alloc, Factory, UtilType, Untyped>::get_allocator_storage() const noexcept
     {
         return m_alloc.get_allocator_storage();
     }
 
     template <allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr dynamic_memory_resource_base<Alloc, Factory, UtilType, Untyped>::factory_storage_type&
+    constexpr typename dynamic_memory_resource_base<Alloc, Factory, UtilType, Untyped>::factory_storage_type&
     dynamic_memory_resource_base<Alloc, Factory, UtilType, Untyped>::get_factory_storage() noexcept
     {
         return m_alloc.get_factory_storage();
     }
 
     template <allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr const dynamic_memory_resource_base<Alloc, Factory, UtilType, Untyped>::factory_storage_type&
+    constexpr const typename dynamic_memory_resource_base<Alloc, Factory, UtilType, Untyped>::factory_storage_type&
     dynamic_memory_resource_base<Alloc, Factory, UtilType, Untyped>::get_factory_storage() const noexcept
     {
         return m_alloc.get_factory_storage();
@@ -388,28 +388,28 @@ namespace rsl
     }
 
     template <size_type BufferSize, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::factory_t& static_memory_resource_base<
+    constexpr typename static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::factory_t& static_memory_resource_base<
         BufferSize, Factory, UtilType, Untyped>::get_factory() noexcept
     {
         return *m_factory;
     }
 
     template <size_type BufferSize, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr const static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::factory_t&
+    constexpr const typename static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::factory_t&
     static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::get_factory() const noexcept
     {
         return *m_factory;
     }
 
     template <size_type BufferSize, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::factory_storage_type&
+    constexpr typename static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::factory_storage_type&
     static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::get_factory_storage() noexcept
     {
         return m_factory;
     }
 
     template <size_type BufferSize, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr const static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::factory_storage_type&
+    constexpr const typename static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::factory_storage_type&
     static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::get_factory_storage() const noexcept
     {
         return m_factory;
@@ -519,14 +519,14 @@ namespace rsl
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::allocator_t&
+    constexpr typename hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::allocator_t&
         hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::get_allocator() noexcept
     {
         return m_alloc.get_allocator();
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr const hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::allocator_t&
+    constexpr const typename hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::allocator_t&
         hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::get_allocator() const noexcept
     {
         return m_alloc.get_allocator();
@@ -541,42 +541,42 @@ namespace rsl
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::factory_t&
+    constexpr typename hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::factory_t&
         hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::get_factory() noexcept
     {
         return m_alloc.get_factory();
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr const hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::factory_t&
+    constexpr const typename hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::factory_t&
         hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::get_factory() const noexcept
     {
         return m_alloc.get_factory();
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::allocator_storage_type&
+    constexpr typename hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::allocator_storage_type&
         hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::get_allocator_storage() noexcept
     {
         return m_alloc.get_allocator_storage();
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr const hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::allocator_storage_type&
+    constexpr const typename hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::allocator_storage_type&
         hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::get_allocator_storage() const noexcept
     {
         return m_alloc.get_allocator_storage();
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::factory_storage_type&
+    constexpr typename hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::factory_storage_type&
         hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::get_factory_storage() noexcept
     {
         return m_alloc.get_factory_storage();
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
-    constexpr const hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::factory_storage_type&
+    constexpr const typename hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::factory_storage_type&
         hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::get_factory_storage() const noexcept
     {
         return m_alloc.get_factory_storage();
@@ -613,9 +613,13 @@ namespace rsl
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
     constexpr void hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::deallocate(const size_type count) noexcept
     {
-        rsl_assert_invalid_operation(is_dynamic_memory());
+        if(is_static_memory())
+        {
+            return;
+        }
+
         m_alloc.deallocate(get_ptr(), count);
-        m_ptr = nullptr;
+        set_ptr_to_static_memory();
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
@@ -624,9 +628,13 @@ namespace rsl
             const size_type alignment
             ) noexcept
     {
-        rsl_assert_invalid_operation(is_dynamic_memory());
+        if(is_static_memory())
+        {
+            return;
+        }
+
         m_alloc.deallocate(get_ptr(), count, alignment);
-        m_ptr = nullptr;
+        set_ptr_to_static_memory();
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
@@ -715,7 +723,7 @@ namespace rsl
     {
         rsl_assert_invalid_operation(is_dynamic_memory());
         m_alloc.destroy_and_deallocate(get_ptr(), count);
-        m_ptr = nullptr;
+        set_ptr_to_static_memory();
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
@@ -724,9 +732,15 @@ namespace rsl
             const size_type alignment
             ) noexcept
     {
-        rsl_assert_invalid_operation(is_dynamic_memory());
-        m_alloc.destroy_and_deallocate_aligned(get_ptr(), count, alignment);
-        m_ptr = nullptr;
+        if(is_dynamic_memory())
+        {
+            m_alloc.destroy_and_deallocate_aligned(get_ptr(), count, alignment);
+            set_ptr_to_static_memory();
+        }
+        else
+        {
+            m_alloc.destroy(get_ptr(), count);
+        }
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
@@ -738,7 +752,7 @@ namespace rsl
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
     constexpr bool hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::is_dynamic_memory() const noexcept
     {
-        return m_ptr && !is_static_memory();
+        return !is_static_memory();
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
@@ -772,7 +786,14 @@ namespace rsl
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
     constexpr void hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::set_ptr(UtilType* const& ptr) noexcept
     {
-        m_ptr = ptr;
+        if (ptr == nullptr)
+        {
+            set_ptr_to_static_memory();
+        }
+        else
+        {
+            m_ptr = ptr;
+        }
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>

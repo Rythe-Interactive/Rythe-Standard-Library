@@ -23,7 +23,7 @@ namespace rsl
                                                       ContiguousContainerInfo::can_allocate>::type
     {
     public:
-        using mem_rsc = internal::select_memory_resource<
+        using mem_rsc = typename internal::select_memory_resource<
             T, Alloc, Factory, ContiguousContainerInfo::static_capacity, ContiguousContainerInfo::can_allocate>::type;
         using value_type = T;
         using iterator_type = Iter;
@@ -32,10 +32,10 @@ namespace rsl
         using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
         using view_type = rsl::array_view<value_type, iterator_type, const_iterator_type>;
         using const_view_type = rsl::array_view<const value_type, const_iterator_type>;
-        using allocator_storage_type = mem_rsc::allocator_storage_type;
-        using allocator_t = mem_rsc::allocator_t;
-        using factory_storage_type = mem_rsc::factory_storage_type;
-        using factory_t = mem_rsc::factory_t;
+        using allocator_storage_type = typename mem_rsc::allocator_storage_type;
+        using allocator_t = typename mem_rsc::allocator_t;
+        using factory_storage_type = typename mem_rsc::factory_storage_type;
+        using factory_t = typename mem_rsc::factory_t;
 
         constexpr static bool use_post_fix = ContiguousContainerInfo::use_post_fix;
         constexpr static size_type static_capacity = ContiguousContainerInfo::static_capacity;
@@ -321,7 +321,7 @@ namespace rsl
             copy_assign_impl(
                     const value_type* src,
                     size_type srcSize,
-                    mem_rsc::typed_alloc_type* alloc = nullptr
+                    typename mem_rsc::typed_alloc_type* alloc = nullptr
                     )
                 noexcept(copy_assign_noexcept && copy_construct_noexcept);
 

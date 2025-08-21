@@ -2,6 +2,7 @@
 
 #include "../platform/platform.hpp"
 #include "../time/stopwatch.hpp"
+
 #include "message.hpp"
 
 namespace rsl::log

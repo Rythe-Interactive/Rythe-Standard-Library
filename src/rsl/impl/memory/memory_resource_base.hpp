@@ -183,11 +183,11 @@ namespace rsl
         using base_type = dynamic_memory_resource_base<Alloc, Factory, UtilType, true>;
 
     public:
-        using allocator_storage_type = base_type::allocator_storage_type;
-        using allocator_t = base_type::allocator_t;
-        using factory_storage_type = base_type::factory_storage_type;
-        using factory_t = base_type::factory_t;
-        using typed_alloc_type = base_type::typed_alloc_type;
+        using allocator_storage_type = typename base_type::allocator_storage_type;
+        using allocator_t = typename base_type::allocator_t;
+        using factory_storage_type = typename base_type::factory_storage_type;
+        using factory_t = typename base_type::factory_t;
+        using typed_alloc_type = typename base_type::typed_alloc_type;
 
         using base_type::dynamic_memory_resource_base;
     };
@@ -198,11 +198,11 @@ namespace rsl
         using base_type = dynamic_memory_resource_base<Alloc, Factory, T, false>;
 
     public:
-        using allocator_storage_type = base_type::allocator_storage_type;
-        using allocator_t = base_type::allocator_t;
-        using factory_storage_type = base_type::factory_storage_type;
-        using factory_t = base_type::factory_t;
-        using typed_alloc_type = base_type::typed_alloc_type;
+        using allocator_storage_type = typename base_type::allocator_storage_type;
+        using allocator_t = typename base_type::allocator_t;
+        using factory_storage_type = typename base_type::factory_storage_type;
+        using factory_t = typename base_type::factory_t;
+        using typed_alloc_type = typename base_type::typed_alloc_type;
 
         using value_type = T;
         using ref_type = add_lval_ref_t<T>;
@@ -351,8 +351,8 @@ namespace rsl
         using base_type = static_memory_resource_base<BufferSize, Factory, UtilType, true>;
 
     public:
-        using factory_storage_type = base_type::factory_storage_type;
-        using factory_t = base_type::factory_t;
+        using factory_storage_type = typename base_type::factory_storage_type;
+        using factory_t = typename base_type::factory_t;
 
         using base_type::static_memory_resource_base;
     };
@@ -368,8 +368,8 @@ namespace rsl
         using const_ref_type = decorate_type_t<T, const_signal, lval_ref_signal>;
         using ptr_type = add_pointer_t<T>;
         using const_ptr_type = decorate_type_t<T, const_signal, pointer_signal>;
-        using factory_storage_type = base_type::factory_storage_type;
-        using factory_t = base_type::factory_t;
+        using factory_storage_type = typename base_type::factory_storage_type;
+        using factory_t = typename base_type::factory_t;
         constexpr static size_type buffer_count = BufferCount;
 
         using base_type::static_memory_resource_base;
@@ -562,11 +562,11 @@ namespace rsl
         using base_type = hybrid_memory_resource_base<BufferCount * sizeof(T), Alloc, Factory, T, false>;
 
     public:
-        using allocator_storage_type = base_type::allocator_storage_type;
-        using allocator_t = base_type::allocator_t;
-        using factory_storage_type = base_type::factory_storage_type;
-        using factory_t = base_type::factory_t;
-        using typed_alloc_type = base_type::typed_alloc_type;
+        using allocator_storage_type = typename base_type::allocator_storage_type;
+        using allocator_t = typename base_type::allocator_t;
+        using factory_storage_type = typename base_type::factory_storage_type;
+        using factory_t = typename base_type::factory_t;
+        using typed_alloc_type = typename base_type::typed_alloc_type;
 
         using value_type = T;
         using ref_type = add_lval_ref_t<T>;
