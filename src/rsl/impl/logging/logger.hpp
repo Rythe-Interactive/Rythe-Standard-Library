@@ -36,8 +36,8 @@ namespace rsl::log
 
 		void flush();
 
-		[[rythe_always_inline]] void set_sinks(view<sink*> sinks);
-		[[nodiscard]] [[rythe_always_inline]] view<sink* const> view_sinks() const noexcept;
+		[[rythe_always_inline]] void set_sinks(array_view<sink*> sinks);
+		[[nodiscard]] [[rythe_always_inline]] array_view<sink* const> view_sinks() const noexcept;
 
 		[[rythe_always_inline]] void filter(severity s) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] severity filter_severity() const noexcept;

@@ -2,6 +2,7 @@
 
 #include "../util/common.hpp"
 #include "../util/primitives.hpp"
+
 #include "iterators.hpp"
 
 namespace rsl
@@ -13,7 +14,7 @@ namespace rsl
 	}
 
 	template <typename T, contiguous_iterator Iter = T*, contiguous_iterator ConstIter = internal::select_const_iter<T, Iter>>
-	struct view
+	struct array_view
 	{
 	public:
 		using value_type = T;
@@ -26,25 +27,25 @@ namespace rsl
 		using reverse_iterator_type = reverse_iterator<iterator_type>;
 		using const_reverse_iterator_type = reverse_iterator<const_iterator_type>;
 
-		using const_view_type = conditional_t<is_const_v<T>, view, view<const value_type, const_iterator_type>>;
+		using const_view_type = conditional_t<is_const_v<T>, array_view, array_view<const value_type, const_iterator_type>>;
 
-		[[rythe_always_inline]] constexpr view() noexcept = default;
-		[[rythe_always_inline]] constexpr view(pointer ptr, size_type count) noexcept;
+		[[rythe_always_inline]] constexpr array_view() noexcept = default;
+		[[rythe_always_inline]] constexpr array_view(pointer ptr, size_type count) noexcept;
 		template <contiguous_iterator It>
-		[[rythe_always_inline]] constexpr view(It first, It last) noexcept(iter_noexcept_deref<It> && iter_noexcept_diff<It>) requires same_as<iter_pointer_t<It>, pointer>;
+		[[rythe_always_inline]] constexpr array_view(It first, It last) noexcept(iter_noexcept_deref<It> && iter_noexcept_diff<It>) requires same_as<iter_pointer_t<It>, pointer>;
 		template <size_type N>
-		[[rythe_always_inline]] constexpr view(value_type (&arr)[N]) noexcept;
-		[[rythe_always_inline]] constexpr view(const view& other) noexcept;
-		[[rythe_always_inline]] constexpr view(value_type& src) noexcept;
+		[[rythe_always_inline]] constexpr array_view(value_type (&arr)[N]) noexcept;
+		[[rythe_always_inline]] constexpr array_view(const array_view& other) noexcept;
+		[[rythe_always_inline]] constexpr array_view(value_type& src) noexcept;
 
-		[[rythe_always_inline]] constexpr operator view<const value_type, const_iterator_type>() noexcept requires (!is_const_v<value_type>);
+		[[rythe_always_inline]] constexpr operator array_view<const value_type, const_iterator_type>() noexcept requires (!is_const_v<value_type>);
 
-		[[rythe_always_inline]] constexpr static view from_string_length(T* str, T terminator = T{}) noexcept requires char_type<T>;
+		[[rythe_always_inline]] constexpr static array_view from_string_length(T* str, T terminator = T{}) noexcept requires char_type<T>;
 
-		[[rythe_always_inline]] constexpr view& operator=(const view&) = default;
+		[[rythe_always_inline]] constexpr array_view& operator=(const array_view&) = default;
 
-		[[rythe_always_inline]] constexpr bool operator==(const view& rhs);
-		[[rythe_always_inline]] constexpr bool operator!=(const view& rhs);
+		[[rythe_always_inline]] constexpr bool operator==(const array_view& rhs);
+		[[rythe_always_inline]] constexpr bool operator!=(const array_view& rhs);
 		template <size_type N>
 		[[rythe_always_inline]] constexpr bool operator==(const value_type (&rhs)[N]);
 		template <size_type N>
@@ -79,7 +80,7 @@ namespace rsl
 		[[rythe_always_inline]] constexpr size_type size_bytes() const noexcept;
 		[[rythe_always_inline]] constexpr bool empty() const noexcept;
 
-		[[rythe_always_inline]] constexpr view subview(size_type, size_type) const;
+		[[rythe_always_inline]] constexpr array_view subview(size_type, size_type) const;
 
 	private:
 		pointer m_src = nullptr;
@@ -87,18 +88,18 @@ namespace rsl
 	};
 
 	template <typename It>
-	view(It, size_type) -> view<iter_read_t<It>, It>;
+	array_view(It, size_type) -> array_view<iter_read_t<It>, It>;
 
 	template <typename It>
-	view(It, It) -> view<iter_read_t<It>, It>;
+	array_view(It, It) -> array_view<iter_read_t<It>, It>;
 
 	template <typename T, size_type N>
-	view(T (&)[N]) -> view<T>;
+	array_view(T (&)[N]) -> array_view<T>;
 
 	template <typename T, contiguous_iterator Iter>
-	view(view<T, Iter> other) -> view<const T, const_iterator<Iter>>;
+	array_view(array_view<T, Iter> other) -> array_view<const T, const_iterator<Iter>>;
 
-	using string_view = rsl::view<const char>;
+	using string_view = rsl::array_view<const char>;
 
 	[[nodiscard]] [[rythe_always_inline]] constexpr string_view operator""_sv(const char* str, const size_type size) noexcept
 	{
@@ -108,35 +109,35 @@ namespace rsl
 	// TODO(Rowan): The below functions check for any occurrence of any of the items in other in str, not for the sequence of other in str. Is that intended?
 	//				https://en.cppreference.com/w/cpp/string/basic_string_view/find_last_not_of.html see overload 1
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_of(view<const T, Iter> str, view<const T, Iter> key,
+	constexpr size_type find_first_of(array_view<const T, Iter> str, array_view<const T, Iter> key,
 	                                  [[maybe_unused]] size_type pos = 0) noexcept;
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_not_of(view<const T, Iter> str, view<const T, Iter> key,
+	constexpr size_type find_first_not_of(array_view<const T, Iter> str, array_view<const T, Iter> key,
 	                                      [[maybe_unused]] size_type pos = 0) noexcept;
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_of(view<const T, Iter> str, view<const T, Iter> key,
+	constexpr size_type find_last_of(array_view<const T, Iter> str, array_view<const T, Iter> key,
 	                                 [[maybe_unused]] size_type pos = 0) noexcept;
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_last_not_of(view<const T, Iter> str, view<const T, Iter> key,
+	constexpr size_type find_last_not_of(array_view<const T, Iter> str, array_view<const T, Iter> key,
 	                                     [[maybe_unused]] size_type pos = 0) noexcept;
 
 	template <typename T, contiguous_iterator Iter>
-	constexpr size_type find_first_of(view<const T, Iter> str, const T& key,
+	constexpr size_type find_first_of(array_view<const T, Iter> str, const T& key,
 	                                  [[maybe_unused]] size_type pos = 0) noexcept;
 
 	template <typename T, contiguous_iterator Iter, same_as<T> C>
-	constexpr size_type find_first_not_of(view<const T, Iter> str, const C& key,
+	constexpr size_type find_first_not_of(array_view<const T, Iter> str, const C& key,
 	                                      [[maybe_unused]] size_type pos = 0) noexcept;
 
 	template <typename T, contiguous_iterator Iter, same_as<T> C>
-	constexpr size_type find_last_of(view<const T, Iter> str, const C& key,
+	constexpr size_type find_last_of(array_view<const T, Iter> str, const C& key,
 	                                 [[maybe_unused]] size_type pos = 0) noexcept;
 
 	template <typename T, contiguous_iterator Iter, same_as<T> C>
-	constexpr size_type find_last_not_of(view<const T, Iter> str, const C& key,
+	constexpr size_type find_last_not_of(array_view<const T, Iter> str, const C& key,
 	                                     [[maybe_unused]] size_type pos = 0) noexcept;
 
 	namespace internal
@@ -151,7 +152,7 @@ namespace rsl
 		template<typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
 		struct select_contiguous_view_impl<T, Iter, ConstIter>
 		{
-			using contiguous_view = view<T, Iter, ConstIter>;
+			using contiguous_view = array_view<T, Iter, ConstIter>;
 		};
 
 		template<typename T, input_or_output_iterator<T> Iter, input_or_output_iterator<T> ConstIter>
