@@ -1,9 +1,8 @@
 #pragma once
 #include "../util/primitives.hpp"
-
 #include "../util/hash.hpp"
-#include "view.hpp"
-#include "string_view.hpp"
+
+#include "views.hpp"
 
 #include <bit>
 
