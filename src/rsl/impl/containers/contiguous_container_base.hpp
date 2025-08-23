@@ -50,6 +50,12 @@ namespace rsl
 
     public:
         [[rythe_always_inline]] constexpr contiguous_container_base() noexcept(is_nothrow_constructible_v<mem_rsc>);
+        [[rythe_always_inline]] constexpr contiguous_container_base(
+                contiguous_container_base&& src
+                ) noexcept(is_nothrow_constructible_v<mem_rsc, mem_rsc&&>);
+        [[rythe_always_inline]] constexpr contiguous_container_base(
+                const contiguous_container_base& src
+                ) noexcept(is_nothrow_constructible_v<mem_rsc, const mem_rsc&>);
         constexpr virtual ~contiguous_container_base();
 
         [[rythe_always_inline]] explicit constexpr contiguous_container_base(
@@ -314,7 +320,9 @@ namespace rsl
 
         [[nodiscard]] [[rythe_always_inline]] constexpr bool maybe_grow() noexcept(move_construct_noexcept);
 
-        [[nodiscard]] [[rythe_always_inline]] constexpr bool resize_capacity_unsafe(size_type newCapacity) noexcept(move_construct_noexcept)
+        [[nodiscard]] [[rythe_always_inline]] constexpr bool resize_capacity_unsafe(
+                size_type newCapacity
+                ) noexcept(move_construct_noexcept)
             requires(can_reallocate);
 
         [[rythe_always_inline]] constexpr void

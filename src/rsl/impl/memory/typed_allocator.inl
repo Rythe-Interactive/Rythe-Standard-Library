@@ -44,10 +44,10 @@ namespace rsl
         {
             value_type* mem = nullptr;
 
-            if (newCount != 0)
+            if (newCount != 0) [[likely]]
             {
                 mem = allocate(newCount);
-                if (mem)
+                if (mem) [[likely]]
                 {
                     move(mem, ptr, oldCount);
                 }
@@ -84,10 +84,10 @@ namespace rsl
         {
             value_type* mem = nullptr;
 
-            if (newCount != 0)
+            if (newCount != 0) [[likely]]
             {
                 mem = allocate(newCount, alignment);
-                if (mem)
+                if (mem) [[likely]]
                 {
                     move(mem, ptr, oldCount);
                 }
@@ -198,7 +198,7 @@ namespace rsl
             allocator_t& allocator = self().get_allocator();
             value_type* mem = static_cast<value_type*>(allocator.reallocate(ptr, oldCount * type_size(), newCount * type_size()));
 
-            if (newCount > oldCount)
+            if (newCount > oldCount) [[likely]]
             {
                 construct(mem + oldCount, oldCount - newCount, forward<Args>(args)...);
             }
@@ -209,10 +209,10 @@ namespace rsl
         {
             value_type* mem = nullptr;
 
-            if (newCount != 0)
+            if (newCount != 0) [[likely]]
             {
                 mem = allocate(newCount);
-                if (mem)
+                if (mem) [[likely]]
                 {
                     move(mem, ptr, oldCount);
                 }
@@ -220,7 +220,7 @@ namespace rsl
 
             deallocate(ptr, oldCount);
 
-            if (newCount > oldCount)
+            if (newCount > oldCount) [[likely]]
             {
                 construct(mem + oldCount, oldCount - newCount, forward<Args>(args)...);
             }
@@ -253,7 +253,7 @@ namespace rsl
                     alignment
                     ));
 
-            if (newCount > oldCount)
+            if (newCount > oldCount) [[likely]]
             {
                 construct(mem + oldCount, oldCount - newCount, forward<Args>(args)...);
             }
@@ -264,10 +264,10 @@ namespace rsl
         {
             value_type* mem = nullptr;
 
-            if (newCount != 0)
+            if (newCount != 0) [[likely]]
             {
                 mem = allocate(newCount, alignment);
-                if (mem)
+                if (mem) [[likely]]
                 {
                     move(mem, ptr, oldCount);
                 }
@@ -275,7 +275,7 @@ namespace rsl
 
             deallocate(ptr, oldCount, alignment);
 
-            if (newCount > oldCount)
+            if (newCount > oldCount) [[likely]]
             {
                 construct(mem + oldCount, oldCount - newCount, forward<Args>(args)...);
             }
@@ -434,10 +434,10 @@ namespace rsl
 
         void* mem = nullptr;
 
-        if (newCount != 0)
+        if (newCount != 0) [[likely]]
         {
             mem = m_alloc->allocate(newCount * typeSize);
-            if (mem)
+            if (mem) [[likely]]
             {
                 m_factory->move(mem, ptr, oldCount);
             }
@@ -465,10 +465,10 @@ namespace rsl
         }
         void* mem = nullptr;
 
-        if (newCount != 0)
+        if (newCount != 0) [[likely]]
         {
             mem = m_alloc->allocate(newCount * typeSize, alignment);
-            if (mem)
+            if (mem) [[likely]]
             {
                 m_factory->move(mem, ptr, oldCount);
             }
@@ -566,7 +566,7 @@ namespace rsl
         {
             void* mem = m_alloc->reallocate(ptr, oldCount * typeSize, newCount * typeSize);
 
-            if (newCount > oldCount)
+            if (newCount > oldCount) [[likely]]
             {
                 m_factory->construct(advance(mem, oldCount * typeSize), oldCount - newCount);
             }
@@ -575,10 +575,10 @@ namespace rsl
         }
         void* mem = nullptr;
 
-        if (newCount != 0)
+        if (newCount != 0) [[likely]]
         {
             mem = m_alloc->allocate(newCount * typeSize);
-            if (mem)
+            if (mem) [[likely]]
             {
                 m_factory->move(mem, ptr, oldCount);
             }
@@ -586,7 +586,7 @@ namespace rsl
 
         m_alloc->deallocate(ptr, oldCount * typeSize);
 
-        if (newCount > oldCount)
+        if (newCount > oldCount) [[likely]]
         {
             m_factory->construct(advance(mem, oldCount * typeSize), oldCount - newCount);
         }
@@ -609,7 +609,7 @@ namespace rsl
         {
             void* mem = m_alloc->reallocate(ptr, oldCount * typeSize, newCount * typeSize, alignment);
 
-            if (newCount > oldCount)
+            if (newCount > oldCount) [[likely]]
             {
                 m_factory->construct(advance(mem, oldCount * typeSize), oldCount - newCount);
             }
@@ -618,10 +618,10 @@ namespace rsl
         }
         void* mem = nullptr;
 
-        if (newCount != 0)
+        if (newCount != 0) [[likely]]
         {
             mem = m_alloc->allocate(newCount * typeSize, alignment);
-            if (mem)
+            if (mem) [[likely]]
             {
                 m_factory->move(mem, ptr, oldCount);
             }
@@ -629,7 +629,7 @@ namespace rsl
 
         m_alloc->deallocate(ptr, oldCount * typeSize, alignment);
 
-        if (newCount > oldCount)
+        if (newCount > oldCount) [[likely]]
         {
             m_factory->construct(advance(mem, oldCount * typeSize), oldCount - newCount);
         }

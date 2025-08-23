@@ -601,19 +601,53 @@ namespace rsl
     constexpr void hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::reallocate(
             const size_type oldCount,
             const size_type newCount
-            ) noexcept(factory_traits<Factory>::noexcept_moveable) {}
+            ) noexcept(factory_traits<Factory>::noexcept_moveable)
+    {
+        if (is_dynamic_memory()) [[likely]]
+        {
+            m_ptr = m_alloc.reallocate(get_ptr(), oldCount, newCount);
+        }
+        else
+        {
+            if (newCount != 0ull) [[likely]]
+            {
+                m_ptr = m_alloc.allocate(newCount);
+                if (m_ptr) [[likely]]
+                {
+                    m_alloc.move(m_ptr, m_buffer.data, oldCount);
+                }
+            }
+        }
+    }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
     constexpr void hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::reallocate(
             const size_type oldCount,
             const size_type newCount,
             const size_type alignment
-            ) noexcept(factory_traits<Factory>::noexcept_moveable) {}
+            ) noexcept(factory_traits<Factory>::noexcept_moveable)
+    {
+        if (is_dynamic_memory()) [[likely]]
+        {
+            m_ptr = m_alloc.reallocate(get_ptr(), oldCount, newCount, alignment);
+        }
+        else
+        {
+            if (newCount != 0ull) [[likely]]
+            {
+                m_ptr = m_alloc.allocate(newCount, alignment);
+                if (m_ptr) [[likely]]
+                {
+                    m_alloc.move(m_ptr, m_buffer.data, oldCount);
+                }
+            }
+        }
+    }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
     constexpr void hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::deallocate(const size_type count) noexcept
     {
-        if(is_static_memory())
+        if(is_static_memory()) [[unlikely]]
         {
             return;
         }
@@ -628,7 +662,7 @@ namespace rsl
             const size_type alignment
             ) noexcept
     {
-        if(is_static_memory())
+        if(is_static_memory()) [[unlikely]]
         {
             return;
         }
@@ -732,7 +766,7 @@ namespace rsl
             const size_type alignment
             ) noexcept
     {
-        if(is_dynamic_memory())
+        if(is_dynamic_memory()) [[likely]]
         {
             m_alloc.destroy_and_deallocate_aligned(get_ptr(), count, alignment);
             set_ptr_to_static_memory();
@@ -786,7 +820,7 @@ namespace rsl
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
     constexpr void hybrid_memory_resource_base<BufferSize, Alloc, Factory, UtilType, Untyped>::set_ptr(UtilType* const& ptr) noexcept
     {
-        if (ptr == nullptr)
+        if (ptr == nullptr) [[unlikely]]
         {
             set_ptr_to_static_memory();
         }

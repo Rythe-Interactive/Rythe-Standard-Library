@@ -24,10 +24,15 @@ namespace rsl
         }
         else
         {
-            if (!empty())
+            if (!empty()) [[unlikely]]
             {
                 reset();
             }
+        }
+
+        if constexpr (can_reallocate)
+        {
+            shrink_to_fit();
         }
     }
 
@@ -111,6 +116,10 @@ namespace rsl
     {
         mem_rsc::operator=(move(src));
         src.set_ptr(nullptr);
+        if constexpr (use_post_fix && !internal::is_dynamic_resource_v<mem_rsc>)
+        {
+            src.construct(1ull);
+        }
         src.m_size = 0ull;
         src.m_capacity = 0ull;
         return *this;
@@ -187,7 +196,7 @@ namespace rsl
     {
         if constexpr (use_post_fix)
         {
-            if (m_capacity > 0ull)
+            if (m_capacity > 0ull) [[likely]]
             {
                 mem_rsc::destroy(1ull, m_size);
             }
@@ -195,11 +204,7 @@ namespace rsl
 
         if constexpr (can_reallocate)
         {
-            if (newSize > m_capacity)
-            {
-                reserve(newSize);
-            }
-            else if (newSize < static_capacity) {}
+            reserve(newSize);
         }
         else
         {
@@ -231,7 +236,7 @@ namespace rsl
         noexcept(move_construct_noexcept)
         requires (can_reallocate)
     {
-        if (newCapacity < m_capacity)
+        if (newCapacity < m_capacity) [[unlikely]]
         {
             return;
         }
@@ -246,9 +251,12 @@ namespace rsl
     {
         reset_unsafe_impl();
         m_size = 0ull;
-        if constexpr (can_reallocate)
+        if constexpr (use_post_fix)
         {
-            shrink_to_fit();
+            if (m_capacity > 0ull) [[likely]]
+            {
+                mem_rsc::construct(1ull);
+            }
         }
     }
 
@@ -260,13 +268,13 @@ namespace rsl
     {
         if (m_size == 0ull)
         {
-            if constexpr (internal::is_dynamic_resource_v<mem_rsc>)
+            if constexpr (!internal::is_static_resource_v<mem_rsc>)
             {
-                mem_rsc::deallocate(m_capacity);
-            }
-            else if constexpr (internal::is_hybrid_resource_v<mem_rsc>)
-            {
-                if (mem_rsc::is_dynamic_memory())
+                if constexpr (use_post_fix)
+                {
+                    mem_rsc::deallocate(m_capacity + 1);
+                }
+                else
                 {
                     mem_rsc::deallocate(m_capacity);
                 }
@@ -276,14 +284,14 @@ namespace rsl
 
         if constexpr (internal::is_dynamic_resource_v<mem_rsc>)
         {
-            mem_rsc::deallocate(m_capacity);
+            rsl_ensure(resize_capacity_unsafe(m_size));
         }
         else if constexpr (internal::is_hybrid_resource_v<mem_rsc>)
         {
             maybe_shrink_to_static_storage();
             if (m_capacity != static_capacity)
             {
-                rsl_ensure(resize_capacity_unsafe(m_capacity * 2));
+                rsl_ensure(resize_capacity_unsafe(m_size));
             }
         }
     }
@@ -298,7 +306,7 @@ namespace rsl
     {
         if constexpr (use_post_fix)
         {
-            if (m_capacity > 0ull)
+            if (m_capacity > 0ull) [[likely]]
             {
                 mem_rsc::destroy(1ull, m_size);
             }
@@ -324,7 +332,7 @@ namespace rsl
     {
         if constexpr (use_post_fix)
         {
-            if (m_capacity > 0ull)
+            if (m_capacity > 0ull) [[likely]]
             {
                 mem_rsc::destroy(1ull, m_size);
             }
@@ -352,7 +360,7 @@ namespace rsl
     {
         if constexpr (use_post_fix)
         {
-            if (m_capacity > 0ull)
+            if (m_capacity > 0ull) [[likely]]
             {
                 mem_rsc::destroy(1ull, m_size);
             }
@@ -387,14 +395,14 @@ namespace rsl
         noexcept
         requires (can_resize)
     {
-        if (count > m_size)
+        if (count > m_size) [[unlikely]]
         {
             count = m_size;
         }
 
         if constexpr (use_post_fix)
         {
-            if (m_capacity > 0ull)
+            if (m_capacity > 0ull) [[likely]]
             {
                 mem_rsc::destroy(1ull, m_size);
             }
@@ -415,15 +423,17 @@ namespace rsl
         noexcept
         requires (can_resize)
     {
+        reset_unsafe_impl();
+
         if constexpr (use_post_fix)
         {
-            if (m_capacity > 0ull)
+            if (m_capacity > 0ull) [[likely]]
             {
                 mem_rsc::destroy(1ull, m_size);
+                mem_rsc::construct(1ull);
             }
         }
 
-        reset_unsafe_impl();
         m_size = 0;
     }
 
@@ -754,7 +764,7 @@ namespace rsl
     {
         rsl_assert_out_of_range(first < m_size);
         rsl_assert_invalid_parameters(first < last);
-        if (last > m_size)
+        if (last > m_size) [[unlikely]]
         {
             last = m_size;
         }
@@ -806,7 +816,7 @@ namespace rsl
         size_type erasureCount = 0ull;
         for (size_type i = originalSize; i != 0; --i)
         {
-            if (comparer(iterator_at(i - 1)))
+            if (comparer(iterator_at(i - 1))) [[unlikely]]
             {
                 erase_swap_impl(i - 1);
                 erasureCount++;
@@ -815,7 +825,7 @@ namespace rsl
 
         if constexpr (use_post_fix)
         {
-            if (erasureCount != 0ull)
+            if (erasureCount != 0ull) [[likely]]
             {
                 mem_rsc::destroy(1, originalSize);
                 mem_rsc::construct(1, m_size);
@@ -871,7 +881,7 @@ namespace rsl
     {
         rsl_assert_out_of_range(first < m_size);
         rsl_assert_invalid_parameters(first < last);
-        if (last > m_size)
+        if (last > m_size) [[unlikely]]
         {
             last = m_size;
         }
@@ -883,7 +893,7 @@ namespace rsl
 
         if constexpr (use_post_fix)
         {
-            if (count != 0ull)
+            if (count != 0ull) [[likely]]
             {
                 mem_rsc::destroy(1ull, m_size + count);
                 mem_rsc::construct(1ull, m_size);
@@ -920,9 +930,9 @@ namespace rsl
         size_type erasureCount = 0ull;
         for (size_type i = 0; i < originalSize; i++)
         {
-            if (comparer(iterator_at(i)))
+            if (comparer(iterator_at(i))) [[unlikely]]
             {
-                if (eraseLocation != npos)
+                if (eraseLocation != npos) [[likely]]
                 {
                     mem_rsc::destroy(1, eraseLocation);
                     move_shift_elements_unsafe(eraseLocation + 1, i, shift);
@@ -935,7 +945,7 @@ namespace rsl
             }
         }
 
-        if (eraseLocation != npos)
+        if (eraseLocation != npos) [[likely]]
         {
             mem_rsc::destroy(1, eraseLocation);
             move_shift_elements_unsafe(eraseLocation + 1, m_size, shift);
@@ -944,7 +954,7 @@ namespace rsl
 
         if constexpr (use_post_fix)
         {
-            if (erasureCount != 0ull)
+            if (erasureCount != 0ull) [[likely]]
             {
                 mem_rsc::destroy(1ull, originalSize);
                 mem_rsc::construct(1ull, m_size);
@@ -1175,23 +1185,34 @@ namespace rsl
     maybe_shrink_to_static_storage() noexcept(move_construct_noexcept)
         requires (can_reallocate)
     {
-        if constexpr (!internal::is_static_resource_v<mem_rsc>)
+        if constexpr (internal::is_hybrid_resource_v<mem_rsc>)
         {
-            return;
-        }
+            size_type memorySize;
+            size_type memoryCapacity;
+            if constexpr (use_post_fix)
+            {
+                memorySize = m_size + 1ull;
+                memoryCapacity = m_capacity + 1ull;
+            }
+            else
+            {
+                memorySize = m_size;
+                memoryCapacity = m_capacity;
+            }
 
-        if (m_size > static_capacity)
-        {
-            return;
-        }
+            if (memorySize > static_capacity)
+            {
+                return;
+            }
 
-        if (mem_rsc::is_static_memory())
-        {
-            return;
-        }
+            if (mem_rsc::is_static_memory()) [[unlikely]]
+            {
+                return;
+            }
 
-        mem_rsc::move_to_static_memory_and_deallocate(m_size, m_capacity);
-        m_capacity = static_capacity;
+            mem_rsc::move_to_static_memory_and_deallocate(memorySize, memoryCapacity);
+            m_capacity = static_capacity;
+        }
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
@@ -1201,12 +1222,15 @@ namespace rsl
     {
         if constexpr (can_reallocate)
         {
-            if (m_capacity == 0)
+            if constexpr (internal::is_dynamic_resource_v<mem_rsc>)
             {
-                return resize_capacity_unsafe(1);
+                if (m_capacity == 0) [[unlikely]]
+                {
+                    return resize_capacity_unsafe(1);
+                }
             }
 
-            if (m_size == m_capacity)
+            if (m_size == m_capacity) [[unlikely]]
             {
                 return resize_capacity_unsafe(m_capacity * 2);
             }
@@ -1238,33 +1262,45 @@ namespace rsl
             oldMemorySize = m_capacity;
         }
 
-        if (m_capacity == 0)
+        if constexpr (internal::is_dynamic_resource_v<mem_rsc>)
         {
-            rsl_assert_invalid_object(!mem_rsc::get_ptr());
-
-            mem_rsc::allocate(newMemorySize);
-
-            if (mem_rsc::get_ptr() == nullptr)
+            if (m_capacity == 0) [[unlikely]]
             {
-                m_capacity = 0ull;
-                return false;
+                rsl_assert_invalid_object(!mem_rsc::get_ptr());
+
+                mem_rsc::allocate(newMemorySize);
+
+                if (mem_rsc::get_ptr() == nullptr) [[unlikely]]
+                {
+                    m_capacity = 0ull;
+                    return false;
+                }
+
+                m_capacity = newCapacity;
+
+                if constexpr (use_post_fix)
+                {
+                    mem_rsc::construct(1ull, 0);
+                }
+
+                return true;
             }
+        }
 
-            m_capacity = newCapacity;
-
-            if constexpr (use_post_fix)
+        if constexpr (internal::is_hybrid_resource_v<mem_rsc>)
+        {
+            if (newMemorySize <= static_capacity) [[unlikely]]
             {
-                mem_rsc::construct(1ull, 0);
+                maybe_shrink_to_static_storage();
+                return true;
             }
-
-            return true;
         }
 
         if constexpr (is_trivially_copyable_v<T>)
         {
             mem_rsc::reallocate(oldMemorySize, newMemorySize);
 
-            if (mem_rsc::get_ptr() == nullptr)
+            if (mem_rsc::get_ptr() == nullptr) [[unlikely]]
             {
                 m_capacity = 0ull;
                 return false;
@@ -1273,7 +1309,7 @@ namespace rsl
         else
         {
             T* newMem = mem_rsc::m_alloc.allocate(newMemorySize);
-            if (!newMem)
+            if (!newMem) [[unlikely]]
             {
                 m_capacity = 0ull;
                 mem_rsc::destroy(m_size);
@@ -1312,7 +1348,7 @@ namespace rsl
 
         if constexpr (use_post_fix)
         {
-            if (m_capacity > 0ull)
+            if (m_capacity > 0ull) [[likely]]
             {
                 mem_rsc::destroy(1ull, m_size);
             }
@@ -1320,10 +1356,9 @@ namespace rsl
 
         if constexpr (can_reallocate)
         {
-            // TODO(Glyn): Fix this for hybrid resources!
             if (srcSize > m_capacity || alloc != nullptr)
             {
-                if (mem_rsc::get_ptr())
+                if (mem_rsc::get_ptr()) [[likely]]
                 {
                     reset_unsafe_impl();
 
@@ -1402,7 +1437,7 @@ namespace rsl
 
         if constexpr (use_post_fix)
         {
-            if (m_capacity > 0ull)
+            if (m_capacity > 0ull) [[likely]]
             {
                 mem_rsc::destroy(1ull, m_size);
             }
@@ -1410,10 +1445,9 @@ namespace rsl
 
         if constexpr (can_reallocate)
         {
-            // TODO(Glyn): Fix this for hybrid resources!
             if (srcSize > m_capacity)
             {
-                if (mem_rsc::get_ptr())
+                if (mem_rsc::get_ptr()) [[likely]]
                 {
                     reset_unsafe_impl();
 
@@ -1474,17 +1508,30 @@ namespace rsl
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
               ConstIter, typename ContiguousContainerInfo>
     constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::
-    split_reserve(size_type pos, const size_type count, size_type newSize) noexcept(move_construct_noexcept)
+    split_reserve(size_type pos, const size_type count, const size_type newSize) noexcept(move_construct_noexcept)
         requires (can_resize)
     {
         if constexpr (can_reallocate)
         {
-            if (m_capacity == 0)
+            if (m_capacity == 0) [[unlikely]]
             {
-                reserve(newSize);
+                rsl_ensure(resize_capacity_unsafe(newSize));
             }
             else
             {
+                size_type oldMemorySize;
+                size_type newMemorySize;
+                if constexpr (use_post_fix)
+                {
+                    newMemorySize = newSize + 1ull;
+                    oldMemorySize = m_capacity + 1ull;
+                }
+                else
+                {
+                    newMemorySize = newSize;
+                    oldMemorySize = m_capacity;
+                }
+
                 if constexpr (use_post_fix)
                 {
                     mem_rsc::destroy(1ull, m_size);
@@ -1494,19 +1541,19 @@ namespace rsl
                 {
                     if constexpr (is_trivially_copyable_v<T>)
                     {
-                        mem_rsc::reallocate(m_capacity, newSize);
+                        mem_rsc::reallocate(oldMemorySize, newMemorySize);
                         move_shift_elements_unsafe(pos, m_size, count);
                     }
                     else
                     {
-                        T* newMem = mem_rsc::m_alloc.allocate(newSize);
-                        if (newMem)
+                        T* newMem = mem_rsc::m_alloc.allocate(newMemorySize);
+                        if (newMem) [[likely]]
                         {
                             mem_rsc::m_alloc.move(newMem, mem_rsc::get_ptr(), pos);
                             mem_rsc::m_alloc.move(newMem + pos, get_ptr_at(pos), pos + count);
                         }
 
-                        mem_rsc::deallocate(m_capacity);
+                        mem_rsc::deallocate(oldMemorySize);
                         mem_rsc::set_ptr(newMem);
                     }
 
@@ -1545,10 +1592,16 @@ namespace rsl
         --m_size;
         mem_rsc::destroy(1, pos);
 
-        if (pos != m_size)
+        if (pos != m_size) [[likely]]
         {
             mem_rsc::construct(1, pos, move(*get_ptr_at(m_size)));
             mem_rsc::destroy(1, m_size);
+        }
+
+        if constexpr (use_post_fix)
+        {
+            mem_rsc::destroy(1, m_size + 2);
+            mem_rsc::construct(1, m_size + 1);
         }
     }
 
@@ -1654,7 +1707,7 @@ namespace rsl
             size_type end
             ) noexcept
     {
-        if (end > m_size)
+        if (end > m_size) [[unlikely]]
         {
             end = m_size;
         }

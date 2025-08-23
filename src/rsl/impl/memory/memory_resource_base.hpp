@@ -340,6 +340,7 @@ namespace rsl
         [[nodiscard]] [[rythe_always_inline]] constexpr const UtilType* get_ptr() const noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr UtilType* get_ptr_at(size_type offset) noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const UtilType* get_ptr_at(size_type offset) const noexcept;
+        [[rythe_always_inline]] static constexpr void set_ptr(UtilType* const&) noexcept {}
 
         factory_storage_type m_factory;
         static_capacity_storage<conditional_t<Untyped, void, UtilType>, BufferSize> m_buffer;
