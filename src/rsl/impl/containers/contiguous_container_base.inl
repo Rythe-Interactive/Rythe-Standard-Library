@@ -16,6 +16,57 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::contiguous_container_base(
+            const contiguous_container_base& src
+            ) noexcept(is_nothrow_constructible_v<mem_rsc, const mem_rsc&>)
+        : mem_rsc(internal::alloc_and_factory_only_signal, src)
+    {
+        size_type memorySize;
+        if constexpr (use_post_fix)
+        {
+            memorySize = src.m_size + 1ull;
+        }
+        else
+        {
+            memorySize = src.m_size;
+        }
+
+        reserve(src.m_size);
+        m_size = src.m_size;
+        // will copy postfix from src if `use_post_fix`
+        copy_construct_from_unsafe_impl(0ull, memorySize, src.get_ptr());
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::contiguous_container_base(
+            contiguous_container_base&& src
+            ) noexcept(is_nothrow_constructible_v<mem_rsc, mem_rsc&&>)
+        : mem_rsc(internal::alloc_and_factory_only_signal, rsl::move(src))
+    {
+        size_type memorySize;
+        if constexpr (use_post_fix)
+        {
+            memorySize = src.m_size + 1ull;
+        }
+        else
+        {
+            memorySize = src.m_size;
+        }
+
+        if (src.is_static_memory())
+        {
+            mem_rsc::move(memorySize, 0ull, src.get_ptr());
+            return;
+        }
+
+        mem_rsc::set_ptr(src.get_ptr());
+        m_size = src.m_size;
+        m_capacity = src.m_capacity;
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
     constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::~contiguous_container_base()
     {
         if constexpr (!can_resize)
@@ -30,7 +81,7 @@ namespace rsl
             }
         }
 
-        if constexpr (can_reallocate)
+        if constexpr (can_allocate)
         {
             shrink_to_fit();
         }
@@ -74,6 +125,117 @@ namespace rsl
         {
             mem_rsc::construct(m_size);
         }
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    template <size_type N>
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo> contiguous_container_base<T, Alloc
+        , Factory, Iter, ConstIter, ContiguousContainerInfo>::from_array(const value_type (& arr)[N]) noexcept(copy_construct_noexcept)
+    {
+        contiguous_container_base result;
+        result.reserve(N);
+        result.m_size = N;
+        result.copy_construct_from_unsafe_impl(0ull, result.m_size, &arr[0]);
+
+        if constexpr (use_post_fix)
+        {
+            result.construct(1ull, result.m_size);
+        }
+
+        return result;
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    template <size_type N>
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo> contiguous_container_base<T, Alloc
+        , Factory, Iter, ConstIter, ContiguousContainerInfo>::from_array(value_type (&& arr)[N]) noexcept(move_construct_noexcept)
+    {
+        contiguous_container_base result;
+        result.reserve(N);
+        result.m_size = N;
+        result.move_construct_from_unsafe_impl(0ull, result.m_size, &arr[0]);
+
+        if constexpr (use_post_fix)
+        {
+            result.construct(1ull, result.m_size);
+        }
+
+        return result;
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo> contiguous_container_base<T, Alloc
+        , Factory, Iter, ConstIter, ContiguousContainerInfo>::from_buffer(
+            const value_type* ptr,
+            const size_type count
+            ) noexcept(copy_construct_noexcept)
+    {
+        contiguous_container_base result;
+        result.reserve(count);
+        result.m_size = count;
+        result.copy_construct_from_unsafe_impl(0ull, result.m_size, ptr);
+
+        if constexpr (use_post_fix)
+        {
+            result.construct(1ull, result.m_size);
+        }
+
+        return result;
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo> contiguous_container_base<T, Alloc
+        , Factory, Iter, ConstIter, ContiguousContainerInfo>::from_view(const_view_type src) noexcept(copy_construct_noexcept)
+    {
+        contiguous_container_base result;
+        result.reserve(src.size());
+        result.m_size = src.size();
+        result.copy_construct_from_unsafe_impl(0ull, result.m_size, src.data());
+
+        if constexpr (use_post_fix)
+        {
+            result.construct(1ull, result.m_size);
+        }
+
+        return result;
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo> contiguous_container_base<T, Alloc
+        , Factory, Iter, ConstIter, ContiguousContainerInfo>::create_reserved(const size_type capacity) noexcept
+        requires (can_allocate)
+    {
+        contiguous_container_base result;
+        result.reserve(capacity);
+
+        return result;
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    template <typename... Args>
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo> contiguous_container_base<T, Alloc
+        , Factory, Iter, ConstIter, ContiguousContainerInfo>::create_in_place(
+            const size_type count,
+            Args&&... args
+            ) noexcept(construct_noexcept<Args...>)
+    {
+        contiguous_container_base result;
+        result.reserve(count);
+        result.m_size = count;
+        result.construct(count, 0ull, rsl::forward<Args>(args)...);
+
+        if constexpr (use_post_fix)
+        {
+            result.construct(1ull, result.m_size);
+        }
+
+        return result;
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
@@ -202,7 +364,7 @@ namespace rsl
             }
         }
 
-        if constexpr (can_reallocate)
+        if constexpr (can_allocate)
         {
             reserve(newSize);
         }
@@ -234,7 +396,7 @@ namespace rsl
             const size_type newCapacity
             )
         noexcept(move_construct_noexcept)
-        requires (can_reallocate)
+        requires (can_allocate)
     {
         if (newCapacity < m_capacity) [[unlikely]]
         {
@@ -264,7 +426,7 @@ namespace rsl
               ContiguousContainerInfo>
     constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
                                              ContiguousContainerInfo>::shrink_to_fit() noexcept(move_construct_noexcept)
-        requires (can_reallocate)
+        requires (can_allocate)
     {
         if (m_size == 0ull)
         {
@@ -1183,7 +1345,7 @@ namespace rsl
               ContiguousContainerInfo>
     constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::
     maybe_shrink_to_static_storage() noexcept(move_construct_noexcept)
-        requires (can_reallocate)
+        requires (can_allocate)
     {
         if constexpr (internal::is_hybrid_resource_v<mem_rsc>)
         {
@@ -1220,7 +1382,7 @@ namespace rsl
     constexpr bool contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::maybe_grow()
         noexcept(move_construct_noexcept)
     {
-        if constexpr (can_reallocate)
+        if constexpr (can_allocate)
         {
             if constexpr (internal::is_dynamic_resource_v<mem_rsc>)
             {
@@ -1247,7 +1409,7 @@ namespace rsl
               ContiguousContainerInfo>
     constexpr bool contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::
     resize_capacity_unsafe(const size_type newCapacity) noexcept(move_construct_noexcept)
-        requires (can_reallocate)
+        requires (can_allocate)
     {
         size_type newMemorySize;
         size_type oldMemorySize;
@@ -1354,7 +1516,7 @@ namespace rsl
             }
         }
 
-        if constexpr (can_reallocate)
+        if constexpr (can_allocate)
         {
             if (srcSize > m_capacity || alloc != nullptr)
             {
@@ -1443,7 +1605,7 @@ namespace rsl
             }
         }
 
-        if constexpr (can_reallocate)
+        if constexpr (can_allocate)
         {
             if (srcSize > m_capacity)
             {
@@ -1511,7 +1673,7 @@ namespace rsl
     split_reserve(size_type pos, const size_type count, const size_type newSize) noexcept(move_construct_noexcept)
         requires (can_resize)
     {
-        if constexpr (can_reallocate)
+        if constexpr (can_allocate)
         {
             if (m_capacity == 0) [[unlikely]]
             {

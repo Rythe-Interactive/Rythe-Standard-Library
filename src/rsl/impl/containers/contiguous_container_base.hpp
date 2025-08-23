@@ -39,7 +39,7 @@ namespace rsl
 
         constexpr static bool use_post_fix = ContiguousContainerInfo::use_post_fix;
         constexpr static size_type static_capacity = ContiguousContainerInfo::static_capacity;
-        constexpr static bool can_reallocate = ContiguousContainerInfo::can_allocate;
+        constexpr static bool can_allocate = ContiguousContainerInfo::can_allocate;
         constexpr static bool can_resize = ContiguousContainerInfo::can_resize;
 
     protected:
@@ -51,11 +51,11 @@ namespace rsl
     public:
         [[rythe_always_inline]] constexpr contiguous_container_base() noexcept(is_nothrow_constructible_v<mem_rsc>);
         [[rythe_always_inline]] constexpr contiguous_container_base(
-                contiguous_container_base&& src
-                ) noexcept(is_nothrow_constructible_v<mem_rsc, mem_rsc&&>);
-        [[rythe_always_inline]] constexpr contiguous_container_base(
                 const contiguous_container_base& src
                 ) noexcept(is_nothrow_constructible_v<mem_rsc, const mem_rsc&>);
+        [[rythe_always_inline]] constexpr contiguous_container_base(
+                contiguous_container_base&& src
+                ) noexcept(is_nothrow_constructible_v<mem_rsc, mem_rsc&&>);
         constexpr virtual ~contiguous_container_base();
 
         [[rythe_always_inline]] explicit constexpr contiguous_container_base(
@@ -71,6 +71,34 @@ namespace rsl
                 const factory_storage_type& factoryStorage
                 )
             noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&, const factory_storage_type&>);
+
+        template <size_type N>
+        [[rythe_always_inline]] constexpr static contiguous_container_base from_array(
+                const value_type (& arr)[N]
+                )
+            noexcept(copy_construct_noexcept);
+        template <size_type N>
+        [[rythe_always_inline]] constexpr static contiguous_container_base from_array(
+                value_type (&& arr)[N]
+                ) noexcept(move_construct_noexcept);
+
+        [[rythe_always_inline]] constexpr static contiguous_container_base from_buffer(
+                const value_type* ptr,
+                size_type count
+                ) noexcept(copy_construct_noexcept);
+
+        [[rythe_always_inline]] constexpr static contiguous_container_base from_view(
+                const_view_type src
+                ) noexcept(copy_construct_noexcept);
+
+        [[rythe_always_inline]] constexpr static contiguous_container_base create_reserved(size_type capacity) noexcept
+            requires(can_allocate);
+
+        template <typename... Args>
+        [[rythe_always_inline]] constexpr static contiguous_container_base create_in_place(
+                size_type count,
+                Args&&... args
+                ) noexcept(construct_noexcept<Args...>);
 
         [[nodiscard]] [[rythe_always_inline]] constexpr size_type size() const noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr bool empty() const noexcept;
@@ -107,11 +135,11 @@ namespace rsl
             noexcept(construct_noexcept<Args...> && move_construct_noexcept)
             requires(can_resize);
         [[rythe_always_inline]] constexpr void reserve(size_type newCapacity) noexcept(move_construct_noexcept)
-            requires(can_reallocate);
+            requires(can_allocate);
         [[rythe_always_inline]] constexpr void reset() noexcept
             requires(can_resize);
         [[rythe_always_inline]] constexpr void shrink_to_fit() noexcept(move_construct_noexcept)
-            requires(can_reallocate);
+            requires(can_allocate);
 
         [[rythe_always_inline]] constexpr void push_back(const value_type& value) noexcept(copy_construct_noexcept)
             requires(can_resize);
@@ -316,14 +344,14 @@ namespace rsl
         constexpr static bool construct_noexcept = is_nothrow_constructible_v<value_type, Args...>;
 
         [[rythe_always_inline]] constexpr void maybe_shrink_to_static_storage() noexcept(move_construct_noexcept)
-            requires(can_reallocate);
+            requires(can_allocate);
 
         [[nodiscard]] [[rythe_always_inline]] constexpr bool maybe_grow() noexcept(move_construct_noexcept);
 
         [[nodiscard]] [[rythe_always_inline]] constexpr bool resize_capacity_unsafe(
                 size_type newCapacity
                 ) noexcept(move_construct_noexcept)
-            requires(can_reallocate);
+            requires(can_allocate);
 
         [[rythe_always_inline]] constexpr void
             copy_assign_impl(

@@ -25,6 +25,13 @@ namespace rsl
     template <>
     struct static_capacity_storage<void, 0ull> {};
 
+    namespace internal
+    {
+        struct alloc_and_factory_only_signal_type {};
+
+        constexpr alloc_and_factory_only_signal_type alloc_and_factory_only_signal{};
+    }
+
     template <allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>
     class dynamic_memory_resource_base
     {
@@ -39,22 +46,21 @@ namespace rsl
         [[rythe_always_inline]] constexpr dynamic_memory_resource_base()
             noexcept(is_nothrow_constructible_v<typed_alloc_type>) = default;
         [[rythe_always_inline]] constexpr dynamic_memory_resource_base(
+                internal::alloc_and_factory_only_signal_type,
                 const dynamic_memory_resource_base& other
                 )
-            noexcept(is_nothrow_copy_constructible_v<typed_alloc_type>) = default;
+            noexcept(is_nothrow_copy_constructible_v<typed_alloc_type>);
         [[rythe_always_inline]] constexpr dynamic_memory_resource_base(
-                dynamic_memory_resource_base&&
+                internal::alloc_and_factory_only_signal_type,
+                dynamic_memory_resource_base&& other
                 )
-            noexcept(is_nothrow_move_constructible_v<typed_alloc_type>) = default;
+            noexcept(is_nothrow_move_constructible_v<typed_alloc_type>);
 
-        [[rythe_always_inline]] constexpr dynamic_memory_resource_base& operator=(
-                const dynamic_memory_resource_base&
-                )
-            noexcept(is_nothrow_copy_assignable_v<typed_alloc_type>) = default;
-        [[rythe_always_inline]] constexpr dynamic_memory_resource_base& operator=(
-                dynamic_memory_resource_base&&
-                )
-            noexcept(is_nothrow_move_assignable_v<typed_alloc_type>) = default;
+        dynamic_memory_resource_base(const dynamic_memory_resource_base&) = delete;
+        dynamic_memory_resource_base(dynamic_memory_resource_base&&) = delete;
+
+        dynamic_memory_resource_base& operator=(const dynamic_memory_resource_base&) = delete;
+        dynamic_memory_resource_base& operator=(dynamic_memory_resource_base&&) = delete;
 
         virtual ~dynamic_memory_resource_base() = default;
 
@@ -273,22 +279,20 @@ namespace rsl
         [[rythe_always_inline]] constexpr static_memory_resource_base()
             noexcept(is_nothrow_constructible_v<factory_storage_type>) = default;
         [[rythe_always_inline]] constexpr static_memory_resource_base(
+                internal::alloc_and_factory_only_signal_type,
                 const static_memory_resource_base& other
                 )
-            noexcept(is_nothrow_copy_constructible_v<factory_storage_type>) = default;
+            noexcept(is_nothrow_copy_constructible_v<factory_storage_type>);
         [[rythe_always_inline]] constexpr static_memory_resource_base(
-                static_memory_resource_base&&
+                internal::alloc_and_factory_only_signal_type,
+                static_memory_resource_base&& other
                 )
-            noexcept(is_nothrow_move_constructible_v<factory_storage_type>) = default;
+            noexcept(is_nothrow_move_constructible_v<factory_storage_type>);
 
-        [[rythe_always_inline]] constexpr static_memory_resource_base& operator=(
-                const static_memory_resource_base&
-                )
-            noexcept(is_nothrow_copy_assignable_v<factory_storage_type>) = default;
-        [[rythe_always_inline]] constexpr static_memory_resource_base& operator=(
-                static_memory_resource_base&&
-                )
-            noexcept(is_nothrow_move_assignable_v<factory_storage_type>) = default;
+        static_memory_resource_base(const static_memory_resource_base&) = delete;
+        static_memory_resource_base(static_memory_resource_base&&) = delete;
+        static_memory_resource_base& operator=(const static_memory_resource_base&) = delete;
+        static_memory_resource_base& operator=(static_memory_resource_base&&) = delete;
 
         virtual ~static_memory_resource_base() = default;
 
@@ -402,22 +406,20 @@ namespace rsl
         [[rythe_always_inline]] constexpr hybrid_memory_resource_base()
             noexcept(is_nothrow_constructible_v<typed_alloc_type>) = default;
         [[rythe_always_inline]] constexpr hybrid_memory_resource_base(
+                internal::alloc_and_factory_only_signal_type,
                 const hybrid_memory_resource_base& other
                 )
-            noexcept(is_nothrow_copy_constructible_v<typed_alloc_type>) = default;
+            noexcept(is_nothrow_copy_constructible_v<factory_storage_type>);
         [[rythe_always_inline]] constexpr hybrid_memory_resource_base(
-                hybrid_memory_resource_base&&
+                internal::alloc_and_factory_only_signal_type,
+                hybrid_memory_resource_base&& other
                 )
-            noexcept(is_nothrow_move_constructible_v<typed_alloc_type>) = default;
+            noexcept(is_nothrow_move_constructible_v<factory_storage_type>);
 
-        [[rythe_always_inline]] constexpr hybrid_memory_resource_base& operator=(
-                const hybrid_memory_resource_base&
-                )
-            noexcept(is_nothrow_copy_assignable_v<typed_alloc_type>) = default;
-        [[rythe_always_inline]] constexpr hybrid_memory_resource_base& operator=(
-                hybrid_memory_resource_base&&
-                )
-            noexcept(is_nothrow_move_assignable_v<typed_alloc_type>) = default;
+        hybrid_memory_resource_base(const hybrid_memory_resource_base& other) = delete;
+        hybrid_memory_resource_base(hybrid_memory_resource_base&&) = delete;
+        hybrid_memory_resource_base& operator=(const hybrid_memory_resource_base&) = delete;
+        hybrid_memory_resource_base& operator=(hybrid_memory_resource_base&&) = delete;
 
         virtual ~hybrid_memory_resource_base() = default;
 
@@ -541,8 +543,11 @@ namespace rsl
         [[nodiscard]] [[rythe_always_inline]] constexpr UtilType* get_static_ptr_at(size_type offset) noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const UtilType* get_static_ptr_at(size_type offset) const noexcept;
 
-        [[rythe_always_inline]] constexpr void move_to_static_memory_and_deallocate(size_type count, size_type memoryCount)
-        noexcept(factory_traits<Factory>::noexcept_moveable);
+        [[rythe_always_inline]] constexpr void move_to_static_memory_and_deallocate(
+                size_type count,
+                size_type memoryCount
+                )
+            noexcept(factory_traits<Factory>::noexcept_moveable);
         [[rythe_always_inline]] constexpr void set_ptr_to_static_memory() noexcept;
 
         static_capacity_storage<conditional_t<Untyped, void, UtilType>, BufferSize> m_buffer;
