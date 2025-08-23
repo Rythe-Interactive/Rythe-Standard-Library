@@ -3,7 +3,7 @@
 
 namespace rsl
 {
-	inline constexpr void* heap_allocator::allocate(size_type size) noexcept
+    constexpr void* heap_allocator::allocate(const size_type size) noexcept
 	{
 		if (is_constant_evaluated())
 		{
@@ -15,7 +15,7 @@ namespace rsl
 		}
 	}
 
-	inline constexpr void* heap_allocator::allocate(size_type size, size_type alignment) noexcept
+    constexpr void* heap_allocator::allocate(const size_type size, const size_type alignment) noexcept
 	{
 		if (is_constant_evaluated())
 		{
@@ -27,7 +27,7 @@ namespace rsl
 		}
 	}
 
-	inline constexpr void* heap_allocator::reallocate(void* ptr, size_type oldSize, size_type newSize) noexcept
+    constexpr void* heap_allocator::reallocate(void* ptr, const size_type oldSize, const size_type newSize) noexcept
 	{
 		if (is_constant_evaluated())
 		{
@@ -47,10 +47,10 @@ namespace rsl
 		{
 			void* mem = nullptr;
 
-			if (newSize != 0)
+			if (newSize != 0) [[likely]]
 			{
 				mem = ::operator new(newSize, std::nothrow);
-				if (mem)
+				if (mem) [[likely]]
 				{
 					memcpy(mem, ptr, std::min(oldSize, newSize));
 				}
@@ -62,8 +62,8 @@ namespace rsl
 		}
 	}
 
-	inline constexpr void*
-	heap_allocator::reallocate(void* ptr, size_type oldSize, size_type newSize, size_type alignment) noexcept
+    constexpr void*
+	heap_allocator::reallocate(void* ptr, const size_type oldSize, const size_type newSize, const size_type alignment) noexcept
 	{
 		if (is_constant_evaluated())
 		{
@@ -83,10 +83,10 @@ namespace rsl
 		{
 			void* mem = nullptr;
 
-			if (newSize != 0)
+			if (newSize != 0) [[likely]]
 			{
 				mem = ::operator new(newSize, std::align_val_t{alignment}, std::nothrow);
-				if (mem)
+				if (mem) [[likely]]
 				{
 					memcpy(mem, ptr, std::min(oldSize, newSize));
 				}
@@ -98,7 +98,7 @@ namespace rsl
 		}
 	}
 
-	inline constexpr void heap_allocator::deallocate(void* ptr, size_type size) noexcept
+    constexpr void heap_allocator::deallocate(void* ptr, const size_type size) noexcept
 	{
 		if (is_constant_evaluated())
 		{
@@ -110,7 +110,7 @@ namespace rsl
 		}
 	}
 
-	inline constexpr void heap_allocator::deallocate(void* ptr, size_type size, size_type alignment) noexcept
+    constexpr void heap_allocator::deallocate(void* ptr, const size_type size, const size_type alignment) noexcept
 	{
 		if (is_constant_evaluated())
 		{
