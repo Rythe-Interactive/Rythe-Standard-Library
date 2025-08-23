@@ -27,7 +27,17 @@ namespace rsl
         using factory_storage_type = factory_storage<default_factory<CharType>>;
         using factory_t = default_factory<CharType>;
 
-        using container_base::contiguous_container_base;
+        using contiguous_container_base<
+            CharType, Alloc, default_factory<CharType>, CharType*, const CharType*, contiguous_container_info<
+                true, StaticCapacity, !is_same_v<Alloc, mock_allocator>, true>>::contiguous_container_base;
+
+        [[rythe_always_inline]] constexpr basic_dynamic_string(
+                const container_base& src
+                )
+            noexcept(container_base::copy_construct_container_noexcept);
+        [[rythe_always_inline]] constexpr basic_dynamic_string(
+                container_base&& src
+                ) noexcept(container_base::move_construct_container_noexcept);
 
         using container_base::operator view_type;
         using container_base::operator const_view_type;
@@ -43,13 +53,19 @@ namespace rsl
 
     using dynamic_string = basic_dynamic_string<>;
 
-    template <size_type StaticCapacity>
-    using hybrid_string = basic_dynamic_string<char, default_allocator, StaticCapacity>;
+    template <size_type StaticCapacity, allocator_type Alloc = default_allocator>
+    using hybrid_string = basic_dynamic_string<char, Alloc, StaticCapacity>;
 
     template <size_type StaticCapacity>
     using static_string = basic_dynamic_string<char, mock_allocator, StaticCapacity>;
 
     using dynamic_wstring = basic_dynamic_string<utf16>;
+
+    template <size_type StaticCapacity, allocator_type Alloc = default_allocator>
+    using hybrid_wstring = basic_dynamic_string<utf16, Alloc, StaticCapacity>;
+
+    template <size_type StaticCapacity>
+    using static_wstring = basic_dynamic_string<utf16, mock_allocator, StaticCapacity>;
 
     dynamic_wstring to_utf16(dynamic_string::const_view_type str);
 

@@ -1894,7 +1894,7 @@ namespace rsl
     template<typename T>
     [[rythe_always_inline]] constexpr T* advance(T* ptr, const size_type count) noexcept
 	{
-	    return bit_cast<const T*>(advance(static_cast<void*>(ptr), count));
+	    return bit_cast<T*>(advance(static_cast<void*>(ptr), count));
 	}
 
     template<typename T>
@@ -1906,7 +1906,7 @@ namespace rsl
     template<typename T>
     [[rythe_always_inline]] constexpr T* advance(T* ptr, const diff_type count) noexcept
 	{
-	    return bit_cast<const T*>(advance(static_cast<void*>(ptr), count));
+	    return bit_cast<T*>(advance(static_cast<void*>(ptr), count));
 	}
 
 	template <typename LHS, typename RHS>

@@ -18,7 +18,7 @@ namespace rsl
               ContiguousContainerInfo>
     constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::contiguous_container_base(
             const contiguous_container_base& src
-            ) noexcept(is_nothrow_constructible_v<mem_rsc, const mem_rsc&>)
+            ) noexcept(copy_construct_container_noexcept)
         : mem_rsc(internal::alloc_and_factory_only_signal, src)
     {
         size_type memorySize;
@@ -41,7 +41,7 @@ namespace rsl
               ContiguousContainerInfo>
     constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::contiguous_container_base(
             contiguous_container_base&& src
-            ) noexcept(is_nothrow_constructible_v<mem_rsc, mem_rsc&&>)
+            ) noexcept(move_construct_container_noexcept)
         : mem_rsc(internal::alloc_and_factory_only_signal, rsl::move(src))
     {
         size_type memorySize;
@@ -267,7 +267,14 @@ namespace rsl
             const contiguous_container_base& src
             ) noexcept(copy_assign_noexcept && copy_construct_noexcept)
     {
-        copy_assign_impl(src.get_ptr(), src.m_size, mem_rsc::m_alloc == src.m_alloc ? nullptr : &src.m_alloc);
+        if constexpr (internal::is_static_resource_v<mem_rsc>)
+        {
+            copy_assign_impl(src.get_ptr(), src.m_size, mem_rsc::m_factory == src.m_factory ? nullptr : &src.m_factory);
+        }
+        else
+        {
+            copy_assign_impl(src.get_ptr(), src.m_size, mem_rsc::m_alloc == src.m_alloc ? nullptr : &src.m_alloc);
+        }
         return *this;
     }
 
@@ -276,7 +283,15 @@ namespace rsl
     constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>& contiguous_container_base<T,
         Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::operator=(contiguous_container_base&& src) noexcept
     {
-        mem_rsc::operator=(move(src));
+        if constexpr (internal::has_factory_v<mem_rsc>)
+        {
+            mem_rsc::set_factory(rsl::move(src.get_factory_storage()));
+        }
+        if constexpr (internal::has_allocator_v<mem_rsc>)
+        {
+            mem_rsc::set_allocator(rsl::move(src.get_allocator_storage()));
+        }
+
         src.set_ptr(nullptr);
         if constexpr (use_post_fix && !internal::is_dynamic_resource_v<mem_rsc>)
         {
@@ -1500,7 +1515,7 @@ namespace rsl
     copy_assign_impl(
             const value_type* src,
             size_type srcSize,
-            typename mem_rsc::typed_alloc_type* alloc
+            void* allocOrFactory
             ) noexcept(copy_assign_noexcept && copy_construct_noexcept)
     {
         if constexpr (!can_resize)
@@ -1518,7 +1533,7 @@ namespace rsl
 
         if constexpr (can_allocate)
         {
-            if (srcSize > m_capacity || alloc != nullptr)
+            if (srcSize > m_capacity || allocOrFactory != nullptr)
             {
                 if (mem_rsc::get_ptr()) [[likely]]
                 {
@@ -1540,9 +1555,9 @@ namespace rsl
                 rsl_assert_frequent(m_size == 0);
                 rsl_assert_frequent(m_capacity == 0);
 
-                if (alloc)
+                if (allocOrFactory)
                 {
-                    mem_rsc::m_alloc = *alloc;
+                    mem_rsc::m_alloc = *static_cast<mem_rsc::typed_alloc_type*>(allocOrFactory);
                 }
 
                 reserve(srcSize);
@@ -1550,7 +1565,11 @@ namespace rsl
         }
         else
         {
-            rsl_assert_invalid_operation(alloc == nullptr);
+            if (allocOrFactory)
+            {
+                mem_rsc::m_factory = *static_cast<mem_rsc::factory_storage_type*>(allocOrFactory);
+            }
+
             if (srcSize > m_capacity)
             {
                 srcSize = m_capacity;

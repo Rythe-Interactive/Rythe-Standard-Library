@@ -48,14 +48,17 @@ namespace rsl
         constexpr static bool move_assign_noexcept = is_nothrow_move_assignable_v<value_type>;
         constexpr static bool move_construct_noexcept = is_nothrow_move_constructible_v<value_type>;
 
+        constexpr static bool copy_construct_container_noexcept = is_nothrow_copy_constructible_v<mem_rsc>;
+        constexpr static bool move_construct_container_noexcept = is_nothrow_move_constructible_v<mem_rsc>;
+
     public:
         [[rythe_always_inline]] constexpr contiguous_container_base() noexcept(is_nothrow_constructible_v<mem_rsc>);
         [[rythe_always_inline]] constexpr contiguous_container_base(
                 const contiguous_container_base& src
-                ) noexcept(is_nothrow_constructible_v<mem_rsc, const mem_rsc&>);
+                ) noexcept(copy_construct_container_noexcept);
         [[rythe_always_inline]] constexpr contiguous_container_base(
                 contiguous_container_base&& src
-                ) noexcept(is_nothrow_constructible_v<mem_rsc, mem_rsc&&>);
+                ) noexcept(move_construct_container_noexcept);
         constexpr virtual ~contiguous_container_base();
 
         [[rythe_always_inline]] explicit constexpr contiguous_container_base(
@@ -357,7 +360,7 @@ namespace rsl
             copy_assign_impl(
                     const value_type* src,
                     size_type srcSize,
-                    typename mem_rsc::typed_alloc_type* alloc = nullptr
+                    void* allocOrFactory = nullptr
                     )
                 noexcept(copy_assign_noexcept && copy_construct_noexcept);
 

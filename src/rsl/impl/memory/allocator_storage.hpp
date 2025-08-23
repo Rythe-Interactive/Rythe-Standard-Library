@@ -7,7 +7,7 @@ namespace rsl
     struct allocator_storage;
 
     template <allocator_type Alloc>
-        requires !is_empty_v<Alloc>
+        requires (!is_empty_v<Alloc>)
     struct allocator_storage<Alloc> final
     {
         [[rythe_always_inline]] constexpr allocator_storage() noexcept(is_nothrow_constructible_v<Alloc>) = default;
@@ -29,7 +29,7 @@ namespace rsl
     };
 
     template <allocator_type Alloc>
-        requires is_empty_v<Alloc>
+        requires (is_empty_v<Alloc>)
     struct allocator_storage<Alloc> final
     {
         [[rythe_always_inline]] constexpr allocator_storage() noexcept = default;

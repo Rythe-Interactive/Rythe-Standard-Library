@@ -7,7 +7,7 @@ namespace rsl
     struct factory_storage;
 
 	template <factory_type Factory>
-        requires !is_empty_v<Factory>
+        requires (!is_empty_v<Factory>)
 	struct factory_storage<Factory> final
 	{
 		[[rythe_always_inline]] constexpr factory_storage() noexcept(is_nothrow_constructible_v<Factory>) = default;
@@ -35,7 +35,7 @@ namespace rsl
 	};
 
     template <factory_type Factory>
-        requires is_empty_v<Factory>
+        requires (is_empty_v<Factory>)
     struct factory_storage<Factory> final
     {
         [[rythe_always_inline]] constexpr factory_storage() noexcept = default;

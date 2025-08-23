@@ -324,7 +324,11 @@ namespace rsl
     #define rythe_closed_enum clang::enum_extensibility(closed)
     #define rythe_flag_enum clang::flag_enum
     #define rythe_preferred_name(name) clang::preferred_name(name)
-    #define rythe_no_unique_address no_unique_address
+    #if defined(RYTHE_CLANG_MSVC)
+        #define rythe_no_unique_address msvc::no_unique_address
+    #else
+        #define rythe_no_unique_address no_unique_address
+    #endif
 #elif defined(RYTHE_MSVC)
     #define rythe_never_inline msvc::noinline
     #define rythe_allocating

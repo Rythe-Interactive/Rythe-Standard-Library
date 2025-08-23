@@ -29,7 +29,17 @@ namespace rsl
         using factory_storage_type = factory_storage<Factory>;
         using factory_t = Factory;
 
-        using container_base::contiguous_container_base;
+        using contiguous_container_base<
+            T, Alloc, Factory, T*, const T*, contiguous_container_info<
+                false, StaticCapacity, !is_same_v<Alloc, mock_allocator>, CanResize>>::contiguous_container_base;
+
+        [[rythe_always_inline]] constexpr basic_dynamic_array(
+                const container_base& src
+                )
+            noexcept(container_base::copy_construct_container_noexcept);
+        [[rythe_always_inline]] constexpr basic_dynamic_array(
+                container_base&& src
+                ) noexcept(container_base::move_construct_container_noexcept);
 
         using container_base::operator view_type;
         using container_base::operator const_view_type;

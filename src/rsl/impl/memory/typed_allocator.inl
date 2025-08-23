@@ -2,21 +2,24 @@
 
 namespace rsl
 {
-    template <typename TypedAllocator>
-    [[nodiscard]] [[rythe_always_inline]] constexpr size_type typed_allocator_impl<TypedAllocator>::type_size() const noexcept
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    [[nodiscard]] [[rythe_always_inline]] constexpr size_type typed_allocator_impl<
+        TypedAllocator, T, Alloc, Factory>::type_size() const noexcept
     {
         return self().get_factory().type_size();
     }
 
-    template <typename TypedAllocator>
-    constexpr typename TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::allocate(const size_type count) noexcept
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr T* typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::allocate(
+            const size_type count
+            ) noexcept
     {
         allocator_t& allocator = self().get_allocator();
         return bit_cast<value_type*>(allocator.allocate(count * type_size()));
     }
 
-    template <typename TypedAllocator>
-    constexpr typename TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::allocate(
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr T* typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::allocate(
             const size_type count,
             size_type alignment
             ) noexcept
@@ -25,8 +28,8 @@ namespace rsl
         return bit_cast<value_type*>(allocator.allocate(count * type_size(), alignment));
     }
 
-    template <typename TypedAllocator>
-    constexpr typename TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::reallocate(
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr T* typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::reallocate(
             value_type* ptr,
             const size_type oldCount,
             const size_type newCount
@@ -59,8 +62,9 @@ namespace rsl
         }
     }
 
-    template <typename TypedAllocator>
-    constexpr typename typed_allocator_impl<TypedAllocator>::value_type* typed_allocator_impl<TypedAllocator>::reallocate(
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr typename typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::value_type* typed_allocator_impl<
+        TypedAllocator, T, Alloc, Factory>::reallocate(
             value_type* ptr,
             const size_type oldCount,
             const size_type newCount,
@@ -99,14 +103,14 @@ namespace rsl
         }
     }
 
-    template <typename TypedAllocator>
-    constexpr void typed_allocator_impl<TypedAllocator>::deallocate(value_type* ptr, const size_type count) noexcept
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr void typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::deallocate(value_type* ptr, const size_type count) noexcept
     {
         self().get_allocator().deallocate(ptr, count * type_size());
     }
 
-    template <typename TypedAllocator>
-    constexpr void typed_allocator_impl<TypedAllocator>::deallocate(
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr void typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::deallocate(
             value_type* ptr,
             const size_type count,
             size_type alignment
@@ -115,9 +119,9 @@ namespace rsl
         self().get_allocator().deallocate(ptr, count * type_size(), alignment);
     }
 
-    template <typename TypedAllocator>
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
     template <typename... Args>
-    constexpr typename TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::construct(
+    constexpr T* typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::construct(
             value_type* ptr,
             const size_type count,
             Args&&... args
@@ -127,8 +131,8 @@ namespace rsl
         return self().get_factory().construct(ptr, count, rsl::forward<Args>(args)...);
     }
 
-    template <typename TypedAllocator>
-    constexpr typename TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::copy(
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr T* typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::copy(
             value_type* dst,
             const value_type* src,
             const size_type count
@@ -138,8 +142,8 @@ namespace rsl
         return self().get_factory().copy(dst, src, count);
     }
 
-    template <typename TypedAllocator>
-    constexpr typename TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::move(
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr T* typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::move(
             value_type* dst,
             value_type* src,
             const size_type count
@@ -149,16 +153,16 @@ namespace rsl
         return self().get_factory().move(dst, src, count);
     }
 
-    template <typename TypedAllocator>
-    constexpr void typed_allocator_impl<TypedAllocator>::destroy(value_type* ptr, size_type count) noexcept
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr void typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::destroy(value_type* ptr, size_type count) noexcept
     {
         self().get_factory().destroy(ptr, count);
     }
 
-    template <typename TypedAllocator>
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
     template <typename... Args>
-    constexpr TypedAllocator::value_type*
-    typed_allocator_impl<TypedAllocator>::allocate_and_construct(
+    constexpr T*
+    typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::allocate_and_construct(
             const size_type count,
             Args&&... args
             )
@@ -168,9 +172,10 @@ namespace rsl
         return construct(mem, count, forward<Args>(args)...);
     }
 
-    template <typename TypedAllocator>
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
     template <typename... Args>
-    constexpr typename TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::allocate_aligned_and_construct(
+    constexpr T* typed_allocator_impl<
+        TypedAllocator, T, Alloc, Factory>::allocate_aligned_and_construct(
             const size_type count,
             const size_type alignment,
             Args&&... args
@@ -180,9 +185,9 @@ namespace rsl
         return construct(mem, count, forward<Args>(args)...);
     }
 
-    template <typename TypedAllocator>
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
     template <typename... Args>
-    constexpr typename TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::reallocate_and_construct(
+    constexpr T* typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::reallocate_and_construct(
             value_type* ptr,
             const size_type oldCount,
             const size_type newCount,
@@ -229,9 +234,10 @@ namespace rsl
         }
     }
 
-    template <typename TypedAllocator>
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
     template <typename... Args>
-    constexpr typename TypedAllocator::value_type* typed_allocator_impl<TypedAllocator>::reallocate_aligned_and_construct(
+    constexpr T* typed_allocator_impl<
+        TypedAllocator, T, Alloc, Factory>::reallocate_aligned_and_construct(
             value_type* ptr,
             const size_type oldCount,
             const size_type newCount,
@@ -284,15 +290,18 @@ namespace rsl
         }
     }
 
-    template <typename TypedAllocator>
-    constexpr void typed_allocator_impl<TypedAllocator>::destroy_and_deallocate(value_type* ptr, const size_type count) noexcept
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr void typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::destroy_and_deallocate(
+            value_type* ptr,
+            const size_type count
+            ) noexcept
     {
         destroy(ptr, count);
         deallocate(ptr, count);
     }
 
-    template <typename TypedAllocator>
-    constexpr void typed_allocator_impl<TypedAllocator>::destroy_and_deallocate_aligned(
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr void typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::destroy_and_deallocate_aligned(
             value_type* ptr,
             const size_type count,
             const size_type alignment
@@ -302,14 +311,14 @@ namespace rsl
         deallocate(ptr, count, alignment);
     }
 
-    template <typename TypedAllocator>
-    constexpr TypedAllocator& typed_allocator_impl<TypedAllocator>::self() noexcept
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr TypedAllocator& typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::self() noexcept
     {
         return static_cast<TypedAllocator&>(*this);
     }
 
-    template <typename TypedAllocator>
-    constexpr const TypedAllocator& typed_allocator_impl<TypedAllocator>::self() const noexcept
+    template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
+    constexpr const TypedAllocator& typed_allocator_impl<TypedAllocator, T, Alloc, Factory>::self() const noexcept
     {
         return static_cast<const TypedAllocator&>(*this);
     }
@@ -509,9 +518,9 @@ namespace rsl
             const size_type count
             )
         noexcept(factory_traits<Factory>::noexcept_copyable)
-	{
-	    return m_factory->copy(dst, src, count);
-	}
+    {
+        return m_factory->copy(dst, src, count);
+    }
 
     template <allocator_type Alloc, untyped_factory_type Factory>
     constexpr void* type_erased_allocator<Alloc, Factory>::move(

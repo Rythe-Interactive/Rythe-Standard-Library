@@ -24,6 +24,7 @@ namespace rsl::log
 		NO_DTOR_RULE5_CONSTEXPR_NOEXCEPT(flag_formatter)
 		virtual ~flag_formatter() = default;
 		virtual void format(const message& msg, const time::point32 time, fmt::memory_buffer& dest) = 0;
+	    virtual void set_flag_options(string_view) {}
 	};
 
 	class pattern_formatter final : public formatter
@@ -31,7 +32,7 @@ namespace rsl::log
 	public:
 		using input_flag_pair = pair<char, temporary_object<flag_formatter>>;
 
-		template <typename Iter = input_flag_pair*, typename ConstIter = internal::select_const_iter<input_flag_pair, Iter>>
+		template <typename Iter = input_flag_pair*, typename ConstIter = rsl::internal::select_const_iter<input_flag_pair, Iter>>
 		explicit pattern_formatter(string_view pattern, iterator_view<input_flag_pair, Iter, ConstIter> flags = {});
 
 		void format(const message& msg, fmt::memory_buffer& dest) override;
