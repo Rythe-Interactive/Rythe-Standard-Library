@@ -276,12 +276,12 @@ namespace rsl
         // Returns amount of items removed, specific location of erasure is not possible to reconstruct.
         template <typename Comp>
         [[rythe_always_inline]] constexpr size_type erase_swap(const Comp& comparable) noexcept(move_construct_noexcept)
-            requires equality_comparable_with<Comp, value_type> && can_resize;
+            requires equality_comparable_with<Comp, T> && can_resize;
 
         // Returns amount of items removed, specific location of erasure is not possible to reconstruct.
         template <typename Func>
         [[rythe_always_inline]] constexpr size_type erase_swap(Func&& comparer) noexcept(move_construct_noexcept)
-            requires invocable<Func, bool(const_iterator_type)> && can_resize;
+            requires invocable<Func, bool(ConstIter)> && can_resize;
 
         // Unless specifically required, use erase_swap for single erasures.
         // If it's possible to do a bulk erasure, then erase_shift in bulk might be faster. Try both and test!
@@ -297,14 +297,14 @@ namespace rsl
         // Returns amount of items removed, specific location of erasure is not possible to reconstruct.
         template <typename Comp>
         [[rythe_always_inline]] constexpr size_type erase_shift(const Comp& comparable) noexcept(move_construct_noexcept)
-            requires equality_comparable_with<Comp, value_type> && can_resize;
+            requires equality_comparable_with<Comp, T> && can_resize;
 
         // Unless specifically required use erase_swap for selective erasures.
         // Depending on your use case erase_swap might be faster. Try both and test!
         // Returns amount of items removed, specific location of erasure is not possible to reconstruct.
         template <typename Func>
         [[rythe_always_inline]] constexpr size_type erase_shift(Func&& comparer) noexcept(move_construct_noexcept)
-            requires invocable<Func, bool(const_iterator_type)> && can_resize;
+            requires invocable<Func, bool(ConstIter)> && can_resize;
 
         [[nodiscard]] [[rythe_always_inline]] constexpr value_type& at(size_type i) noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const value_type& at(size_type i) const noexcept;

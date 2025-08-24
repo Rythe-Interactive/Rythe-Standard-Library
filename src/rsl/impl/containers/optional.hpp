@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../memory/factory_storage.hpp"
-#include "../util/type_traits.hpp"
-#include "../util/assert.hpp"
 
 namespace rsl
 {

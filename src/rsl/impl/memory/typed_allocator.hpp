@@ -3,6 +3,8 @@
 #include "allocator_storage.hpp"
 #include "factory_storage.hpp"
 
+#include "mock_allocator.hpp"
+
 namespace rsl
 {
     template <typename TypedAllocator, typename T, allocator_type Alloc, factory_type Factory>
