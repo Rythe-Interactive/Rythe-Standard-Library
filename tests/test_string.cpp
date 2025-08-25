@@ -41,16 +41,41 @@ TEST_CASE("string","[containers]")
 
 	SECTION("search")
 	{
-		array_view str = "abcdeffedcba";
+		array_view str = "abcdeffedcbaabcdeffedcba";
 
+	    {
+		    size_type offset = rsl::linear_search_sequence(str, "effed"_sv, 0);
+		    REQUIRE(offset == 4);
+		    REQUIRE(str[offset] == 'e');
+	    }
+	    {
+		    size_type offset = rsl::reverse_linear_search_sequence(str, "effed"_sv, 0);
+		    REQUIRE(offset == 16);
+		    REQUIRE(str[offset] == 'e');
+	    }
+	    {
+		    size_type offset = rsl::linear_search_sequence(str, "effed"_sv, 10);
+		    REQUIRE(offset == 16);
+		    REQUIRE(str[offset] == 'e');
+	    }
 		{
 			size_type offset = rsl::linear_search(str, 'd', 0);
 			REQUIRE(offset == 3);
 			REQUIRE(str[offset] == 'd');
 		}
+	    {
+		    size_type offset = rsl::linear_search(str, 'd', 10);
+		    REQUIRE(offset == 15);
+		    REQUIRE(str[offset] == 'd');
+	    }
 		{
 			size_type offset = rsl::linear_search(str, 'c', 0);
 			REQUIRE(offset == 2);
+			REQUIRE(str[offset] == 'c');
+		}
+		{
+			size_type offset = rsl::linear_search(str, 'c', 5);
+			REQUIRE(offset == 9);
 			REQUIRE(str[offset] == 'c');
 		}
 		{
@@ -65,6 +90,11 @@ TEST_CASE("string","[containers]")
 			REQUIRE(str[offset] == 'a');
 		}
 		{
+			size_type offset = rsl::linear_search_not_eq(str, 'f', 5);
+			REQUIRE(offset == 7);
+			REQUIRE(str[offset] == 'e');
+		}
+		{
 			size_type offset = rsl::linear_search_not_eq(str, 'a', 0);
 			REQUIRE(offset == 1);
 			REQUIRE(str[offset] == 'b');
@@ -77,33 +107,33 @@ TEST_CASE("string","[containers]")
 
 		{
 			size_type offset = rsl::reverse_linear_search(str, 'd', 0);
-			REQUIRE(offset == 8);
+			REQUIRE(offset == 20);
 			REQUIRE(str[offset] == 'd');
 		}
 		{
 			size_type offset = rsl::reverse_linear_search(str, 'c', 0);
-			REQUIRE(offset == 9);
+			REQUIRE(offset == 21);
 			REQUIRE(str[offset] == 'c');
 		}
 		{
 			size_type offset = rsl::reverse_linear_search_collection(str, "efb"_sv, 0);
-			REQUIRE(offset == 10);
+			REQUIRE(offset == 22);
 			REQUIRE(str[offset] == 'b');
 		}
 
 		{
 			size_type offset = rsl::reverse_linear_search_not_eq(str, 'd', 0);
-			REQUIRE(offset == 11);
+			REQUIRE(offset == 23);
 			REQUIRE(str[offset] == 'a');
 		}
 		{
 			size_type offset = rsl::reverse_linear_search_not_eq(str, 'a', 0);
-			REQUIRE(offset == 10);
+			REQUIRE(offset == 22);
 			REQUIRE(str[offset] == 'b');
 		}
 		{
 			size_type offset = rsl::reverse_linear_search_outside_collection(str, "abcde"_sv, 0);
-			REQUIRE(offset == 6);
+			REQUIRE(offset == 18);
 			REQUIRE(str[offset] == 'f');
 		}
 	}

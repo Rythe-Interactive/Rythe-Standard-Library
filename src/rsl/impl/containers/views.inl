@@ -298,7 +298,7 @@ namespace rsl
 
             if (keyIter == keyEnd)
             {
-                return offset;
+                return offset - (key.size() - 1ull);
             }
             ++offset;
         }
