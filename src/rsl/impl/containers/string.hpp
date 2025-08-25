@@ -44,8 +44,6 @@ namespace rsl
 
         using container_base::operator[];
         using container_base::operator=;
-        using container_base::operator==;
-        using container_base::operator!=;
 
         // operator+=
         [[rythe_always_inline]] constexpr basic_dynamic_string& operator+=(const_view_type rhs);

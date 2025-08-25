@@ -1799,7 +1799,7 @@ namespace rsl
 	struct any_type
 	{
 		template <typename T>
-		constexpr operator T&(); // implicit conversion to any type. NOLINT
+		constexpr operator T(); // implicit conversion to any type. NOLINT
 
 		template <typename T>
 		constexpr any_type(const T&); // implicit conversion from any type. NOLINT

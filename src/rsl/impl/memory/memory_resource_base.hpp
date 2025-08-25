@@ -639,7 +639,7 @@ namespace rsl
             typename T,
             allocator_type Alloc,
             factory_type Factory,
-            size_type StaticStorageCount,
+            size_type StaticStorageCount = 0ull,
             bool CanAllocate = !is_same_v<Alloc, mock_allocator>,
             bool Untyped = untyped_factory_type<Factory>>
         struct select_memory_resource;
@@ -752,6 +752,31 @@ namespace rsl
         template <typename T>
         constexpr bool has_allocator_v = !is_static_resource_v<T>;
 
+        template<typename MemRsc>
+        void move_alloc_and_factory(MemRsc& dst, MemRsc&& src)
+        {
+            if constexpr (internal::has_allocator_v<MemRsc>)
+            {
+                dst.set_allocator(rsl::move(src.get_allocator_storage()));
+            }
+            if constexpr (internal::has_factory_v<MemRsc>)
+            {
+                dst.set_factory(rsl::move(src.get_factory_storage()));
+            }
+        }
+
+        template<typename MemRsc>
+        void copy_alloc_and_factory(MemRsc& dst, const MemRsc& src)
+        {
+            if constexpr (internal::has_allocator_v<MemRsc>)
+            {
+                dst.set_allocator(src.get_allocator_storage());
+            }
+            if constexpr (internal::has_factory_v<MemRsc>)
+            {
+                dst.set_factory(src.get_factory_storage());
+            }
+        }
     } // namespace internal
 }     // namespace rsl
 

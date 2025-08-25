@@ -127,9 +127,6 @@ namespace rsl
                 )
             noexcept(copy_assign_noexcept && copy_construct_noexcept);
 
-        [[rythe_always_inline]] constexpr bool operator==(const contiguous_container_base& rhs);
-        [[rythe_always_inline]] constexpr bool operator!=(const contiguous_container_base& rhs);
-
         template <typename... Args>
         [[rythe_always_inline]] constexpr void resize(
                 size_type newSize,
@@ -356,13 +353,12 @@ namespace rsl
                 ) noexcept(move_construct_noexcept)
             requires(can_allocate);
 
-        [[rythe_always_inline]] constexpr void
-            copy_assign_impl(
-                    const value_type* src,
-                    size_type srcSize,
-                    void* allocOrFactory = nullptr
-                    )
-                noexcept(copy_assign_noexcept && copy_construct_noexcept);
+        [[rythe_always_inline]] constexpr void copy_assign_impl(
+                const value_type* src,
+                size_type srcSize,
+                void* allocOrFactory = nullptr
+                )
+            noexcept(copy_assign_noexcept && copy_construct_noexcept);
 
         [[rythe_always_inline]] constexpr void move_data_assign_impl(
                 const value_type* src,
@@ -436,6 +432,20 @@ namespace rsl
         size_type m_size = can_resize ? 0ull : static_capacity;
         size_type m_capacity = static_capacity;
     };
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    [[rythe_always_inline]] constexpr bool operator==(
+            const contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>& lhs,
+            const contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>& rhs
+            ) noexcept;
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    [[rythe_always_inline]] constexpr bool operator!=(
+            const contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>& lhs,
+            const contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>& rhs
+            ) noexcept { return !(lhs == rhs); }
 } // namespace rsl
 
 #include "contiguous_container_base.inl"

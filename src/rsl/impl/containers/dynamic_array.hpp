@@ -46,8 +46,6 @@ namespace rsl
 
         using container_base::operator[];
         using container_base::operator=;
-        using container_base::operator==;
-        using container_base::operator!=;
     };
 
     template <typename T, allocator_type Alloc = default_allocator, typed_factory_type Factory = default_factory<T>>

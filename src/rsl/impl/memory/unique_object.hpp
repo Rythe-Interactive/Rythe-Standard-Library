@@ -107,7 +107,7 @@ namespace rsl
 
 		template <typename... Args>
 		[[rythe_always_inline]] constexpr void arm(Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>)
-			requires (factory_t::valid_factory);
+			requires (Factory::valid_factory);
 
 		factory_storage_type m_factory;
 	};

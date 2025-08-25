@@ -131,8 +131,7 @@ namespace rsl
 		constexpr static id_type type_id() noexcept { rsl_assert_unreachable(); return 0; }
 	};
 
-	template <typename T>
-		requires (!is_constructible_any_v<T>)
+	template <not_constructible T>
 	class default_factory<T> : public default_factory<void> {};
 
 	class polymorphic_factory

@@ -306,12 +306,19 @@ namespace rsl
 	template <size_type N>
 	inline constexpr size_type constexpr_string<N>::size() const noexcept
 	{
-		size_type s = 0ull;
-		while (s + 1 < N && buffer[s])
-		{
-			++s;
-		}
-		return s;
+        if constexpr (N == 1ull)
+        {
+            return buffer[0] != '\0';
+        }
+	    else
+	    {
+	        size_type s = 0ull;
+	        while (s + 1 < N && buffer[s])
+	        {
+	            ++s;
+	        }
+	        return s;
+	    }
 	}
 
 	template <size_type N>

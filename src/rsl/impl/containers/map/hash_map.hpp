@@ -1,14 +1,15 @@
 #pragma once
 
-#include "map_iterator.hpp"
-#include "../../memory/memory_pool.hpp"
 #include "../any.hpp"
-#include "../views.hpp"
 #include "../dynamic_array.hpp"
 #include "../optional.hpp"
-#include "../util/comparers.hpp"
 #include "../pair.hpp"
+#include "../views.hpp"
+#include "../../memory/memory_pool.hpp"
+#include "../../util/type_traits.hpp"
+#include "../util/comparers.hpp"
 
+#include "map_iterator.hpp"
 #include "map_node.hpp"
 
 namespace rsl

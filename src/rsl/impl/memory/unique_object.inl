@@ -38,6 +38,7 @@ namespace rsl
             )
         noexcept(is_nothrow_constructible_v<mem_rsc> && is_nothrow_constructible_v<T, Args...>)
     {
+        static_assert(constructible_at_all<T>, "T needs to be constructible.");
         unique_object ret;
         ret.arm(rsl::forward<Args>(args)...);
         return ret;
@@ -140,7 +141,7 @@ namespace rsl
             Args&&... args
             )
         noexcept(is_nothrow_constructible_v<T, Args...>)
-        //requires (factory_t::valid_factory)
+        requires (Factory::valid_factory)
     {
         T* ptr = static_cast<T*>(this->get_allocator().allocate(m_factory->type_size()));
         m_factory->construct(ptr, 1, forward<Args>(args)...);

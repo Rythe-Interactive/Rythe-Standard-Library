@@ -39,8 +39,9 @@ namespace rsl
 	constexpr basic_reference_counter<Counter, Alloc, Factory>::basic_reference_counter(
 		const basic_reference_counter& other
 	) noexcept
-		: mem_rsc(other)
+		: mem_rsc(internal::alloc_and_factory_only_signal, other)
 	{
+	    mem_rsc::set_ptr(static_cast<Counter* const>(other.m_ptr));
 		if (is_armed())
 		{
 			borrow();
@@ -51,8 +52,9 @@ namespace rsl
 	constexpr basic_reference_counter<Counter, Alloc, Factory>::basic_reference_counter(
 		basic_reference_counter&& other
 	) noexcept
-		: mem_rsc(move(other))
+		: mem_rsc(internal::alloc_and_factory_only_signal, move(other))
 	{
+	    mem_rsc::set_ptr(other.get_ptr());
 		other.set_ptr(nullptr);
 	}
 
@@ -65,7 +67,8 @@ namespace rsl
 			disarm();
 		}
 
-		mem_rsc::operator=(other);
+        internal::copy_alloc_and_factory<mem_rsc>(*this, other);
+	    mem_rsc::set_ptr(static_cast<Counter* const>(other.m_ptr));
 
 		if (is_armed())
 		{
@@ -79,7 +82,8 @@ namespace rsl
 	constexpr basic_reference_counter<Counter, Alloc, Factory>&
 	basic_reference_counter<Counter, Alloc, Factory>::operator=(basic_reference_counter&& other) noexcept
 	{
-		mem_rsc::operator=(move(other));
+        internal::move_alloc_and_factory<mem_rsc>(*this, rsl::move(other));
+	    mem_rsc::set_ptr(other.get_ptr());
 		other.set_ptr(nullptr);
 		return *this;
 	}
