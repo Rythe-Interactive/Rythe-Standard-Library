@@ -57,19 +57,19 @@ namespace rsl
 
             constexpr_string<functionName.size()> ret{};
             #if defined(RYTHE_MSVC)
-            auto first = find_first_of(functionName, '<', find_first_sequence(functionName, "compiler_dependent_type_name"_sv)) + 1;
-            auto end = find_last_of(functionName, '>');
+            auto first = linear_search(functionName, '<', linear_search_sequence(functionName, "compiler_dependent_type_name"_sv)) + 1;
+            auto end = reverse_linear_search(functionName, '>');
 
             ret.copy_from(functionName.subview(first, end - first));
             #elif defined(RYTHE_GCC)
-            auto first = find_first_not_of(functionName, ' ', find_first_of(functionName, '=') + 1);
-            auto end = find_last_of(functionName, ';');
-            if (end == std::string_view::npos) { end = find_last_of(functionName, ']'); }
+            auto first = linear_search_not_eq(functionName, ' ', linear_search(functionName, '=') + 1);
+            auto end = reverse_linear_search(functionName, ';');
+            if (end == std::string_view::npos) { end = reverse_linear_search(functionName, ']'); }
 
             ret.copy_from(functionName.subview(first, end - first));
             #elif defined(RYTHE_CLANG)
-            auto first = find_first_not_of(functionName, ' ', find_first_of(functionName, '=') + 1);
-            ret.copy_from(functionName.subview(first, find_last_of(functionName, ']') - first));
+            auto first = linear_search_not_eq(functionName, ' ', linear_search(functionName, '=') + 1);
+            ret.copy_from(functionName.subview(first, reverse_linear_search(functionName, ']') - first));
             #else
             ret.copy_from(functionName);
             #endif
@@ -85,17 +85,17 @@ namespace rsl
             constexpr_string<functionName.size()> ret{};
             #if defined(RYTHE_MSVC)
             auto first =
-                    find_first_of(functionName, '<', find_first_sequence(functionName, "compiler_dependent_templated_type_name"_sv)) +
+                    linear_search(functionName, '<', linear_search_sequence(functionName, "compiler_dependent_templated_type_name"_sv)) +
                     1;
-            auto end = find_last_of(functionName, '>');
+            auto end = reverse_linear_search(functionName, '>');
 
             ret.copy_from(functionName.subview(first, end - first));
             #elif defined(RYTHE_GCC)
-            auto first = find_first_not_of(functionName, ' ', find_first_of(functionName, '=') + 1);
-            ret.copy_from(functionName.subview(first, find_last_of(functionName, ']') - first));
+            auto first = linear_search_not_eq(functionName, ' ', linear_search(functionName, '=') + 1);
+            ret.copy_from(functionName.subview(first, reverse_linear_search(functionName, ']') - first));
             #elif defined(RYTHE_CLANG)
-            auto first = find_first_not_of(functionName, ' ', find_first_of(functionName, '=') + 1);
-            ret.copy_from(functionName.subview(first, find_last_of(functionName, ']') - first));
+            auto first = linear_search_not_eq(functionName, ' ', linear_search(functionName, '=') + 1);
+            ret.copy_from(functionName.subview(first, reverse_linear_search(functionName, ']') - first));
             #else
             ret.copy_from(functionName);
             #endif

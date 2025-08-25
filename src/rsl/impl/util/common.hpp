@@ -1798,9 +1798,13 @@ namespace rsl
 
 	struct any_type
 	{
-		template <typename T>
-		constexpr operator T(); // implicit conversion to any type. NOLINT
-
+	    #if defined(RYTHE_MSVC)
+	    template <typename T>
+        constexpr operator T&(); // implicit conversion to any type. NOLINT
+	    #else
+	    template <typename T>
+        constexpr operator T(); // implicit conversion to any type. NOLINT
+	    #endif
 		template <typename T>
 		constexpr any_type(const T&); // implicit conversion from any type. NOLINT
 	};

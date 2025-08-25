@@ -63,6 +63,13 @@ namespace rsl
         mem_rsc::set_ptr(src.get_ptr());
         m_size = src.m_size;
         m_capacity = src.m_capacity;
+
+        src.m_size = src.m_capacity = 0ull;
+        src.set_ptr(nullptr);
+        if constexpr (use_post_fix && !internal::is_dynamic_resource_v<mem_rsc>)
+        {
+            src.construct(1ull);
+        }
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
@@ -284,14 +291,16 @@ namespace rsl
         Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::operator=(contiguous_container_base&& src) noexcept
     {
         internal::move_alloc_and_factory<mem_rsc>(*this, rsl::move(src));
-        src.set_ptr(nullptr);
+        mem_rsc::set_ptr(src.get_ptr());
+        m_size = src.m_size;
+        m_capacity = src.m_capacity;
 
+        src.m_size = src.m_capacity = 0ull;
+        src.set_ptr(nullptr);
         if constexpr (use_post_fix && !internal::is_dynamic_resource_v<mem_rsc>)
         {
             src.construct(1ull);
         }
-        src.m_size = 0ull;
-        src.m_capacity = 0ull;
         return *this;
     }
 

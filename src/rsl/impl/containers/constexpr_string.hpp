@@ -2,6 +2,7 @@
 
 #include "../util/common.hpp"
 #include "../util/primitives.hpp"
+
 #include "views.hpp"
 
 namespace rsl
@@ -21,7 +22,7 @@ namespace rsl
 			}
 		}
 
-		[[nodiscard]] consteval size_type capacity() const noexcept { return N; }
+		[[nodiscard]] static consteval size_type capacity() noexcept { return N; }
 		// Uses strlen
 		[[nodiscard]] constexpr size_type size() const noexcept;
 		[[nodiscard]] constexpr bool empty() const noexcept { return size() == 0; }
@@ -74,21 +75,25 @@ namespace rsl
 	template <size_type A, size_type B>
 	[[nodiscard]] consteval auto operator+(constexpr_string<A> lhs, constexpr_string<B> rhs) noexcept
 	{
-		constexpr_string<A + B - 1> retval;
+	    constexpr size_type retSize = A + B + 1;
+		constexpr_string<retSize> retval;
+
+        const size_type lhsSize = lhs.size();
+
 		// copy up to first nil in lhs:
-		for (size_type i = 0; i < lhs.size(); ++i)
+		for (size_type i = 0; i < lhsSize; ++i)
 		{
 			retval[i] = lhs[i];
 		}
 		// copy entire rhs buffer, including trailing nils:
 		for (size_type i = 0; i < B; ++i)
 		{
-			retval[lhs.size() + i] = rhs[i];
+			retval[lhsSize + i] = rhs[i];
 		}
 		// zero out the leftovers, if any:
-		for (size_type i = lhs.size() + B; i < A + B - 1; ++i)
+		for (size_type i = lhsSize + B; i < retSize; ++i)
 		{
-			retval[i] = 0;
+			retval[i] = '\0';
 		}
 
 		return retval;
@@ -140,15 +145,20 @@ namespace rsl
 
 	template <size_type N>
 	inline consteval constexpr_string<N>
-	constexpr_string<N>::filter_range(size_type start, size_type end) const noexcept
+	constexpr_string<N>::filter_range(const size_type start, const size_type end) const noexcept
 	{
-		return filter_if([&](size_type i) { return i < start || i > end; });
+		return filter_if([&](const size_type i) { return i < start || i > end; });
 	}
 
 	template <size_type N>
 	template <size_type OtherN>
 	inline consteval constexpr_string<N> constexpr_string<N>::filter(const constexpr_string<OtherN>& str) const noexcept
 	{
+	    if (empty())
+	    {
+			return *this;
+	    }
+
 		size_type start = find(str);
 		if (start == npos)
 		{
@@ -225,7 +235,7 @@ namespace rsl
 	template <size_type N>
 	template <size_type N0, size_type N1>
 	inline consteval constexpr_string<N> constexpr_string<N>::replace(
-		const constexpr_string<N0>& filter, const constexpr_string<N1>& replacement, size_type offset, bool linear
+		const constexpr_string<N0>& filter, const constexpr_string<N1>& replacement, size_type offset, const bool linear
 	) const noexcept
 	{
 		constexpr_string<N> ret = replace_first(filter, replacement, offset);
@@ -270,7 +280,7 @@ namespace rsl
 	template <size_type N>
 	template <size_type OtherN>
 	inline consteval size_type
-	constexpr_string<N>::find(const constexpr_string<OtherN>& str, size_type offset) const noexcept
+	constexpr_string<N>::find(const constexpr_string<OtherN>& str, const size_type offset) const noexcept
 	{
 		if (str.size() > size())
 		{
@@ -312,10 +322,14 @@ namespace rsl
         }
 	    else
 	    {
-	        size_type s = 0ull;
-	        while (s + 1 < N && buffer[s])
+	        size_type s = N;
+	        while (buffer[s - 1ull] == '\0')
 	        {
-	            ++s;
+	            --s;
+	            if (s == 0ull)
+	            {
+	                break;
+	            }
 	        }
 	        return s;
 	    }

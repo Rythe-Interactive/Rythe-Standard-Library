@@ -115,35 +115,35 @@ namespace rsl
     // TODO(Rowan): The below functions check for any occurrence of any of the items in other in str, not for the sequence of other in
     // str. Is that intended?
     //				https://en.cppreference.com/w/cpp/string/basic_string_view/find_last_not_of.html see overload 1
-    template <typename T, contiguous_iterator Iter>
-    constexpr size_type find_first_sequence(array_view<const T, Iter> str, array_view<const T, Iter> key, size_type pos = 0) noexcept;
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    constexpr size_type linear_search_sequence(array_view<T, Iter, ConstIter> str, array_view<T, Iter, ConstIter> key, size_type offset = 0) noexcept;
 
-    template <typename T, contiguous_iterator Iter>
-    constexpr size_type find_last_sequence(array_view<const T, Iter> str, array_view<const T, Iter> key, size_type pos = 0) noexcept;
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    constexpr size_type reverse_linear_search_sequence(array_view<T, Iter, ConstIter> str, array_view<T, Iter, ConstIter> key, size_type offset = 0) noexcept;
 
-    template <typename T, contiguous_iterator Iter>
-    constexpr size_type find_first_of(array_view<const T, Iter> str, array_view<const T, Iter> key, size_type pos = 0) noexcept;
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    constexpr size_type linear_search_collection(array_view<T, Iter, ConstIter> str, array_view<T, Iter, ConstIter> key, size_type offset = 0) noexcept;
 
-    template <typename T, contiguous_iterator Iter>
-    constexpr size_type find_first_not_of(array_view<const T, Iter> str, array_view<const T, Iter> key, size_type pos = 0) noexcept;
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    constexpr size_type linear_search_outside_collection(array_view<T, Iter, ConstIter> str, array_view<T, Iter, ConstIter> key, size_type offset = 0) noexcept;
 
-    template <typename T, contiguous_iterator Iter>
-    constexpr size_type find_last_of(array_view<const T, Iter> str, array_view<const T, Iter> key, size_type pos = 0) noexcept;
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    constexpr size_type reverse_linear_search_collection(array_view<T, Iter, ConstIter> str, array_view<T, Iter, ConstIter> key, size_type offset = 0) noexcept;
 
-    template <typename T, contiguous_iterator Iter>
-    constexpr size_type find_last_not_of(array_view<const T, Iter> str, array_view<const T, Iter> key, size_type pos = 0) noexcept;
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    constexpr size_type reverse_linear_search_outside_collection(array_view<T, Iter, ConstIter> str, array_view<T, Iter, ConstIter> key, size_type offset = 0) noexcept;
 
-    template <typename T, contiguous_iterator Iter>
-    constexpr size_type find_first_of(array_view<const T, Iter> str, const T& key, size_type pos = 0) noexcept;
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, equality_comparable_with<T> C>
+    constexpr size_type linear_search(array_view<T, Iter, ConstIter> str, const C& key, size_type offset = 0) noexcept;
 
-    template <typename T, contiguous_iterator Iter, same_as<T> C>
-    constexpr size_type find_first_not_of(array_view<const T, Iter> str, const C& key, size_type pos = 0) noexcept;
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, equality_comparable_with<T> C>
+    constexpr size_type linear_search_not_eq(array_view<T, Iter, ConstIter> str, const C& key, size_type offset = 0) noexcept;
 
-    template <typename T, contiguous_iterator Iter, same_as<T> C>
-    constexpr size_type find_last_of(array_view<const T, Iter> str, const C& key, size_type pos = 0) noexcept;
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, equality_comparable_with<T> C>
+    constexpr size_type reverse_linear_search(array_view<T, Iter, ConstIter> str, const C& key, size_type offset = 0) noexcept;
 
-    template <typename T, contiguous_iterator Iter, same_as<T> C>
-    constexpr size_type find_last_not_of(array_view<const T, Iter> str, const C& key, size_type pos = 0) noexcept;
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, equality_comparable_with<T> C>
+    constexpr size_type reverse_linear_search_not_eq(array_view<T, Iter, ConstIter> str, const C& key, size_type offset = 0) noexcept;
 
     namespace internal
     {
