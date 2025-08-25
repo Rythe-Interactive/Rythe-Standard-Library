@@ -1,7 +1,7 @@
 #pragma once
 
 #include "delegate.hpp"
-#include "dynamic_array.hpp"
+#include "array.hpp"
 
 namespace rsl
 {

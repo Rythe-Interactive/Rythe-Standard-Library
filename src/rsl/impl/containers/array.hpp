@@ -62,4 +62,4 @@ namespace rsl
     using array = basic_dynamic_array<T, mock_allocator, Factory, StaticCapacity, false>;
 } // namespace rsl
 
-#include "dynamic_array.inl"
+#include "array.inl"

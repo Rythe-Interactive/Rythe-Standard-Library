@@ -25,7 +25,7 @@ namespace
 
 #define RSL_DEFAULT_ALLOCATOR_OVERRIDE test_heap_allocator
 
-#include <rsl/dynamic_array>
+#include <rsl/array>
 
 #include <catch2/catch_test_macros.hpp>
 

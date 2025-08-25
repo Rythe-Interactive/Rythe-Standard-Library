@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../any.hpp"
-#include "../dynamic_array.hpp"
+#include "../array.hpp"
 #include "../optional.hpp"
 #include "../pair.hpp"
 #include "../views.hpp"

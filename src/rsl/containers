@@ -7,7 +7,7 @@
 #include "impl/containers/delegate.hpp"
 #include "impl/containers/multicast_delegate.hpp"
 #include "impl/containers/type_map.hpp"
-#include "impl/containers/dynamic_array.hpp"
+#include "impl/containers/array.hpp"
 #include "impl/containers/optional.hpp"
 #include "impl/containers/string.hpp"
 #include "impl/containers/string_literal.hpp"

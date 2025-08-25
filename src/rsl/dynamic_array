@@ -1,3 +1,0 @@
-#pragma once
-
-#include "impl/containers/dynamic_array.hpp"
