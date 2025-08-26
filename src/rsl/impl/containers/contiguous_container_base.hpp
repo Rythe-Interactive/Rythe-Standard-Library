@@ -51,6 +51,9 @@ namespace rsl
         constexpr static bool copy_construct_container_noexcept = is_nothrow_copy_constructible_v<mem_rsc>;
         constexpr static bool move_construct_container_noexcept = is_nothrow_move_constructible_v<mem_rsc>;
 
+        template<typename... Types>
+        constexpr static bool noexcept_construct_from_all = (is_nothrow_constructible_v<T, Types> && ...);
+
     public:
         [[rythe_always_inline]] constexpr contiguous_container_base() noexcept(is_nothrow_constructible_v<mem_rsc>);
         [[rythe_always_inline]] constexpr contiguous_container_base(
@@ -93,6 +96,9 @@ namespace rsl
         [[rythe_always_inline]] constexpr static contiguous_container_base from_view(
                 const_view_type src
                 ) noexcept(copy_construct_noexcept);
+
+        template<explicitly_convertible_to<T>... ItemTypes>
+        [[rythe_always_inline]] constexpr static contiguous_container_base from_variadic_items(ItemTypes&&... items) noexcept(noexcept_construct_from_all<ItemTypes...>);
 
         [[rythe_always_inline]] constexpr static contiguous_container_base create_reserved(size_type capacity) noexcept
             requires(can_allocate);
@@ -429,6 +435,9 @@ namespace rsl
         [[nodiscard]] [[rythe_always_inline]] constexpr value_type* get_ptr_at(size_type i) noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const value_type* get_ptr_at(size_type i) const noexcept;
 
+        // TODO: m_size is not needed if `can_resize` is false
+        //       m_capacity is not needed if `can_allocate` is false
+        //       make a special case for array without resizing or allocations
         size_type m_size = can_resize ? 0ull : static_capacity;
         size_type m_capacity = static_capacity;
     };

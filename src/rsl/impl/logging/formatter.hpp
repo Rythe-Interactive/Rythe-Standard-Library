@@ -23,31 +23,26 @@ namespace rsl::log
 	public:
 		NO_DTOR_RULE5_CONSTEXPR_NOEXCEPT(flag_formatter)
 		virtual ~flag_formatter() = default;
-		virtual void format(const message& msg, const time::point32 time, fmt::memory_buffer& dest) = 0;
+		virtual void format(const message& msg, time::point32 time, fmt::memory_buffer& dest) = 0;
 	    virtual void set_flag_options(string_view) {}
 	};
 
 	class pattern_formatter final : public formatter
 	{
 	public:
-		using input_flag_pair = pair<char, temporary_object<flag_formatter>>;
-
-		template <typename Iter = input_flag_pair*, typename ConstIter = rsl::internal::select_const_iter<input_flag_pair, Iter>>
-		explicit pattern_formatter(string_view pattern, iterator_view<input_flag_pair, Iter, ConstIter> flags = {});
+		template <derived_from<flag_formatter>... FlagFormatterTypes>
+		explicit pattern_formatter(string_view pattern, FlagFormatterTypes&&... flagFormatters);
 
 		void format(const message& msg, fmt::memory_buffer& dest) override;
 
-		template <derived_from<flag_formatter>... Formatters>
-		void set_pattern(string_view pattern, Formatters&&... formatters);
+		template <derived_from<flag_formatter>... FlagFormatterTypes>
+		void set_pattern(string_view pattern, FlagFormatterTypes&&... flagFormatters);
 
 	private:
-		void compile_pattern(array_view<temporary_object<flag_formatter>> formatters);
+		void compile_pattern(array_view<temporary_object<flag_formatter>> flagFormatters);
 
 		dynamic_string m_pattern;
-
 		using flag_formatter_ptr = unique_object<flag_formatter>;
-		using formatters_map = dynamic_map<char, flag_formatter_ptr>;
-		formatters_map m_flags;
 		dynamic_array<flag_formatter_ptr> m_formatters;
 	};
 
