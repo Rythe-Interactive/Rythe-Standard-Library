@@ -23,50 +23,50 @@ namespace rsl
 
 		template <typename T, typename... Args>
 		[[rythe_always_inline]] constexpr T default_construct_single_inline(Args&&... args)
-			noexcept(noexcept(default_factory<T>{}.construct_single_inline(forward<Args>(args)...)))
+			noexcept(noexcept(basic_factory<T>{}.construct_single_inline(forward<Args>(args)...)))
 		{
-			return default_factory<T>{}.construct_single_inline(forward<Args>(args)...);
+			return basic_factory<T>{}.construct_single_inline(forward<Args>(args)...);
 		}
 
 		template <typename T, typename... Args>
 		[[rythe_always_inline]] constexpr void* default_construct(void* ptr, size_type count, Args&&... args)
-			noexcept(noexcept(default_factory<T>{}.construct(ptr, count, forward<Args>(args)...)))
+			noexcept(noexcept(basic_factory<T>{}.construct(ptr, count, forward<Args>(args)...)))
 		{
-			return default_factory<T>{}.construct(ptr, count, forward<Args>(args)...);
+			return basic_factory<T>{}.construct(ptr, count, forward<Args>(args)...);
 		}
 
 		template <typename T>
 		[[rythe_always_inline]] constexpr void* default_copy(void* dst, const void* src, size_type count)
-			noexcept(noexcept(default_factory<T>{}.copy(dst, static_cast<const T*>(src), count)))
+			noexcept(noexcept(basic_factory<T>{}.copy(dst, static_cast<const T*>(src), count)))
 		{
-			return default_factory<T>{}.copy(dst, static_cast<const T*>(src), count);
+			return basic_factory<T>{}.copy(dst, static_cast<const T*>(src), count);
 		}
 
 		template <typename T>
 		[[rythe_always_inline]] constexpr void* default_move(void* dst, void* src, size_type count)
-			noexcept(noexcept(default_factory<T>{}.move(dst, static_cast<T*>(src), count)))
+			noexcept(noexcept(basic_factory<T>{}.move(dst, static_cast<T*>(src), count)))
 		{
-			return default_factory<T>{}.move(dst, static_cast<T*>(src), count);
+			return basic_factory<T>{}.move(dst, static_cast<T*>(src), count);
 		}
 
 		template <typename T>
 		[[rythe_always_inline]] constexpr void default_destroy(void* ptr, size_type count)
-			noexcept(noexcept(default_factory<T>{}.destroy(static_cast<T*>(ptr), count)))
+			noexcept(noexcept(basic_factory<T>{}.destroy(static_cast<T*>(ptr), count)))
 		{
-			default_factory<T>{}.destroy(static_cast<T*>(ptr), count);
+			basic_factory<T>{}.destroy(static_cast<T*>(ptr), count);
 		}
 	} // namespace internal
 
 	template <constructible_at_all T>
 	template <typename ... Args>
-	constexpr T default_factory<T>::construct_single_inline(Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>)
+	constexpr T basic_factory<T>::construct_single_inline(Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>)
 	{
 		return T(rsl::forward<Args>(args)...);
 	}
 
 	template <constructible_at_all T>
 	template <typename... Args>
-	constexpr T* default_factory<T>::construct(void* ptr, const size_type count, Args&&... args)
+	constexpr T* basic_factory<T>::construct(void* ptr, const size_type count, Args&&... args)
 		noexcept(is_nothrow_constructible_v<T, Args...>)
 	{
 		if constexpr ((is_trivially_default_constructible_v<T>) && sizeof...(Args) == 0)
@@ -92,7 +92,7 @@ namespace rsl
 	}
 
 	template <constructible_at_all T>
-	constexpr T* default_factory<T>::copy(void* dst, const T* src, const size_type count) noexcept(is_nothrow_copy_constructible_v<T>)
+	constexpr T* basic_factory<T>::copy(void* dst, const T* src, const size_type count) noexcept(is_nothrow_copy_constructible_v<T>)
 	{
 		if constexpr (is_trivially_copy_constructible_v<T>)
 		{
@@ -114,7 +114,7 @@ namespace rsl
 	}
 
 	template <constructible_at_all T>
-	constexpr T* default_factory<T>::move(void* dst, T* src, const size_type count) noexcept(is_nothrow_move_constructible_v<T>)
+	constexpr T* basic_factory<T>::move(void* dst, T* src, const size_type count) noexcept(is_nothrow_move_constructible_v<T>)
 	{
 		if constexpr (is_trivially_copy_constructible_v<T>)
 		{
@@ -141,7 +141,7 @@ namespace rsl
 	}
 
 	template <constructible_at_all T>
-	constexpr void default_factory<T>::destroy(T* ptr, const size_type count) noexcept
+	constexpr void basic_factory<T>::destroy(T* ptr, const size_type count) noexcept
 	{
 		if constexpr (!is_trivially_destructible_v<T>)
 		{

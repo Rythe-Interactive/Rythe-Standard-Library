@@ -1,5 +1,6 @@
 #pragma once
 
+#include "allocator.hpp"
 #include "../util/assert.hpp"
 #include "../util/concepts.hpp"
 
@@ -67,10 +68,10 @@ namespace rsl
 	};
 
 	template <typename T>
-	class default_factory;
+	class basic_factory;
 
 	template <constructible_at_all T>
-	class default_factory<T>
+	class basic_factory<T>
 	{
 	public:
 		using value_type = T;
@@ -80,12 +81,12 @@ namespace rsl
 		[[rythe_always_inline]] constexpr bool is_valid() const noexcept { return valid_factory; } //NOLINT
 
 		template <typename Other>
-		using retarget = default_factory<Other>;
+		using retarget = basic_factory<Other>;
 
-		constexpr default_factory() noexcept = default;
+		constexpr basic_factory() noexcept = default;
 
 		template <typename Other>
-		constexpr default_factory(default_factory<Other>) noexcept {} // NOLINT(*-explicit-constructor)
+		constexpr basic_factory(basic_factory<Other>) noexcept {} // NOLINT(*-explicit-constructor)
 
 		template <typename... Args>
 		constexpr T construct_single_inline(Args&&... args) noexcept(is_nothrow_constructible_v<T, Args...>);
@@ -101,7 +102,7 @@ namespace rsl
 	};
 
 	template<>
-	class default_factory<void>
+	class basic_factory<void>
 	{
 	public:
 		using value_type = void;
@@ -111,12 +112,12 @@ namespace rsl
 		[[rythe_always_inline]] constexpr bool is_valid() const noexcept { return valid_factory; } //NOLINT
 
 		template <typename Other>
-		using retarget = default_factory<Other>;
+		using retarget = basic_factory<Other>;
 
-		constexpr default_factory() noexcept = default;
+		constexpr basic_factory() noexcept = default;
 
 		template <typename Other>
-		constexpr default_factory(default_factory<Other>) noexcept { } // NOLINT(*-explicit-constructor)
+		constexpr basic_factory(basic_factory<Other>) noexcept { } // NOLINT(*-explicit-constructor)
 
 		template <typename... Args>
 		static void construct_single_inline(Args&&...) { rsl_assert_unreachable(); }
@@ -132,7 +133,15 @@ namespace rsl
 	};
 
 	template <not_constructible T>
-	class default_factory<T> : public default_factory<void> {};
+	class basic_factory<T> : public basic_factory<void> {};
+
+    #if !defined(RSL_DEFAULT_FACTORY_OVERRIDE)
+    template <typename T>
+    using default_factory = basic_factory<T>;
+    #else
+    template <typename T>
+    using default_factory = RSL_DEFAULT_FACTORY_OVERRIDE;
+    #endif
 
 	class polymorphic_factory
 	{
