@@ -444,7 +444,7 @@ namespace rsl
             const size_type offset
             ) noexcept(factory_traits<Factory>::template noexcept_constructable<>)
     {
-        m_factory.construct(get_ptr_at(offset), count);
+        m_factory->construct(get_ptr_at(offset), count);
     }
 
     template <size_type BufferSize, factory_type Factory, typename UtilType, bool Untyped>
@@ -454,7 +454,7 @@ namespace rsl
             const void* src
             ) noexcept(factory_traits<Factory>::noexcept_copyable)
     {
-        m_factory.copy(get_ptr_at(offset), static_cast<const UtilType*>(src), count);
+        m_factory->copy(get_ptr_at(offset), static_cast<const UtilType*>(src), count);
     }
 
     template <size_type BufferSize, factory_type Factory, typename UtilType, bool Untyped>
@@ -464,7 +464,7 @@ namespace rsl
             void* src
             ) noexcept(factory_traits<Factory>::noexcept_moveable)
     {
-        m_factory.move(get_ptr_at(offset), static_cast<UtilType*>(src), count);
+        m_factory->move(get_ptr_at(offset), static_cast<UtilType*>(src), count);
     }
 
     template <size_type BufferSize, factory_type Factory, typename UtilType, bool Untyped>
@@ -473,19 +473,19 @@ namespace rsl
             const size_type offset
             ) noexcept
     {
-        m_factory.destroy(get_ptr_at(offset), count);
+        m_factory->destroy(get_ptr_at(offset), count);
     }
 
     template <size_type BufferSize, factory_type Factory, typename UtilType, bool Untyped>
     constexpr UtilType* static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::get_ptr() noexcept
     {
-        return bit_cast<UtilType*>(m_buffer.data);
+        return bit_cast<UtilType*>(static_cast<static_storage::value_type*>(m_buffer.data));
     }
 
     template <size_type BufferSize, factory_type Factory, typename UtilType, bool Untyped>
     constexpr const UtilType* static_memory_resource_base<BufferSize, Factory, UtilType, Untyped>::get_ptr() const noexcept
     {
-        return bit_cast<const UtilType*>(m_buffer.data);
+        return bit_cast<const UtilType*>(static_cast<const static_storage::value_type*>(m_buffer.data));
     }
 
     template <size_type BufferSize, factory_type Factory, typename UtilType, bool Untyped>
@@ -493,7 +493,7 @@ namespace rsl
             const size_type offset
             ) noexcept
     {
-        return advance(get_ptr(), offset * m_factory.type_size());
+        return advance(get_ptr(), offset * m_factory->type_size());
     }
 
     template <size_type BufferSize, factory_type Factory, typename UtilType, bool Untyped>
@@ -501,7 +501,7 @@ namespace rsl
             const size_type offset
             ) const noexcept
     {
-        return advance(get_ptr(), offset * m_factory.type_size());
+        return advance(get_ptr(), offset * m_factory->type_size());
     }
 
     template <typename T, size_type BufferSize, factory_type Factory>
@@ -513,7 +513,7 @@ namespace rsl
             )
         noexcept(factory_traits<Factory>::template noexcept_constructable<Args...>)
     {
-        base_type::m_factory.construct(base_type::get_ptr_at(offset), count, rsl::forward<Args>(args)...);
+        base_type::m_factory->construct(base_type::get_ptr_at(offset), count, rsl::forward<Args>(args)...);
     }
 
     template <size_type BufferSize, allocator_type Alloc, factory_type Factory, typename UtilType, bool Untyped>

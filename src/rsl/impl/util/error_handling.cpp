@@ -89,7 +89,7 @@ namespace rsl
 	namespace
 	{
 		void error_handler_based_assert_handler(
-			const std::string_view expression, const std::string_view file, const size_type line, const std::string_view message, const bool soft, bool* ignore
+			const string_view expression, const string_view file, const size_type line, const string_view message, const bool soft, bool* ignore
 		)
 		{
 			get_error_handler()->handle_assert(expression, file, line, message, soft, ignore);

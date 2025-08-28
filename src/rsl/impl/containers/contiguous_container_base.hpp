@@ -67,7 +67,7 @@ namespace rsl
         [[rythe_always_inline]] explicit constexpr contiguous_container_base(
                 const allocator_storage_type& allocStorage
                 )
-            noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>);
+            noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&>) requires(can_allocate);
         [[rythe_always_inline]] explicit constexpr contiguous_container_base(
                 const factory_storage_type& factoryStorage
                 )
@@ -76,38 +76,44 @@ namespace rsl
                 const allocator_storage_type& allocStorage,
                 const factory_storage_type& factoryStorage
                 )
-            noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&, const factory_storage_type&>);
+            noexcept(is_nothrow_constructible_v<mem_rsc, const allocator_storage_type&, const factory_storage_type&>) requires(can_allocate);
 
+        [[nodiscard]] [[rythe_always_inline]] constexpr static contiguous_container_base from_value(value_type& src) noexcept;
         template <size_type N>
-        [[rythe_always_inline]] constexpr static contiguous_container_base from_array(
+        [[nodiscard]] [[rythe_always_inline]] constexpr static contiguous_container_base from_array(
                 const value_type (& arr)[N]
                 )
             noexcept(copy_construct_noexcept);
         template <size_type N>
-        [[rythe_always_inline]] constexpr static contiguous_container_base from_array(
+        [[nodiscard]] [[rythe_always_inline]] constexpr static contiguous_container_base from_array(
                 value_type (&& arr)[N]
                 ) noexcept(move_construct_noexcept);
 
-        [[rythe_always_inline]] constexpr static contiguous_container_base from_buffer(
+        [[nodiscard]] [[rythe_always_inline]] constexpr static contiguous_container_base from_buffer(
                 const value_type* ptr,
                 size_type count
                 ) noexcept(copy_construct_noexcept);
 
-        [[rythe_always_inline]] constexpr static contiguous_container_base from_view(
+        [[nodiscard]] [[rythe_always_inline]] constexpr static contiguous_container_base move_from_buffer(
+                const value_type* ptr,
+                size_type count
+                ) noexcept(move_construct_noexcept);
+
+        [[nodiscard]] [[rythe_always_inline]] constexpr static contiguous_container_base from_view(
                 const_view_type src
                 ) noexcept(copy_construct_noexcept);
-        
-        [[rythe_always_inline]] constexpr static contiguous_container_base from_string_length(T* str, T terminator = T{}) noexcept
+
+        [[nodiscard]] [[rythe_always_inline]] constexpr static contiguous_container_base from_string_length(T* str, T terminator = T{}) noexcept
             requires char_type<T>;
 
         template<explicitly_convertible_to<T>... ItemTypes>
-        [[rythe_always_inline]] constexpr static contiguous_container_base from_variadic_items(ItemTypes&&... items) noexcept(noexcept_construct_from_all<ItemTypes...>);
+        [[nodiscard]] [[rythe_always_inline]] constexpr static contiguous_container_base from_variadic_items(ItemTypes&&... items) noexcept(noexcept_construct_from_all<ItemTypes...>);
 
-        [[rythe_always_inline]] constexpr static contiguous_container_base create_reserved(size_type capacity) noexcept
+        [[nodiscard]] [[rythe_always_inline]] constexpr static contiguous_container_base create_reserved(size_type capacity) noexcept
             requires(can_allocate);
 
         template <typename... Args>
-        [[rythe_always_inline]] constexpr static contiguous_container_base create_in_place(
+        [[nodiscard]] [[rythe_always_inline]] constexpr static contiguous_container_base create_in_place(
                 size_type count,
                 Args&&... args
                 ) noexcept(construct_noexcept<Args...>);

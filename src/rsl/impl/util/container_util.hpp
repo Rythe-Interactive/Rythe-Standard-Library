@@ -2,7 +2,7 @@
 
 #include "common.hpp"
 
-#include "../containers/basic_iterators.hpp"
+#include "../containers/iterators.hpp"
 
 namespace rsl
 {
@@ -17,6 +17,7 @@ namespace rsl
 	RYTHE_HAS_FUNC(size)
 	RYTHE_HAS_FUNC(empty)
 	RYTHE_HAS_FUNC(data)
+	RYTHE_HAS_FUNC(view)
 
 	template <has_begin<any_type()> Container>
 	[[nodiscard]] constexpr auto begin(Container& container) noexcept(noexcept(container.begin()))

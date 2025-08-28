@@ -12,7 +12,7 @@ namespace rsl::log
         class forwarding_formatter final : public flag_formatter
         {
         public:
-            forwarding_formatter(string_view section) noexcept : patternSection(section) {}
+            forwarding_formatter(const string_view section) noexcept : patternSection(section) {}
 
             string_view patternSection;
 
@@ -67,7 +67,7 @@ namespace rsl::log
                         {
                             ++character;
                         }
-                        formatter->set_flag_options({ start, static_cast<size_type>(character - start) });
+                        formatter->set_flag_options(string_view::from_buffer(start, static_cast<size_type>(character - start)));
                     }
                 }
                 else

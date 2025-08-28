@@ -13,7 +13,7 @@ TEST_CASE("string","[containers]")
 			rsl::dynamic_string s;
 			s = "hello world";
 			REQUIRE(!s.empty());
-			REQUIRE(s.size() == 12);
+			REQUIRE(s.size() == 11);
 		}
 
 		{//copy constructor
@@ -41,7 +41,7 @@ TEST_CASE("string","[containers]")
 
 	SECTION("search")
 	{
-		array_view str = "abcdeffedcbaabcdeffedcba";
+		string_view str = "abcdeffedcbaabcdeffedcba"_sv;
 
 	    {
 		    size_type offset = rsl::linear_search_sequence(str, "effed"_sv, 0);
@@ -136,5 +136,37 @@ TEST_CASE("string","[containers]")
 			REQUIRE(offset == 18);
 			REQUIRE(str[offset] == 'f');
 		}
+	}
+
+    SECTION("hashed string")
+	{
+	    {//operator=
+	        rsl::hashed_string s;
+	        s = "hello world"_hs;
+	        REQUIRE(!s.empty());
+	        REQUIRE(s.size() == 11);
+	    }
+
+	    {//copy constructor
+	        rsl::hashed_string s = hashed_string::from_array("hello world");
+	        rsl::hashed_string s2(s);
+	        REQUIRE(!s.empty());
+	        REQUIRE(!s2.empty());
+	        REQUIRE(s.size() == s2.size());
+	        REQUIRE(s == s2);
+	    }
+
+	    {//capacity constructor
+	        rsl::hashed_string s = hashed_string::create_reserved(10);
+	        REQUIRE(s.empty());
+	        REQUIRE(s.capacity() == 10);
+	    }
+
+	    {//char array constructor
+	        const char str[5] = {'h','e','l','l','o'};
+	        rsl::hashed_string s = hashed_string::from_array(str);
+	        REQUIRE(!s.empty());
+	        REQUIRE(s.capacity() == 5);
+	    }
 	}
 }

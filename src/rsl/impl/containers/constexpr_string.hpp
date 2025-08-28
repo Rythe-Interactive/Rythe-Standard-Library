@@ -62,7 +62,7 @@ namespace rsl
 
 		consteval void copy_from(string_view str) noexcept;
 
-		[[nodiscard]] constexpr string_view view() const noexcept { return string_view(buffer, size()); }
+		[[nodiscard]] constexpr string_view view() const noexcept { return string_view::from_buffer(buffer, size()); }
 		[[nodiscard]] explicit constexpr operator string_view() const noexcept { return view(); }
 	};
 

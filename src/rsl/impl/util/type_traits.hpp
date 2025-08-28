@@ -53,7 +53,7 @@ namespace rsl
         template <typename T>
         consteval auto compiler_dependent_type_name() noexcept
         {
-            constexpr string_view functionName = __RYTHE_FULL_FUNC__;
+            constexpr string_view functionName = string_view::from_array(__RYTHE_FULL_FUNC__);
 
             constexpr_string<functionName.size()> ret{};
             #if defined(RYTHE_MSVC)
@@ -80,7 +80,7 @@ namespace rsl
         template <template <typename...> typename T>
         consteval auto compiler_dependent_templated_type_name() noexcept
         {
-            constexpr string_view functionName = __RYTHE_FULL_FUNC__;
+            constexpr string_view functionName = string_view::from_array(__RYTHE_FULL_FUNC__);
 
             constexpr_string<functionName.size()> ret{};
             #if defined(RYTHE_MSVC)
@@ -218,8 +218,8 @@ namespace rsl
         template <typename, typename = void, typename = void>
         struct ptr_traits_sfinae_layer {};
 
-        template <typename T, typename _Uty>
-        struct ptr_traits_sfinae_layer<T, _Uty, void_t<typename get_first_parameter<T>::type>>
+        template <typename T, typename Uty>
+        struct ptr_traits_sfinae_layer<T, Uty, void_t<typename get_first_parameter<T>::type>>
                 : ptr_traits_base<T, typename get_first_parameter<T>::type> {};
 
         template <typename T>

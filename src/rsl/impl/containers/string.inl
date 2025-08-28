@@ -3,19 +3,19 @@
 
 namespace rsl
 {
-    template <typename CharType, allocator_type Alloc, size_type StaticCapacity>
+    template <char_type CharType, allocator_type Alloc, size_type StaticCapacity>
     constexpr basic_dynamic_string<CharType, Alloc, StaticCapacity>::basic_dynamic_string(
             const container_base& src
             ) noexcept(container_base::copy_construct_container_noexcept)
         : container_base(src) {}
 
-    template <typename CharType, allocator_type Alloc, size_type StaticCapacity>
+    template <char_type CharType, allocator_type Alloc, size_type StaticCapacity>
     constexpr basic_dynamic_string<CharType, Alloc, StaticCapacity>::basic_dynamic_string(
             container_base&& src
             ) noexcept(container_base::move_construct_container_noexcept)
         : container_base(rsl::move(src)) {}
 
-    template <typename CharType, allocator_type Alloc, size_type StaticCapacity>
+    template <char_type CharType, allocator_type Alloc, size_type StaticCapacity>
     constexpr basic_dynamic_string<CharType, Alloc, StaticCapacity>& basic_dynamic_string<CharType, Alloc, StaticCapacity>::operator+=(
             const_view_type rhs
             )

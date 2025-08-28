@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../defines.hpp"
 #include "primitives.hpp"
+#include "../defines.hpp"
+#include "../containers/views.hpp"
+#include "../util/container_util.hpp"
 
 #define rsl_mock_assert(expr)                                                                                          \
 	if constexpr (false)                                                                                               \
@@ -27,47 +29,87 @@
 		[[maybe_unused]] const char* m = static_cast<const char*>(msg);                                                \
 	}
 
-namespace rsl::asserts
+namespace rsl
 {
-	namespace internal
-	{
-		void default_assert_handler(
-			std::string_view expression, std::string_view file, size_type line, std::string_view message, bool soft, bool* ignore
-		);
-	}
+    namespace asserts
+    {
+        namespace internal
+        {
+            void default_assert_handler(
+                    string_view expression,
+                    string_view file,
+                    size_type line,
+                    string_view message,
+                    bool soft,
+                    const bool* ignore
+                    );
+        }
 
-	using assert_handler_function = void (*)(
-		std::string_view expression, std::string_view file, size_type line, std::string_view message, bool soft, bool* ignore
-	);
+        using assert_handler_function = void (*)(
+                string_view expression,
+                string_view file,
+                size_type line,
+                string_view message,
+                bool soft,
+                bool* ignore
+                );
 
-	extern assert_handler_function assert_handler;
-} // namespace rsl::asserts
+        extern assert_handler_function assert_handler;
+    } // namespace asserts
 
-#define __rsl_assert_impl(expr, file, line, msg, soft, ignore)                                                         \
-	if(!is_constant_evaluated())																					   \
-	{                                                                                                                  \
-		if (!rsl::asserts::assert_handler)                                                                             \
-		{                                                                                                              \
-			rsl::asserts::internal::default_assert_handler(expr, file, line, msg, soft, ignore);                       \
-		}                                                                                                              \
-		else                                                                                                           \
-		{                                                                                                              \
-			rsl::asserts::assert_handler(expr, file, line, msg, soft, ignore);                                         \
-		}                                                                                                              \
-	}
+    namespace internal
+    {
+        template<typename StrType>
+        constexpr string_view __rsl_view_from_stringish(StrType&& str) noexcept
+        {
+            if constexpr (is_same_v<StrType, string_view>)
+            {
+                return str;
+            }
+            else if constexpr (has_view_v<StrType, string_view()>)
+            {
+                return str.view();
+            }
+            else
+            {
+                return string_view::from_string_length(str);
+            }
+        }
+
+        template<typename ExprType, typename FileType, typename MsgType>
+        constexpr void __rsl_assert_impl(ExprType&& expr, FileType&& file, const size_type line, MsgType&& msg, const bool soft, bool* ignore)
+        {
+            if(!is_constant_evaluated())
+            {
+                const string_view exprView = __rsl_view_from_stringish(expr);
+                const string_view fileView = __rsl_view_from_stringish(file);
+                const string_view msgView = __rsl_view_from_stringish(msg);
+
+                if (!asserts::assert_handler)
+                {
+                    asserts::internal::default_assert_handler(exprView, fileView, line, msgView, soft, ignore);
+                }
+                else
+                {
+                    asserts::assert_handler(exprView, fileView, line, msgView, soft, ignore);
+                }
+            }
+        }
+    }
+}
 
 #define rsl_assert_always(expr)                                                                                        \
 	{                                                                                                                  \
 		if (!!!(expr)) [[unlikely]]                                                                                    \
 		{                                                                                                              \
-			__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, "", false, nullptr)                           \
+			::rsl::internal::__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, "", false, nullptr);         \
 		}                                                                                                              \
 	}
 #define rsl_assert_msg_always(expr, msg)                                                                               \
 	{                                                                                                                  \
 		if (!!!(expr)) [[unlikely]]                                                                                    \
 		{                                                                                                              \
-			__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, msg, false, nullptr)                          \
+			::rsl::internal::__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, msg, false, nullptr);        \
 		}                                                                                                              \
 	}
 
@@ -76,7 +118,7 @@ namespace rsl::asserts
 		if (!!!(expr)) [[unlikely]]                                                                                    \
 		{                                                                                                              \
 			static bool ignore = false;                                                                                \
-			__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, "", true, &ignore)                            \
+			::rsl::internal::__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, "", true, &ignore);          \
 		}                                                                                                              \
 	}
 #define rsl_assert_msg_soft_always(expr, msg)                                                                          \
@@ -84,87 +126,87 @@ namespace rsl::asserts
 		if (!!!(expr)) [[unlikely]]                                                                                    \
 		{                                                                                                              \
 			static bool ignore = false;                                                                                \
-			__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, msg, true, &ignore)                           \
+			::rsl::internal::__rsl_assert_impl(RYTHE_STRINGIFY(expr), __FILE__, __LINE__, msg, true, &ignore);         \
 		}                                                                                                              \
 	}
 
 #ifdef RYTHE_VALIDATE
-	#define rsl_assert_hard(expr) rsl_assert_always(expr)
-	#define rsl_assert_msg_hard(expr, msg) rsl_assert_msg_always(expr, msg)
+#define rsl_assert_hard(expr) rsl_assert_always(expr)
+#define rsl_assert_msg_hard(expr, msg) rsl_assert_msg_always(expr, msg)
 
-	#define rsl_assert_soft(expr) rsl_assert_soft_always(expr)
-	#define rsl_assert_msg_soft(expr, msg) rsl_assert_msg_soft_always(expr, msg)
+#define rsl_assert_soft(expr) rsl_assert_soft_always(expr)
+#define rsl_assert_msg_soft(expr, msg) rsl_assert_msg_soft_always(expr, msg)
 
-	#if RYTHE_VALIDATION_LEVEL >= RYTHE_HIGH_IMPACT_VALIDATION_LEVEL
-		#define rsl_assert_frequent(expr) rsl_assert_hard(expr)
-		#define rsl_assert_consistent(expr) rsl_assert_hard(expr)
-		#define rsl_assert_rarely(expr) rsl_assert_hard(expr)
+#if RYTHE_VALIDATION_LEVEL >= RYTHE_HIGH_IMPACT_VALIDATION_LEVEL
+#define rsl_assert_frequent(expr) rsl_assert_hard(expr)
+#define rsl_assert_consistent(expr) rsl_assert_hard(expr)
+#define rsl_assert_rarely(expr) rsl_assert_hard(expr)
 
-		#define rsl_assert_msg_frequent(expr, msg) rsl_assert_msg_hard(expr, msg)
-		#define rsl_assert_msg_consistent(expr, msg) rsl_assert_msg_hard(expr, msg)
-		#define rsl_assert_msg_rarely(expr, msg) rsl_assert_msg_hard(expr, msg)
+#define rsl_assert_msg_frequent(expr, msg) rsl_assert_msg_hard(expr, msg)
+#define rsl_assert_msg_consistent(expr, msg) rsl_assert_msg_hard(expr, msg)
+#define rsl_assert_msg_rarely(expr, msg) rsl_assert_msg_hard(expr, msg)
 
-		#define rsl_assert_soft_frequent(expr) rsl_assert_soft(expr)
-		#define rsl_assert_soft_consistent(expr) rsl_assert_soft(expr)
-		#define rsl_assert_soft_rarely(expr) rsl_assert_soft(expr)
+#define rsl_assert_soft_frequent(expr) rsl_assert_soft(expr)
+#define rsl_assert_soft_consistent(expr) rsl_assert_soft(expr)
+#define rsl_assert_soft_rarely(expr) rsl_assert_soft(expr)
 
-		#define rsl_assert_msg_soft_frequent(expr, msg) rsl_assert_msg_soft(expr, msg)
-		#define rsl_assert_msg_soft_consistent(expr, msg) rsl_assert_msg_soft(expr, msg)
-		#define rsl_assert_msg_soft_rarely(expr, msg) rsl_assert_msg_soft(expr, msg)
-	#elif RYTHE_VALIDATION_LEVEL == RYTHE_MEDIUM_IMPACT_VALIDATION_LEVEL
-		#define rsl_assert_frequent(expr) rsl_mock_assert(expr)
-		#define rsl_assert_consistent(expr) rsl_assert_hard(expr)
-		#define rsl_assert_rarely(expr) rsl_assert_hard(expr)
+#define rsl_assert_msg_soft_frequent(expr, msg) rsl_assert_msg_soft(expr, msg)
+#define rsl_assert_msg_soft_consistent(expr, msg) rsl_assert_msg_soft(expr, msg)
+#define rsl_assert_msg_soft_rarely(expr, msg) rsl_assert_msg_soft(expr, msg)
+#elif RYTHE_VALIDATION_LEVEL == RYTHE_MEDIUM_IMPACT_VALIDATION_LEVEL
+#define rsl_assert_frequent(expr) rsl_mock_assert(expr)
+#define rsl_assert_consistent(expr) rsl_assert_hard(expr)
+#define rsl_assert_rarely(expr) rsl_assert_hard(expr)
 
-		#define rsl_assert_msg_frequent(expr, msg) rsl_mock_assert_msg(expr, msg)
-		#define rsl_assert_msg_consistent(expr, msg) rsl_assert_msg_hard(expr, msg)
-		#define rsl_assert_msg_rarely(expr, msg) rsl_assert_msg_hard(expr, msg)
+#define rsl_assert_msg_frequent(expr, msg) rsl_mock_assert_msg(expr, msg)
+#define rsl_assert_msg_consistent(expr, msg) rsl_assert_msg_hard(expr, msg)
+#define rsl_assert_msg_rarely(expr, msg) rsl_assert_msg_hard(expr, msg)
 
-		#define rsl_assert_soft_frequent(expr) rsl_mock_assert_soft(expr)
-		#define rsl_assert_soft_consistent(expr) rsl_assert_soft(expr)
-		#define rsl_assert_soft_rarely(expr) rsl_assert_soft(expr)
+#define rsl_assert_soft_frequent(expr) rsl_mock_assert_soft(expr)
+#define rsl_assert_soft_consistent(expr) rsl_assert_soft(expr)
+#define rsl_assert_soft_rarely(expr) rsl_assert_soft(expr)
 
-		#define rsl_assert_msg_soft_frequent(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
-		#define rsl_assert_msg_soft_consistent(expr, msg) rsl_assert_msg_soft(expr, msg)
-		#define rsl_assert_msg_soft_rarely(expr, msg) rsl_assert_msg_soft(expr, msg)
-	#elif RYTHE_VALIDATION_LEVEL == RYTHE_LOW_IMPACT_VALIDATION_LEVEL
-		#define rsl_assert_frequent(expr) rsl_mock_assert(expr)
-		#define rsl_assert_consistent(expr) rsl_mock_assert(expr)
-		#define rsl_assert_rarely(expr) rsl_assert_hard(expr)
+#define rsl_assert_msg_soft_frequent(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
+#define rsl_assert_msg_soft_consistent(expr, msg) rsl_assert_msg_soft(expr, msg)
+#define rsl_assert_msg_soft_rarely(expr, msg) rsl_assert_msg_soft(expr, msg)
+#elif RYTHE_VALIDATION_LEVEL == RYTHE_LOW_IMPACT_VALIDATION_LEVEL
+#define rsl_assert_frequent(expr) rsl_mock_assert(expr)
+#define rsl_assert_consistent(expr) rsl_mock_assert(expr)
+#define rsl_assert_rarely(expr) rsl_assert_hard(expr)
 
-		#define rsl_assert_msg_frequent(expr, msg) rsl_mock_assert_msg(expr, msg)
-		#define rsl_assert_msg_consistent(expr, msg) rsl_mock_assert_msg(expr, msg)
-		#define rsl_assert_msg_rarely(expr, msg) rsl_assert_msg_hard(expr, msg)
+#define rsl_assert_msg_frequent(expr, msg) rsl_mock_assert_msg(expr, msg)
+#define rsl_assert_msg_consistent(expr, msg) rsl_mock_assert_msg(expr, msg)
+#define rsl_assert_msg_rarely(expr, msg) rsl_assert_msg_hard(expr, msg)
 
-		#define rsl_assert_soft_frequent(expr) rsl_mock_assert_soft(expr)
-		#define rsl_assert_soft_consistent(expr) rsl_mock_assert_soft(expr)
-		#define rsl_assert_soft_rarely(expr) rsl_assert_soft(expr)
+#define rsl_assert_soft_frequent(expr) rsl_mock_assert_soft(expr)
+#define rsl_assert_soft_consistent(expr) rsl_mock_assert_soft(expr)
+#define rsl_assert_soft_rarely(expr) rsl_assert_soft(expr)
 
-		#define rsl_assert_msg_soft_frequent(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
-		#define rsl_assert_msg_soft_consistent(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
-		#define rsl_assert_msg_soft_rarely(expr, msg) rsl_assert_msg_soft(expr, msg)
-	#endif
+#define rsl_assert_msg_soft_frequent(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
+#define rsl_assert_msg_soft_consistent(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
+#define rsl_assert_msg_soft_rarely(expr, msg) rsl_assert_msg_soft(expr, msg)
+#endif
 #else
-	#define rsl_assert_frequent(expr) rsl_mock_assert(expr)
-	#define rsl_assert_consistent(expr) rsl_mock_assert(expr)
-	#define rsl_assert_rarely(expr) rsl_mock_assert(expr)
+#define rsl_assert_frequent(expr) rsl_mock_assert(expr)
+#define rsl_assert_consistent(expr) rsl_mock_assert(expr)
+#define rsl_assert_rarely(expr) rsl_mock_assert(expr)
 
-	#define rsl_assert_msg_frequent(expr, msg) rsl_mock_assert_msg(expr, msg)
-	#define rsl_assert_msg_consistent(expr, msg) rsl_mock_assert_msg(expr, msg)
-	#define rsl_assert_msg_rarely(expr, msg) rsl_mock_assert_msg(expr, msg)
+#define rsl_assert_msg_frequent(expr, msg) rsl_mock_assert_msg(expr, msg)
+#define rsl_assert_msg_consistent(expr, msg) rsl_mock_assert_msg(expr, msg)
+#define rsl_assert_msg_rarely(expr, msg) rsl_mock_assert_msg(expr, msg)
 
-	#define rsl_assert_soft_frequent(expr) rsl_mock_assert_soft(expr)
-	#define rsl_assert_soft_consistent(expr) rsl_mock_assert_soft(expr)
-	#define rsl_assert_soft_rarely(expr) rsl_mock_assert_soft(expr)
+#define rsl_assert_soft_frequent(expr) rsl_mock_assert_soft(expr)
+#define rsl_assert_soft_consistent(expr) rsl_mock_assert_soft(expr)
+#define rsl_assert_soft_rarely(expr) rsl_mock_assert_soft(expr)
 
-	#define rsl_assert_msg_soft_frequent(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
-	#define rsl_assert_msg_soft_consistent(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
-	#define rsl_assert_msg_soft_rarely(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
+#define rsl_assert_msg_soft_frequent(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
+#define rsl_assert_msg_soft_consistent(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
+#define rsl_assert_msg_soft_rarely(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
 
-	#define rsl_assert_hard(expr) rsl_mock_assert(expr)
-	#define rsl_assert_msg_hard(expr, msg) rsl_mock_assert_msg(expr, msg)
-	#define rsl_assert_soft(expr) rsl_mock_assert_soft(expr)
-	#define rsl_assert_msg_soft(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
+#define rsl_assert_hard(expr) rsl_mock_assert(expr)
+#define rsl_assert_msg_hard(expr, msg) rsl_mock_assert_msg(expr, msg)
+#define rsl_assert_soft(expr) rsl_mock_assert_soft(expr)
+#define rsl_assert_msg_soft(expr, msg) rsl_mock_assert_msg_soft(expr, msg)
 
 #endif // RYTHE_VALIDATE
 

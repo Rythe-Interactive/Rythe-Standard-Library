@@ -4,7 +4,7 @@
 namespace rsl
 {
     // TODO(Rowan): constexpr strings are still useful if the string never leaks from constant evaluation time to runtime. constexpr_string is needed if you want to be able to read the results of a string at runtime.
-    template <typename CharType = char, allocator_type Alloc = default_allocator, size_type StaticCapacity = 0ull>
+    template <char_type CharType = char, allocator_type Alloc = default_allocator, size_type StaticCapacity = 0ull>
     class basic_dynamic_string final
             : public contiguous_container_base<CharType, Alloc, default_factory<CharType>, CharType*, const CharType*,
                                                contiguous_container_info<
@@ -66,6 +66,11 @@ namespace rsl
     using static_wstring = basic_dynamic_string<utf16, mock_allocator, StaticCapacity>;
 
     dynamic_wstring to_utf16(dynamic_string::const_view_type str);
+
+    using static_string64 = static_string<64>;
+    using static_string128 = static_string<128>;
+    using static_string256 = static_string<256>;
+    using static_string512 = static_string<512>;
 
     template <typename T>
     [[nodiscard]] [[rythe_always_inline]] dynamic_string to_string(const T& value);
