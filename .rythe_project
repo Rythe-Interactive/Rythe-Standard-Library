@@ -4,6 +4,7 @@ local project = {
     types = { "library" },
     additional_types = { "test" },
     dependencies = {
+        "public third_party/argh:header-only",
         "public third_party/spdlog:header-only"
     },
     defines = { "RYTHE_INTERNAL" },
