@@ -96,6 +96,9 @@ namespace rsl
         [[rythe_always_inline]] constexpr static contiguous_container_base from_view(
                 const_view_type src
                 ) noexcept(copy_construct_noexcept);
+        
+        [[rythe_always_inline]] constexpr static contiguous_container_base from_string_length(T* str, T terminator = T{}) noexcept
+            requires char_type<T>;
 
         template<explicitly_convertible_to<T>... ItemTypes>
         [[rythe_always_inline]] constexpr static contiguous_container_base from_variadic_items(ItemTypes&&... items) noexcept(noexcept_construct_from_all<ItemTypes...>);

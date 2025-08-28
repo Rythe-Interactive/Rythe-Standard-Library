@@ -256,6 +256,15 @@ namespace rsl
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+        ContiguousContainerInfo>
+    constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo> contiguous_container_base<T, Alloc
+    , Factory, Iter, ConstIter, ContiguousContainerInfo>::from_string_length(T* str, T terminator) noexcept
+        requires char_type<T>
+    {
+        return from_buffer(str, string_length(str, terminator));
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
     constexpr contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo> contiguous_container_base<T, Alloc
         , Factory, Iter, ConstIter, ContiguousContainerInfo>::create_reserved(const size_type capacity) noexcept

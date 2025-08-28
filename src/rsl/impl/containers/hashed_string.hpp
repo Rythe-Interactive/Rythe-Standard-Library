@@ -1,17 +1,17 @@
 #pragma once
-#include "../util/primitives.hpp"
 #include "../util/hash.hpp"
+#include "../util/primitives.hpp"
 
 #include "views.hpp"
 
-#include <bit>
+// TODO(Glyn): Revisit these!
 
 namespace rsl
 {
 	template <typename Alloc>
 	struct basic_hashed_string;
 
-	using hashed_string = basic_hashed_string<std::allocator<char>>;
+	using hashed_string = basic_hashed_string<default_allocator>;
 
 	struct hashed_string_view
 	{
@@ -22,8 +22,8 @@ namespace rsl
 
 		constexpr hashed_string_view(const hashed_string& str) noexcept;
 		constexpr hashed_string_view(cstring str) noexcept
-			: value(hash_string(str)),
-			  str(str)
+			: value(hash_string(string_view::from_string_length(str))),
+			  str(string_view::from_string_length(str))
 		{
 		}
 		constexpr hashed_string_view(string_view str) noexcept
@@ -68,7 +68,7 @@ namespace rsl
 	class basic_hashed_string
 	{
 	public:
-		using string_type = std::basic_string<char, std::char_traits<char>, Alloc>;
+		using string_type = basic_dynamic_string<char, Alloc>;
 
 		u64 value = 0;
 		string_type str;
@@ -76,13 +76,13 @@ namespace rsl
 		constexpr basic_hashed_string() noexcept = default;
 
 		explicit constexpr basic_hashed_string(cstring str) noexcept
-			: value(hash_string(str)),
-			  str(str)
+			: value(hash_string(string_view::from_string_length(str))),
+			  str(string_type::from_string_length(str))
 		{
 		}
 		explicit constexpr basic_hashed_string(string_view str) noexcept
 			: value(hash_string(str)),
-			  str(str)
+			  str(string_type::from_view(str))
 		{
 		}
 		explicit constexpr basic_hashed_string(hashed_string_view other) noexcept
@@ -101,7 +101,7 @@ namespace rsl
 		{
 		}
 
-		constexpr const char* c_str() const noexcept { return str.c_str(); }
+		constexpr const char* data() const noexcept { return str.data(); }
 		constexpr string_view view() const noexcept { return str; }
 
 		constexpr operator u64() const noexcept { return value; }
