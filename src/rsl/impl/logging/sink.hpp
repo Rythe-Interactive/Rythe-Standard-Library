@@ -1,8 +1,8 @@
 #pragma once
 #include "../memory/unique_object.hpp"
 
-#include "severity.hpp"
 #include "formatter.hpp"
+#include "severity.hpp"
 
 namespace rsl::log
 {
@@ -29,6 +29,14 @@ namespace rsl::log
 		severity m_severity = severity::default_severity;
 		unique_object<formatter> m_formatter;
 	};
+
+    class void_sink : public sink
+    {
+    public:
+        void log([[maybe_unused]]const message& msg) override{}
+        void flush() override;
+
+    };
 }
 
 #include "sink.inl"

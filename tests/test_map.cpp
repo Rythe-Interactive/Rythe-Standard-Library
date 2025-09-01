@@ -64,18 +64,18 @@ TEST_CASE("dynamic_map", "[containers]")
 	{
 		{
 			rsl::dynamic_map<float32, test_struct> map{};
-			REQUIRE(map.get_allocator().id == 1012234);
+			CHECK(map.get_allocator().id == 1012234);
 		}
 		{
 			test_heap_allocator alloc{1234};
 			rsl::dynamic_map<float32, test_struct> map{alloc};
-			REQUIRE(map.get_allocator().id == 1234);
+			CHECK(map.get_allocator().id == 1234);
 		}
 		{
 			default_pmu_allocator alloc;
 			allocator_storage<polymorphic_allocator> store(&alloc);
 			rsl::dynamic_map<float32, test_struct, hash_map_flags::defaultFlags, polymorphic_allocator> map{store};
-			REQUIRE((&(map.get_allocator())) == &alloc);
+			CHECK((&(map.get_allocator())) == &alloc);
 		}
 	}
 
@@ -85,94 +85,94 @@ TEST_CASE("dynamic_map", "[containers]")
 
 		{
 			auto [result, emplaced] = map.try_emplace(key1, const1);
-			REQUIRE(result.value == const1);
-			REQUIRE(emplaced);
+			CHECK(result.value == const1);
+			CHECK(emplaced);
 		}
 
-		REQUIRE(map.contains(key1));
-		REQUIRE(!map.contains(key2));
-		REQUIRE(!map.contains(key3));
-		REQUIRE(!map.contains(key4));
+		CHECK(map.contains(key1));
+		CHECK(!map.contains(key2));
+		CHECK(!map.contains(key3));
+		CHECK(!map.contains(key4));
 
 		{
 			auto [result, emplaced] = map.try_emplace(key1, const1);
-			REQUIRE(result.value == const1);
-			REQUIRE(!emplaced);
+			CHECK(result.value == const1);
+			CHECK(!emplaced);
 		}
 
-		REQUIRE(map.contains(key1));
-		REQUIRE(!map.contains(key2));
-		REQUIRE(!map.contains(key3));
-		REQUIRE(!map.contains(key4));
+		CHECK(map.contains(key1));
+		CHECK(!map.contains(key2));
+		CHECK(!map.contains(key3));
+		CHECK(!map.contains(key4));
 
 		{
 			auto [result, emplaced] = map.try_emplace(key2, const6);
-			REQUIRE(result.value == const6);
-			REQUIRE(emplaced);
+			CHECK(result.value == const6);
+			CHECK(emplaced);
 		}
 
-		REQUIRE(map.contains(key1));
-		REQUIRE(map.contains(key2));
-		REQUIRE(!map.contains(key3));
-		REQUIRE(!map.contains(key4));
+		CHECK(map.contains(key1));
+		CHECK(map.contains(key2));
+		CHECK(!map.contains(key3));
+		CHECK(!map.contains(key4));
 
 		{
 			auto [result, emplaced] = map.try_emplace(key2, const5);
-			REQUIRE(result.value == const6);
-			REQUIRE(!emplaced);
+			CHECK(result.value == const6);
+			CHECK(!emplaced);
 		}
 
-		REQUIRE(map.contains(key1));
-		REQUIRE(map.contains(key2));
-		REQUIRE(!map.contains(key3));
-		REQUIRE(!map.contains(key4));
+		CHECK(map.contains(key1));
+		CHECK(map.contains(key2));
+		CHECK(!map.contains(key3));
+		CHECK(!map.contains(key4));
 
 		{
 			test_struct& result = map.emplace(key3, const3);
-			REQUIRE(result.value == const3);
+			CHECK(result.value == const3);
 		}
 
-		REQUIRE(map.contains(key1));
-		REQUIRE(map.contains(key2));
-		REQUIRE(map.contains(key3));
-		REQUIRE(!map.contains(key4));
+		CHECK(map.contains(key1));
+		CHECK(map.contains(key2));
+		CHECK(map.contains(key3));
+		CHECK(!map.contains(key4));
 
 		{
 			test_struct& result = map.emplace(key3, const4);
-			REQUIRE(result.value == const3);
+			CHECK(result.value == const3);
 		}
 
-		REQUIRE(map.contains(key1));
-		REQUIRE(map.contains(key2));
-		REQUIRE(map.contains(key3));
-		REQUIRE(!map.contains(key4));
+		CHECK(map.contains(key1));
+		CHECK(map.contains(key2));
+		CHECK(map.contains(key3));
+		CHECK(!map.contains(key4));
 
 		{
 			test_struct& result = map.emplace_or_replace(key3, const4);
-			REQUIRE(result.value == const4);
+			CHECK(result.value == const4);
 		}
 
-		REQUIRE(map.contains(key1));
-		REQUIRE(map.contains(key2));
-		REQUIRE(map.contains(key3));
-		REQUIRE(!map.contains(key4));
+		CHECK(map.contains(key1));
+		CHECK(map.contains(key2));
+		CHECK(map.contains(key3));
+		CHECK(!map.contains(key4));
 
 		{
 			test_struct& result = map.emplace(key4, const5);
-			REQUIRE(result.value == const5);
+			CHECK(result.value == const5);
 		}
 
-		REQUIRE(map.contains(key1));
-		REQUIRE(map.contains(key2));
-		REQUIRE(map.contains(key3));
-		REQUIRE(map.contains(key4));
+		CHECK(map.contains(key1));
+		CHECK(map.contains(key2));
+		CHECK(map.contains(key3));
+		CHECK(map.contains(key4));
 
 		map.clear();
 
-		REQUIRE(!map.contains(key1));
-		REQUIRE(!map.contains(key2));
-		REQUIRE(!map.contains(key3));
-		REQUIRE(!map.contains(key4));
+		CHECK(!map.contains(key1));
+		CHECK(!map.contains(key2));
+		CHECK(!map.contains(key3));
+		CHECK(!map.contains(key4));
 	}
 
 	SECTION("get") {}

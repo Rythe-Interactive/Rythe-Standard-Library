@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../util/source_location.hpp"
 #include "../containers/string.hpp"
+#include "../util/source_location.hpp"
 
 #include "severity.hpp"
 
@@ -13,7 +13,7 @@ namespace rsl::log
 	struct format_string
 	{
 		[[rythe_always_inline]] constexpr format_string(
-			string_view s,
+			const string_view s,
 			const source_location loc = source_location::current())
 			noexcept : str(s), srcLoc(loc) {}
 
@@ -21,13 +21,13 @@ namespace rsl::log
 		source_location srcLoc;
 	};
 
-	class basic_logger
+	class logger
 	{
 	public:
-		explicit basic_logger(string_view name, log::severity severity = log::severity::default_severity,
+		explicit logger(string_view name, log::severity severity = log::severity::default_severity,
 		                      log::severity flushSeverity = log::severity::default_flush_severity);
 
-		virtual ~basic_logger() = default;
+		virtual ~logger() = default;
 
 		template <typename... Args>
 		[[rythe_always_inline]] constexpr void log(log::severity s, format_string format, Args&&... args) noexcept;
@@ -53,16 +53,20 @@ namespace rsl::log
 		dynamic_array<sink*> m_sinks;
 	};
 
-	class synchronous_logger final : public basic_logger
+	class synchronous_logger final : public logger
 	{
 	public:
-		using basic_logger::basic_logger;
+		using logger::logger;
 
 	protected:
 		void log(const log::message& message) override;
 	};
 
-	using logger = synchronous_logger;
+    #if !defined(RSL_DEFAULT_LOGGER_OVERRIDE)
+    using default_logger = synchronous_logger;
+    #else
+    using default_logger = RSL_DEFAULT_LOGGER_OVERRIDE;
+    #endif
 } // namespace rsl::log
 
 #include "logger.inl"

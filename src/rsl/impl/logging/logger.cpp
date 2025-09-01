@@ -13,7 +13,7 @@
 
 namespace rsl::log
 {
-	void basic_logger::log(const log::severity s, const format_string format, const fmt::format_args args) noexcept
+	void logger::log(const log::severity s, const format_string format, const fmt::format_args args) noexcept
 	{
 		const log::message logMessage
 		{
@@ -29,7 +29,7 @@ namespace rsl::log
 		log(logMessage);
 	}
 
-	void basic_logger::flush()
+	void logger::flush()
 	{
 		for (auto* sink : m_sinks)
 		{
