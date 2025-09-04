@@ -6,7 +6,6 @@
 #include "../pair.hpp"
 #include "../views.hpp"
 #include "../../memory/memory_pool.hpp"
-#include "../../util/type_traits.hpp"
 #include "../util/comparers.hpp"
 
 #include "map_iterator.hpp"
@@ -189,12 +188,12 @@ namespace rsl
 
 		[[rythe_always_inline]] constexpr hash_result get_hash_result(const key_type& key) const noexcept;
 
-		enum struct search_result_type : uint8
+		enum struct [[rythe_closed_enum]] search_result_type : uint8
 		{
-			newInsertion,
+			new_insertion,
 			swap,
-			existingItem,
-			itemNotFound,
+			existing_item,
+			item_not_found,
 		};
 
 		struct bucket_search_result
@@ -207,10 +206,10 @@ namespace rsl
 			index_type homeIndex, storage_type startPsl, storage_type fingerprint, const key_type& key, bool earlyOut
 		) const noexcept;
 
-		enum struct insert_result_type : uint8
+		enum struct [[rythe_closed_enum]] insert_result_type : uint8
 		{
-			newInsertion,
-			existingItem,
+			new_insertion,
+			existing_item,
 		};
 
 		struct insert_result

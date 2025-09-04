@@ -32,18 +32,22 @@ namespace rsl
         [[rythe_always_inline]] constexpr array_view() noexcept = default;
         [[rythe_always_inline]] constexpr array_view(const array_view& other) noexcept = default;
 
+        template <size_type N>
+        [[rythe_always_inline]] constexpr array_view(T (& arr)[N]) noexcept;
+
         [[nodiscard]] [[rythe_always_inline]] constexpr operator array_view<const value_type, const_iterator_type>() noexcept
             requires(!is_const_v<T>);
 
         [[nodiscard]] [[rythe_always_inline]] constexpr static array_view from_value(T& src) noexcept;
-        template <size_type N>
-        [[nodiscard]] [[rythe_always_inline]] constexpr static array_view from_array(T (& arr)[N]) noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr static array_view from_buffer(
                 T* ptr,
                 size_type count
                 ) noexcept;
         template <contiguous_iterator It>
-        [[rythe_always_inline]] constexpr static array_view from_iterator_pair(It first, It last) noexcept(iter_noexcept_deref<It> && iter_noexcept_diff<It>)
+        [[rythe_always_inline]] constexpr static array_view from_iterator_pair(
+                It first,
+                It last
+                ) noexcept(iter_noexcept_deref<It> && iter_noexcept_diff<It>)
             requires same_as<iter_pointer_t<It>, T*>;
         [[nodiscard]] [[rythe_always_inline]] constexpr static array_view from_string_length(T* str, T terminator = T{}) noexcept
             requires char_type<T>;
@@ -86,7 +90,8 @@ namespace rsl
         [[nodiscard]] [[rythe_always_inline]] constexpr size_type size_bytes() const noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr bool empty() const noexcept;
 
-        [[nodiscard]] [[rythe_always_inline]] constexpr array_view subview(size_type offset, size_type count) const;
+        // negative count will assume size() - abs(count)
+        [[nodiscard]] [[rythe_always_inline]] constexpr array_view subview(size_type offset, diff_type count) const;
 
         [[rythe_always_inline]] constexpr void set_data(pointer data, size_type count) noexcept;
         [[rythe_always_inline]] constexpr void reset() noexcept;
@@ -111,7 +116,7 @@ namespace rsl
     using string_view = rsl::array_view<const char>;
     using binary_view = rsl::array_view<const byte>;
 
-    [[nodiscard]] [[rythe_always_inline]] consteval string_view operator""_sv(const char* str, const size_type size) noexcept
+    [[nodiscard]] [[rythe_always_inline]] consteval string_view operator""_sv(const cstring str, const size_type size) noexcept
     {
         return string_view::from_buffer(str, size);
     }
@@ -119,59 +124,95 @@ namespace rsl
     // TODO(Rowan): The below functions check for any occurrence of any of the items in other in str, not for the sequence of other in
     // str. Is that intended?
     //				https://en.cppreference.com/w/cpp/string/basic_string_view/find_last_not_of.html see overload 1
-    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter,
+        weakly_equality_comparable_with<T> C, contiguous_iterator CIter, contiguous_iterator CConstIter>
     constexpr size_type linear_search_sequence(
             array_view<T, Iter, ConstIter> str,
-            array_view<T, Iter, ConstIter> key,
+            array_view<C, CIter, CConstIter> key,
             size_type offset = 0
             ) noexcept;
 
-    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter,
+        weakly_equality_comparable_with<T> C, contiguous_iterator CIter, contiguous_iterator CConstIter>
     constexpr size_type reverse_linear_search_sequence(
             array_view<T, Iter, ConstIter> str,
-            array_view<T, Iter, ConstIter> key,
+            array_view<C, CIter, CConstIter> key,
             size_type offset = 0
             ) noexcept;
 
-    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter,
+        weakly_equality_comparable_with<T> C, contiguous_iterator CIter, contiguous_iterator CConstIter>
     constexpr size_type linear_search_collection(
             array_view<T, Iter, ConstIter> str,
-            array_view<T, Iter, ConstIter> key,
+            array_view<C, CIter, CConstIter> key,
             size_type offset = 0
             ) noexcept;
 
-    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter,
+        weakly_equality_comparable_with<T> C, contiguous_iterator CIter, contiguous_iterator CConstIter>
     constexpr size_type linear_search_outside_collection(
             array_view<T, Iter, ConstIter> str,
-            array_view<T, Iter, ConstIter> key,
+            array_view<C, CIter, CConstIter> key,
             size_type offset = 0
             ) noexcept;
 
-    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter,
+        weakly_equality_comparable_with<T> C, contiguous_iterator CIter, contiguous_iterator CConstIter>
     constexpr size_type reverse_linear_search_collection(
             array_view<T, Iter, ConstIter> str,
-            array_view<T, Iter, ConstIter> key,
+            array_view<C, CIter, CConstIter> key,
             size_type offset = 0
             ) noexcept;
 
-    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter,
+        weakly_equality_comparable_with<T> C, contiguous_iterator CIter, contiguous_iterator CConstIter>
     constexpr size_type reverse_linear_search_outside_collection(
             array_view<T, Iter, ConstIter> str,
-            array_view<T, Iter, ConstIter> key,
+            array_view<C, CIter, CConstIter> key,
             size_type offset = 0
             ) noexcept;
 
-    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, equality_comparable_with<T> C>
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, weakly_equality_comparable_with<T> C>
     constexpr size_type linear_search(array_view<T, Iter, ConstIter> str, const C& key, size_type offset = 0) noexcept;
 
-    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, equality_comparable_with<T> C>
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, weakly_equality_comparable_with<T> C>
     constexpr size_type linear_search_not_eq(array_view<T, Iter, ConstIter> str, const C& key, size_type offset = 0) noexcept;
 
-    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, equality_comparable_with<T> C>
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, weakly_equality_comparable_with<T> C>
     constexpr size_type reverse_linear_search(array_view<T, Iter, ConstIter> str, const C& key, size_type offset = 0) noexcept;
 
-    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, equality_comparable_with<T> C>
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, weakly_equality_comparable_with<T> C>
     constexpr size_type reverse_linear_search_not_eq(array_view<T, Iter, ConstIter> str, const C& key, size_type offset = 0) noexcept;
+
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter,
+        weakly_equality_comparable_with<T> C, contiguous_iterator CIter, contiguous_iterator CConstIter>
+    constexpr size_type linear_count_sequence(
+            array_view<T, Iter, ConstIter> str,
+            array_view<C, CIter, CConstIter> key,
+            size_type offset = 0
+            ) noexcept;
+
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter,
+        weakly_equality_comparable_with<T> C, contiguous_iterator CIter, contiguous_iterator CConstIter>
+    constexpr size_type linear_count_collection(
+            array_view<T, Iter, ConstIter> str,
+            array_view<C, CIter, CConstIter> key,
+            size_type offset = 0
+            ) noexcept;
+
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter,
+        weakly_equality_comparable_with<T> C, contiguous_iterator CIter, contiguous_iterator CConstIter>
+    constexpr size_type linear_count_outside_collection(
+            array_view<T, Iter, ConstIter> str,
+            array_view<C, CIter, CConstIter> key,
+            size_type offset = 0
+            ) noexcept;
+
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, weakly_equality_comparable_with<T> C>
+    constexpr size_type linear_count(array_view<T, Iter, ConstIter> str, const C& key, size_type offset = 0) noexcept;
+
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, weakly_equality_comparable_with<T> C>
+    constexpr size_type linear_count_not_eq(array_view<T, Iter, ConstIter> str, const C& key, size_type offset = 0) noexcept;
 
     namespace internal
     {

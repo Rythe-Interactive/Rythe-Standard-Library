@@ -53,7 +53,7 @@ namespace rsl
         template <typename T>
         consteval auto compiler_dependent_type_name() noexcept
         {
-            constexpr string_view functionName = string_view::from_array(__RYTHE_FULL_FUNC__);
+            constexpr string_view functionName = __RYTHE_FULL_FUNC__;
 
             constexpr_string<functionName.size()> ret{};
             #if defined(RYTHE_MSVC)
@@ -80,7 +80,7 @@ namespace rsl
         template <template <typename...> typename T>
         consteval auto compiler_dependent_templated_type_name() noexcept
         {
-            constexpr string_view functionName = string_view::from_array(__RYTHE_FULL_FUNC__);
+            constexpr string_view functionName = __RYTHE_FULL_FUNC__;
 
             constexpr_string<functionName.size()> ret{};
             #if defined(RYTHE_MSVC)

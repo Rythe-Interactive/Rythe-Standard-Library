@@ -1,6 +1,7 @@
 #pragma once
 #include "../util/concepts.hpp"
 #include "../util/type_util.hpp"
+
 #include "pair.hpp"
 
 namespace rsl
@@ -189,7 +190,7 @@ namespace rsl
 
 	template <typename Se, typename It>
 	concept sentinel_for =
-		semiregular<Se> && weak_input_or_output_iterator<It> && internal::weakly_equality_comparable_with<Se, It>;
+		semiregular<Se> && weak_input_or_output_iterator<It> && weakly_equality_comparable_with<Se, It>;
 
 	template <typename Se, typename It>
 	constexpr bool disable_sized_sentinel_for = false;

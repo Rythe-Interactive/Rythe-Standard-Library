@@ -41,7 +41,7 @@ namespace rsl
     template <typename ErrC>
     concept error_code = is_enum_v<ErrC> && is_same_v<std::underlying_type_t<ErrC>, errc>;
 
-    enum struct error_severity : uint8
+    enum struct [[rythe_closed_enum]] error_severity : uint8
     {
         warning,
         error,
@@ -96,12 +96,12 @@ namespace rsl
 
     struct error_context
     {
-        thread_local static error_list errors;
-        thread_local static errid currentError;
-        thread_local static error_handler* errorHandlerOverride;
-        thread_local static bool assertOnError;
-        static error_handler defaultErrorHandler;
+        error_list errors;
+        errid currentError = invalid_err_id;
+        error_handler* errorHandlerOverride = nullptr;
+        bool assertOnError = true;
     };
+    DECLARE_SINGLETON(error_context)
 
     void enable_assert_on_error(bool enabled = true) noexcept;
     void disable_assert_on_error() noexcept;
@@ -139,7 +139,7 @@ namespace rsl
         errid m_errid = invalid_err_id;
 
         constexpr result_base() noexcept = default;
-        result_base(error_signal) noexcept : m_errid(error_context::currentError) {}
+        result_base(error_signal) noexcept : m_errid(get_error_context().currentError) {}
 
         friend errid& internal::get_errid(result_base&) noexcept;
 
@@ -148,7 +148,7 @@ namespace rsl
 
         [[nodiscard]] [[rythe_always_inline]] const error_type& get_error() const noexcept
         {
-            return m_errid == invalid_err_id ? success : error_context::errors[m_errid];
+            return m_errid == invalid_err_id ? success : get_error_context().errors[m_errid];
         }
 
         [[nodiscard]] [[rythe_always_inline]] error_view get_errors() const noexcept
@@ -158,21 +158,25 @@ namespace rsl
                 return error_view{};
             }
 
-            errid blockStart = error_context::errors[m_errid].errorBlockStart;
-            return error_view::from_buffer(&error_context::errors[blockStart], static_cast<size_type>((m_errid - blockStart) + 1));
+            error_context& context = get_error_context();
+
+            errid blockStart = context.errors[m_errid].errorBlockStart;
+            return error_view::from_buffer(&context.errors[blockStart], static_cast<size_type>((m_errid - blockStart) + 1));
         }
 
         [[rythe_always_inline]] void resolve() noexcept
         {
+            error_context& context = get_error_context();
+
             rsl_assert_msg_hard(!is_okay(), "Tried to resolve a valid result without error.");
             rsl_assert_msg_hard(
-                    m_errid == error_context::currentError,
+                    m_errid == context.currentError,
                     "Errors not resolved in order. Earlier result remains unresolved."
                     );
 
-            auto& error = error_context::errors[error_context::currentError];
-            error_context::errors.reduce((error_context::currentError - error.errorBlockStart) + 1);
-            error_context::currentError = static_cast<errid>(error_context::errors.size() - 1);
+            auto& error = context.errors[context.currentError];
+            context.errors.reduce((context.currentError - error.errorBlockStart) + 1);
+            context.currentError = static_cast<errid>(context.errors.size() - 1);
             m_errid = invalid_err_id;
         }
 
@@ -274,13 +278,14 @@ namespace rsl
                 const error_severity severity
                 ) noexcept
         {
+            error_context& context = get_error_context();
             rsl_assert_msg_hard(
-                    error_context::errors.size() != RSL_ERR_MAX_COUNT,
+                    context.errors.size() != RSL_ERR_MAX_COUNT,
                     "Max error count overflow, consider changing RSL_ERR_ID_UNDERLYING to a larger type."
                     );
 
-            error_context::currentError = static_cast<errid>(error_context::errors.size());
-            error_context::errors.emplace_back(
+            context.currentError = static_cast<errid>(context.errors.size());
+            context.errors.emplace_back(
                     error_type{
                         .code = static_cast<errc>(errorType),
                         .message = error_message::from_view(message),
@@ -298,7 +303,7 @@ namespace rsl
             error_severity severity = error_severity::error
             ) noexcept
     {
-        internal::append_error(static_cast<errid>(error_context::errors.size()), errorType, message, severity);
+        internal::append_error(static_cast<errid>(get_error_context().errors.size()), errorType, message, severity);
         return error_signal{};
     }
 
@@ -322,10 +327,11 @@ namespace rsl
             error_severity severity = error_severity::error
             ) noexcept
     {
+        error_context& context = get_error_context();
         errid blockStart = 0;
-        if (error_context::currentError != invalid_err_id)
+        if (context.currentError != invalid_err_id)
         {
-            blockStart = error_context::errors[error_context::currentError].errorBlockStart;
+            blockStart = context.errors[context.currentError].errorBlockStart;
         }
         else if (result.id() != invalid_err_id)
         {
@@ -333,7 +339,7 @@ namespace rsl
         }
 
         internal::append_error(blockStart, errorType, message, severity);
-        internal::get_errid(result) = error_context::currentError;
+        internal::get_errid(result) = context.currentError;
     }
 
     template <typename T, error_code ErrorType>

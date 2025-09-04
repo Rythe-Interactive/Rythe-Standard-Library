@@ -1,8 +1,10 @@
 #pragma once
 
 #include "../containers/string.hpp"
+#include "../memory/unique_object.hpp"
 #include "../util/source_location.hpp"
 
+#include "formatter.hpp"
 #include "severity.hpp"
 
 namespace rsl::log
@@ -24,6 +26,8 @@ namespace rsl::log
 	class logger
 	{
 	public:
+        COPY_FUNCS_CONSTEXPR_NOEXCEPT(logger)
+
 		explicit logger(string_view name, log::severity severity = log::severity::default_severity,
 		                      log::severity flushSeverity = log::severity::default_flush_severity);
 
@@ -34,8 +38,14 @@ namespace rsl::log
 
 		void log(log::severity s, format_string format, fmt::format_args args) noexcept;
 
-		void flush();
+	    void flush();
 
+	    [[rythe_always_inline]] void set_formatter(temporary_object<formatter>&& sinkFormatter);
+	    template <derived_from<formatter> FormatterType, typename... Args>
+        [[rythe_always_inline]] void set_formatter(Args&&... args);
+
+	    template <derived_from<sink>... SinkTypes>
+		[[rythe_always_inline]] void set_sinks(SinkTypes*... sinks);
 		[[rythe_always_inline]] void set_sinks(array_view<sink*> sinks);
 		[[nodiscard]] [[rythe_always_inline]] array_view<sink* const> view_sinks() const noexcept;
 
@@ -44,6 +54,7 @@ namespace rsl::log
 
 		[[rythe_always_inline]] void flush_at(severity s) noexcept;
 		[[nodiscard]] [[rythe_always_inline]] severity flush_severity() const noexcept;
+
 	protected:
 		virtual void log(const log::message& message) = 0;
 
@@ -51,12 +62,14 @@ namespace rsl::log
 		log::severity m_severity;
 		log::severity m_flushSeverity;
 		dynamic_array<sink*> m_sinks;
+	    unique_object<formatter> m_formatter;
 	};
 
 	class synchronous_logger final : public logger
 	{
 	public:
 		using logger::logger;
+	    using logger::log;
 
 	protected:
 		void log(const log::message& message) override;

@@ -13,7 +13,11 @@ namespace rsl::log
     {
         using temporary_formatter_array = array<temporary_object<flag_formatter>, sizeof...(flagFormatters)>;
         m_pattern = dynamic_string::from_view(pattern);
-        temporary_formatter_array temporaryFlags = temporary_formatter_array::from_variadic_items(rsl::forward<FlagFormatterTypes>(flagFormatters)...);
+        temporary_formatter_array temporaryFlags = temporary_formatter_array::from_variadic_items(
+                temporary_object<remove_cvr_t<FlagFormatterTypes>>::create_in_place(
+                        rsl::forward<FlagFormatterTypes>(flagFormatters)
+                        )...
+                );
 
         compile_pattern(temporaryFlags);
     }

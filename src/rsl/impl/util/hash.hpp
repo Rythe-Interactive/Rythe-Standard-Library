@@ -8,7 +8,7 @@
 
 namespace rsl
 {
-	enum struct hash_mode : u8
+	enum struct [[rythe_closed_enum]] hash_mode : u8
 	{
 		fast_hash,      // fast hashing
 		protected_hash, // extra protection against entropy loss

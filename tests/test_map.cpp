@@ -74,7 +74,7 @@ TEST_CASE("dynamic_map", "[containers]")
 		{
 			default_pmu_allocator alloc;
 			allocator_storage<polymorphic_allocator> store(&alloc);
-			rsl::dynamic_map<float32, test_struct, hash_map_flags::defaultFlags, polymorphic_allocator> map{store};
+			rsl::dynamic_map<float32, test_struct, hash_map_flags::default_flags, polymorphic_allocator> map{store};
 			CHECK((&(map.get_allocator())) == &alloc);
 		}
 	}

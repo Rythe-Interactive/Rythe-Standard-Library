@@ -65,15 +65,40 @@ namespace rsl
     template <size_type StaticCapacity>
     using static_wstring = basic_dynamic_string<utf16, mock_allocator, StaticCapacity>;
 
-    dynamic_wstring to_utf16(dynamic_string::const_view_type str);
+    [[nodiscard]] dynamic_wstring to_utf16(dynamic_string::const_view_type str);
+    [[nodiscard]] [[rythe_always_inline]] constexpr char to_upper(char ch);
+    [[nodiscard]] [[rythe_always_inline]] constexpr char to_lower(char ch);
+    [[nodiscard]] [[rythe_always_inline]] constexpr dynamic_string to_upper(dynamic_string::const_view_type str);
+    [[nodiscard]] [[rythe_always_inline]] constexpr dynamic_string to_lower(dynamic_string::const_view_type str);
 
     using static_string64 = static_string<64>;
     using static_string128 = static_string<128>;
     using static_string256 = static_string<256>;
     using static_string512 = static_string<512>;
 
+    struct white_space
+    {
+        [[nodiscard]] [[rythe_always_inline]] bool operator==(const white_space) const noexcept{ return true; }
+        [[nodiscard]] [[rythe_always_inline]] bool operator!=(const white_space) const noexcept{ return false; }
+
+        [[nodiscard]] [[rythe_always_inline]] bool operator==(const char ch) const noexcept
+        {
+            return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r';
+        }
+
+        [[nodiscard]] [[rythe_always_inline]] bool operator!=(const char ch) const noexcept
+        {
+            return !(*this == ch);
+        }
+    };
+
     template <typename T>
     [[nodiscard]] [[rythe_always_inline]] dynamic_string to_string(const T& value);
+
+    [[nodiscard]] [[rythe_always_inline]] constexpr dynamic_string operator""_ds(const cstring str, const size_type size) noexcept
+    {
+        return dynamic_string::from_buffer(str, size);
+    }
 } // namespace rsl
 
 #include "string.inl"

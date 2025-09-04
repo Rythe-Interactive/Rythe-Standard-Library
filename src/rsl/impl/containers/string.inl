@@ -24,6 +24,42 @@ namespace rsl
         return *this;
     }
 
+    char to_upper(const char ch)
+    {
+        return static_cast<char>(toupper(static_cast<unsigned char>(ch)));
+    }
+
+    char to_lower(const char ch)
+    {
+        return static_cast<char>(tolower(static_cast<unsigned char>(ch)));
+    }
+
+    dynamic_string to_upper(const dynamic_string::const_view_type str)
+    {
+        dynamic_string result;
+        result.resize(str.size());
+
+        for (size_type i = 0; i < str.size(); i++)
+        {
+            result[i] = to_upper(str[i]);
+        }
+
+        return result;
+    }
+
+    dynamic_string to_lower(const dynamic_string::const_view_type str)
+    {
+        dynamic_string result;
+        result.resize(str.size());
+
+        for (size_type i = 0; i < str.size(); i++)
+        {
+            result[i] = to_lower(str[i]);
+        }
+
+        return result;
+    }
+
     template <typename T>
     dynamic_string to_string(const T& value)
     {

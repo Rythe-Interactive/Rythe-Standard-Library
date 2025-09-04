@@ -1,210 +1,108 @@
 #pragma once
-
-#include <sstream>
-#include <thread>
-
-#include "../util/primitives.hpp"
-#include "../containers/map/dynamic_map.hpp"
-
-#include "sink.hpp"
 #include "logger.hpp"
+#include "sink.hpp"
 
 namespace rsl
 {
-	using logger_ptr = std::shared_ptr<spdlog::logger>;
-
 	struct logging_context
 	{
-		rsl::cstring logFile = "logs/rythe.log";
-		logger_ptr logger;
-		logger_ptr fileLogger;
-		logger_ptr consoleLogger = spdlog::stdout_color_mt("console-logger");
-		logger_ptr undecoratedLogger = spdlog::stdout_color_mt("undecorated-logger");
-
-		static logging_context& get()
-		{
-			static logging_context m_instance;
-			return m_instance;
-		}
+		dynamic_string logFile = "logs/rythe.log"_ds;
+	    log::logger* logger = nullptr;
+		log::logger* undecoratedLogger = nullptr;
 	};
-
-
-	[[rythe_always_inline]] static void
-	initLogger([[maybe_unused]] logger_ptr& logger, [[maybe_unused]] std::string_view loggerName = "")
-	{
-		// auto f = std::make_unique<spdlog::pattern_formatter>();
-		//
-		// f->add_flag<log::thread_name_formatter_flag>('f');
-		// f->add_flag<log::genesis_formatter_flag>('*');
-		//
-		// f->set_pattern("T+ %* [%^%=7l%$] [%=13!f] : %v");
-		//
-		// logger->set_formatter(std::move(f));
-	}
-
-	[[maybe_unused]] [[rythe_always_inline]] static void setDefaultLogger(const logger_ptr& newLogger)
-	{
-		logging_context::get().logger = newLogger;
-	}
+    DECLARE_SINGLETON(logging_context)
 
 	namespace log
-	{
-		/** @brief prints a log line, using the specified `severity`
-		 *  @param s The severity you wan't to report this log with
-		 *  @param format The format string you want to print
-		 *  @param a The arguments to the format string
-		 *  @note This uses fmt lib style syntax check
-		 *         https://fmt.dev/latest/syntax.html
-		 */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void println([[maybe_unused]] severity s, [[maybe_unused]] const FormatString& format, [[maybe_unused]] Args&&... a)
-		{
-			//logging_context::get().logger->log(internal::rythe_to_spdlog(s), format, std::forward<Args>(a)...);
-		}
+    {
+        template <typename... Args>
+        [[rythe_always_inline]] void println(severity s, format_string format, Args&&... args) noexcept
+        {
+            get_logging_context().logger->log(s, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief same as println but uses the undecorated logger */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void undecoratedln([[maybe_unused]] severity s, [[maybe_unused]] const FormatString& format, [[maybe_unused]] Args&&... a)
-		{
-			// I need to get back to this
-			//logging_context::get().undecoratedLogger->log(internal::rythe_to_spdlog(s), format, std::forward<Args>(a)...);
-		}
+        template <typename... Args>
+        [[rythe_always_inline]] void undecoratedln(severity s, format_string format, Args&&... args) noexcept
+        {
+            get_logging_context().undecoratedLogger->log(s, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief prints a log line, using the specified `severity`
-		 *  @param level selects the severity level you are interested in
-		 */
-		[[rythe_always_inline]] static void filter(const severity level)
-		{
-			auto& inst = logging_context::get();
-			inst.logger->set_level(internal::rythe_to_spdlog(level));
-			inst.undecoratedLogger->set_level(internal::rythe_to_spdlog(level));
-		}
+        [[rythe_always_inline]] static void filter(const severity level)
+        {
+            logging_context& context = get_logging_context();
+            context.logger->filter(level);
+            context.undecoratedLogger->filter(level);
+        }
 
-		/** @brief same as println but with severity = trace */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void undecoratedTrace(const FormatString& format, Args&&... a)
-		{
-			undecoratedln(severity::trace, format, std::forward<Args>(a)...);
-		}
+        template <typename... Args>
+        [[rythe_always_inline]] void undecorated_trace(format_string format, Args&&... args)
+        {
+            undecoratedln(severity::trace, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief same as println but with severity = debug */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void undecoratedDebug(const FormatString& format, Args&&... a)
-		{
-			undecoratedln(severity::debug, format, std::forward<Args>(a)...);
-		}
+        template <typename... Args>
+        [[rythe_always_inline]] void undecorated_debug(format_string format, Args&&... args)
+        {
+            undecoratedln(severity::debug, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief same as undecoratedln but with severity = info */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void undecoratedInfo(const FormatString& format, Args&&... a)
-		{
-			undecoratedln(severity::info, format, std::forward<Args>(a)...);
-		}
+        template <typename... Args>
+        [[rythe_always_inline]] void undecorated_info(format_string format, Args&&... args)
+        {
+            undecoratedln(severity::info, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief same as undecoratedln but with severity = warn */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void undecoratedWarn(const FormatString& format, Args&&... a)
-		{
-			undecoratedln(severity::warn, format, std::forward<Args>(a)...);
-		}
+        template <typename... Args>
+        [[rythe_always_inline]] void undecorated_warn(format_string format, Args&&... args)
+        {
+            undecoratedln(severity::warn, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief same as undecoratedln but with severity = error */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void undecoratedError(const FormatString& format, Args&&... a)
-		{
-			undecoratedln(severity::error, format, std::forward<Args>(a)...);
-		}
+        template <typename... Args>
+        [[rythe_always_inline]] void undecorated_error(format_string format, Args&&... args)
+        {
+            undecoratedln(severity::error, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief same as undecoratedln but with severity = fatal */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void undecoratedFatal(const FormatString& format, Args&&... a)
-		{
-			undecoratedln(severity::fatal, format, std::forward<Args>(a)...);
-		}
+        template <typename... Args>
+        [[rythe_always_inline]] void undecorated_fatal(format_string format, Args&&... args)
+        {
+            undecoratedln(severity::fatal, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief same as println but with severity = trace */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void trace(const FormatString& format, Args&&... a)
-		{
-			println(severity::trace, format, std::forward<Args>(a)...);
-		}
+        template <typename... Args>
+        [[rythe_always_inline]] void trace(format_string format, Args&&... args)
+        {
+            println(severity::trace, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief same as println but with severity = debug */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void debug(const FormatString& format, Args&&... a)
-		{
-			println(severity::debug, format, std::forward<Args>(a)...);
-		}
+        template <typename... Args>
+        [[rythe_always_inline]] void debug(format_string format, Args&&... args)
+        {
+            println(severity::debug, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief same as println but with severity = info */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void info(const FormatString& format, Args&&... a)
-		{
-			println(severity::info, format, std::forward<Args>(a)...);
-		}
+        template <typename... Args>
+        [[rythe_always_inline]] void info(format_string format, Args&&... args)
+        {
+            println(severity::info, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief same as println but with severity = warn */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void warn(const FormatString& format, Args&&... a)
-		{
-			println(severity::warn, format, std::forward<Args>(a)...);
-		}
+        template <typename... Args>
+        [[rythe_always_inline]] void warn(format_string format, Args&&... args)
+        {
+            println(severity::warn, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief same as println but with severity = error */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void error(const FormatString& format, Args&&... a)
-		{
-			println(severity::error, format, std::forward<Args>(a)...);
-		}
+        template <typename... Args>
+        [[rythe_always_inline]] void error(format_string format, Args&&... args)
+        {
+            println(severity::error, format, rsl::forward<Args>(args)...);
+        }
 
-		/** @brief same as println but with severity = fatal */
-		template <class... Args, class FormatString>
-		[[rythe_always_inline]] void fatal(const FormatString& format, Args&&... a)
-		{
-			println(severity::fatal, format, std::forward<Args>(a)...);
-		}
-
-		namespace internal
-		{
-			void setup()
-			{
-				auto& inst = logging_context::get();
-
-				auto f = std::make_unique<spdlog::pattern_formatter>();
-				f->set_pattern("%^%v%$");
-				inst.undecoratedLogger->set_formatter(std::move(f));
-
-				inst.fileLogger = spdlog::rotating_logger_mt(inst.logFile, inst.logFile, 1'048'576, 5);
-				initLogger(inst.consoleLogger);
-				initLogger(inst.fileLogger);
-
-				#if defined(RYTHE_KEEP_CONSOLE) || defined(RYTHE_DEBUG)
-				inst.logger = inst.consoleLogger;
-				#else
-				inst.logger = inst.fileLogger;
-				#endif
-
-				#if defined(RYTHE_LOG_TRACE)
-				filter(severity::trace);
-				#elif defined(RYTHE_LOG_DEBUG)
-				filter(severity::debug);
-				#elif defined(RYTHE_LOG_INFO)
-				filter(severity::info);
-				#elif defined(RYTHE_LOG_WARN)
-				filter(severity::warn);
-				#elif defined(RYTHE_LOG_ERROR)
-				filter(severity::error);
-				#elif defined(RYTHE_LOG_FATAL)
-				filter(severity::fatal);
-				#elif defined(RYTHE_DEBUG)
-				filter(severity::debug);
-				#else
-				filter(severity::info);
-				#endif
-
-				undecoratedInfo("== Initializing Logger");
-			}
-		} // namespace internal
-	} // namespace log
+        template <typename... Args>
+        [[rythe_always_inline]] void fatal(format_string format, Args&&... args)
+        {
+            println(severity::fatal, format, rsl::forward<Args>(args)...);
+        }
+    } // namespace log
 } // namespace rsl
-#undef logger
