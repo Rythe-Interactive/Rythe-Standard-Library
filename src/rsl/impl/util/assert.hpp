@@ -1,7 +1,9 @@
 #pragma once
 
-#include "primitives.hpp"
 #include "../defines.hpp"
+
+#include "primitives.hpp"
+
 #include "../containers/views.hpp"
 #include "../util/container_util.hpp"
 
@@ -31,6 +33,27 @@
 
 namespace rsl
 {
+    template<typename StrType>
+    constexpr string_view view_from_stringish(StrType&& str) noexcept
+    {
+        if constexpr (is_same_v<StrType, string_view>)
+        {
+            return str;
+        }
+        else if constexpr (has_view_v<StrType, string_view()>)
+        {
+            return str.view();
+        }
+        else if constexpr (is_char_v<StrType>)
+        {
+            return string_view::from_value(str);
+        }
+        else
+        {
+            return string_view::from_string_length(str);
+        }
+    }
+
     namespace asserts
     {
         namespace internal
@@ -59,31 +82,14 @@ namespace rsl
 
     namespace internal
     {
-        template<typename StrType>
-        constexpr string_view __rsl_view_from_stringish(StrType&& str) noexcept
-        {
-            if constexpr (is_same_v<StrType, string_view>)
-            {
-                return str;
-            }
-            else if constexpr (has_view_v<StrType, string_view()>)
-            {
-                return str.view();
-            }
-            else
-            {
-                return string_view::from_string_length(str);
-            }
-        }
-
         template<typename ExprType, typename FileType, typename MsgType>
         constexpr void __rsl_assert_impl(ExprType&& expr, FileType&& file, const size_type line, MsgType&& msg, const bool soft, bool* ignore)
         {
             if(!is_constant_evaluated())
             {
-                const string_view exprView = __rsl_view_from_stringish(expr);
-                const string_view fileView = __rsl_view_from_stringish(file);
-                const string_view msgView = __rsl_view_from_stringish(msg);
+                const string_view exprView = view_from_stringish(expr);
+                const string_view fileView = view_from_stringish(file);
+                const string_view msgView = view_from_stringish(msg);
 
                 if (!asserts::assert_handler)
                 {

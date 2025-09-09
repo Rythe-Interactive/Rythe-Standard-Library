@@ -213,7 +213,7 @@ namespace rsl
     struct result;
 
     template <typename T>
-    struct result<T> final : public result_base
+    struct [[nodiscard]] result<T> final : public result_base
     {
     private:
         union
@@ -261,7 +261,7 @@ namespace rsl
     };
 
     template <>
-    struct result<void> final : public result_base
+    struct [[nodiscard]] result<void> final : public result_base
     {
         [[rythe_always_inline]] result(error_signal) noexcept : result_base(error_signal{}) {}
 

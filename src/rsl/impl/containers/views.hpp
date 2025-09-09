@@ -43,6 +43,12 @@ namespace rsl
                 T* ptr,
                 size_type count
                 ) noexcept;
+        template <not_same_as<T> Other>
+        [[nodiscard]] [[rythe_always_inline]] constexpr static array_view from_buffer(
+                Other* ptr,
+                size_type count
+                ) noexcept
+            requires same_as<byte, remove_cvr_t<T>> && (is_const_v<T> || !is_const_v<Other>);
         template <contiguous_iterator It>
         [[rythe_always_inline]] constexpr static array_view from_iterator_pair(
                 It first,
@@ -91,7 +97,7 @@ namespace rsl
         [[nodiscard]] [[rythe_always_inline]] constexpr bool empty() const noexcept;
 
         // negative count will assume size() - abs(count)
-        [[nodiscard]] [[rythe_always_inline]] constexpr array_view subview(size_type offset, diff_type count) const;
+        [[nodiscard]] [[rythe_always_inline]] constexpr array_view subview(size_type offset, diff_type count = npos) const noexcept;
 
         [[rythe_always_inline]] constexpr void set_data(pointer data, size_type count) noexcept;
         [[rythe_always_inline]] constexpr void reset() noexcept;
@@ -114,7 +120,7 @@ namespace rsl
     array_view(array_view<T, Iter> other) -> array_view<const T, const_iterator<Iter>>;
 
     using string_view = rsl::array_view<const char>;
-    using binary_view = rsl::array_view<const byte>;
+    using byte_view = rsl::array_view<const byte>;
 
     [[nodiscard]] [[rythe_always_inline]] consteval string_view operator""_sv(const cstring str, const size_type size) noexcept
     {
@@ -183,6 +189,16 @@ namespace rsl
 
     template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, weakly_equality_comparable_with<T> C>
     constexpr size_type reverse_linear_search_not_eq(array_view<T, Iter, ConstIter> str, const C& key, size_type offset = 0) noexcept;
+
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, typename Func>
+    constexpr size_type linear_search_custom(array_view<T, Iter, ConstIter> str, Func&& comparer, size_type offset = 0) noexcept;
+
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter, typename Func>
+    constexpr size_type reverse_linear_search_custom(
+            array_view<T, Iter, ConstIter> str,
+            Func&& comparer,
+            size_type offset = 0
+            ) noexcept;
 
     template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter,
         weakly_equality_comparable_with<T> C, contiguous_iterator CIter, contiguous_iterator CConstIter>
