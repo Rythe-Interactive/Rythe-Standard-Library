@@ -54,12 +54,24 @@ namespace rsl::log
     void error(const format_string format, Args&&... args)
     {
         println(severity::error, format, rsl::forward<Args>(args)...);
+        #if !defined(RSL_NO_LOGGING_DEBUGBREAK)
+        if (platform::is_debugger_attached())
+        {
+            rythe_debugbreak_instruction();
+        }
+        #endif
     }
 
     template <typename... Args>
     void fatal(const format_string format, Args&&... args)
     {
         println(severity::fatal, format, rsl::forward<Args>(args)...);
+        #if !defined(RSL_NO_LOGGING_DEBUGBREAK)
+        if (platform::is_debugger_attached())
+        {
+            rythe_debugbreak_instruction();
+        }
+        #endif
     }
 
     template <typename... Args>
@@ -96,11 +108,23 @@ namespace rsl::log
     void undecorated_error(const format_string format, Args&&... args)
     {
         undecoratedln(severity::error, format, rsl::forward<Args>(args)...);
+        #if !defined(RSL_NO_LOGGING_DEBUGBREAK)
+        if (platform::is_debugger_attached())
+        {
+            rythe_debugbreak_instruction();
+        }
+        #endif
     }
 
     template <typename... Args>
     void undecorated_fatal(const format_string format, Args&&... args)
     {
         undecoratedln(severity::fatal, format, rsl::forward<Args>(args)...);
+        #if !defined(RSL_NO_LOGGING_DEBUGBREAK)
+        if (platform::is_debugger_attached())
+        {
+            rythe_debugbreak_instruction();
+        }
+        #endif
     }
 }

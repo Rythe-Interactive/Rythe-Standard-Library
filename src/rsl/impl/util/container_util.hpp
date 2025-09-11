@@ -64,6 +64,31 @@ namespace rsl
     template <typename T>
     concept contiguous_container_like = container_like<T> && has_data<T, any_type()> && has_at<T, any_type(size_type)> && has_index_operator<T, any_type(size_type)>;
 
+    template <typename T>
+    concept string_like = contiguous_container_like<T> && is_char_v<container_value_type<T>>;
+
+    template<typename StrType>
+    constexpr string_view view_from_stringish(StrType&& str) noexcept
+    {
+        if constexpr (is_same_v<StrType, string_view>)
+        {
+            return str;
+        }
+        else if constexpr (has_view_v<StrType, string_view()>)
+        {
+            return str.view();
+        }
+        else if constexpr (is_char_v<StrType>)
+        {
+            return string_view::from_value(str);
+        }
+        else
+        {
+            return string_view::from_string_length(str);
+        }
+    }
+
+
     template <has_begin<any_type()> Container>
     [[nodiscard]] constexpr auto begin(Container& container) noexcept(noexcept(container.begin())) -> decltype(container.begin())
     {

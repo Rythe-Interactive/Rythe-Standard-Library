@@ -70,7 +70,6 @@ namespace rsl
         }
     }
 
-
     constexpr static filesystem_traits invalid_filesystem_traits{ false, false };
 
     inline void sanitize_traits(file_traits& traits) noexcept

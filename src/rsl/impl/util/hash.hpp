@@ -2,6 +2,8 @@
 
 #include "../containers/views.hpp"
 
+#include "container_util.hpp"
+
 #ifndef RSL_DEFAULT_HASH_MODE
 	#define RSL_DEFAULT_HASH_MODE fast_hash
 #endif
@@ -47,6 +49,15 @@ namespace rsl
 			return hash_bytes<Mode>(byte_view::from_buffer(bit_cast<const byte*>(&val), sizeof(T)));
 		}
 	};
+
+    template <string_like StringType, hash_mode Mode>
+    struct hash_strategy<StringType, Mode>
+    {
+        [[rythe_always_inline]] constexpr static id_type hash(const StringType& val) noexcept
+        {
+            return hash_string<Mode>(view_from_stringish(val));
+        }
+    };
 
 	template <typename T>
 	struct hash

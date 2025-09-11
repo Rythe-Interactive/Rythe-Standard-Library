@@ -1094,9 +1094,9 @@ namespace rsl
         auto test_returnable(...) -> false_type; // NOLINT
 
         template <typename From, typename To>
-        auto test_implicitly_convertible(
+        auto test_implicitly_convertible( /* NOLINT */
                 int
-                ) // NOLINT
+                )
             -> decltype((void)(::rsl::declval<void (&)(To)>()(::rsl::declval<From>())), true_type{});
         template <typename, typename>
         auto test_implicitly_convertible(...) -> false_type; // NOLINT

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <filesystem>
+#include "path_util.hpp"
 
 namespace rsl::filesystem
 {
@@ -22,47 +22,32 @@ namespace rsl::filesystem
 
     inline dynamic_string view::domain() const
     {
-        const size_type idx = linear_search(m_path.view(), ':');
-        if (idx == npos)
-        {
-            return dynamic_string{};
-        }
-
-        return dynamic_string::from_variadic_items(m_path.subview(0, idx + 1), separator(), separator());
+        return fs::domain(m_path);
     }
 
-    inline string_view view::path() const
+    inline string_view view::path() const noexcept
     {
         return m_path;
     }
 
-    inline string_view view::extension(const bool fullExtension) const
+    inline string_view view::extension(const bool fullExtension) const noexcept
     {
-        const string_view fullname = this->filename();
-        if (fullExtension)
-        {
-            return fullname.subview(linear_search(fullname, '.'));
-        }
-
-        return fullname.subview(reverse_linear_search(fullname, '.'));
+        return fs::extension(m_path, fullExtension);
     }
 
-    inline string_view view::filename() const
+    inline string_view view::filename() const noexcept
     {
-        return m_path.subview(reverse_linear_search(m_path.view(), separator_char{}));
+        return fs::filename(m_path);
     }
 
-    inline string_view view::stem() const
+    inline string_view view::stem() const noexcept
     {
-        const string_view fullname = this->filename();
-        return fullname.subview(0ull, linear_search(fullname, '.'));
+        return fs::stem(m_path);
     }
 
     inline view view::parent() const
     {
-        const size_type end = reverse_linear_search(m_path.view(), separator_char{});
-        const size_type start = reverse_linear_search(m_path.view(), separator_char{}, m_path.size() - (end + 1ull));
-        return m_path.subview(start, end - start);
+        return view(fs::parent(m_path));
     }
 
     inline view view::subdir(const string_view identifier) const

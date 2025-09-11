@@ -9,6 +9,8 @@
 
 namespace rsl::filesystem
 {
+    class file_solution;
+
     class view
     {
     public:
@@ -19,14 +21,16 @@ namespace rsl::filesystem
         [[nodiscard]] [[rythe_always_inline]] operator bool() const noexcept;
         [[nodiscard]] [[rythe_always_inline]] bool is_valid(bool deepCheck = false) const;
 
+        [[rythe_always_inline]] result<void> prefetch_solution(bool ignoreMultipleSolutions = false) const;
+
         [[nodiscard]] file_traits file_info() const;
         [[nodiscard]] filesystem_traits filesystem_info() const;
 
         [[nodiscard]] [[rythe_always_inline]] dynamic_string domain() const;
-        [[nodiscard]] [[rythe_always_inline]] string_view path() const;
-        [[nodiscard]] [[rythe_always_inline]] string_view extension(bool fullExtension = false) const;
-        [[nodiscard]] [[rythe_always_inline]] string_view filename() const;
-        [[nodiscard]] [[rythe_always_inline]] string_view stem() const;
+        [[nodiscard]] [[rythe_always_inline]] string_view path() const noexcept;
+        [[nodiscard]] [[rythe_always_inline]] string_view extension(bool fullExtension = false) const noexcept;
+        [[nodiscard]] [[rythe_always_inline]] string_view filename() const noexcept;
+        [[nodiscard]] [[rythe_always_inline]] string_view stem() const noexcept;
 
         [[nodiscard]] [[rythe_always_inline]] view parent() const;
         [[nodiscard]] [[rythe_always_inline]] view subdir(string_view identifier) const;
@@ -34,13 +38,20 @@ namespace rsl::filesystem
 
         [[nodiscard]] result<dynamic_array<view>> ls() const;
 
-        [[nodiscard]] result<byte_view> read();
+        [[nodiscard]] result<byte_view> read() const;
         [[nodiscard]] result<void> write(byte_view data);
         [[nodiscard]] result<void> append(byte_view data);
-        [[nodiscard]] result<void> flush();
+        [[nodiscard]] result<void> flush() const;
 
     protected:
+        void set_path(dynamic_string&& path);
+        [[nodiscard]] const file_solution* find_solution() const;
+        [[nodiscard]] file_solution* find_solution();
+
+    private:
+
         dynamic_string m_path;
+        mutable file_solution* m_solution = nullptr;
     };
 }
 

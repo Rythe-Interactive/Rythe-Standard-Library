@@ -33,27 +33,6 @@
 
 namespace rsl
 {
-    template<typename StrType>
-    constexpr string_view view_from_stringish(StrType&& str) noexcept
-    {
-        if constexpr (is_same_v<StrType, string_view>)
-        {
-            return str;
-        }
-        else if constexpr (has_view_v<StrType, string_view()>)
-        {
-            return str.view();
-        }
-        else if constexpr (is_char_v<StrType>)
-        {
-            return string_view::from_value(str);
-        }
-        else
-        {
-            return string_view::from_string_length(str);
-        }
-    }
-
     namespace asserts
     {
         namespace internal

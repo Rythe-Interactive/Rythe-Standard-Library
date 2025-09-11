@@ -61,13 +61,13 @@ namespace rsl
 		        return &defaultErrorHandler;
 		    }
         }
-	} // namespace internal
 
-    error_context& internal::get_default_error_context() noexcept
-	{
-	    thread_local error_context context;
-	    return context;
-	}
+        error_context& get_default_error_context() noexcept
+        {
+            thread_local error_context context;
+            return context;
+        }
+	} // namespace internal
 
     get_error_context_func get_error_context = &internal::get_default_error_context;
 

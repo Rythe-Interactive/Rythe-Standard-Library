@@ -1,4 +1,6 @@
 #pragma once
+#include "../platform/platform.hpp"
+
 #include "logger.hpp"
 #include "sink.hpp"
 

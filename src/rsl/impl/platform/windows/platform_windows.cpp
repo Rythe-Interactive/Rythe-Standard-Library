@@ -9,6 +9,9 @@
 #define NOMCX
 #define NOSERVICE
 #define NOHELP
+#define NODRAWTEXT
+#define NOGDI
+#define NOBITMAP
 #include "winplatformdef.h"
 #include <libloaderapi.h>
 #include <windef.h>
@@ -78,8 +81,13 @@ namespace rsl
 		return bit_cast<void*>(::GetProcAddress(library.m_handle, symbolName));
 	}
 
-	thread platform::create_thread(const native_thread_start startFunction, void* userData, string_view name,
-	                               pmu_allocator& allocator)
+    bool platform::is_debugger_attached()
+	{
+		return IsDebuggerPresent() == TRUE;
+	}
+
+    thread platform::create_thread(const native_thread_start startFunction, void* userData, string_view name,
+                                   pmu_allocator& allocator)
 	{
 		rsl_assert_always(startFunction);
 

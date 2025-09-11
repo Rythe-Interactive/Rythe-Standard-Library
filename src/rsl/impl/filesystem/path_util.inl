@@ -26,9 +26,41 @@ namespace rsl::filesystem
         }
     }
 
+    constexpr dynamic_string domain(const string_view path)
+    {
+        const size_type idx = linear_search(path, ':');
+        if (idx == npos)
+        {
+            return dynamic_string{};
+        }
+
+        return dynamic_string::from_variadic_items(path.subview(0, idx + 1), separator(), separator());
+    }
+
     constexpr string_view parent(const string_view path) noexcept
     {
         return path.subview(0ull, reverse_linear_search(path, separator_char{}, path.size() - 2ull));
+    }
+    constexpr string_view filename(const string_view path) noexcept
+    {
+        return path.subview(reverse_linear_search(path, separator_char{}));
+    }
+
+    constexpr string_view extension(const string_view path, const bool fullExtension) noexcept
+    {
+        const string_view fullname = filename(path);
+        if (fullExtension)
+        {
+            return fullname.subview(linear_search(fullname, '.'));
+        }
+
+        return fullname.subview(reverse_linear_search(fullname, '.'));
+    }
+
+    constexpr string_view stem(const string_view path) noexcept
+    {
+        const string_view fullname = filename(path);
+        return fullname.subview(0ull, linear_search(fullname, '.'));
     }
 
     constexpr dynamic_string subdir(const string_view path, const string_view sub)

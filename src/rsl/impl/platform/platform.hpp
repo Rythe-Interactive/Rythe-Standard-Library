@@ -20,6 +20,8 @@ namespace rsl
 
 		static void* get_symbol(dynamic_library library, cstring symbolName);
 
+	    static bool is_debugger_attached();
+
 		static thread create_thread(native_thread_start startFunction, void* userData = nullptr, string_view name = "unknown thread"_sv, pmu_allocator& allocator = *allocator_context::globalAllocator);
 		static uint32 destroy_thread(thread thread);
 

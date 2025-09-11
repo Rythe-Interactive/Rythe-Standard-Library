@@ -41,6 +41,9 @@ namespace rsl
     template <typename ErrC>
     concept error_code = is_enum_v<ErrC> && is_same_v<std::underlying_type_t<ErrC>, errc>;
 
+    template <error_code ErrorType>
+    constexpr string_view default_error_message(ErrorType) { rsl_assert_unimplemented(); return {}; }
+
     enum struct [[rythe_closed_enum]] error_severity : uint8
     {
         warning,
@@ -182,6 +185,8 @@ namespace rsl
 
         [[nodiscard]] [[rythe_always_inline]] errid id() const noexcept { return m_errid; }
 
+        [[nodiscard]] [[rythe_always_inline]] static error_signal propagate() noexcept { return error_signal{}; }
+
         errc report_errors() noexcept
         {
             error_handler* errorHandler = get_error_handler();
@@ -237,7 +242,7 @@ namespace rsl
 
         [[nodiscard]] [[rythe_always_inline]] bool carries_value() const noexcept
         {
-            for (auto& error : get_errors())
+            for (const auto& error : get_errors())
             {
                 if (error.severity != error_severity::warning)
                 {
@@ -249,14 +254,18 @@ namespace rsl
 
         [[nodiscard]] [[rythe_always_inline]] result_type& value() noexcept
         {
-            rsl_assert_msg_hard(is_okay(), "Tried to get value of result with unresolved error.");
+            rsl_assert_msg_hard(report_errors() == no_error_code, "Tried to get value of result with unresolved error.");
             return m_value;
         }
 
-        [[nodiscard]] [[rythe_always_inline]] const result_type& value() const noexcept
+        [[nodiscard]] [[rythe_always_inline]] result_type* operator->() noexcept
         {
-            rsl_assert_msg_hard(is_okay(), "Tried to get value of result with unresolved error.");
-            return m_value;
+            return &value();
+        }
+
+        [[nodiscard]] [[rythe_always_inline]] result_type& operator*() noexcept
+        {
+            return value();
         }
     };
 
@@ -304,6 +313,16 @@ namespace rsl
             ) noexcept
     {
         internal::append_error(static_cast<errid>(get_error_context().errors.size()), errorType, message, severity);
+        return error_signal{};
+    }
+
+    template <error_code ErrorType>
+    [[nodiscard]] [[rythe_always_inline]] constexpr auto make_error(
+            ErrorType errorType,
+            error_severity severity = error_severity::error
+            ) noexcept
+    {
+        internal::append_error(static_cast<errid>(get_error_context().errors.size()), errorType, default_error_message<ErrorType>(errorType), severity);
         return error_signal{};
     }
 
