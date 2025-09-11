@@ -11,24 +11,26 @@ namespace rsl::filesystem
     class file_solution
     {
     public:
-        file_solution() = default;
+        VIRTUAL_RULE_OF_5(file_solution)
 
-        const filesystem_provider* get_provider() const noexcept;
-        filesystem_provider* get_provider() noexcept;
-        void release();
+        [[nodiscard]] [[rythe_always_inline]] const filesystem_provider* get_provider() const noexcept;
+        [[nodiscard]] [[rythe_always_inline]] filesystem_provider* get_provider() noexcept;
+         [[rythe_always_inline]] void release();
 
-        [[nodiscard]] file_traits file_info() const;
-        [[nodiscard]] filesystem_traits filesystem_info() const;
-        [[nodiscard]] result<dynamic_array<view>> ls() const;
+        [[nodiscard]] virtual file_traits file_info() const = 0;
+        [[nodiscard]] [[rythe_always_inline]] filesystem_traits filesystem_info() const;
+        [[nodiscard]] virtual result<dynamic_array<view>> ls() const = 0;
 
-        [[nodiscard]] result<byte_view> read() const;
-        [[nodiscard]] result<void> write(byte_view data);
-        [[nodiscard]] result<void> append(byte_view data);
-        [[nodiscard]] result<void> flush() const;
+        [[nodiscard]] virtual result<byte_view> read() const = 0;
+        [[nodiscard]] virtual result<void> write(byte_view data) = 0;
+        [[nodiscard]] virtual result<void> append(byte_view data) = 0;
+        [[nodiscard]] virtual result<void> flush() const = 0;
 
-    private:
+    protected:
         friend class filesystem_provider;
 
         filesystem_provider* m_provider;
     };
 }
+
+#include "file_solution.inl"

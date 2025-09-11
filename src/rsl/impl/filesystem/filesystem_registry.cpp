@@ -1,5 +1,7 @@
 ﻿#include "filesystem_registry.hpp"
 
+#include "../platform/platform.hpp"
+
 #include "file_solution.hpp"
 #include "filesystem_error.hpp"
 #include "path_util.hpp"
@@ -13,9 +15,21 @@ namespace rsl::filesystem
 {
     namespace internal
     {
+        filesystem_registry construct_default_registry() noexcept
+        {
+            filesystem_registry registry;
+
+            for (auto driveName : platform::enumerate_drives())
+            {
+            }
+
+            registry.register_provider()
+            return registry;
+        }
+
         filesystem_registry& get_default_filesystem_registry() noexcept
         {
-            static filesystem_registry registry;
+            static filesystem_registry registry = construct_default_registry();
             return registry;
         }
     } // namespace internal
@@ -82,5 +96,20 @@ namespace rsl::filesystem
         }
 
         return make_error(filesystem_error::no_solution_found);
+    }
+
+    bool filesystem_registry::has_domain(const string_view domain) const noexcept
+    {
+        return m_domainMap.contains(domain);
+    }
+
+    array_view<const unique_object<filesystem_provider>> filesystem_registry::providers() const noexcept
+    {
+        return m_providers;
+    }
+
+    iterator_view<const dynamic_string, domain_iterator> filesystem_registry::domains() const noexcept
+    {
+        return iterator_view<const dynamic_string, domain_iterator>(domain_iterator(m_providers.begin()), domain_iterator(m_providers.end()));
     }
 }

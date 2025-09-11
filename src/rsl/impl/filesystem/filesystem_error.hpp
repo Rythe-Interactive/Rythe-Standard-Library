@@ -13,6 +13,7 @@ namespace rsl
         file_not_found,
         no_solution_found,
         multiple_solutions_found,
+        invalid_solution,
     };
 
     template <>
@@ -20,11 +21,13 @@ namespace rsl
     {
         switch (err)
         {
+            case filesystem_error::no_error: return "No error.";
             case filesystem_error::domain_not_found: return "Domain not found.";
             case filesystem_error::directory_not_found: return "Directory not found.";
             case filesystem_error::file_not_found: return "File not found.";
             case filesystem_error::no_solution_found: return "No solution found.";
             case filesystem_error::multiple_solutions_found: return "Multiple solutions found.";
+            case filesystem_error::invalid_solution: return "Invalid solution.";
             default: return "Unknown filesystem_error.";
         }
     }

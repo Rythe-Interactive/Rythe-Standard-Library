@@ -697,7 +697,7 @@ namespace rsl
 	template <typename... Args>
 	typename hash_map_base<MapInfo>::mapped_type& hash_map_base<MapInfo>::emplace(const key_type& key, Args&&... args)
 	{
-		return try_emplace(key, std::forward<Args>(args)...).first;
+		return try_emplace(key, rsl::forward<Args>(args)...).first;
 	}
 
 	template <typename MapInfo>

@@ -382,6 +382,14 @@ extern get_##name##_func get_##name;
     type& operator=(type&&) = default;                                                                                                \
     ~type() = default;
 
+#define VIRTUAL_RULE_OF_5(type)                                                                                                       \
+    type() = default;                                                                                                                 \
+    type(const type&) = default;                                                                                                      \
+    type(type&&) = default;                                                                                                           \
+    type& operator=(const type&) = default;                                                                                           \
+    type& operator=(type&&) = default;                                                                                                \
+    virtual ~type() = default;
+
 #define RULE_OF_5_NOEXCEPT(type)                                                                                                      \
     type() noexcept = default;                                                                                                        \
     type(const type&) noexcept = default;                                                                                             \

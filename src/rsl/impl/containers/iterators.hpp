@@ -285,6 +285,7 @@ namespace rsl
 		using underlying_iter = It;
 		using difference_type = iter_difference_t<It>;
 
+	    using value_type = iter_value_t<underlying_iter>;
 		using ref_type = iter_reference_t<underlying_iter>;
 		using ptr_type = iter_pointer_t<underlying_iter>;
 

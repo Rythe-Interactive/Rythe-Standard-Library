@@ -10,11 +10,16 @@ namespace rsl::filesystem
         return is_valid();
     }
 
-    inline bool view::is_valid(bool deepCheck) const
+    inline bool view::is_valid(const bool deepCheck) const
     {
         if (m_path.empty())
         {
             return false;
+        }
+
+        if (deepCheck)
+        {
+            return prefetch_solution().reduce_and_discard();
         }
 
         return true;

@@ -3,6 +3,18 @@
 
 namespace rsl
 {
+    void error_handler::handle_assert(
+            const string_view expression,
+            const string_view file,
+            const size_type line,
+            const string_view message,
+            const bool soft,
+            bool* ignore
+            )
+    {
+        asserts::internal::default_assert_handler(expression, file, line, message, soft, ignore);
+    }
+
 	void error_handler::handle_error(const error_type& error, const bool assertError)
 	{
 		switch (error.severity)
@@ -129,5 +141,4 @@ namespace rsl
 	{
 		set_error_handler(previousErrorHandler);
 	}
-
 } // namespace rsl

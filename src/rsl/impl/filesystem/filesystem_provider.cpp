@@ -19,4 +19,48 @@ namespace rsl::filesystem
     {
         solution->m_provider = provider;
     }
+
+    pair<index_type, bool> filesystem_provider::create_solution_reference(const dynamic_string& path)
+    {
+        auto [index, newValue] = m_solutionMap.try_emplace(path);
+        if (newValue)
+        {
+            index = m_solutionIndexAllocator.allocate_index();
+            if (index >= m_solutionReferences.size())
+            {
+                m_solutionReferences.resize(index + 1ull);
+            }
+        }
+
+        m_solutionReferences[index].borrow();
+
+        return { index, newValue };
+    }
+
+    void filesystem_provider::destroy_solution_reference(const dynamic_string& path)
+    {
+        const index_type index = m_solutionMap.at(path);
+        m_solutionReferences[index].release();
+
+        if (m_solutionReferences[index].free())
+        {
+            m_solutionMap.erase(path);
+            m_solutionIndexAllocator.free_index(index);
+        }
+    }
+
+    index_type filesystem_provider::find_existing_solution(const dynamic_string& path)
+    {
+        if (const index_type* result = m_solutionMap.find(path))
+        {
+            return *result;
+        }
+
+        return npos;
+    }
+
+    const manual_reference_counter& filesystem_provider::get_reference_count_status(const index_type index) const
+    {
+        return m_solutionReferences[index];
+    }
 }
