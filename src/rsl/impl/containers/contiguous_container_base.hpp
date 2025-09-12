@@ -33,6 +33,25 @@ namespace rsl
     concept variadic_item_type = explicitly_convertible_to<T, ValueType> || (container_like<T> && explicitly_convertible_to<
         container_value_type<T>, ValueType>) || (is_array_v<T> && explicitly_convertible_to<array_value_t<T>, ValueType>);
 
+    namespace internal
+    {
+        template<bool CanResize, bool UsePostFix, size_type StaticCapacity>
+        constexpr size_type calculate_initial_size()
+        {
+            if constexpr (CanResize)
+            {
+                return 0ull;
+            }
+
+            if constexpr (UsePostFix)
+            {
+                return StaticCapacity == 0ull ? 0ull : StaticCapacity - 1ull;
+            }
+
+            return StaticCapacity;
+        }
+    }
+
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
     class contiguous_container_base
@@ -399,7 +418,7 @@ namespace rsl
         template <typename... Args>
         constexpr static bool construct_noexcept = is_nothrow_constructible_v<value_type, Args...>;
 
-        [[rythe_always_inline]] constexpr void maybe_shrink_to_static_storage() noexcept(move_construct_noexcept)
+        [[rythe_always_inline]] constexpr bool maybe_shrink_to_static_storage() noexcept(move_construct_noexcept)
             requires(can_allocate);
 
         [[nodiscard]] [[rythe_always_inline]] constexpr bool maybe_grow() noexcept(move_construct_noexcept);
@@ -430,7 +449,7 @@ namespace rsl
             noexcept(move_construct_noexcept)
             requires(can_resize);
 
-        [[rythe_always_inline]] constexpr void erase_swap_impl(size_type pos) noexcept(move_construct_noexcept)
+        [[rythe_always_inline]] constexpr void erase_swap_unsafe_impl(size_type pos) noexcept(move_construct_noexcept)
             requires(can_resize);
 
         template <input_iterator InputIt>
@@ -485,11 +504,18 @@ namespace rsl
         [[nodiscard]] [[rythe_always_inline]] constexpr value_type* get_ptr_at(size_type i) noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const value_type* get_ptr_at(size_type i) const noexcept;
 
+        [[rythe_always_inline]] constexpr void shrink_to_postfix() noexcept;
+        [[rythe_always_inline]] constexpr void construct_postfix() noexcept(construct_noexcept<>);
+        [[rythe_always_inline]] constexpr void destroy_postfix() noexcept;
+
+        [[nodiscard]] [[rythe_always_inline]] constexpr size_type calc_max_size() const noexcept;
+        [[nodiscard]] [[rythe_always_inline]] constexpr static size_type calc_memory_size(size_type itemCount) noexcept;
+
         // TODO: m_size is not needed if `can_resize` is false
         //       m_capacity is not needed if `can_allocate` is false
         //       make a special case for array without resizing or allocations
-        size_type m_size = can_resize ? 0ull : static_capacity;
-        size_type m_capacity = static_capacity;
+        size_type m_size = internal::calculate_initial_size<can_resize, use_post_fix, static_capacity>();
+        size_type m_memorySize = static_capacity;
     };
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename

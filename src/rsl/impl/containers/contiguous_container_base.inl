@@ -20,20 +20,10 @@ namespace rsl
             ) noexcept(copy_construct_container_noexcept)
         : mem_rsc(internal::alloc_and_factory_only_signal, src)
     {
-        size_type memorySize;
-        if constexpr (use_post_fix)
-        {
-            memorySize = src.m_size + 1ull;
-        }
-        else
-        {
-            memorySize = src.m_size;
-        }
-
         reserve(src.m_size);
         m_size = src.m_size;
         // will copy postfix from src if `use_post_fix`
-        copy_construct_from_unsafe_impl(0ull, memorySize, src.get_ptr());
+        copy_construct_from_unsafe_impl(0ull, calc_memory_size(m_size), src.get_ptr());
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
@@ -43,32 +33,20 @@ namespace rsl
             ) noexcept(move_construct_container_noexcept)
         : mem_rsc(internal::alloc_and_factory_only_signal, rsl::move(src))
     {
-        size_type memorySize;
-        if constexpr (use_post_fix)
-        {
-            memorySize = src.m_size + 1ull;
-        }
-        else
-        {
-            memorySize = src.m_size;
-        }
-
         if (src.is_static_memory())
         {
-            mem_rsc::move(memorySize, 0ull, src.get_ptr());
+            mem_rsc::move(calc_memory_size(src.m_size), 0ull, src.get_ptr());
             return;
         }
 
         mem_rsc::set_ptr(src.get_ptr());
         m_size = src.m_size;
-        m_capacity = src.m_capacity;
+        m_memorySize = src.m_memorySize;
 
-        src.m_size = src.m_capacity = 0ull;
+        src.m_size = internal::calculate_initial_size<can_resize, use_post_fix, static_capacity>();
+        src.m_memorySize = static_capacity;
         src.set_ptr(nullptr);
-        if constexpr (use_post_fix && !internal::is_dynamic_resource_v<mem_rsc>)
-        {
-            src.construct(1ull);
-        }
+        src.construct_postfix();
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
@@ -177,14 +155,7 @@ namespace rsl
         }
         else
         {
-            if constexpr (use_post_fix)
-            {
-                rsl_assert_invalid_operation((count + 1) <= static_capacity);
-            }
-            else
-            {
-                rsl_assert_invalid_operation(count <= static_capacity);
-            }
+            rsl_assert_invalid_operation(contiguous_container_base::calc_memory_size(count) <= static_capacity);
         }
 
         if constexpr (can_resize)
@@ -205,11 +176,7 @@ namespace rsl
             }
         }
 
-        if constexpr (use_post_fix)
-        {
-            result.construct(1ull, result.m_size);
-        }
-
+        result.construct_postfix();
         return result;
     }
 
@@ -229,14 +196,7 @@ namespace rsl
         }
         else
         {
-            if constexpr (use_post_fix)
-            {
-                rsl_assert_invalid_operation((count + 1) <= static_capacity);
-            }
-            else
-            {
-                rsl_assert_invalid_operation(count <= static_capacity);
-            }
+            rsl_assert_invalid_operation(contiguous_container_base::calc_memory_size(count) <= static_capacity);
         }
 
         if constexpr (can_resize)
@@ -245,12 +205,7 @@ namespace rsl
         }
 
         result.move_construct_from_unsafe_impl(0ull, result.m_size, ptr);
-
-        if constexpr (use_post_fix)
-        {
-            result.construct(1ull, result.m_size);
-        }
-
+        result.construct_postfix();
         return result;
     }
 
@@ -311,37 +266,6 @@ namespace rsl
             }
         }
 
-        template <typename Container, typename Type, typename... Types>
-        void container_append_items(Container& container, Type&& arg, Types&&... args)
-        {
-            if constexpr (container_like<Type> || is_array_v<Type>)
-            {
-                for (auto& item : arg)
-                {
-                    if constexpr (is_rvalue_reference_v<Type>)
-                    {
-                        container.emplace_back(rsl::move(item));
-                    }
-                    else
-                    {
-                        container.emplace_back(item);
-                    }
-                }
-            }
-            else
-            {
-                container.emplace_back(rsl::forward<Type>(arg));
-            }
-
-            if constexpr (sizeof...(Types) != 0)
-            {
-                container_append_items(
-                        container,
-                        rsl::forward<Types>(args)...
-                        );
-            }
-        }
-
         template <typename T, variadic_item_type<T> ... ItemTypes>
         constexpr size_type calc_total_variadic_item_size(ItemTypes&&... items) noexcept
         {
@@ -357,27 +281,26 @@ namespace rsl
             ItemTypes&&... items
             ) noexcept(noexcept_construct_from_all<ItemTypes...>)
     {
+        contiguous_container_base result;
         if constexpr (can_allocate)
         {
-            contiguous_container_base result;
             result.reserve(internal::calc_total_variadic_item_size<T>(items));
-            internal::container_append_items(result, rsl::forward<ItemTypes>(items)...);
-
-            return result;
         }
         else
         {
-            rsl_assert_invalid_operation(internal::calc_total_variadic_item_size<T>(items) <= static_capacity);
-            contiguous_container_base result;
-
-            if constexpr (can_resize)
-            {
-                result.m_size = internal::calc_total_variadic_item_size<T>(items);
-            }
-
-            internal::container_construct_items(result, 0ull, rsl::forward<ItemTypes>(items)...);
-            return result;
+            rsl_assert_invalid_operation(
+                    contiguous_container_base::calc_memory_size(internal::calc_total_variadic_item_size<T>(items)) <= static_capacity
+                    );
         }
+
+        if constexpr (can_resize)
+        {
+            result.m_size = internal::calc_total_variadic_item_size<T>(items);
+        }
+
+        internal::container_construct_items(result, 0ull, rsl::forward<ItemTypes>(items)...);
+        result.construct_postfix();
+        return result;
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
@@ -414,11 +337,7 @@ namespace rsl
         result.reserve(count);
         result.m_size = count;
         result.construct(count, 0ull, rsl::forward<Args>(args)...);
-
-        if constexpr (use_post_fix)
-        {
-            result.construct(1ull, result.m_size);
-        }
+        result.construct_postfix();
 
         return result;
     }
@@ -442,7 +361,7 @@ namespace rsl
     constexpr size_type contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
                                                   ContiguousContainerInfo>::capacity() const noexcept
     {
-        return m_capacity;
+        return m_memorySize;
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
@@ -471,14 +390,12 @@ namespace rsl
         internal::move_alloc_and_factory<mem_rsc>(*this, rsl::move(src));
         mem_rsc::set_ptr(src.get_ptr());
         m_size = src.m_size;
-        m_capacity = src.m_capacity;
+        m_memorySize = src.m_memorySize;
 
-        src.m_size = src.m_capacity = 0ull;
+        src.m_size = internal::calculate_initial_size<can_resize, use_post_fix, static_capacity>();
+        src.m_memorySize = static_capacity;
         src.set_ptr(nullptr);
-        if constexpr (use_post_fix && !internal::is_dynamic_resource_v<mem_rsc>)
-        {
-            src.construct(1ull);
-        }
+        src.construct_postfix();
         return *this;
     }
 
@@ -492,13 +409,7 @@ namespace rsl
         noexcept(construct_noexcept<Args...> && move_construct_noexcept)
         requires (can_resize)
     {
-        if constexpr (use_post_fix)
-        {
-            if (m_capacity > 0ull) [[likely]]
-            {
-                mem_rsc::destroy(1ull, m_size);
-            }
-        }
+        destroy_postfix();
 
         if constexpr (can_allocate)
         {
@@ -506,7 +417,7 @@ namespace rsl
         }
         else
         {
-            rsl_assert_invalid_operation(newSize <= m_capacity);
+            rsl_assert_invalid_operation(newSize <= m_memorySize);
         }
 
         if (newSize > m_size)
@@ -520,21 +431,20 @@ namespace rsl
 
         m_size = newSize;
 
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::construct(1ull, m_size);
-        }
+        construct_postfix();
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
               ConstIter, typename ContiguousContainerInfo>
     constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::reserve(
-            const size_type newCapacity
+            size_type newCapacity
             )
         noexcept(move_construct_noexcept)
         requires (can_allocate)
     {
-        if (newCapacity < m_capacity) [[unlikely]]
+        newCapacity = calc_memory_size(newCapacity);
+
+        if (newCapacity < m_memorySize) [[unlikely]]
         {
             return;
         }
@@ -547,15 +457,10 @@ namespace rsl
     constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::reset() noexcept
         requires (can_resize)
     {
+        destroy_postfix();
         reset_unsafe_impl();
         m_size = 0ull;
-        if constexpr (use_post_fix)
-        {
-            if (m_capacity > 0ull) [[likely]]
-            {
-                mem_rsc::construct(1ull);
-            }
-        }
+        construct_postfix();
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
@@ -568,30 +473,17 @@ namespace rsl
         {
             if constexpr (!internal::is_static_resource_v<mem_rsc>)
             {
-                if constexpr (use_post_fix)
-                {
-                    mem_rsc::deallocate(m_capacity + 1);
-                }
-                else
-                {
-                    mem_rsc::deallocate(m_capacity);
-                }
+                mem_rsc::deallocate(m_memorySize);
             }
             return;
         }
 
-        if constexpr (internal::is_dynamic_resource_v<mem_rsc>)
+        if (maybe_shrink_to_static_storage())
         {
-            rsl_ensure(resize_capacity_unsafe(m_size));
+            return;
         }
-        else if constexpr (internal::is_hybrid_resource_v<mem_rsc>)
-        {
-            maybe_shrink_to_static_storage();
-            if (m_capacity != static_capacity)
-            {
-                rsl_ensure(resize_capacity_unsafe(m_size));
-            }
-        }
+
+        rsl_ensure(resize_capacity_unsafe(calc_memory_size(m_size)));
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
@@ -602,22 +494,13 @@ namespace rsl
         noexcept(copy_construct_noexcept)
         requires (can_resize)
     {
-        if constexpr (use_post_fix)
-        {
-            if (m_capacity > 0ull) [[likely]]
-            {
-                mem_rsc::destroy(1ull, m_size);
-            }
-        }
+        destroy_postfix();
 
         rsl_ensure(maybe_grow());
         emplace_unsafe_impl(m_size, m_size + 1, value);
         ++m_size;
 
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::construct(1ull, m_size);
-        }
+        construct_postfix();
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
@@ -628,22 +511,13 @@ namespace rsl
         noexcept(move_construct_noexcept)
         requires (can_resize)
     {
-        if constexpr (use_post_fix)
-        {
-            if (m_capacity > 0ull) [[likely]]
-            {
-                mem_rsc::destroy(1ull, m_size);
-            }
-        }
+        destroy_postfix();
 
         rsl_ensure(maybe_grow());
         emplace_unsafe_impl(m_size, m_size + 1, move(value));
         ++m_size;
 
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::construct(1ull, m_size);
-        }
+        construct_postfix();
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
@@ -656,22 +530,13 @@ namespace rsl
         noexcept(construct_noexcept<Args...> && move_construct_noexcept)
         requires (can_resize)
     {
-        if constexpr (use_post_fix)
-        {
-            if (m_capacity > 0ull) [[likely]]
-            {
-                mem_rsc::destroy(1ull, m_size);
-            }
-        }
+        destroy_postfix();
 
         rsl_ensure(maybe_grow());
         emplace_unsafe_impl(m_size, m_size + 1, rsl::forward<Args>(args)...);
         ++m_size;
 
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::construct(1ull, m_size);
-        }
+        construct_postfix();
 
         return back();
     }
@@ -698,21 +563,12 @@ namespace rsl
             count = m_size;
         }
 
-        if constexpr (use_post_fix)
-        {
-            if (m_capacity > 0ull) [[likely]]
-            {
-                mem_rsc::destroy(1ull, m_size);
-            }
-        }
+        destroy_postfix();
 
         reset_unsafe_impl(m_size - count);
         m_size -= count;
 
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::construct(1ull, m_size);
-        }
+        construct_postfix();
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
@@ -721,18 +577,10 @@ namespace rsl
         noexcept
         requires (can_resize)
     {
+        destroy_postfix();
         reset_unsafe_impl();
-
-        if constexpr (use_post_fix)
-        {
-            if (m_capacity > 0ull) [[likely]]
-            {
-                mem_rsc::destroy(1ull, m_size);
-                mem_rsc::construct(1ull);
-            }
-        }
-
         m_size = 0;
+        construct_postfix();
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
@@ -957,7 +805,7 @@ namespace rsl
         split_reserve(
                 pos,
                 1,
-                m_size == m_capacity ? m_capacity * 2 : m_size + 1
+                m_size == m_memorySize ? m_memorySize * 2 : m_size + 1
                 );
 
         mem_rsc::construct(1, pos, value);
@@ -976,7 +824,7 @@ namespace rsl
         split_reserve(
                 pos,
                 1,
-                m_size == m_capacity ? m_capacity * 2 : m_size + 1
+                m_size == m_memorySize ? m_memorySize * 2 : m_size + 1
                 );
 
         mem_rsc::construct(1, pos, move(value));
@@ -1076,17 +924,12 @@ namespace rsl
     {
         rsl_assert_out_of_range(pos < m_size);
 
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::destroy(1, m_size);
-        }
+        destroy_postfix();
 
-        erase_swap_impl(pos);
+        erase_swap_unsafe_impl(pos);
+        --m_size;
 
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::construct(1, m_size);
-        }
+        construct_postfix();
 
         return pos;
     }
@@ -1121,25 +964,19 @@ namespace rsl
             last = m_size;
         }
 
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::destroy(1, m_size);
-        }
+        destroy_postfix();
 
         size_type count = last - first;
         mem_rsc::destroy(count, first);
 
-        for (size_type i = 0; i < count; ++i)
+        for (size_type i = 0ull; i < count; ++i)
         {
-            mem_rsc::construct(1, i + first, move(*get_ptr_at(m_size - (i + 1))));
+            mem_rsc::construct(1ull, i + first, move(*get_ptr_at(m_size - (i + 1ull))));
         }
 
         m_size -= count;
 
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::construct(1, m_size);
-        }
+        construct_postfix();
 
         return first;
     }
@@ -1163,25 +1000,23 @@ namespace rsl
         requires invocable<Func, bool(ConstIter)> &&
         can_resize
     {
-        const size_type originalSize = m_size;
-
-        size_type erasureCount = 0ull;
-        for (size_type i = originalSize; i != 0; --i)
+        size_type newSize = m_size;
+        for (size_type i = m_size; i != 0ull; --i)
         {
-            if (comparer(iterator_at(i - 1))) [[unlikely]]
+            if (comparer(iterator_at(i - 1ull))) [[unlikely]]
             {
-                erase_swap_impl(i - 1);
-                erasureCount++;
+                erase_swap_unsafe_impl(i - 1ull);
+                --newSize;
             }
         }
 
-        if constexpr (use_post_fix)
+        const size_type erasureCount = m_size - newSize;
+
+        if (newSize != m_size)
         {
-            if (erasureCount != 0ull) [[likely]]
-            {
-                mem_rsc::destroy(1, originalSize);
-                mem_rsc::construct(1, m_size);
-            }
+            destroy_postfix();
+            m_size = newSize;
+            construct_postfix();
         }
 
         return erasureCount;
@@ -1195,15 +1030,12 @@ namespace rsl
     {
         rsl_assert_out_of_range(pos < m_size);
 
-        mem_rsc::destroy(1, pos);
-        move_shift_elements_unsafe(pos + 1, m_size, -1ll);
+        mem_rsc::destroy(1ull, pos);
+        destroy_postfix();
+        move_shift_elements_unsafe(pos + 1ull, m_size, -1ll);
         --m_size;
 
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::destroy(1ull, m_size + 1ull);
-            mem_rsc::construct(1ull, m_size);
-        }
+        construct_postfix();
 
         return pos;
     }
@@ -1239,19 +1071,14 @@ namespace rsl
         }
 
         const size_type count = last - first;
+
         mem_rsc::destroy(count, first);
+        destroy_postfix();
+
         move_shift_elements_unsafe(last, m_size, -static_cast<diff_type>(count));
         m_size -= count;
 
-        if constexpr (use_post_fix)
-        {
-            if (count != 0ull) [[likely]]
-            {
-                mem_rsc::destroy(1ull, m_size + count);
-                mem_rsc::construct(1ull, m_size);
-            }
-        }
-
+        construct_postfix();
         return first;
     }
 
@@ -1277,40 +1104,36 @@ namespace rsl
         size_type eraseLocation = npos;
         diff_type shift = -1ll;
 
-        const size_type originalSize = m_size;
-
-        size_type erasureCount = 0ull;
-        for (size_type i = 0; i < originalSize; i++)
+        size_type newSize = m_size;
+        for (size_type i = 0ull; i < m_size; ++i)
         {
             if (comparer(iterator_at(i))) [[unlikely]]
             {
                 if (eraseLocation != npos) [[likely]]
                 {
-                    mem_rsc::destroy(1, eraseLocation);
-                    move_shift_elements_unsafe(eraseLocation + 1, i, shift);
-                    --m_size;
+                    mem_rsc::destroy(1ull, eraseLocation);
+                    move_shift_elements_unsafe(eraseLocation + 1ull, i, shift);
+                    --newSize;
                     shift -= 1ll;
                 }
 
-                erasureCount++;
                 eraseLocation = i;
             }
         }
 
         if (eraseLocation != npos) [[likely]]
         {
-            mem_rsc::destroy(1, eraseLocation);
-            move_shift_elements_unsafe(eraseLocation + 1, m_size, shift);
-            --m_size;
+            mem_rsc::destroy(1ull, eraseLocation);
+            move_shift_elements_unsafe(eraseLocation + 1ull, newSize, shift);
+            --newSize;
         }
 
-        if constexpr (use_post_fix)
+        const size_type erasureCount = m_size - newSize;
+        if (newSize != m_size) [[likely]]
         {
-            if (erasureCount != 0ull) [[likely]]
-            {
-                mem_rsc::destroy(1ull, originalSize);
-                mem_rsc::construct(1ull, m_size);
-            }
+            destroy_postfix();
+            m_size = newSize;
+            construct_postfix();
         }
 
         return erasureCount;
@@ -1555,37 +1378,32 @@ namespace rsl
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
               ContiguousContainerInfo>
-    constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::
+    constexpr bool contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::
     maybe_shrink_to_static_storage() noexcept(move_construct_noexcept)
         requires (can_allocate)
     {
         if constexpr (internal::is_hybrid_resource_v<mem_rsc>)
         {
-            size_type memorySize;
-            size_type memoryCapacity;
-            if constexpr (use_post_fix)
-            {
-                memorySize = m_size + 1ull;
-                memoryCapacity = m_capacity + 1ull;
-            }
-            else
-            {
-                memorySize = m_size;
-                memoryCapacity = m_capacity;
-            }
+            const size_type footprint = calc_memory_size(m_size);
 
-            if (memorySize > static_capacity)
+            if (footprint > static_capacity)
             {
-                return;
+                return false;
             }
 
             if (mem_rsc::is_static_memory()) [[unlikely]]
             {
-                return;
+                return true;
             }
 
-            mem_rsc::move_to_static_memory_and_deallocate(memorySize, memoryCapacity);
-            m_capacity = static_capacity;
+            mem_rsc::move_to_static_memory_and_deallocate(footprint, m_memorySize);
+            m_memorySize = static_capacity;
+
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -1598,15 +1416,15 @@ namespace rsl
         {
             if constexpr (internal::is_dynamic_resource_v<mem_rsc>)
             {
-                if (m_capacity == 0) [[unlikely]]
+                if (m_memorySize == 0) [[unlikely]]
                 {
                     return resize_capacity_unsafe(1);
                 }
             }
 
-            if (m_size == m_capacity) [[unlikely]]
+            if (m_size == m_memorySize) [[unlikely]]
             {
-                return resize_capacity_unsafe(m_capacity * 2);
+                return resize_capacity_unsafe(m_memorySize * 2);
             }
 
             return true;
@@ -1623,47 +1441,31 @@ namespace rsl
     resize_capacity_unsafe(const size_type newCapacity) noexcept(move_construct_noexcept)
         requires (can_allocate)
     {
-        size_type newMemorySize;
-        size_type oldMemorySize;
-        if constexpr (use_post_fix)
-        {
-            newMemorySize = newCapacity + 1ull;
-            oldMemorySize = m_capacity + 1ull;
-        }
-        else
-        {
-            newMemorySize = newCapacity;
-            oldMemorySize = m_capacity;
-        }
-
+        const size_type oldCapacity = m_memorySize;
         if constexpr (internal::is_dynamic_resource_v<mem_rsc>)
         {
-            if (m_capacity == 0) [[unlikely]]
+            if (m_memorySize == 0) [[unlikely]]
             {
                 rsl_assert_invalid_object(!mem_rsc::get_ptr());
+                rsl_assert_invalid_object(m_size == 0ull);
 
-                mem_rsc::allocate(newMemorySize);
+                mem_rsc::allocate(newCapacity);
 
                 if (mem_rsc::get_ptr() == nullptr) [[unlikely]]
                 {
-                    m_capacity = 0ull;
+                    m_memorySize = 0ull;
                     return false;
                 }
 
-                m_capacity = newCapacity;
-
-                if constexpr (use_post_fix)
-                {
-                    mem_rsc::construct(1ull, 0);
-                }
-
+                m_memorySize = newCapacity;
+                construct_postfix();
                 return true;
             }
         }
 
         if constexpr (internal::is_hybrid_resource_v<mem_rsc>)
         {
-            if (newMemorySize <= static_capacity) [[unlikely]]
+            if (newCapacity <= static_capacity) [[unlikely]]
             {
                 maybe_shrink_to_static_storage();
                 return true;
@@ -1672,37 +1474,33 @@ namespace rsl
 
         if constexpr (is_trivially_copyable_v<T>)
         {
-            mem_rsc::reallocate(oldMemorySize, newMemorySize);
+            mem_rsc::reallocate(oldCapacity, newCapacity);
 
             if (mem_rsc::get_ptr() == nullptr) [[unlikely]]
             {
-                m_capacity = 0ull;
+                m_memorySize = 0ull;
                 return false;
             }
         }
         else
         {
-            T* newMem = mem_rsc::m_alloc.allocate(newMemorySize);
+            T* newMem = mem_rsc::m_alloc.allocate(newCapacity);
             if (!newMem) [[unlikely]]
             {
-                m_capacity = 0ull;
+                m_memorySize = 0ull;
                 mem_rsc::destroy(m_size);
                 mem_rsc::set_ptr(nullptr);
                 return false;
             }
 
-            mem_rsc::m_alloc.move(newMem, mem_rsc::get_ptr(), m_size);
-            mem_rsc::destroy(m_size);
-            mem_rsc::deallocate(oldMemorySize);
+            const size_type footprint = calc_memory_size(m_size);
+            mem_rsc::m_alloc.move(newMem, mem_rsc::get_ptr(), footprint);
+            mem_rsc::destroy(footprint);
+            mem_rsc::deallocate(oldCapacity);
             mem_rsc::set_ptr(newMem);
-
-            if constexpr (use_post_fix)
-            {
-                mem_rsc::construct(1ull, m_size);
-            }
         }
 
-        m_capacity = newCapacity;
+        m_memorySize = newCapacity;
         return true;
     }
 
@@ -1720,44 +1518,31 @@ namespace rsl
             rsl_assert_invalid_operation(srcSize != m_size);
         }
 
-        if constexpr (use_post_fix)
-        {
-            if (m_capacity > 0ull) [[likely]]
-            {
-                mem_rsc::destroy(1ull, m_size);
-            }
-        }
+        destroy_postfix();
 
         if constexpr (can_allocate)
         {
-            if (srcSize > m_capacity || allocOrFactory != nullptr)
+            const size_type srcFootprint = calc_memory_size(srcSize);
+            if (srcFootprint > m_memorySize || allocOrFactory != nullptr)
             {
                 if (mem_rsc::get_ptr()) [[likely]]
                 {
                     reset_unsafe_impl();
+                    mem_rsc::deallocate(m_memorySize);
 
-                    if constexpr (use_post_fix)
-                    {
-                        mem_rsc::deallocate(m_capacity + 1ull);
-                    }
-                    else
-                    {
-                        mem_rsc::deallocate(m_capacity);
-                    }
-
-                    m_capacity = 0;
+                    m_memorySize = 0;
                     m_size = 0;
                 }
 
                 rsl_assert_frequent(m_size == 0);
-                rsl_assert_frequent(m_capacity == 0);
+                rsl_assert_frequent(m_memorySize == 0);
 
                 if (allocOrFactory)
                 {
                     mem_rsc::m_alloc = *static_cast<mem_rsc::typed_alloc_type*>(allocOrFactory);
                 }
 
-                reserve(srcSize);
+                rsl_ensure(resize_capacity_unsafe(srcFootprint));
             }
         }
         else
@@ -1767,48 +1552,23 @@ namespace rsl
                 mem_rsc::m_factory = *static_cast<mem_rsc::factory_storage_type*>(allocOrFactory);
             }
 
-            if (srcSize > m_capacity)
+            const size_type maxSize = calc_max_size();
+            if (srcSize > maxSize)
             {
-                srcSize = m_capacity;
+                srcSize = maxSize;
             }
         }
 
         if (m_size > srcSize)
         {
             reset_unsafe_impl(srcSize);
-            m_size = srcSize;
         }
 
-        if (m_size > 0)
-        {
-            copy_assign_from_unsafe_impl(0, m_size, src);
-        }
+        copy_construct_from_unsafe_impl(0ull, srcSize, src);
+        m_size = srcSize;
 
-        if (m_size < srcSize)
-        {
-            copy_construct_from_unsafe_impl(
-                    m_size,
-                    srcSize,
-                    src + m_size
-                    );
-            m_size = srcSize;
-        }
-
-        if constexpr (char_type<value_type>)
-        {
-            if (m_size > 0)
-            {
-                if (*get_ptr_at(m_size - 1) == static_cast<value_type>('\0'))
-                {
-                    --m_size;
-                }
-            }
-        }
-
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::construct(1ull, m_size);
-        }
+        shrink_to_postfix();
+        construct_postfix();
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
@@ -1824,46 +1584,34 @@ namespace rsl
             rsl_assert_invalid_operation(srcSize != m_size);
         }
 
-        if constexpr (use_post_fix)
-        {
-            if (m_capacity > 0ull) [[likely]]
-            {
-                mem_rsc::destroy(1ull, m_size);
-            }
-        }
+        destroy_postfix();
 
         if constexpr (can_allocate)
         {
-            if (srcSize > m_capacity)
+            const size_type srcFootprint = calc_memory_size(srcSize);
+            if (srcFootprint > m_memorySize)
             {
                 if (mem_rsc::get_ptr()) [[likely]]
                 {
                     reset_unsafe_impl();
+                    mem_rsc::deallocate(m_memorySize);
 
-                    if constexpr (use_post_fix)
-                    {
-                        mem_rsc::deallocate(m_capacity + 1ull);
-                    }
-                    else
-                    {
-                        mem_rsc::deallocate(m_capacity);
-                    }
-
-                    m_capacity = 0;
+                    m_memorySize = 0;
                     m_size = 0;
                 }
 
                 rsl_assert_frequent(m_size == 0);
-                rsl_assert_frequent(m_capacity == 0);
+                rsl_assert_frequent(m_memorySize == 0);
 
-                reserve(srcSize);
+                rsl_ensure(resize_capacity_unsafe(srcFootprint));
             }
         }
         else
         {
-            if (srcSize > m_capacity)
+            const size_type maxSize = calc_max_size();
+            if (srcSize > maxSize)
             {
-                srcSize = m_capacity;
+                srcSize = maxSize;
             }
         }
 
@@ -1899,10 +1647,7 @@ namespace rsl
             }
         }
 
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::construct(1ull, m_size);
-        }
+        construct_postfix();
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
@@ -1913,51 +1658,35 @@ namespace rsl
     {
         if constexpr (can_allocate)
         {
-            if (m_capacity == 0) [[unlikely]]
+            if (m_memorySize == 0) [[unlikely]]
             {
                 rsl_ensure(resize_capacity_unsafe(newSize));
             }
             else
             {
-                size_type oldMemorySize;
-                size_type newMemorySize;
-                if constexpr (use_post_fix)
-                {
-                    newMemorySize = newSize + 1ull;
-                    oldMemorySize = m_capacity + 1ull;
-                }
-                else
-                {
-                    newMemorySize = newSize;
-                    oldMemorySize = m_capacity;
-                }
+                destroy_postfix();
 
-                if constexpr (use_post_fix)
-                {
-                    mem_rsc::destroy(1ull, m_size);
-                }
-
-                if (newSize > m_capacity)
+                if (newSize > m_memorySize)
                 {
                     if constexpr (is_trivially_copyable_v<T>)
                     {
-                        mem_rsc::reallocate(oldMemorySize, newMemorySize);
+                        mem_rsc::reallocate(m_memorySize, newSize);
                         move_shift_elements_unsafe(pos, m_size, count);
                     }
                     else
                     {
-                        T* newMem = mem_rsc::m_alloc.allocate(newMemorySize);
+                        T* newMem = mem_rsc::m_alloc.allocate(newSize);
                         if (newMem) [[likely]]
                         {
                             mem_rsc::m_alloc.move(newMem, mem_rsc::get_ptr(), pos);
                             mem_rsc::m_alloc.move(newMem + pos, get_ptr_at(pos), pos + count);
                         }
 
-                        mem_rsc::deallocate(oldMemorySize);
+                        mem_rsc::deallocate(m_memorySize);
                         mem_rsc::set_ptr(newMem);
                     }
 
-                    m_capacity = newSize;
+                    m_memorySize = newSize;
                 }
                 else
                 {
@@ -1967,41 +1696,29 @@ namespace rsl
         }
         else
         {
-            rsl_assert_invalid_operation(newSize <= m_capacity);
-            if constexpr (use_post_fix)
-            {
-                mem_rsc::destroy(1ull, m_size);
-            }
+            rsl_assert_invalid_operation(newSize <= m_memorySize);
+            destroy_postfix();
             move_shift_elements_unsafe(pos, m_size, count);
         }
 
         m_size = newSize;
 
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::construct(1ull, m_size);
-        }
+        construct_postfix();
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator
               ConstIter, typename ContiguousContainerInfo>
     constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::
-    erase_swap_impl(size_type pos) noexcept(move_construct_noexcept)
+    erase_swap_unsafe_impl(size_type pos) noexcept(move_construct_noexcept)
         requires (can_resize)
     {
-        --m_size;
         mem_rsc::destroy(1, pos);
 
-        if (pos != m_size) [[likely]]
+        const size_type lastIndex = m_size - 1ull;
+        if (pos != lastIndex) [[likely]]
         {
-            mem_rsc::construct(1, pos, move(*get_ptr_at(m_size)));
-            mem_rsc::destroy(1, m_size);
-        }
-
-        if constexpr (use_post_fix)
-        {
-            mem_rsc::destroy(1, m_size + 2);
-            mem_rsc::construct(1, m_size + 1);
+            mem_rsc::construct(1, pos, move(*get_ptr_at(lastIndex)));
+            mem_rsc::destroy(1, lastIndex);
         }
     }
 
@@ -2039,7 +1756,7 @@ namespace rsl
         }
         else
         {
-            for (size_type i = offset; i != end; i++, ++srcIter)
+            for (size_type i = offset; i != end; ++i, ++srcIter)
             {
                 mem_rsc::construct(1, i, *srcIter);
             }
@@ -2079,7 +1796,7 @@ namespace rsl
         }
         else
         {
-            for (size_type i = offset; i != end; i++, ++srcIter)
+            for (size_type i = offset; i != end; ++i, ++srcIter)
             {
                 mem_rsc::construct(1, i, move(*srcIter));
             }
@@ -2123,7 +1840,7 @@ namespace rsl
             const diff_type shift
             ) noexcept(move_construct_noexcept)
     {
-        for (size_type i = offset; i != end; i++)
+        for (size_type i = offset; i != end; ++i)
         {
             mem_rsc::construct(1, static_cast<size_type>(i + shift), move(*get_ptr_at(i)));
         }
@@ -2145,6 +1862,92 @@ namespace rsl
             ) const noexcept
     {
         return mem_rsc::get_ptr() + i;
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
+                                             ContiguousContainerInfo>::shrink_to_postfix() noexcept
+    {
+        if constexpr (use_post_fix)
+        {
+            if (m_size > 0) [[likely]]
+            {
+                const size_type oldSize = m_size;
+                while (*get_ptr_at(m_size - 1) == value_type{})
+                {
+                    --m_size;
+                    if (m_size == 0) [[unlikely]]
+                    {
+                        break;
+                    }
+                }
+
+                if (oldSize != m_size)
+                {
+                    mem_rsc::destroy(oldSize - m_size, m_size);
+                }
+            }
+        }
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
+                                             ContiguousContainerInfo>::construct_postfix() noexcept(construct_noexcept<>)
+    {
+        if constexpr (use_post_fix)
+        {
+            if (m_memorySize > 0ull) [[likely]]
+            {
+                mem_rsc::construct(1ull, m_size);
+            }
+        }
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr void contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
+                                             ContiguousContainerInfo>::destroy_postfix() noexcept
+    {
+        if constexpr (use_post_fix)
+        {
+            if (m_memorySize > 0ull) [[likely]]
+            {
+                mem_rsc::destroy(1ull, m_size);
+            }
+        }
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr size_type contiguous_container_base<T, Alloc, Factory, Iter, ConstIter,
+                                                  ContiguousContainerInfo>::calc_max_size() const noexcept
+    {
+        if constexpr (use_post_fix)
+        {
+            return m_memorySize == 0ull ? 0ull : m_memorySize - 1ull;
+        }
+        else
+        {
+            return m_memorySize;
+        }
+    }
+
+    template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
+              ContiguousContainerInfo>
+    constexpr size_type contiguous_container_base<T, Alloc, Factory, Iter, ConstIter, ContiguousContainerInfo>::calc_memory_size(
+            const size_type itemCount
+            ) noexcept
+    {
+        if constexpr (use_post_fix)
+        {
+            return itemCount + 1ull;
+        }
+        else
+        {
+            return itemCount;
+        }
     }
 
     template <typename T, allocator_type Alloc, factory_type Factory, contiguous_iterator Iter, contiguous_iterator ConstIter, typename
