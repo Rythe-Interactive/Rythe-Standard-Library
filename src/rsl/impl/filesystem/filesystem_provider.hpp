@@ -11,6 +11,8 @@ namespace rsl::filesystem
     class view;
     class file_solution;
 
+    using domain_string = hybrid_string<16>;
+
     class filesystem_provider
     {
     public:
@@ -20,7 +22,7 @@ namespace rsl::filesystem
         explicit filesystem_provider(Domain&& domain, Domains&&... domains);
 
         filesystem_provider& register_domain(string_view domain) noexcept;
-        [[nodiscard]] array_view<const dynamic_string> get_domains() const noexcept;
+        [[nodiscard]] array_view<const domain_string> get_domains() const noexcept;
         [[nodiscard]] virtual filesystem_traits filesystem_info() const = 0;
         [[nodiscard]] virtual result<dynamic_array<view>> ls() const = 0;
 
@@ -31,11 +33,11 @@ namespace rsl::filesystem
         static void set_solution_provider(file_solution* solution, filesystem_provider* provider);
 
         pair<index_type, bool> create_solution_reference(const dynamic_string& path);
-        void destroy_solution_reference(const dynamic_string& path);
-        index_type find_existing_solution(const dynamic_string& path);
+        void destroy_solution_reference(string_view path);
+        index_type find_existing_solution(string_view path);
         const manual_reference_counter& get_reference_count_status(index_type index) const;
 
-        dynamic_array<dynamic_string> m_domains;
+        dynamic_array<domain_string> m_domains;
         index_allocator m_solutionIndexAllocator;
         dynamic_map<dynamic_string, index_type> m_solutionMap;
         dynamic_array<manual_reference_counter> m_solutionReferences;

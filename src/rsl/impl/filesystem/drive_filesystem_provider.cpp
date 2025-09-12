@@ -7,7 +7,7 @@ namespace rsl::filesystem
 
     file_traits drive_file_solution::file_info() const
     {
-        if (!m_provider)
+        if (!m_provider) [[unlikely]]
         {
             return invalid_file_traits;
         }
@@ -48,6 +48,7 @@ namespace rsl::filesystem
             }
 
             set_solution_provider(&m_solutions[index], this);
+            m_solutions[index].m_absolutePath = localize(solutionPath);
         }
 
         return &m_solutions[index];

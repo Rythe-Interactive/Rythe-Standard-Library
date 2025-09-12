@@ -35,7 +35,7 @@ namespace rsl
 
     namespace internal
     {
-        template<bool CanResize, bool UsePostFix, size_type StaticCapacity>
+        template <bool CanResize, bool UsePostFix, size_type StaticCapacity>
         constexpr size_type calculate_initial_size()
         {
             if constexpr (CanResize)
@@ -77,6 +77,8 @@ namespace rsl
         constexpr static size_type static_capacity = ContiguousContainerInfo::static_capacity;
         constexpr static bool can_allocate = ContiguousContainerInfo::can_allocate;
         constexpr static bool can_resize = ContiguousContainerInfo::can_resize;
+
+        constexpr static bool view_hash_identical = true;
 
     protected:
         constexpr static bool copy_assign_noexcept = is_nothrow_copy_assignable_v<value_type>;
@@ -335,7 +337,7 @@ namespace rsl
             requires(can_resize);
         // Unless specifically required, use erase_shift for bulk erasures.
         // Effectively the same as erase_shift, but reverses the order of shifted elements.
-        [[rythe_always_inline]] constexpr size_type erase_swap(size_type first, size_type last) noexcept(move_construct_noexcept)
+        [[rythe_always_inline]] constexpr size_type erase_swap(size_type pos, size_type count) noexcept(move_construct_noexcept)
             requires(can_resize);
 
         // Returns amount of items removed, specific location of erasure is not possible to reconstruct.
@@ -354,7 +356,7 @@ namespace rsl
             requires(can_resize);
         [[rythe_always_inline]] constexpr size_type erase_shift(const_view_type view) noexcept(move_construct_noexcept)
             requires(can_resize);
-        [[rythe_always_inline]] constexpr size_type erase_shift(size_type first, size_type last) noexcept(move_construct_noexcept)
+        [[rythe_always_inline]] constexpr size_type erase_shift(size_type pos, size_type count) noexcept(move_construct_noexcept)
             requires(can_resize);
 
         // Unless specifically required use erase_swap for selective erasures.
@@ -370,6 +372,12 @@ namespace rsl
         template <typename Func>
         [[rythe_always_inline]] constexpr size_type erase_shift(Func&& comparer) noexcept(move_construct_noexcept)
             requires invocable<Func, bool(ConstIter)> && can_resize;
+
+        [[rythe_always_inline]] constexpr size_type replace(
+                size_type pos,
+                size_type count,
+                const_view_type replacement
+                ) noexcept(move_construct_noexcept && copy_construct_noexcept);
 
         [[nodiscard]] [[rythe_always_inline]] constexpr value_type& at(size_type i) noexcept;
         [[nodiscard]] [[rythe_always_inline]] constexpr const value_type& at(size_type i) const noexcept;
@@ -443,8 +451,7 @@ namespace rsl
 
         [[rythe_always_inline]] constexpr void split_reserve(
                 size_type pos,
-                size_type count,
-                size_type newSize
+                diff_type offset
                 )
             noexcept(move_construct_noexcept)
             requires(can_resize);

@@ -47,6 +47,8 @@ namespace rsl
 		using bucket_factory_t = typename MapInfo::template factory_t<bucket_type>;
 		using node_factory_t = typename MapInfo::template factory_t<node_type>;
 
+	    constexpr static bool view_hash_identical = true;
+
 	private:
 		using data_pool = conditional_storage<!is_flat, memory_pool<value_type, allocator_t>>;
 		using value_container = dynamic_array<node_type, allocator_t, node_factory_t>;
@@ -63,6 +65,9 @@ namespace rsl
 
 		constexpr static bool nothrow_constructible_alloc_fact =
 			nothrow_constructible_alloc && nothrow_constructible_fact;
+
+	    using key_view_alternative = MapInfo::key_view_alternative;
+	    constexpr static bool has_key_view_alternative = MapInfo::has_key_view_alternative;
 
 	public:
 		using iterator_type = hash_map_iterator<hash_map_base, typename value_container::iterator_type>;
@@ -118,16 +123,25 @@ namespace rsl
 		void clear() noexcept;
 
 		[[nodiscard]] [[rythe_always_inline]] bool contains(const key_type& key) const noexcept;
+		[[nodiscard]] [[rythe_always_inline]] bool contains(key_view_alternative key) const noexcept requires(has_key_view_alternative);
 
 		[[nodiscard]] [[rythe_always_inline]] const mapped_type* find(const key_type& key) const noexcept
 			requires (MapInfo::is_map);
 		[[nodiscard]] [[rythe_always_inline]] mapped_type* find(const key_type& key) noexcept
-		requires (MapInfo::is_map);
+	        requires (MapInfo::is_map);
+	    [[nodiscard]] [[rythe_always_inline]] const mapped_type* find(key_view_alternative key) const noexcept
+            requires (MapInfo::is_map && has_key_view_alternative);
+	    [[nodiscard]] [[rythe_always_inline]] mapped_type* find(key_view_alternative key) noexcept
+            requires (MapInfo::is_map && has_key_view_alternative);
 
 		[[nodiscard]] [[rythe_always_inline]] const mapped_type& at(const key_type& key) const
 			requires (MapInfo::is_map);
 		[[nodiscard]] [[rythe_always_inline]] mapped_type& at(const key_type& key)
-			requires (MapInfo::is_map);
+	        requires (MapInfo::is_map);
+	    [[nodiscard]] [[rythe_always_inline]] const mapped_type& at(key_view_alternative key) const
+            requires (MapInfo::is_map && has_key_view_alternative);
+	    [[nodiscard]] [[rythe_always_inline]] mapped_type& at(key_view_alternative key)
+            requires (MapInfo::is_map && has_key_view_alternative);
 
 		template <typename... Args>
 		mapped_type& emplace(const key_type& key, Args&&... args);
@@ -139,6 +153,7 @@ namespace rsl
 		pair<mapped_type&, bool> try_emplace(const key_type& key, Args&&... args);
 
 		[[rythe_always_inline]] constexpr void erase(const key_type& key) noexcept;
+		[[rythe_always_inline]] constexpr void erase(key_view_alternative key) noexcept requires(has_key_view_alternative);
 
 		[[nodiscard]] [[rythe_always_inline]] constexpr memory_pool<value_type>& get_memory_pool() noexcept
 			requires(!is_flat);
@@ -186,7 +201,8 @@ namespace rsl
 			index_type homeIndex;
 		};
 
-		[[rythe_always_inline]] constexpr hash_result get_hash_result(const key_type& key) const noexcept;
+	    template<typename KeyType>
+		[[rythe_always_inline]] constexpr hash_result get_hash_result(const KeyType& key) const noexcept;
 
 		enum struct [[rythe_closed_enum]] search_result_type : uint8
 		{
@@ -202,8 +218,9 @@ namespace rsl
 			search_result_type type;
 		};
 
+	    template<typename KeyType>
 		constexpr bucket_search_result find_next_available(
-			index_type homeIndex, storage_type startPsl, storage_type fingerprint, const key_type& key, bool earlyOut
+			index_type homeIndex, storage_type startPsl, storage_type fingerprint, const KeyType& key, bool earlyOut
 		) const noexcept;
 
 		enum struct [[rythe_closed_enum]] insert_result_type : uint8
@@ -223,6 +240,11 @@ namespace rsl
 		) noexcept(noexcept(reserve(0)));
 
 	private:
+	    template<typename KeyType>
+        constexpr const mapped_type* find_impl(const KeyType& key) const noexcept requires (MapInfo::is_map);
+	    template<typename KeyType>
+        constexpr void erase_impl(const KeyType& key) noexcept;
+
 		value_container m_values;
 		bucket_container m_buckets;
 

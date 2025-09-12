@@ -13,7 +13,7 @@ namespace rsl::filesystem
     {
     public:
         using difference_type = diff_type;
-        using value_type = const dynamic_string;
+        using value_type = const domain_string;
         using ref_type = value_type&;
         using ptr_type = value_type*;
 
@@ -27,8 +27,8 @@ namespace rsl::filesystem
         [[rythe_always_inline]] constexpr domain_iterator operator++(int) noexcept;
         [[rythe_always_inline]] constexpr domain_iterator& operator--() noexcept;
         [[rythe_always_inline]] constexpr domain_iterator operator--(int) noexcept;
-        constexpr const dynamic_string& operator*() const noexcept;
-        constexpr const dynamic_string* operator->() const noexcept;
+        constexpr const domain_string& operator*() const noexcept;
+        constexpr const domain_string* operator->() const noexcept;
 
     private:
         size_type m_index = 0ull;
@@ -49,7 +49,7 @@ namespace rsl::filesystem
 
         bool has_domain(string_view domain) const noexcept;
         array_view<const unique_object<filesystem_provider>> providers() const noexcept;
-        iterator_view<const dynamic_string, domain_iterator> domains() const noexcept;
+        iterator_view<const domain_string, domain_iterator> domains() const noexcept;
 
     protected:
         dynamic_map<string_view, dynamic_array<filesystem_provider*>> m_domainMap;

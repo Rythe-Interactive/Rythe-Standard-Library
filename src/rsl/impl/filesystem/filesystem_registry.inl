@@ -59,12 +59,12 @@ namespace rsl::filesystem
         return tmp;
     }
 
-    constexpr const dynamic_string& domain_iterator::operator*() const noexcept
+    constexpr const domain_string& domain_iterator::operator*() const noexcept
     {
         return m_provider->get()->get_domains()[m_index];
     }
 
-    constexpr const dynamic_string* domain_iterator::operator->() const noexcept
+    constexpr const domain_string* domain_iterator::operator->() const noexcept
     {
         return &operator*();
     }

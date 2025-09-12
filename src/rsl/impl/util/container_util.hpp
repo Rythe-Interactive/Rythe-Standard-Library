@@ -67,28 +67,6 @@ namespace rsl
     template <typename T>
     concept string_like = contiguous_container_like<T> && is_char_v<container_value_type<T>>;
 
-    template<typename StrType>
-    constexpr string_view view_from_stringish(StrType&& str) noexcept
-    {
-        if constexpr (is_same_v<StrType, string_view>)
-        {
-            return str;
-        }
-        else if constexpr (has_view_v<StrType, string_view()>)
-        {
-            return str.view();
-        }
-        else if constexpr (is_char_v<StrType>)
-        {
-            return string_view::from_value(str);
-        }
-        else
-        {
-            return string_view::from_string_length(str);
-        }
-    }
-
-
     template <has_begin<any_type()> Container>
     [[nodiscard]] constexpr auto begin(Container& container) noexcept(noexcept(container.begin())) -> decltype(container.begin())
     {
@@ -336,25 +314,5 @@ namespace rsl
     [[nodiscard]] constexpr const T* data(::std::initializer_list<T> initList) noexcept
     {
         return initList.begin();
-    }
-
-    template <has_view<any_type()> Container>
-    [[nodiscard]] constexpr auto view(Container&& container) noexcept -> decltype(container.view())
-    {
-        return container.view();
-    }
-
-    template <typename Container>
-        requires has_size<Container, size_type()> && has_data<Container, any_type()> && !has_view<Container, any_type()>
-    [[nodiscard]] constexpr auto view(Container&& container) noexcept
-    {
-        return array_view<container_value_type<Container>>::from_buffer(container.data(), container.size());
-    }
-
-    template <typename Container>
-        requires has_begin<Container, any_type()> && has_end<Container, any_type()> && !has_data<Container, any_type()>
-    [[nodiscard]] constexpr auto view(Container&& container) noexcept
-    {
-        return iterator_view<container_value_type<Container>, container_iter_type<Container>>(container.begin(), container.end());
     }
 } // namespace rsl

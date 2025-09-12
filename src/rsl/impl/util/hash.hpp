@@ -23,9 +23,15 @@ namespace rsl
 	[[rythe_always_inline]] constexpr id_type hash_bytes(byte_view bytes) noexcept;
 
 	template <hash_mode Mode>
-	[[rythe_always_inline]] constexpr id_type hash_string(rsl::string_view str) noexcept;
+	[[rythe_always_inline]] constexpr id_type hash_string(string_view str) noexcept;
 
-	[[rythe_always_inline]] constexpr id_type hash_string(rsl::string_view str) noexcept;
+    [[rythe_always_inline]] constexpr id_type hash_string(string_view str) noexcept;
+
+    template <hash_mode Mode, typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    [[rythe_always_inline]] constexpr id_type hash_array(array_view<const T, Iter, ConstIter> arr) noexcept;
+
+    template <typename T, contiguous_iterator Iter, contiguous_iterator ConstIter>
+    [[rythe_always_inline]] constexpr id_type hash_array(array_view<const T, Iter, ConstIter> arr) noexcept;
 
 	template <hash_mode Mode, same_as<id_type>... HashTypes>
 	[[rythe_always_inline]] constexpr id_type
@@ -50,12 +56,28 @@ namespace rsl
 		}
 	};
 
-    template <string_like StringType, hash_mode Mode>
-    struct hash_strategy<StringType, Mode>
+    template <container_like Container, hash_mode Mode>
+    struct hash_strategy<Container, Mode>
     {
-        [[rythe_always_inline]] constexpr static id_type hash(const StringType& val) noexcept
+        [[rythe_always_inline]] constexpr static id_type hash(const Container& val) noexcept
         {
-            return hash_string<Mode>(view_from_stringish(val));
+            if constexpr (string_like<Container>)
+            {
+                return hash_string<Mode>(view_from_stringish(val));
+            }
+            else if (contiguous_container_like<Container>)
+            {
+                return hash_array<Mode>(val);
+            }
+            else
+            {
+                id_type result = 0ull;
+                for (const auto& item : val)
+                {
+                    combine_hash(result, hash_strategy<container_value_type<Container>, Mode>::hash(item));
+                }
+                return result;
+            }
         }
     };
 

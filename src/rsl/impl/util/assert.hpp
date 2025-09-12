@@ -206,6 +206,7 @@ namespace rsl
 #define rsl_assert_invalid_access(expr) rsl_assert_msg_frequent(expr, "invalid access")
 #define rsl_assert_invalid_parameters(expr) rsl_assert_msg_rarely(expr, "invalid parameters")
 #define rsl_assert_invalid_operation(expr) rsl_assert_msg_rarely(expr, "invalid operation")
+#define rsl_assert_invalid_operation_frequent(expr) rsl_assert_msg_frequent(expr, "invalid operation")
 #define rsl_assert_invalid_object(expr) rsl_assert_msg_rarely(expr, "invalid object")
 #define rsl_assert_duplicate_object(expr) rsl_assert_msg_consistent(expr, "duplicate object")
 #define rsl_assert_borrow_release_mismatch(expr) rsl_assert_msg_consistent(expr, "borrow release mismatch")

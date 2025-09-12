@@ -41,6 +41,7 @@ namespace rsl::filesystem
     {
         return path.subview(0ull, reverse_linear_search(path, separator_char{}, path.size() - 2ull));
     }
+
     constexpr string_view filename(const string_view path) noexcept
     {
         return path.subview(reverse_linear_search(path, separator_char{}));
@@ -121,5 +122,61 @@ namespace rsl::filesystem
         }
 
         return filesystem + join_strings_with(recreation, separator());
+    }
+
+    constexpr dynamic_string localize(const string_view path)
+    {
+        dynamic_string result = dynamic_string::from_view(path);
+        localize(in_place_signal, result);
+        return result;
+    }
+
+    constexpr dynamic_string standardize(const string_view path)
+    {
+        dynamic_string result = dynamic_string::from_view(path);
+        standardize(in_place_signal, result);
+        return result;
+    }
+
+    template <string_like StringType>
+    constexpr void localize(in_place_signal_type, StringType& path)
+    {
+        linear_search_and_replace(path, anti_separator(), separator());
+    }
+
+    template <string_like StringType>
+    constexpr void standardize(in_place_signal_type, StringType& path)
+    {
+        linear_search_and_replace(path, '\\', '/');
+    }
+
+    constexpr string_view strip_domain(const string_view path) noexcept
+    {
+        const size_type idx = linear_search_sequence(path, "://"_sv, 0ull, 64ull);
+        if (idx == npos)
+        {
+            return path;
+        }
+
+        return path.subview(idx + 3ull);
+    }
+
+    constexpr dynamic_string replace_domain(const string_view path, const string_view replacement) noexcept
+    {
+        dynamic_string result = dynamic_string::from_view(path);
+        replace_domain(in_place_signal, result, replacement);
+        return result;
+    }
+
+    template <string_like StringType>
+    constexpr void replace_domain(in_place_signal_type, StringType& path, const string_view replacement) noexcept
+    {
+        const size_type idx = linear_search_sequence(path, "://"_sv, 0ull, 64ull);
+        if (idx == npos)
+        {
+            return;
+        }
+
+        path.replace(0ull, idx + 3ull, replacement);
     }
 }

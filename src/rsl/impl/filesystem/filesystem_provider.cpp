@@ -6,11 +6,11 @@ namespace rsl::filesystem
 {
     filesystem_provider& filesystem_provider::register_domain(const string_view domain) noexcept
     {
-        m_domains.push_back(dynamic_string::from_view(domain));
+        m_domains.push_back(domain_string::from_view(domain));
         return *this;
     }
 
-    array_view<const dynamic_string> filesystem_provider::get_domains() const noexcept
+    array_view<const domain_string> filesystem_provider::get_domains() const noexcept
     {
         return m_domains;
     }
@@ -37,7 +37,7 @@ namespace rsl::filesystem
         return { index, newValue };
     }
 
-    void filesystem_provider::destroy_solution_reference(const dynamic_string& path)
+    void filesystem_provider::destroy_solution_reference(const string_view path)
     {
         const index_type index = m_solutionMap.at(path);
         m_solutionReferences[index].release();
@@ -49,7 +49,7 @@ namespace rsl::filesystem
         }
     }
 
-    index_type filesystem_provider::find_existing_solution(const dynamic_string& path)
+    index_type filesystem_provider::find_existing_solution(const string_view path)
     {
         if (const index_type* result = m_solutionMap.find(path))
         {

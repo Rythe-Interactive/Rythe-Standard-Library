@@ -2,6 +2,7 @@
 
 #include "../platform/platform.hpp"
 
+#include "drive_filesystem_provider.hpp"
 #include "file_solution.hpp"
 #include "filesystem_error.hpp"
 #include "path_util.hpp"
@@ -21,9 +22,12 @@ namespace rsl::filesystem
 
             for (auto driveName : platform::enumerate_drives())
             {
+                hybrid_string<64> domain = hybrid_string<64>::from_view(driveName);
+                domain.append('/');
+                standardize( in_place_signal, domain);
+                registry.register_provider<drive_filesystem_provider>(driveName + '\\', domain);
             }
 
-            registry.register_provider()
             return registry;
         }
 
@@ -50,7 +54,7 @@ namespace rsl::filesystem
         const string_view domain = fs::domain(path);
 
         dynamic_array<filesystem_provider*>* providers = m_domainMap.find(domain);
-        if (!providers)
+        if (!providers) [[unlikely]]
         {
             return make_error(filesystem_error::domain_not_found);
         }
@@ -74,7 +78,7 @@ namespace rsl::filesystem
             {
                 if (auto result = provider->create_solution(path); result.is_okay())
                 {
-                    if (solution)
+                    if (solution) [[unlikely]]
                     {
                         solution->release();
                         result.value()->release();
@@ -108,8 +112,8 @@ namespace rsl::filesystem
         return m_providers;
     }
 
-    iterator_view<const dynamic_string, domain_iterator> filesystem_registry::domains() const noexcept
+    iterator_view<const domain_string, domain_iterator> filesystem_registry::domains() const noexcept
     {
-        return iterator_view<const dynamic_string, domain_iterator>(domain_iterator(m_providers.begin()), domain_iterator(m_providers.end()));
+        return iterator_view<const domain_string, domain_iterator>(domain_iterator(m_providers.begin()), domain_iterator(m_providers.end()));
     }
 }
